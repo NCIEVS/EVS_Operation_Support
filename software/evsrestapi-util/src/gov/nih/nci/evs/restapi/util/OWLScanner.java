@@ -1,4 +1,5 @@
 package gov.nih.nci.evs.restapi.util;
+import gov.nih.nci.evs.restapi.config.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import java.io.*;
 import java.io.BufferedReader;
@@ -3031,19 +3032,63 @@ C4910|<NHC0>C4910</NHC0>
 		ScannerUtils.dumpPropertyQualifier2CountMap(hmap);
 	}
 
+    public Vector extractEquivalenceClasses() {
+		String rdfs_label = "rdfs:label";
+        Vector w = new Vector();
+        boolean istart = false;
+        String label = null;
+        boolean isDefined = false;
+        String classId = null;
+
+        w = new Vector();
+        StringBuffer buf = null;
+
+        for (int i=0; i<owl_vec.size(); i++) {
+			String t = (String) owl_vec.elementAt(i);
+			t = t.trim();
+
+			if (t.indexOf("// Classes") != -1) {
+				istart = true;
+				isDefined = false;
+			}
+
+			if (istart) {
+				if (t.indexOf(NAMESPACE_TARGET) != -1 && t.endsWith("-->")) {
+					if (classId != null && isDefined) {
+						w.add(classId + "|" + label);
+					}
+					classId = extractClassId(t);
+					label = null;
+					isDefined = false;
+				}
+
+			    if (t.indexOf("<" + rdfs_label + ">") != -1) {
+					String retstr = parseProperty(t);
+					Vector u = split(retstr);
+					label = (String) u.elementAt(1);
+				}
+
+				if (t.startsWith("<owl:equivalentClass")) {
+                    isDefined = true;
+				}
+			}
+        }
+		if (classId != null && isDefined) {
+			w.add(classId + "|" + label);
+		}
+        return w;
+    }
+
 
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
-        String owlfile = args[0];
+        String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
+        String owlfile = ConfigurationController.owlfile;
+        owlfile = reportGenerationDirectory + File.separator + owlfile;
 		OWLScanner scanner = new OWLScanner(owlfile);
-		scanner.extractProperties(scanner.get_owl_vec());
-		HashMap hmap = scanner.getPropertyCode2CountMap();
-		scanner.dumpPropertyCode2CountMap(hmap);
-		//Vector roles = scanner.extractOWLRestrictions(scanner.get_owl_vec());
-		//Utils.saveToFile("roles.txt", roles);
-		//Vector associations = scanner.extractAssociations(scanner.get_owl_vec());
-		//Utils.saveToFile("associations.txt", associations);
-         System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		Vector w = scanner.extractEquivalenceClasses();
+		Utils.saveToFile("equivalence_classses.txt", w);
+        System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 }
