@@ -2977,7 +2977,6 @@ C4910|<NHC0>C4910</NHC0>
 
     public HashMap getPropertyCode2CountMap() {
 		HashMap hmap = new HashMap();
-		//Vector w = extractProperties(get_owl_vec());
 		Vector w = extractAllProperties(get_owl_vec());
 		for (int i=0; i<w.size(); i++) {
 			String line = (String) w.elementAt(i);
@@ -3079,6 +3078,20 @@ C4910|<NHC0>C4910</NHC0>
         return w;
     }
 
+    public HashSet createRetiredConceptSet() {
+        HashSet hset = new HashSet();
+		Vector v = extractProperties(get_owl_vec(), "P310");
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String status = (String) u.elementAt(2);
+			if (status.compareTo("Retired_Concept") == 0) {
+				String code = (String) u.elementAt(0);
+				hset.add(code);
+			}
+		}
+		return hset;
+    }
 
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
