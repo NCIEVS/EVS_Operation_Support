@@ -1,4 +1,5 @@
 package gov.nih.nci.evs.restapi.config;
+import gov.nih.nci.evs.restapi.util.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -100,6 +101,7 @@ public class ConfigurationController {
 	public final static String rolefile = properties.getProperty("rolefile");
 	public final static String serviceUrl = properties.getProperty("serviceUrl");
 	public final static String serviceUrls = properties.getProperty("serviceUrls");
+	public final static Vector serviceUrl_vec = StringUtils.parseData(serviceUrls, '|');
 	public final static String source_coding_scheme = properties.getProperty("source_coding_scheme");
 	public final static String source_coding_scheme_version = properties.getProperty("source_coding_scheme_version");
 	public final static String source_ns = properties.getProperty("source_ns");
@@ -112,7 +114,6 @@ public class ConfigurationController {
 	public final static String term_file_heading = properties.getProperty("term_file_heading");
 	public final static String termfiles = properties.getProperty("termfiles");
 	public final static String username = properties.getProperty("username");
-
 
 	/**
 	 * To be implemented by each descendant testcase.
