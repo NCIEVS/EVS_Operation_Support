@@ -367,6 +367,65 @@ public class AxiomParser {
 		return owlSPARQLUtils.get_axioms_by_code(named_graph, code);
 	}
 
+    public static Synonym line2Synonym(String line) {
+		line = line.trim();
+		if (line.length() == 0) return null;
+		Vector u = StringUtils.parseData(line, '|');
+		String code = (String) u.elementAt(1);
+		String label = (String) u.elementAt(0);
+		String termName = (String) u.elementAt(3);
+		String termGroup = null;
+		String termSource = null;
+		String sourceCode = null;
+		String subSourceName = null;
+		String subSourceCode = null;
+		for (int i=4; i<u.size(); i++) {
+			String t = (String) u.elementAt(i);
+			Vector u2 = StringUtils.parseData(t, '$');
+			String s1 = (String) u2.elementAt(0);
+			String s2 = (String) u2.elementAt(1);
+			if (s1.compareTo("P383") == 0) {
+				termGroup = s2;
+			} else if (s1.compareTo("P384") == 0) {
+				termSource = s2;
+			} else if (s1.compareTo("P385") == 0) {
+				sourceCode = s2;
+			} else if (s1.compareTo("P386") == 0) {
+				subSourceName = s2;
+			}
+		}
+        return new Synonym(
+			code,
+			label,
+			termName,
+			termGroup,
+			termSource,
+			sourceCode,
+			subSourceName,
+			subSourceCode);
+	}
+
+    public static HashMap loadSynonyms(String filename) {
+		HashMap hmap = new HashMap();
+		Vector v = Utils.readFile(filename);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String type = (String) u.elementAt(2);
+			if (type.compareTo("P90") == 0) {
+				Synonym syn = line2Synonym(line);
+				String code = syn.getCode();
+				Vector w = new Vector();
+				if (hmap.containsKey(code)) {
+					w = (Vector) hmap.get(code);
+				}
+				w.add(syn);
+				hmap.put(code, w);
+			}
+		}
+		return hmap;
+	}
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		String serviceUrl = args[0];
