@@ -655,12 +655,6 @@ public class CDISCReportGenerator {
 	}
 
 	public void run(String subsetcode) {
-		String serviceUrl = ConfigurationController.serviceUrl;
-		String namedGraph = ConfigurationController.namedGraph;
-		String username = ConfigurationController.username;
-		String password = ConfigurationController.password;
-        CDISCReportGenerator utils = new CDISCReportGenerator(serviceUrl, namedGraph, username, password);
-
         Vector w = new Vector();
 		String t = "0|1|2";
 		List a = delimStr2IntList(t);
@@ -671,7 +665,7 @@ public class CDISCReportGenerator {
 		//CDISC ADaM Analysis Stratum Terminology|C204411|Extensible_List|Yes|Concept_In_Subset|CDISC ADaM Terminology|C81222
         //String code = "C81222";
         boolean withExtensibleList = true;
-        Vector v = utils.getCdiscCodelists(namedGraph, subsetcode, withExtensibleList);
+        Vector v = getCdiscCodelists(named_graph, subsetcode, withExtensibleList);
 
         //Utils.dumpVector(subsetcode, v);
 
@@ -685,7 +679,7 @@ public class CDISCReportGenerator {
 
 			Vector u = StringUtils.parseData(line, '|');
 			String codelistcode = (String) u.elementAt(1);
-			Vector w1 = utils.getCdiscCodelists(namedGraph, codelistcode, withExtensibleList);
+			Vector w1 = getCdiscCodelists(named_graph, codelistcode, withExtensibleList);
 
 			t = "1|4|-1";
 			a = delimStr2IntList(t);
@@ -695,7 +689,6 @@ public class CDISCReportGenerator {
 				w.add(value.replace("|", "\t"));
 			}
 		}
-		//Utils.saveToFile("CDISC_" + code + ".txt", w);
 		Vector w1 = new Vector();
 		w1.add(HEADING);
 		for (int i=1; i<w.size(); i++) {
@@ -704,7 +697,7 @@ public class CDISCReportGenerator {
 			w1.add(line);
 		}
 
-		String label = utils.getLabel(namedGraph, subsetcode);
+		String label = getLabel(named_graph, subsetcode);
 		String outputfile = label + "_" + StringUtils.getToday() + ".txt";
 		outputfile = outputfile.replace(" ", "_");
 		Utils.saveToFile(outputfile, w1);
