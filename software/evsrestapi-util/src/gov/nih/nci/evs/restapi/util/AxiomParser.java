@@ -426,8 +426,73 @@ public class AxiomParser {
 		return hmap;
 	}
 
+	public static String getCode(Object obj){
+		if (obj instanceof Synonym) {
+			Synonym syn = (Synonym) obj;
+			return syn.getCode();
+		} else if (obj instanceof Definition) {
+			Definition def = (Definition) obj;
+			return def.getCode();
+		} else if (obj instanceof AltDefinition) {
+			AltDefinition def = (AltDefinition) obj;
+			return def.getCode();
+		} else if (obj instanceof GoAnnotation) {
+			GoAnnotation go = (GoAnnotation) obj;
+			return go.getCode();
+		} else if (obj instanceof GoAnnotation) {
+			MapToEntry e = (MapToEntry) obj;
+			return e.getCode();
+		}
+		return null;
+	}
+
+	public static HashMap loadAxioms(Vector v) {
+		HashMap hmap = new HashMap();
+		v = new SortUtils().quickSort(v);
+		Vector w = new Vector();
+		String id = "";
+		String curr_id = null;
+		int count = 0;
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			curr_id = (String) u.elementAt(0);
+			if (id.compareTo("") == 0) {
+				id = curr_id;
+				w.add(line);
+			} else {
+				if (curr_id.compareTo(id) == 0) {
+					w.add(line);
+				} else {
+					count++;
+					Object obj = axiomData2Object(w);
+					String code = getCode(obj);
+					List list = new ArrayList();
+					if (hmap.containsKey(code)) {
+						list = (List) hmap.get(code);
+					}
+					list.add(obj);
+					hmap.put(code, list);
+					w = new Vector();
+					id = curr_id;
+					w.add(line);
+				}
+			}
+		}
+		Object obj = axiomData2Object(w);
+		String code = getCode(obj);
+		List list = new ArrayList();
+		if (hmap.containsKey(code)) {
+			list = (List) hmap.get(code);
+		}
+		list.add(obj);
+		hmap.put(code, list);
+        return hmap;
+	}
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
+		/*
 		String serviceUrl = args[0];
 		String named_graph = args[1];
 		String username = args[2];
@@ -439,5 +504,22 @@ public class AxiomParser {
 			Object obj = w.elementAt(i);
 			printAxiomObject(obj);
 		}
+		*/
+        String filename = args[0];
+		HashMap hmap = loadAxioms(Utils.readFile(filename));
+		System.out.println(hmap.keySet().size());
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String code = (String) it.next();
+			List list = (List) hmap.get(code);
+			for (int i=0; i<list.size(); i++) {
+				Object obj = list.get(i);
+				if (obj instanceof Definition) {
+					Definition def = (Definition) obj;
+					System.out.println(def.toJson());
+				}
+			}
+		}
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
     }
 }
