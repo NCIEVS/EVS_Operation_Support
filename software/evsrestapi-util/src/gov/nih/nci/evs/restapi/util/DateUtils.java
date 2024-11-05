@@ -345,6 +345,31 @@ public class DateUtils {
 		return w;
 	}
 
+	public static int getWeekOfMonth() {
+		Calendar calendar = Calendar.getInstance(Locale.US);
+		LocalDate today = LocalDate.now();
+        int year = today.getYear();
+        int month = today.getMonthValue();
+        int day = today.getDayOfMonth();
+		calendar.set(year, month, day);
+		int weekOfMonth = calendar.get(Calendar.WEEK_OF_MONTH);
+		return weekOfMonth;
+	}
+
+    public static String getCurrNCItVersion() {
+		int currentYear = DateUtils.getCurrentYear();
+		int currentMonth = DateUtils.getCurrentMonth();
+		int weekOfMonth = getWeekOfMonth()-1;
+	    String version = DateUtils.getNCItVersion(currentYear, currentMonth, weekOfMonth);
+	    return version;
+	}
+
+	public static int getDayOfMonth() {
+		LocalDate currentDate = LocalDate.now();
+        int dayOfMonth = currentDate.getDayOfMonth();
+        return dayOfMonth;
+	}
+
 	public static void main(String[] args) throws Exception {
 		int currentYear = getCurrentYear();
 		int currentMonth = getCurrentMonth();
