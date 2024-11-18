@@ -115,6 +115,8 @@ public class ConfigurationController {
 	public final static String termfiles = properties.getProperty("termfiles");
 	public final static String username = properties.getProperty("username");
 	public final static String primitiveConceptRoots = properties.getProperty("primitiveConceptRoots");
+	public final static String branchfile = properties.getProperty("branchfile");
+	public final static String branchroots = properties.getProperty("branchroots");
 
 	/**
 	 * To be implemented by each descendant testcase.
