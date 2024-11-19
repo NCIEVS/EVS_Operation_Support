@@ -1,5 +1,6 @@
 package gov.nih.nci.evs.restapi.util;
 import gov.nih.nci.evs.restapi.config.*;
+
 import java.io.*;
 import java.text.*;
 import java.net.*;
@@ -68,7 +69,6 @@ public class ContainsSearchByTerm {
 	static HashMap sourcePTMap = null;
 	static HashMap sourceCode2NCItCodesMap = null;
 	static HashMap code2FULLSYNMap = null;
-	//static String SOURCE = ConfigurationController.source;
 
     static boolean caseSensitive = false;
     static HashSet retiredConcepts = new HashSet();
@@ -93,10 +93,6 @@ public class ContainsSearchByTerm {
 		} else {
 			System.out.println("INFO: " + AXIOM_FILE + " exists.");
 		}
-
-		//sparqlRunnerDirectory = ConfigurationController.sparqlRunnerDirectory;
-		//CONCEPT_STATUS_FILE = sparqlRunnerDirectory + File.separator + CONCEPT_STATUS_FILE;
-
 		retiredConcepts = createRetiredConceptSet();
 		System.out.println("retired concepts: " + retiredConcepts.size());
 		term2CodesMap = createterm2CodesMap();
@@ -156,8 +152,8 @@ public class ContainsSearchByTerm {
 
 			} else {
 
-				wd1 = Normalizer.stemTerm(wd1);
-				wd2 = Normalizer.stemTerm(wd2);
+				wd1 = gov.nih.nci.evs.restapi.util.Normalizer.stemTerm(wd1);
+				wd2 = gov.nih.nci.evs.restapi.util.Normalizer.stemTerm(wd2);
 				w = new Vector();
 				if (SYNONYM_MAP.containsKey(wd1)) {
 					w = (Vector) SYNONYM_MAP.get(wd1);
@@ -268,7 +264,6 @@ public class ContainsSearchByTerm {
 		return hmap;
 	}
 
-    //Recombinant Amphiregulin|C1000|P90|AR|P383$AB|P384$NCI
     public static HashMap createSourceSYMap(String source) {
 		HashMap hmap = new HashMap();
 		Vector v = Utils.readFile(AXIOM_FILE);
@@ -502,33 +497,6 @@ public class ContainsSearchByTerm {
 		return code_str + "\t" + pt_str + "\t" + syns_str;
 	}
 
-    public static Vector tokenize(String term) {
-		term = term.toLowerCase();
-		term = removeSpecialCharacters(term);
-		Vector words = new Vector();
-		StringTokenizer st = new StringTokenizer(term);
-		while (st.hasMoreTokens()) {
-		     words.add(st.nextToken());
-		}
-		return words;
-	}
-
-    public static String removeSpecialCharacters(String t) {
-		t = t.replace("(", " ");
-		t = t.replace(")", " ");
-		t = t.replace(",", " ");
-		t = t.replace(";", " ");
-		t = t.replace("'s", " ");
-		t = t.replace("-", " ");
-		t = t.replace("/", " ");
-		t = t.replace("+", " ");
-		t = t.replace("—", " ");
-		t = t.replace(".", " ");
-		//add &
-		t = t.replace("&", " ");
-		return t;
-	}
-
 	public static String run(String datafile, String outputfile) {
 		return run(datafile, outputfile, 0);
 	}
@@ -539,7 +507,7 @@ public class ContainsSearchByTerm {
 		Iterator it = term2CodesMap.keySet().iterator();
 		while (it.hasNext()) {
 			String term = (String) it.next();
-			Vector words = Normalizer.tokenize(term, applyStem);
+			Vector words = gov.nih.nci.evs.restapi.util.Normalizer.tokenize(term, applyStem);
 			boolean contains = true;
 			for (int i=0; i<tokens.size(); i++) {
 				String token = (String) tokens.elementAt(i);
@@ -558,7 +526,7 @@ public class ContainsSearchByTerm {
 	}
 
 	public static Vector containsSearch(String vbt, boolean applyStem) {
-		Vector tokens = Normalizer.tokenize(vbt, applyStem);
+		Vector tokens = gov.nih.nci.evs.restapi.util.Normalizer.tokenize(vbt, applyStem);
 		return containsSearch(tokens, applyStem);
 	}
 
@@ -570,7 +538,7 @@ public class ContainsSearchByTerm {
 		Iterator it = term2CodesMap.keySet().iterator();
 		while (it.hasNext()) {
 			String term = (String) it.next();
-			Vector words = Normalizer.tokenize(term, applyStem); //tokenize(term);
+			Vector words = gov.nih.nci.evs.restapi.util.Normalizer.tokenize(term, applyStem); //tokenize(term);
 			if (words.contains(vbt)) {
 			//if (term.indexOf(vbt) != -1) {
 				Vector v = (Vector) term2CodesMap.get(term);
@@ -627,6 +595,7 @@ public class ContainsSearchByTerm {
         matches.add(header + "\tMatched NCIt Code(s)\tNCI PT(s)\tNCI SY(s)");
 		for (int i=1; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
+			//System.out.println("(" + i + ") " + line);
 			line = line.trim();
 			line = line.replace("|", "\t");
 			if (line.length() > 0) {
@@ -637,7 +606,8 @@ public class ContainsSearchByTerm {
 					term = term_lc;
 				}
 				boolean matched = false;
-				Vector codes_0 = containsSearch(term);
+				Vector tokens = gov.nih.nci.evs.restapi.util.Normalizer.tokenize(term, false);
+				Vector codes_0 = containsSearch(tokens, false);
 				if (codes_0 != null && codes_0.size() > 0) {
 					Vector codes = new Vector();
 					for (int j=0; j<codes_0.size(); j++) {
@@ -700,13 +670,43 @@ public class ContainsSearchByTerm {
 		return def;
 	}
 
+	public static String encode(String t) {
+		t = t.replace("&apos;", "'");
+		t = t.replace("&lt;", "<");
+		t = t.replace("&gt;", ">");
+		t = t.replace("&quot;", "\"");
+		t = t.replace("&amp;", "&");
+        return t;
+	}
+
+	public static Vector encode(Vector v) {
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String t = (String) v.elementAt(i);
+			String t1 = encode(t);
+			if (t1.compareTo(t) != 0) {
+				System.out.println("\nReplace " + t);
+				System.out.println("by      "  + t1);
+			}
+			w.add(t1);
+		}
+		return w;
+	}
+
+	public static void encodeFile(String filename) {
+		Vector v = Utils.readFile(filename);
+		v = encode(v);
+		Utils.saveToFile(filename, v);
+	}
+
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
-		//String datafile = ConfigurationController.NCCN_datafile;
 		String datafile = args[0];
 		int n = datafile.lastIndexOf(".");
 		String outputfile = "contains_iter1_" + datafile.substring(0, n) + "_" + StringUtils.getToday() + ".txt";
-		String resultfile = ContainsSearchByTerm.run(datafile, outputfile, 1);
+		String resultfile = ContainsSearchByTerm.run(datafile, outputfile, 0);
+		encodeFile(resultfile);
+
 		//outputfile = "iter2_" + datafile;
 		//resultfile = ContainsSearchByTerm.run2(resultfile, outputfile);
 		//outputfile = "iter3_" + datafile;
@@ -716,6 +716,3 @@ public class ContainsSearchByTerm {
 
 }
 
-//AM no match??? C113265
-
-//BRD3-NUTM1	No match
