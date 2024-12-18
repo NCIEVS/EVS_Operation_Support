@@ -14,6 +14,14 @@ import java.net.URLEncoder;
 import java.util.*;
 import java.text.*;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.*;
+
 /**
  * <!-- LICENSE_TEXT_START -->
  * Copyright 2022 Guidehouse. This software was developed in conjunction
@@ -71,6 +79,15 @@ public class ExcelExporter {
 
 	}
 
+    public static Vector getSheetNames(String excelfile) {
+		try {
+			return ExcelReader.getSheetNames(excelfile);
+		} catch (Exception ex) {
+			//return -1;
+		}
+		return null;
+	}
+
     public static String run(String excelfile) {
         System.out.println("excelfile: " + excelfile);
         int n = excelfile.lastIndexOf(".");
@@ -81,9 +98,24 @@ public class ExcelExporter {
 	    return textfile;
     }
 
+    public static String run(String excelfile, int sheet_num) {
+        System.out.println("excelfile: " + excelfile);
+        Vector sheetNames = getSheetNames(excelfile);
+        int n = excelfile.lastIndexOf(".");
+        //String textfile = excelfile.substring(0, n) + "_" + sheet_num + ".txt";
+        //textfile = textfile.replace(" ", "_");
+        String sheetName = (String) sheetNames.elementAt(sheet_num);
+        String textfile = sheetName.replace(" ", "_") + ".txt";
+		Vector w = ExcelReader.toDelimited(excelfile, sheet_num, '\t');
+		Utils.saveToFile(textfile, w);
+	    return textfile;
+    }
+
 	public static void main(String[] args) {
         String excelfile = args[0];
-        String textfile = run(excelfile);
+        String sheetStr = args[1];
+        int sheet_num = Integer.parseInt(sheetStr);
+        String textfile = run(excelfile, sheet_num);
         System.out.println(textfile + " generated.");
 	}
 }
