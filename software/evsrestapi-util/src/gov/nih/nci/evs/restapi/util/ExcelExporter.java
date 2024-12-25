@@ -83,32 +83,68 @@ public class ExcelExporter {
 		try {
 			return ExcelReader.getSheetNames(excelfile);
 		} catch (Exception ex) {
-			//return -1;
+			ex.printStackTrace();
 		}
 		return null;
 	}
 
+	public static int getSheetNumber(String excelfile, String sheetName) {
+		Vector names = getSheetNames(excelfile);
+		for (int i=0; i<names.size(); i++) {
+			String nm = (String) names.elementAt(i);
+			if (nm.compareTo(sheetName) == 0) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	public static String getSheetName(String excelfile, int sheet_num) {
+		Vector names = getSheetNames(excelfile);
+        return (String) names.elementAt(sheet_num);
+	}
+
+    public static String export(String excelfile, String sheetName) throws IOException {
+        int sheetNum = getSheetNumber(excelfile, sheetName);
+        return export(excelfile, sheetNum);
+    }
+
+    public static String export(String excelfile, int sheetNum) throws IOException {
+		int n = excelfile.lastIndexOf(".");
+		String textfile = getSheetName(excelfile, sheetNum) + ".txt";
+		textfile = textfile.replace(" ", "_");
+
+        try {
+			XSSFWorkbook workbook = new XSSFWorkbook(new File(excelfile));
+			XSSFSheet sheet = workbook.getSheetAt(sheetNum); // Get the first sheet
+			FileWriter writer = new FileWriter(textfile);
+			for (Row row : sheet) {
+				for (Cell cell : row) {
+					String cellValue = cell.toString();
+					writer.write(cellValue + "\t"); // Use tab as delimiter
+				}
+				writer.write("\n");
+			}
+			writer.close();
+			workbook.close();
+			return textfile;
+    	} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+    }
+
     public static String run(String excelfile) {
-        System.out.println("excelfile: " + excelfile);
-        int n = excelfile.lastIndexOf(".");
-        String textfile = excelfile.substring(0, n) + ".txt";
-        int sheet_num = 0;
-		Vector w = ExcelReader.toDelimited(excelfile, sheet_num, '\t');
-		Utils.saveToFile(textfile, w);
-	    return textfile;
+		return run(excelfile, 0);
     }
 
     public static String run(String excelfile, int sheet_num) {
-        System.out.println("excelfile: " + excelfile);
-        Vector sheetNames = getSheetNames(excelfile);
-        int n = excelfile.lastIndexOf(".");
-        //String textfile = excelfile.substring(0, n) + "_" + sheet_num + ".txt";
-        //textfile = textfile.replace(" ", "_");
-        String sheetName = (String) sheetNames.elementAt(sheet_num);
-        String textfile = sheetName.replace(" ", "_") + ".txt";
-		Vector w = ExcelReader.toDelimited(excelfile, sheet_num, '\t');
-		Utils.saveToFile(textfile, w);
-	    return textfile;
+		try {
+			return export(excelfile, sheet_num);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
     }
 
 	public static void main(String[] args) {
