@@ -443,7 +443,6 @@ public class Utils {
     private static Vector handleFile(File file, Charset encoding) throws IOException {
         try (InputStream in = new FileInputStream(file);
             Reader reader = new InputStreamReader(in, encoding);
-             // buffer for efficiency
             Reader buffer = new BufferedReader(reader)) {
             return handleCharacters(buffer);
         }
