@@ -448,6 +448,13 @@ public class Utils {
         }
     }
 
+    private static String removeNewLineCharacters(String s) {
+		while (s.length() > 0 && s.endsWith("\n")) {
+			s = s.substring(0, s.length()-1);
+		}
+		return s;
+	}
+
     private static Vector handleCharacters(Reader reader)
             throws IOException {
 		Vector w = new Vector();
@@ -456,12 +463,17 @@ public class Utils {
         while ((r = reader.read()) != -1) {
             char ch = (char) r;
             if (ch == 10) {
+				s = s.trim();
 				w.add(s);
 				s = "";
 			} else {
 				s = s + ch;
 			}
         }
+        s = s.trim();
+        if (s.length() > 0) {
+			w.add(s);
+		}
         return w;
     }
 
