@@ -201,25 +201,6 @@ public class Utils {
 		 saveToFile(outputfile, v);
 	 }
 
-/*
-    public static void saveToFile(String outputfile, Vector v) {
-        try {
-            FileOutputStream output = new FileOutputStream(outputfile);
-            for (int i=0; i<v.size(); i++) {
-				String data = (String) v.elementAt(i);
-				if (i < v.size()) {
-					data = data + "\n";
-				}
-				byte[] array = data.getBytes();
-				output.write(array);
-			}
-            output.close();
-        } catch(Exception e) {
-            e.getStackTrace();
-        }
-    }
-*/
-
 	public static void saveToFile(PrintWriter pw, Vector v) {
 		if (v != null && v.size() > 0) {
 			for (int i=0; i<v.size(); i++) {
@@ -228,53 +209,6 @@ public class Utils {
 			}
 		}
 	}
-
-/*
-	public static Vector readFile(String datafile) {
-		Vector v = new Vector();
-        try {
-			File file = new File(datafile);
-			FileInputStream fis = new FileInputStream(file);
-			BufferedInputStream bis = new BufferedInputStream(fis);
-			BufferedReader br = null;
-			try {
-				br = br = new BufferedReader(new InputStreamReader(bis));
-			} catch (Exception ex) {
-				return null;
-			}
-
-            while (true) {
-                String line = br.readLine();
-				if (line == null) {
-					break;
-				}
-				v.add(line);
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return v;
-	}
-
-
-	public static Vector readFile(String filename)
-	{
-		Vector v = new Vector();
-		try {
-			BufferedReader in = new BufferedReader(
-			   new InputStreamReader(
-						  new FileInputStream(filename), "UTF8"));
-			String str;
-			while ((str = in.readLine()) != null) {
-				v.add(str);
-			}
-            in.close();
-		} catch (Exception ex) {
-            ex.printStackTrace();
-		}
-		return v;
-	}
-	*/
 
     public static Vector parseData(String line, char delimiter) {
 		if(line == null) return null;
@@ -495,41 +429,64 @@ public class Utils {
         }
     }
 
-
     public static Vector readFile(String filename) {
-		Vector w = new Vector();
-		try (FileInputStream fis = new FileInputStream(filename);
-			InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-			BufferedReader reader = new BufferedReader(isr)) {
-			String str;
-			while ((str = reader.readLine()) != null) {
-				w.add(str);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
+        Charset encoding = Charset.defaultCharset();
+		File file = new File(filename);
+		try {
+			return handleFile(file, encoding);
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
-		return w;
-	}
+		return null;
+    }
 
-    public static void saveToFile(String fileName, Vector lines) {
-        java.nio.file.Path path = java.nio.file.Paths.get(fileName);
-        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-            for (int i=0; i<lines.size(); i++) {
-				String line = (String) lines.elementAt(i);
-                writer.append(line);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    private static Vector handleFile(File file, Charset encoding) throws IOException {
+        try (InputStream in = new FileInputStream(file);
+            Reader reader = new InputStreamReader(in, encoding);
+             // buffer for efficiency
+            Reader buffer = new BufferedReader(reader)) {
+            return handleCharacters(buffer);
         }
+    }
+
+    private static Vector handleCharacters(Reader reader)
+            throws IOException {
+		Vector w = new Vector();
+        int r;
+        String s = "";
+        while ((r = reader.read()) != -1) {
+            char ch = (char) r;
+            if (ch == 10) {
+				w.add(s);
+				s = "";
+			} else {
+				s = s + ch;
+			}
+        }
+        return w;
+    }
+
+    public static void saveToFile(String target_file, Vector w) {
+	    OutputStream outStream = null;
+    	try{
+    	    File bfile =new File(target_file);
+    	    outStream = new FileOutputStream(bfile);
+    	    for (int i=0; i<w.size(); i++) {
+				String line = (String) w.elementAt(i) + "\n";
+				byte[] buffer = line.getBytes();
+    	    	outStream.write(buffer, 0, buffer.length);
+    	    }
+    	    outStream.close();
+    	    System.out.println("File " + target_file + " generated.");
+    	}catch(IOException e){
+    		e.printStackTrace();
+    	}
     }
 
     public static void copyFile(String filename) {
 		Vector v = readFile(filename);
 		saveToFile("copy_" + filename, v);
 	}
-
 
 	public static Table constructTable(String label, Vector heading_vec, Vector data_vec) {
         return Table.construct_table(label, heading_vec, data_vec);
