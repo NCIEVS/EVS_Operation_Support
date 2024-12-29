@@ -503,4 +503,74 @@ public class Utils {
         return Table.construct_table(label, heading_vec, data_vec);
 	}
 
+	////////////////////////////////////////////////////////////////////////
+	public static HashSet extractColumnData(String filename, int col, char delim) {
+		Vector v = Utils.readFile(filename);
+		HashSet hset = new HashSet();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			String value = (String) u.elementAt(col);
+			if (!hset.contains(value)) {
+				hset.add(value);
+			}
+		}
+		return hset;
+	}
+
+	public static String extractRowData(String line, Vector<Integer> col_vec, char delim) {
+		Vector u = StringUtils.parseData(line, delim);
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<col_vec.size(); i++) {
+			Integer int_obj = col_vec.elementAt(i);
+			int k = Integer.parseInt(int_obj.toString());
+			buf.append((String) u.elementAt(k)).append(delim);
+		}
+		String s = buf.toString();
+		if (col_vec.size() > 0) {
+			s = s.substring(0, s.length()-1);
+		}
+		return s;
+	}
+
+	public static void dumpHeading(String filename) {
+		char delim = '\t';
+		dumpHeading(filename, delim);
+	}
+
+	public static void dumpHeading(String filename, char delim) {
+		Vector v = Utils.readFile(filename);
+        String line = (String) v.elementAt(0);
+        Vector u = StringUtils.parseData(line, delim);
+        Utils.dumpVector(line, u);
+	}
+
+	public static Vector extractColumnData(String filename, Vector<Integer> col_vec, char delim) {
+		Vector v = Utils.readFile(filename);
+        Vector w = new Vector();
+        String heading = extractRowData((String) v.elementAt(0), col_vec, delim);
+        w.add(heading);
+		for (int i=1; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.trim();
+			if (line.length() > 0) {
+				line = extractRowData((String) v.elementAt(i), col_vec, delim);
+				w.add(line);
+			}
+		}
+		return w;
+	}
+
+	public static Vector extractColumnData(String filename, String delimitedString, char delim) {
+		Vector<Integer> col_vec = new Vector();
+		Vector u = StringUtils.parseData(delimitedString, '|');
+		for (int i=0; i<u.size(); i++) {
+			String int_str = (String) u.elementAt(i);
+			int k = Integer.parseInt(int_str);
+			Integer int_obj = Integer.valueOf(k);
+			col_vec.add(int_obj);
+		}
+		return extractColumnData(filename, col_vec, delim);
+	}
+
 }
