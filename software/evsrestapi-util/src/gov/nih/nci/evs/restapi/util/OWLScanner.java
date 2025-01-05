@@ -2549,7 +2549,7 @@ C4910|<NHC0>C4910</NHC0>
 
 	public String extractVersion(Vector owl_vec) {
 		String version = null;
-		String tag = "<owl:versionInfo>";
+		String tag = "owl:versionInfo";
 		for (int i=0; i<owl_vec.size(); i++) {
 			String line = (String) owl_vec.elementAt(i);
 			version = extractTagValue(line, tag);
@@ -2568,7 +2568,7 @@ C4910|<NHC0>C4910</NHC0>
 		t = t.substring(n+tag.length(), t.length());
 		n = t.indexOf("<");
 		if (n == -1) return null;
-		t = t.substring(0, n);
+		t = t.substring(1, n);
 		t = t.trim();
 		return t;
 	}
