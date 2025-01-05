@@ -3093,6 +3093,82 @@ C4910|<NHC0>C4910</NHC0>
 		return hset;
     }
 
+	public String getMatchedTagValue(String line, List codeList) {
+		line = line.trim();
+		for (int i=0; i<codeList.size(); i++) {
+			String value = (String) codeList.get(i);
+			if (line.startsWith("<" + value + ">")) {
+				return value;
+			}
+		}
+		return null;
+	}
+
+	public Vector extractPropertyValues(List codeList) {
+		boolean istart = false;
+		Vector w = new Vector();
+		StringBuffer header_buf = new StringBuffer();
+		header_buf.append("Code|");
+		for (int k=0; k<codeList.size(); k++) {
+			String propCode = (String) codeList.get(k);
+			header_buf.append(propCode).append("|");
+		}
+		String s = header_buf.toString();
+		s = s.substring(0, s.length()-1);
+		w.add(s);
+
+		String classId = null;
+		HashMap key2ValueMap = new HashMap();
+		HashMap hmap = new HashMap();
+		for (int i=0; i<owl_vec.size(); i++) {
+			String t = (String) owl_vec.elementAt(i);
+			if (t.indexOf("// Classes") != -1) {
+				istart = true;
+			}
+			if (istart) {
+				if (t.indexOf(NAMESPACE_TARGET) != -1 && t.endsWith("-->")) {
+					int n = t.lastIndexOf("#");
+					t = t.substring(n, t.length());
+					n = t.lastIndexOf(" ");
+
+					if (classId != null) {
+						key2ValueMap.put(classId, hmap);
+						hmap = new HashMap();
+					}
+					classId = t.substring(1, n);
+				}
+				////////////////////////////////////////////////
+				s = t.trim();
+				String prop_code = getMatchedTagValue(t, codeList);
+				if (prop_code != null) {
+					String value = extractTagValue(s, prop_code);
+					hmap.put(prop_code, value);
+				}
+			}
+		}
+		if (classId != null) {
+			key2ValueMap.put(classId, hmap);
+		}
+
+		// sort data
+		Iterator it = key2ValueMap.keySet().iterator();
+		while (it.hasNext()) {
+			classId = (String) it.next();
+			hmap = (HashMap) key2ValueMap.get(classId);
+			StringBuffer buf = new StringBuffer();
+			buf.append(classId).append("|");
+			for (int k=0; k<codeList.size(); k++) {
+				String propCode = (String) codeList.get(k);
+				String propValue = (String) hmap.get(propCode);
+				buf.append(propValue).append("|");
+			}
+			s = buf.toString();
+			s = s.substring(0, s.length()-1);
+			w.add(s);
+		}
+		return w;
+	}
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
         String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
