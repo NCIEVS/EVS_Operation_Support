@@ -6,6 +6,10 @@ import java.text.*;
 import java.util.*;
 import org.apache.commons.lang.StringEscapeUtils;
 
+import java.nio.file.*;
+import java.nio.charset.Charset;
+import org.apache.commons.text.*;
+
 /**
  * <!-- LICENSE_TEXT_START -->
  * Copyright 2022 Guidehouse. This software was developed in conjunction
@@ -826,4 +830,8 @@ public class StringUtils {
 		 return hset;
 	 }
 
+	public static String decodeHtml(String encoded) {
+		String decoded = org.apache.commons.text.StringEscapeUtils.unescapeHtml4(encoded);
+		return decoded;
+	}
 }
