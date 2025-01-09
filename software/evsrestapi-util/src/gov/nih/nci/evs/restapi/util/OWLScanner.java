@@ -3176,6 +3176,46 @@ C4910|<NHC0>C4910</NHC0>
 		return extractAllProperties(class_vec);
 	}
 
+	public HashMap getPropertyMap() {
+		return getPropertyMap(get_owl_vec());
+	}
+
+	public HashMap getPropertyMap(Vector owl_vec) {
+		Vector v = extractAllProperties(owl_vec);
+        HashMap hmap = new HashMap();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(0);
+			String prop_label = (String) u.elementAt(1);
+			String value = (String) u.elementAt(2);
+			HashMap map = new HashMap();
+			if (hmap.containsKey(prop_label)) {
+				map = (HashMap) hmap.get(prop_label);
+			}
+			Vector w = new Vector();
+			if (prop_label.startsWith("P")) {
+				if (map.containsKey(code)) {
+					w = (Vector) map.get(code);
+				}
+				if (!w.contains(value)) {
+					w.add(value);
+				}
+				map.put(code, w);
+			} else if (prop_label.startsWith("A")) {
+				if (map.containsKey(value)) {
+					w = (Vector) map.get(value);
+				}
+				if (!w.contains(code)) {
+					w.add(code);
+				}
+				map.put(value, w);
+			}
+			hmap.put(prop_label, map);
+		}
+		return hmap;
+	}
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
         String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
