@@ -1248,6 +1248,17 @@ C4910|<NHC0>C4910</NHC0>
 		return hashSet2Vector(parent_codes);
 	}
 
+	public Vector getSupportedProperties() {
+		Vector w = extractAnnotationProperties(this.owl_vec);
+		Vector properties = new Vector();
+		for (int i=0; i<w.size(); i++) {
+			String line = (String) w.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			properties.add((String) u.elementAt(1) + "|" + (String) u.elementAt(0));
+		}
+		return properties;
+	}
+
     public Vector extractAnnotationProperties(Vector owl_vec) {
         Vector w = new Vector();
         boolean istart = false;
@@ -1509,27 +1520,7 @@ C4910|<NHC0>C4910</NHC0>
     public Vector extractSuperclasses() {
 		return extractSuperclasses(owl_vec);
 	}
-/*
-    public Vector extractHierarchicalRelationships0() {
-		Vector w = extractHierarchicalRelationships0(this.owl_vec);
-		return new SortUtils().quickSort(w);
-	}
 
-    public Vector extractHierarchicalRelationships0(Vector owl_vec) {
-		Vector v = extractSuperclasses(owl_vec);
-		Vector w = new Vector();
-		for (int i=0; i<v.size(); i++) {
-			String t = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(t, '|');
-			String code_1 = (String) u.elementAt(0);
-			String code_2 = (String) u.elementAt(1);
-			String label_1 = getLabel(code_1);
-			String label_2 = getLabel(code_2);
-			w.add(label_2 + "|" + code_2 + "|" + label_1 + "|" + code_1);
-		}
-		return new SortUtils().quickSort(w);
-	}
-*/
     public Vector extractAllDisjointClasses(Vector class_vec) {
         Vector w = new Vector();
         boolean istart = false;
@@ -1743,6 +1734,7 @@ C4910|<NHC0>C4910</NHC0>
 		return hmap;
 	}
 
+/*
     public Vector extract_properties(Vector class_vec) {
         int m = 0;
         Vector w = new Vector();
@@ -1794,6 +1786,7 @@ C4910|<NHC0>C4910</NHC0>
 		}
 		return w;
 	}
+*/
 
     public String get_owl_class_hashcode(Vector v) {
 		String classId = null;
@@ -2782,6 +2775,16 @@ C4910|<NHC0>C4910</NHC0>
 				}
 			}
         }
+
+		if (buf != null){
+			String str = buf.toString();
+			Vector u = split(str);
+			if (u.size() > 1) {
+				if (!w.contains(str)) {
+					w.add(str);
+				}
+			}
+		}
         return w;
     }
 
@@ -3167,6 +3170,10 @@ C4910|<NHC0>C4910</NHC0>
 			w.add(s);
 		}
 		return w;
+	}
+
+	public Vector extract_properties(Vector class_vec) {
+		return extractAllProperties(class_vec);
 	}
 
     public static void main(String[] args) {
