@@ -854,6 +854,63 @@ bnode_21e4bb1f_2fc9_480b_bbdb_0d116398d610_891449|Thyroid Gland Carcinoma|C4815|
 		return w2;
 	}
 
+    public static MapToEntry axiom2MapToEntry(String line) {
+		Vector u = StringUtils.parseData(line, '|');
+		String prop_code = (String) u.elementAt(2);
+		if (prop_code.compareTo("P375") != 0) return null;
+
+		String code = (String) u.elementAt(1);
+		String preferredName = (String) u.elementAt(0);
+		String relationshipToTarget = null;
+		String targetCode = null;
+		String targetTerm = null;
+		String targetTermType = null;
+		String targetTerminology = null;
+		String targetTerminologyVersion = null;
+
+		if (u.size() > 3) {
+			for (int j=4; j<u.size(); j++) {
+				String t = (String) u.elementAt(j);
+				Vector u2 = StringUtils.parseData(t, '$');
+				String qual_code = (String) u2.elementAt(0);
+				String qual_value = (String) u2.elementAt(1);
+				if (qual_code.compareTo("P393") == 0) {
+					relationshipToTarget = qual_value;
+				} else if (qual_code.compareTo("P394") == 0) {
+					targetTermType = qual_value;
+				} else if (qual_code.compareTo("P395") == 0) {
+					targetCode = qual_value;
+				} else if (qual_code.compareTo("P396") == 0) {
+					targetTerminology = qual_value;
+				} else if (qual_code.compareTo("P397") == 0) {
+					targetTerminologyVersion = qual_value;
+				}
+			}
+		}
+
+        return new MapToEntry(code,
+        			preferredName,
+        			relationshipToTarget,
+        			targetCode,
+        			targetTerm,
+        			targetTermType,
+        			targetTerminology,
+        			targetTerminologyVersion);
+	}
+
+
+	public static Vector loadMapsToEntries(String AXIOM_FILE) {
+		Vector w = new Vector();
+		Vector v = Utils.readFile(AXIOM_FILE);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			MapToEntry entry = axiom2MapToEntry(line);
+			if (entry != null) {
+				w.add(entry);
+			}
+		}
+		return w;
+	}
 
 	public static void main(String[] args) {
 		String filename = args[0];

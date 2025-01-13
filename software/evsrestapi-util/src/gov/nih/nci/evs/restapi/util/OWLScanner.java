@@ -3216,6 +3216,31 @@ C4910|<NHC0>C4910</NHC0>
 		return hmap;
 	}
 
+    public HashMap createQualifierCode2PropertyCodeHashMap(Vector v) {
+		HashMap hmap = new HashMap();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String prop_code = (String) u.elementAt(2);
+			if (u.size() > 3) {
+				for (int j=4; j<u.size(); j++) {
+					String t = (String) u.elementAt(j);
+					Vector u2 = StringUtils.parseData(t, '$');
+					String qual_code = (String) u2.elementAt(0);
+					Vector w = new Vector();
+					if (hmap.containsKey(qual_code)) {
+						w = (Vector) hmap.get(qual_code);
+					}
+					if (!w.contains(prop_code)) {
+						w.add(prop_code);
+					}
+					hmap.put(qual_code, w);
+				}
+		    }
+		}
+		return hmap;
+	}
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
         String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
