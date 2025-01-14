@@ -858,12 +858,12 @@ bnode_21e4bb1f_2fc9_480b_bbdb_0d116398d610_891449|Thyroid Gland Carcinoma|C4815|
 		Vector u = StringUtils.parseData(line, '|');
 		String prop_code = (String) u.elementAt(2);
 		if (prop_code.compareTo("P375") != 0) return null;
-
+        String preferredName = (String) u.elementAt(0);
 		String code = (String) u.elementAt(1);
-		String preferredName = (String) u.elementAt(0);
-		String relationshipToTarget = null;
+		String targetTerm = (String) u.elementAt(3);
 		String targetCode = null;
-		String targetTerm = null;
+
+		String relationshipToTarget = null;
 		String targetTermType = null;
 		String targetTerminology = null;
 		String targetTerminologyVersion = null;
@@ -898,10 +898,9 @@ bnode_21e4bb1f_2fc9_480b_bbdb_0d116398d610_891449|Thyroid Gland Carcinoma|C4815|
         			targetTerminologyVersion);
 	}
 
-
-	public static Vector loadMapsToEntries(String AXIOM_FILE) {
+	public static Vector loadMapsToEntries(String axiomfile) {
 		Vector w = new Vector();
-		Vector v = Utils.readFile(AXIOM_FILE);
+		Vector v = Utils.readFile(axiomfile);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			MapToEntry entry = axiom2MapToEntry(line);
@@ -910,6 +909,35 @@ bnode_21e4bb1f_2fc9_480b_bbdb_0d116398d610_891449|Thyroid Gland Carcinoma|C4815|
 			}
 		}
 		return w;
+	}
+
+
+	public Vector getMapsToData(Vector mapsToEntries, String terminology_name, String terminology_version) {
+		Vector v = new Vector();
+		HashSet hset = new HashSet();
+
+		for (int i=0; i<mapsToEntries.size(); i++) {
+			MapToEntry entry = (MapToEntry) mapsToEntries.elementAt(i);
+			if ((entry.getTargetTerminology() != null && entry.getTargetTerminology().compareTo(terminology_name) == 0) &&
+		        (entry.getTargetTerminologyVersion() != null && entry.getTargetTerminologyVersion().compareTo(terminology_version) == 0)) {
+				String line = entry.getCode()
+				      + "|" + entry.getPreferredName()
+				      + "|" + entry.getRelationshipToTarget()
+				      + "|" + entry.getTargetCode()
+				      + "|" + entry.getTargetTerm()
+				      + "|" + entry.getTargetTermType()
+				      + "|" + entry.getTargetTerminology()
+				      + "|" + entry.getTargetTerminologyVersion();
+				if (!hset.contains(line)) {
+					v.add(line);
+					hset.add(line);
+				} else {
+					System.out.println("WARNING: dupicated entry " + line);
+				}
+			}
+		}
+
+		return v;
 	}
 
 	public static void main(String[] args) {
