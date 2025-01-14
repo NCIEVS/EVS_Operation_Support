@@ -3241,6 +3241,24 @@ C4910|<NHC0>C4910</NHC0>
 		return hmap;
 	}
 
+    public HashSet getRetiredConcepts() {
+		HashSet retired_concepts = new HashSet();
+        Vector w = extractPropertyData("P310");
+        String property_value = "Retired_Concept";
+        Vector u = new Vector();
+        String line = null;
+		for (int i=0; i<w.size(); i++) {
+			line = (String) w.elementAt(i);
+			u = StringUtils.parseData(line, '|');
+			String status = (String) u.elementAt(u.size()-1);
+			if (status.compareTo(property_value) == 0) {
+				String code = (String) u.elementAt(0);
+				retired_concepts.add(code);
+			}
+		}
+		return retired_concepts;
+	}
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
         String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
