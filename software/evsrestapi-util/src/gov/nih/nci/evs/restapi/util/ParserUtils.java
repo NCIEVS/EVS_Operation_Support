@@ -898,19 +898,173 @@ bnode_21e4bb1f_2fc9_480b_bbdb_0d116398d610_891449|Thyroid Gland Carcinoma|C4815|
         			targetTerminologyVersion);
 	}
 
-	public static Vector loadMapsToEntries(String axiomfile) {
-		Vector w = new Vector();
-		Vector v = Utils.readFile(axiomfile);
-		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			MapToEntry entry = axiom2MapToEntry(line);
-			if (entry != null) {
-				w.add(entry);
+    public static AltDefinition axiom2AltDefinition(String line) {
+		Vector u = StringUtils.parseData(line, '|');
+		String prop_code = (String) u.elementAt(2);
+		if (prop_code.compareTo("P325") != 0) return null;
+        String label = (String) u.elementAt(0);
+		String code = (String) u.elementAt(1);
+		String description = (String) u.elementAt(3);
+
+		String attribution = null;
+		String source = null;
+
+		if (u.size() > 3) {
+			for (int j=4; j<u.size(); j++) {
+				String t = (String) u.elementAt(j);
+				Vector u2 = StringUtils.parseData(t, '$');
+				String qual_code = (String) u2.elementAt(0);
+				String qual_value = (String) u2.elementAt(1);
+				if (qual_code.compareTo("P381") == 0) {
+					attribution = qual_value;
+				} else if (qual_code.compareTo("P378") == 0) {
+					source = qual_value;
+				}
 			}
 		}
-		return w;
+
+		return new AltDefinition(
+			code,
+			label,
+			description,
+			attribution,
+			source);
 	}
 
+    public static Definition axiom2Definition(String line) {
+		Vector u = StringUtils.parseData(line, '|');
+		String prop_code = (String) u.elementAt(2);
+		if (prop_code.compareTo("P97") != 0) return null;
+        String label = (String) u.elementAt(0);
+		String code = (String) u.elementAt(1);
+		String description = (String) u.elementAt(3);
+
+		String attribution = null;
+		String source = null;
+
+		if (u.size() > 3) {
+			for (int j=4; j<u.size(); j++) {
+				String t = (String) u.elementAt(j);
+				Vector u2 = StringUtils.parseData(t, '$');
+				String qual_code = (String) u2.elementAt(0);
+				String qual_value = (String) u2.elementAt(1);
+				if (qual_code.compareTo("P381") == 0) {
+					attribution = qual_value;
+				} else if (qual_code.compareTo("P378") == 0) {
+					source = qual_value;
+				}
+			}
+		}
+
+		return new Definition(
+			code,
+			label,
+			description,
+			attribution,
+			source);
+	}
+
+    public static GoAnnotation axiom2GoAnnotation(String line) {
+		Vector u = StringUtils.parseData(line, '|');
+		String prop_code = (String) u.elementAt(2);
+		if (prop_code.compareTo("P211") != 0) return null;
+        String label = (String) u.elementAt(0);
+		String code = (String) u.elementAt(1);
+		String annotation = (String) u.elementAt(3);
+
+		String goEvi = null;
+		String goId = null;
+		String goSource = null;
+		String sourceDate = null;
+
+		if (u.size() > 3) {
+			for (int j=4; j<u.size(); j++) {
+				String t = (String) u.elementAt(j);
+				Vector u2 = StringUtils.parseData(t, '$');
+				String qual_code = (String) u2.elementAt(0);
+				String qual_value = (String) u2.elementAt(1);
+				if (qual_code.compareTo("P389") == 0) {
+					goEvi = qual_value;
+				} else if (qual_code.compareTo("P387") == 0) {
+					goId = qual_value;
+				} else if (qual_code.compareTo("P390") == 0) {
+					goSource = qual_value;
+				} else if (qual_code.compareTo("P391") == 0) {
+					sourceDate = qual_value;
+				}
+			}
+		}
+
+		return new GoAnnotation(
+	        code,
+	        label,
+	        annotation,
+	        goEvi,
+	        goId,
+	        goSource,
+	        sourceDate);
+	}
+
+    public static Synonym axiom2Synonym(String line) {
+		Vector u = StringUtils.parseData(line, '|');
+		String prop_code = (String) u.elementAt(2);
+		if (prop_code.compareTo("P90") != 0) return null;
+        String label = (String) u.elementAt(0);
+		String code = (String) u.elementAt(1);
+		String termName = (String) u.elementAt(3);
+
+		String termGroup = null;
+		String termSource = null;
+		String sourceCode = null;
+		String subSourceName = null;
+		String subSourceCode = null;
+
+		if (u.size() > 3) {
+			for (int j=4; j<u.size(); j++) {
+				String t = (String) u.elementAt(j);
+				Vector u2 = StringUtils.parseData(t, '$');
+				String qual_code = (String) u2.elementAt(0);
+				String qual_value = (String) u2.elementAt(1);
+				if (qual_code.compareTo("P385") == 0) {
+					sourceCode = qual_value;
+				} else if (qual_code.compareTo("P386") == 0) {
+					subSourceName = qual_value;
+				} else if (qual_code.compareTo("P384") == 0) {
+					termSource = qual_value;
+				} else if (qual_code.compareTo("P383") == 0) {
+					termGroup = qual_value;
+				}
+			}
+		}
+
+		return new Synonym(
+	        code,
+	        label,
+	        termName,
+	        termGroup,
+	        termSource,
+	        sourceCode,
+	        subSourceName,
+	        subSourceCode
+	        );
+	}
+
+	public static Object axiom2Object(String line) {
+		Vector u = StringUtils.parseData(line, '|');
+		String prop_code = (String) u.elementAt(2);
+		if (prop_code.compareTo("P211") == 0) {
+			return (axiom2GoAnnotation(line));
+		} else if (prop_code.compareTo("P375") == 0) {
+			return (axiom2MapToEntry(line));
+		} else if (prop_code.compareTo("P90") == 0) {
+			return (axiom2Synonym(line));
+		} else if (prop_code.compareTo("P325") == 0) {
+			return (axiom2AltDefinition(line));
+		} else if (prop_code.compareTo("P97") == 0) {
+			return (axiom2Definition(line));
+		}
+		return null;
+	}
 
 	public Vector getMapsToData(Vector mapsToEntries, String terminology_name, String terminology_version) {
 		Vector v = new Vector();
@@ -938,6 +1092,71 @@ bnode_21e4bb1f_2fc9_480b_bbdb_0d116398d610_891449|Thyroid Gland Carcinoma|C4815|
 		}
 
 		return v;
+	}
+
+	public static Vector loadMapsToEntries(String axiomfile) {
+		Vector w = new Vector();
+		Vector v = Utils.readFile(axiomfile);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			MapToEntry entry = axiom2MapToEntry(line);
+			if (entry != null) {
+				w.add(entry);
+			}
+		}
+		return w;
+	}
+
+	public static Vector loadSynonyms(String axiomfile) {
+		Vector w = new Vector();
+		Vector v = Utils.readFile(axiomfile);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Synonym syn = axiom2Synonym(line);
+			if (syn != null) {
+				w.add(syn);
+			}
+		}
+		return w;
+	}
+
+	public static Vector loadDefinitions(String axiomfile) {
+		Vector w = new Vector();
+		Vector v = Utils.readFile(axiomfile);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Definition def = axiom2Definition(line);
+			if (def != null) {
+				w.add(def);
+			}
+		}
+		return w;
+	}
+
+	public static Vector loadAltDefinitions(String axiomfile) {
+		Vector w = new Vector();
+		Vector v = Utils.readFile(axiomfile);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			AltDefinition def = axiom2AltDefinition(line);
+			if (def != null) {
+				w.add(def);
+			}
+		}
+		return w;
+	}
+
+	public static Vector loadGoAnnotations(String axiomfile) {
+		Vector w = new Vector();
+		Vector v = Utils.readFile(axiomfile);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			GoAnnotation go = axiom2GoAnnotation(line);
+			if (go != null) {
+				w.add(go);
+			}
+		}
+		return w;
 	}
 
 	public static void main(String[] args) {
