@@ -230,23 +230,6 @@ public class OWLScanner {
 		pw.println("\n");
 	}
 
-    public static Vector parseData(String line, char delimiter) {
-		if(line == null) return null;
-		Vector w = new Vector();
-		StringBuffer buf = new StringBuffer();
-		for (int i=0; i<line.length(); i++) {
-			char c = line.charAt(i);
-			if (c == delimiter) {
-				w.add(buf.toString());
-				buf = new StringBuffer();
-			} else {
-				buf.append(c);
-			}
-		}
-		w.add(buf.toString());
-		return w;
-	}
-
     public boolean fileExists(String filename) {
 		File file = new File(filename);
 		return file.exists();
@@ -3257,6 +3240,21 @@ C4910|<NHC0>C4910</NHC0>
 			}
 		}
 		return retired_concepts;
+	}
+
+    public static Vector parseData(String line, char delimiter) {
+		if(line == null) return null;
+		Vector w = new Vector();
+		String t = line;
+		int n = t.indexOf("" + delimiter);
+		while (n != -1) {
+			String s = t.substring(0, n);
+			w.add(s);
+			t = t.substring(n+1, t.length());
+			n = t.indexOf("" + delimiter);
+		}
+		w.add(t);
+		return w;
 	}
 
     public static void main(String[] args) {
