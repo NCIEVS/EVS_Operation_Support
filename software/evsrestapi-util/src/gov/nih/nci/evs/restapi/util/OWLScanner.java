@@ -84,6 +84,8 @@ public class OWLScanner {
 	static String SUBSET_MEMBERSHIP = "<A8 rdf:resource=\"http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#CCODE\"/>";
 
 	public HashMap code2LabelMap = null;
+	private HashMap propertyMap = null;
+	private HashMap associationMap = null;
 
     public OWLScanner() {
 
@@ -3160,7 +3162,10 @@ C4910|<NHC0>C4910</NHC0>
 	}
 
 	public HashMap getPropertyMap() {
-		return getPropertyMap(get_owl_vec());
+		if (propertyMap == null) {
+			propertyMap = getPropertyMap(get_owl_vec());
+		}
+		return propertyMap;
 	}
 
 	public HashMap getPropertyMap(Vector owl_vec) {
@@ -3255,6 +3260,40 @@ C4910|<NHC0>C4910</NHC0>
 		}
 		w.add(t);
 		return w;
+	}
+
+	public HashMap getAssociationMap() {
+		if (associationMap == null) {
+			associationMap = getAssociationMap(get_owl_vec());
+		}
+		return associationMap;
+	}
+
+	public HashMap getAssociationMap(Vector owl_vec) {
+		Vector association_vec = extractAssociations(owl_vec);
+		HashMap associationMap = null;
+		associationMap = new HashMap();
+		for (int i=0; i<association_vec.size(); i++) {
+			String line = (String) association_vec.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String src_code = (String) u.elementAt(0);
+			String asso_code = (String) u.elementAt(1);
+			String target_code = (String) u.elementAt(2);
+			HashMap hmap = new HashMap();
+			if (associationMap.containsKey(asso_code)) {
+				hmap = (HashMap) associationMap.get(asso_code);
+			}
+			Vector w = new Vector();
+			if (hmap.containsKey(target_code)) {
+				w = (Vector) hmap.get(target_code);
+			}
+			if (!w.contains(src_code)) {
+				w.add(src_code);
+			}
+			hmap.put(target_code, w);
+			associationMap.put(asso_code, hmap);
+		}
+		return associationMap;
 	}
 
     public static void main(String[] args) {
