@@ -3296,6 +3296,49 @@ C4910|<NHC0>C4910</NHC0>
 		return associationMap;
 	}
 
+	public static Vector getAxioms(String axiomfile, String req_data) {
+		Vector w = new Vector();
+		Vector u0 = StringUtils.parseData(req_data, '|');
+		String propCode = (String) u0.elementAt(0);
+		Vector v = Utils.readFile(axiomfile);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String prop_code = (String) u.elementAt(2);
+			if (prop_code.compareTo(propCode) == 0) {
+				boolean matched = true;
+				if (u0.size() > 1) {
+					for (int j=1; j<u0.size(); j++) {
+						String t = (String) u0.elementAt(j);
+						if (line.indexOf(t) == -1 && !line.endsWith(t)) {
+							matched = false;
+							break;
+						}
+					}
+				}
+				if (matched) {
+					if (propCode.compareTo("P90") == 0) {
+						Synonym syn = ParserUtils.axiom2Synonym(line);
+						w.add(syn);
+					} else if (propCode.compareTo("P97") == 0) {
+						Definition def = ParserUtils.axiom2Definition(line);
+						w.add(def);
+					} else if (propCode.compareTo("P325") == 0) {
+						AltDefinition altdef = ParserUtils.axiom2AltDefinition(line);
+						w.add(altdef);
+					} else if (propCode.compareTo("P211") == 0) {
+						GoAnnotation go = ParserUtils.axiom2GoAnnotation(line);
+						w.add(go);
+					} else if (propCode.compareTo("P375") == 0) {
+						MapToEntry go = ParserUtils.axiom2MapToEntry(line);
+						w.add(go);
+					}
+				}
+			}
+		}
+		return w;
+	}
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
         String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
