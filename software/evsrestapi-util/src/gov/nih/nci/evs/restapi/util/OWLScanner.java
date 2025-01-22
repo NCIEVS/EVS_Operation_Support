@@ -3339,6 +3339,83 @@ C4910|<NHC0>C4910</NHC0>
 		return w;
 	}
 
+    public static HashMap getAxiomMap(String axiomfile, String data_req) {
+		HashMap hmap = new HashMap();
+		Vector v = getAxioms(axiomfile, data_req);//"P90|P384$CDISC|P383$SY");
+		String id = null;
+		for (int i=0; i<v.size(); i++) {
+			Object obj = v.elementAt(i);
+			if (obj instanceof String) {
+				id = (String) obj;
+			} else if (obj instanceof Synonym) {
+				Synonym syn = (Synonym) obj;
+				id = syn.getCode();
+			} else if (obj instanceof Definition) {
+				Definition def = (Definition) obj;
+				id = def.getCode();
+			} else if (obj instanceof AltDefinition) {
+				AltDefinition def = (AltDefinition) obj;
+				id = def.getCode();
+			} else if (obj instanceof GoAnnotation) {
+				GoAnnotation go = (GoAnnotation) obj;
+				id = go.getCode();
+			}
+			Vector w = new Vector();
+			if (hmap.containsKey(id)) {
+				w = (Vector) hmap.get(id);
+			}
+			w.add(obj);
+			hmap.put(id, w);
+		}
+		return hmap;
+	}
+
+    public static String getPropertyValues(Vector w, String code) {
+		String s = null;
+		StringBuffer buf = new StringBuffer();
+		for (int j=0; j<w.size(); j++) {
+			Object obj = w.elementAt(j);
+			if (obj instanceof String) {
+				String value = (String) obj;
+				buf.append(value).append("|");
+			} else if (obj instanceof Synonym) {
+				Synonym syn = (Synonym) obj;
+				String id = syn.getCode();
+				if (id.compareTo(code) == 0) {
+					String value = syn.getTermName();
+					buf.append(value).append("|");
+				}
+			} else if (obj instanceof Definition) {
+				Definition def = (Definition) obj;
+				String id = def.getCode();
+				if (id.compareTo(code) == 0) {
+					String value = def.getDescription();
+					buf.append(value).append("|");
+				}
+			} else if (obj instanceof AltDefinition) {
+				AltDefinition def = (AltDefinition) obj;
+				String id = def.getCode();
+				if (id.compareTo(code) == 0) {
+					String value = def.getDescription();
+					buf.append(value).append("|");
+				}
+			} else if (obj instanceof GoAnnotation) {
+				GoAnnotation go = (GoAnnotation) obj;
+				String id = go.getCode();
+				if (id.compareTo(code) == 0) {
+					String value = go.getAnnotation();
+					buf.append(value).append("|");
+				}
+			}
+		}
+		s = buf.toString();
+		if (s.length() > 0) {
+			s = s.substring(0, s.length()-1);
+		}
+		return s;
+	}
+
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
         String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
