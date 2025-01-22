@@ -3310,7 +3310,7 @@ C4910|<NHC0>C4910</NHC0>
 				if (u0.size() > 1) {
 					for (int j=1; j<u0.size(); j++) {
 						String t = (String) u0.elementAt(j);
-						if (line.indexOf(t) == -1 && !line.endsWith(t)) {
+						if (!u.contains(t)) {
 							matched = false;
 							break;
 						}
