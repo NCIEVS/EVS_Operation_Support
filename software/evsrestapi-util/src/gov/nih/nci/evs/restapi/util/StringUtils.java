@@ -831,7 +831,8 @@ public class StringUtils {
 	 }
 
 	public static String decodeHtml(String encoded) {
-		String decoded = org.apache.commons.text.StringEscapeUtils.unescapeHtml4(encoded);
+		//String decoded = org.apache.commons.text.StringEscapeUtils.unescapeHtml4(encoded);
+		String decoded = HTMLDecoder.decode(encoded);
 		return decoded;
 	}
 }
