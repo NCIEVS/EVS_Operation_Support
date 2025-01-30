@@ -97,28 +97,41 @@ public class ExactMatchByTerm {
 		System.out.println("retired concepts: " + retiredConcepts.size());
 		term2CodesMap = createterm2CodesMap();
 		NCIPTMap = createNCIPTMap();
-		NCISYMap = createNCISYMap();
-		code2FULLSYNMap = createCode2FULLSYNMap();
+		System.out.println("NCIPTMap: " + NCIPTMap.keySet().size());
 
-		String branchfile = ConfigurationController.branchfile;
+		NCISYMap = createNCISYMap();
+		System.out.println("NCISYMap: " + NCISYMap.keySet().size());
+
+		code2FULLSYNMap = createCode2FULLSYNMap();
+		System.out.println("code2FULLSYNMap: " + code2FULLSYNMap.keySet().size());
+
         branch = new HashSet();
         Vector codes = null;
-        if (branchfile != null && branchfile.compareTo("null") != 0) {
-			file = new File(branchfile);
-			if (!file.exists()) {
-				System.out.println(branchfile + " does not exists.");
-				String HIER_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile;
-				Vector v = Utils.readFile(HIER_FILE);
-				HierarchyHelper hh = new HierarchyHelper(v);
-				int n = branchfile.indexOf(".");
-				String root = branchfile.substring(0, n);//"C62634";
-				codes = extractBranchCodes(root);
-				Utils.saveToFile(branchfile, codes);
-			} else {
-				System.out.println(branchfile + " exists.");
-				codes = Utils.readFile(branchfile);
+
+        String restrictedcodefile = ConfigurationController.restrictedcodefile;
+        if (restrictedcodefile != null && restrictedcodefile.compareTo("null") != 0) {
+			 codes = Utils.readFile(restrictedcodefile);
+			 branch = Utils.vector2HashSet(codes);
+
+		} else {
+			String branchfile = ConfigurationController.branchfile;
+			if (branchfile != null && branchfile.compareTo("null") != 0) {
+				file = new File(branchfile);
+				if (!file.exists()) {
+					System.out.println(branchfile + " does not exists.");
+					String HIER_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile;
+					Vector v = Utils.readFile(HIER_FILE);
+					HierarchyHelper hh = new HierarchyHelper(v);
+					int n = branchfile.indexOf(".");
+					String root = branchfile.substring(0, n);//"C62634";
+					codes = extractBranchCodes(root);
+					Utils.saveToFile(branchfile, codes);
+				} else {
+					System.out.println(branchfile + " exists.");
+					codes = Utils.readFile(branchfile);
+				}
+				branch = Utils.vector2HashSet(codes);
 			}
-			branch = Utils.vector2HashSet(codes);
 		}
 	}
 
@@ -895,6 +908,8 @@ Cyclophosphamide/Fluoxymesterone/Mitolactol/Prednisone/Tamoxifen|C10000|P90|CTX/
 			}
 		}
 
+		//Utils.dumpVector("codes", codes);
+
 		StringBuffer buf = new StringBuffer();
 		String s = null;
 		//CODES
@@ -920,7 +935,9 @@ Cyclophosphamide/Fluoxymesterone/Mitolactol/Prednisone/Tamoxifen|C10000|P90|CTX/
 				}
 			}
 			pts = pt_buf.toString();
-			pts = pts.substring(0, pts.length()-1);
+			if (pts.length() > 0) {
+				pts = pts.substring(0, pts.length()-1);
+			}
 		}
 		String pt_str = pts;
 

@@ -117,6 +117,7 @@ public class ConfigurationController {
 	public final static String primitiveConceptRoots = properties.getProperty("primitiveConceptRoots");
 	public final static String branchfile = properties.getProperty("branchfile");
 	public final static String branchroots = properties.getProperty("branchroots");
+	public final static String restrictedcodefile = properties.getProperty("restrictedcodefile");
 
 	/**
 	 * To be implemented by each descendant testcase.
