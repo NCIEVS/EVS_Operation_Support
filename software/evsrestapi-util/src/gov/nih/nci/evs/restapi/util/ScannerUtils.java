@@ -487,68 +487,6 @@ public class ScannerUtils {
 		return isInteger(t);
 	}
 
-/*
-C99999|P90|PERCUTANEOUS CORONARY INTERVENTION (PCI) FOR HIGH RISK NON-ST ELEVATION MYOCARDIAL INFARCTION OR UNSTABLE ANGINA|P383$PT|P384$CDISC
-C99999|P90|Percutaneous Coronary Intervention for High Risk Non-ST Elevation Myocardial Infarction or Unstable Angina|P383$PT|P384$NCI
-*/
-/*
-    public static HashMap getPropertyQualifier2CountMap(Vector owl_vec) {
-        Vector w = ScannerUtils.extractAxioms(owl_vec);
-        HashMap hmap = new HashMap();
-        for (int i=0; i<w.size(); i++) {
-			String line = (String) w.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String s0 = (String) u.elementAt(0);
-			if (isConceptCode(s0)) {
-				String propertyCode = (String) u.elementAt(1);
-				if (u.size() > 3) {
-					for (int j=3; j<u.size(); j++) {
-						String q = (String) u.elementAt(j);
-						Vector u2 = StringUtils.parseData(q, '$');
-						String q_code = (String) u2.elementAt(0);
-						int count = 0;
-						if (hmap.containsKey(propertyCode + "|" + q_code)) {
-							Integer int_obj = (Integer) hmap.get(propertyCode + "|" + q_code);
-							count = int_obj.intValue();
-						}
-						count++;
-						hmap.put(propertyCode + "|" + q_code, new Integer(count));
-					}
-			    }
-			}
-		}
-		return hmap;
-	}
-/*
-    public static HashMap createPropertyQualifier2CountMap(Vector w) {
-        HashMap hmap = new HashMap();
-        for (int i=0; i<w.size(); i++) {
-			String line = (String) w.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String s0 = (String) u.elementAt(0);
-			if (isConceptCode(s0)) {
-				String propertyCode = (String) u.elementAt(1);
-				if (u.size() > 3) {
-					for (int j=3; j<u.size(); j++) {
-						String q = (String) u.elementAt(j);
-						Vector u2 = StringUtils.parseData(q, '$');
-						String q_code = (String) u2.elementAt(0);
-						int count = 0;
-						if (hmap.containsKey(propertyCode + "|" + q_code)) {
-							Integer int_obj = (Integer) hmap.get(propertyCode + "|" + q_code);
-							count = int_obj.intValue();
-						}
-						count++;
-						hmap.put(propertyCode + "|" + q_code, new Integer(count));
-					}
-			    }
-			}
-		}
-		return hmap;
-	}
-*/
-
-
     public static void dumpPropertyQualifier2CountMap(HashMap hmap) {
 		Iterator it = hmap.keySet().iterator();
 		while (it.hasNext()) {
@@ -557,5 +495,49 @@ C99999|P90|Percutaneous Coronary Intervention for High Risk Non-ST Elevation Myo
 			System.out.println(key + " " + int_obj.intValue());
 		}
 	}
+
+	public static Vector extractDisjointClasses(Vector owl_vec) {
+		Vector v = new Vector();
+		Vector w = new Vector();
+		String id = null;
+		boolean include = false;
+		for (int i=0; i<owl_vec.size(); i++) {
+			String line = (String) owl_vec.elementAt(i);
+			//////////////////////////////////
+			if (line.indexOf("General axioms") != -1) break;
+			while (!line.endsWith(">") && i < owl_vec.size()-1) {
+				i++;
+				String nextLine = (String) owl_vec.elementAt(i);
+				nextLine = nextLine.trim();
+				line = line + " " + nextLine;
+			}
+
+			if (line.indexOf("<owl:Axiom>") != -1) {
+                include = false;
+			}
+
+			if (isOpenClass(line)) {
+				id = extractIdFromOpenClassLine(line);
+				int n = id.lastIndexOf("#");
+				id = id.substring(n+1, id.length());
+
+			} else {
+				try {
+					line = line.trim();
+					if (line.startsWith("<owl:disjointWith")) {
+						int n = line.lastIndexOf("#");
+						line = line.substring(n+1, line.length());
+						n = line.lastIndexOf("\"");
+						line = line.substring(0, n);
+						w.add(id + "|owl:disjointWith|" + line);
+					}
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
+		return w;
+	}
+
 }
 

@@ -3415,6 +3415,9 @@ C4910|<NHC0>C4910</NHC0>
 		return s;
 	}
 
+	public static Vector extractDisjointClasses(Vector owl_vec) {
+		return ScannerUtils.extractDisjointClasses(owl_vec);
+	}
 
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
