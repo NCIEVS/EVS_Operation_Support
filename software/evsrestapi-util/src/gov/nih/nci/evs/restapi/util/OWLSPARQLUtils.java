@@ -5927,15 +5927,15 @@ bnode_07130346_a093_4c67_ad70_efd4d5bc5796_242618|Thorax|C12799|Maps_To|P375|Tho
         if (v.size() == 0) return v;
         return new SortUtils().quickSort(v);
         */
-        return getSubclass(named_graph);
+        return getSuperclass(named_graph);
 	}
 
 
-	public String construct_get_subclass(String named_graph) {
+	public String construct_get_superclass(String named_graph) {
         String prefixes = getPrefixes();
         StringBuffer buf = new StringBuffer();
         buf.append(prefixes);
-        buf.append("SELECT distinct ?x_label ?x_code ?y_label ?y_code").append("\n");
+        buf.append("SELECT distinct ?y_label ?y_code ?x_label ?x_code").append("\n");
         buf.append("{").append("\n");
         buf.append("graph <" + named_graph + ">").append("\n");
         buf.append("{").append("\n");
@@ -5952,8 +5952,8 @@ bnode_07130346_a093_4c67_ad70_efd4d5bc5796_242618|Thorax|C12799|Maps_To|P375|Tho
 	}
 
 
-	public Vector getSubclass(String named_graph) {
-        String query = construct_get_subclass(named_graph);
+	public Vector getSuperclass(String named_graph) {
+        String query = construct_get_superclass(named_graph);
         Vector v = executeQuery(query);
         if (v == null) return null;
         if (v.size() == 0) return v;
