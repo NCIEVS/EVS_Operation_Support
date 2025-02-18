@@ -219,7 +219,7 @@ public class RelationshipHelper {
 
         if (checkOption(options, SUPERCONCEPT_OPTION)) {
 			superconceptList = new ArrayList();
-			v = owlSPARQLUtils.getSuperclassesByCode(code);
+			v = owlSPARQLUtils.getSuperclassesByCode(named_graph, code);
 			if (v != null && v.size() > 0) {
 				superconceptList = new ArrayList(v);
 				new SortUtils().quickSort(superconceptList);
@@ -228,7 +228,7 @@ public class RelationshipHelper {
 		}
 
         if (checkOption(options, SUBCONCEPT_OPTION)) {
-			v = owlSPARQLUtils.getSubclassesByCode(code);
+			v = owlSPARQLUtils.getSubclassesByCode(named_graph, code);
 			if (v == null) {
 				subconceptList = new ArrayList();
 			} else {
@@ -320,7 +320,7 @@ public class RelationshipHelper {
 		v = new SortUtils().quickSort(v);
 		return v;
 		*/
-		return owlSPARQLUtils.getSuperclassesByCode(code);
+		return owlSPARQLUtils.getSuperclassesByCode(named_graph, code);
 	}
 
 	public Vector getSubclassesByCode(String code) {
@@ -332,7 +332,7 @@ public class RelationshipHelper {
 		v = new SortUtils().quickSort(v);
 		return v;
 		*/
-		return owlSPARQLUtils.getSubclassesByCode(code);
+		return owlSPARQLUtils.getSubclassesByCode(named_graph, code);
 	}
 
 	public Vector getOutboundRolesByCode(String code) {

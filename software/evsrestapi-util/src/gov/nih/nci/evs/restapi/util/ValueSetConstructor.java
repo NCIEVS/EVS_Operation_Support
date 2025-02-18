@@ -128,7 +128,7 @@ public class ValueSetConstructor {
 			String code = (String) stack.pop();
 			v = owlSPARQLUtils.get_concepts_in_subset(this.namedGraph, code);
 			w.addAll(v);
-			Vector subs = owlSPARQLUtils.getSubclassesByCode(code);
+			Vector subs = owlSPARQLUtils.getSubclassesByCode(this.namedGraph, code);
 			if (subs != null && subs.size() > 0) {
 				for (int k=0; k<subs.size(); k++) {
 					String sub = (String) subs.elementAt(k);
@@ -191,7 +191,7 @@ public class ValueSetConstructor {
 	    stack.push(root);
 	    while (!stack.isEmpty()) {
 			String code = (String) stack.pop();
-			Vector v = owlSPARQLUtils.getSuperclassesByCode(code);
+			Vector v = owlSPARQLUtils.getSuperclassesByCode(this.namedGraph, code);
 			if (v != null && v.size() > 0) {
 			    w.addAll(v);
 				System.out.println(code + " has " + v.size() + " superclasses.");
