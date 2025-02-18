@@ -66,6 +66,10 @@ import org.json.*;
  *
  */
 public class OWLSPARQLUtils {
+	int MODE_SPARQL = 1;
+	int MODE_JENA = 2;
+	int MODE = MODE_SPARQL;
+
     gov.nih.nci.evs.restapi.util.JSONUtils jsonUtils = null;
     gov.nih.nci.evs.restapi.util.HTTPUtils httpUtils = null;
     public String named_graph = null;
@@ -87,6 +91,10 @@ public class OWLSPARQLUtils {
     String password = null;
 
     private HashMap propertyCode2labelHashMap = null;
+
+    public void setMode(int mode) {
+		MODE = mode;
+	}
 
     public void setServiceUrl(String serviceUrl) {
 		this.serviceUrl = serviceUrl;
@@ -4140,12 +4148,17 @@ bnode_07130346_a093_4c67_ad70_efd4d5bc5796_242618|Thorax|C12799|Maps_To|P375|Tho
 	}
 
     public Vector executeQuery(String restURL, String username, String password, String query) {
+		if (MODE == MODE_JENA) {
+			if (query.indexOf("graph") != -1 || query.indexOf("Graph") != -1) {
+				query = query.replace("Graph", "graph");
+				query = toJena(query);
+			}
+		}
 		HTTPUtils httpUtils = new HTTPUtils(restURL, username, password);
 		Vector v = null;
 		try {
 			String json = httpUtils.runSPARQL(query);
 			v = new JSONUtils().parseJSON(json);
-			// v = new ParserUtils().getResponseValues(v);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -6168,6 +6181,87 @@ bnode_07130346_a093_4c67_ad70_efd4d5bc5796_242618|Thorax|C12799|Maps_To|P375|Tho
         Vector u = StringUtils.parseData(line, '|');
         return (String) u.elementAt(0);
 	}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public static Vector getCharPositons(String str, char ch) {
+		Vector v = new Vector();
+		int knt = 0;
+        char[] charArray = str.toCharArray();
+        int i = 0;
+        for (char c : charArray) {
+            if (c == ch) {
+				v.add(Integer.valueOf(i));
+				knt++;
+			}
+			i++;
+        }
+        return v;
+	}
+
+	public static String removeGraphStmt(String line) {
+		int n = line.indexOf("graph");
+		String t1 = line.substring(0, n+1);
+		int m1 = t1.lastIndexOf("{")+1;
+		String t2 = line.substring(n, line.length());
+		int m2 = n + t2.indexOf("{");
+		String s = line.substring(m1, m2);
+		line = line.replace(s, "");
+		return line;
+	}
+
+	public static String trimBrackets(String line) {
+		if (line.endsWith("@")) {
+			line = line.substring(0, line.length()-1);
+		}
+		line = line.replace("\t", " ");
+		line = line.replace("\n", " ");
+		line = line.trim();
+
+		Vector v1 = getCharPositons(line, '{');
+		Vector v2 = getCharPositons(line, '}');
+
+		Integer pos = (Integer) v2.elementAt(v2.size()-1);
+        int lastCloseBracketPos = pos.intValue();
+
+		int len = line.length();
+		if (line.endsWith("}")) {
+
+		} else {
+			if (len > lastCloseBracketPos) {
+				int lcv = len;
+				while (len > lastCloseBracketPos) {
+					pos = len-1;
+					len = len-1;
+				}
+			}
+		}
+
+        line = line.trim();
+		if (line.endsWith("@")) {
+			line = line.substring(0, line.length()-1);
+		}
+
+		v1 = getCharPositons(line, '{');
+		while (line.endsWith("}") && v1.size() > 2) {
+			line = line.substring(0, line.length()-1);
+			pos = (Integer) v1.elementAt(0);
+			int int_pos = pos.intValue();
+			line = line.substring(0, int_pos) + line.substring(int_pos+1, line.length());
+			line = line.trim();
+			v1 = getCharPositons(line, '{');
+		}
+		return line;
+	}
+
+	public static String toJena(String query) {
+		String t = removeGraphStmt(query);
+		t = trimBrackets(t);
+		return t;
+	}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 /*
 	public static void main(String[] args) {
