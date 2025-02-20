@@ -66,9 +66,10 @@ import org.json.*;
  *
  */
 public class OWLSPARQLUtils {
-	int MODE_SPARQL = 1;
-	int MODE_JENA = 2;
-	int MODE = MODE_SPARQL;
+	public static int MODE_SPARQL = 1;
+	public static int MODE_JENA = 2;
+
+	public int MODE = MODE_SPARQL;
 
     gov.nih.nci.evs.restapi.util.JSONUtils jsonUtils = null;
     gov.nih.nci.evs.restapi.util.HTTPUtils httpUtils = null;
@@ -93,7 +94,7 @@ public class OWLSPARQLUtils {
     private HashMap propertyCode2labelHashMap = null;
 
     public void setMode(int mode) {
-		MODE = mode;
+		this.MODE = mode;
 	}
 
     public void setServiceUrl(String serviceUrl) {
@@ -258,8 +259,6 @@ public class OWLSPARQLUtils {
 			String query = httpUtils.loadQuery(query_file, false);
 			String json = new HTTPUtils(this.restURL).runSPARQL(query, restURL);
 			System.out.println(json);
-			//gov.nih.nci.evs.reportwriter.core.util.JSONUtils jsonUtils = new gov.nih.nci.evs.reportwriter.core.util.JSONUtils();
-			//gov.nih.nci.evs.restapi.util.JSONUtils jsonUtils = new gov.nih.nci.evs.restapi.util.JSONUtils();
 			JSONUtils jsonUtils = new JSONUtils();
 			w = jsonUtils.parseJSON(json);
 			w = jsonUtils.getResponseValues(w);
@@ -270,26 +269,36 @@ public class OWLSPARQLUtils {
 		return w;
 	}
 
+    public static Vector executeQuery(String restURL, String username, String password, String query) {
+		if (query.indexOf("graph") != -1 || query.indexOf("Graph") != -1) {
+			query = query.replace("Graph", "graph");
+			query = removeGraphStmt(query);
+		}
+		HTTPUtils httpUtils = new HTTPUtils(restURL, username, password);
+		Vector v = null;
+		try {
+			String json = httpUtils.runSPARQL(query);
+			v = new JSONUtils().parseJSON(json);
+			v = new ParserUtils().getResponseValues(v);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return v;
+	}
+
     public Vector executeQuery(String query) {
-		//from <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl>
-		/*
-		if (this.named_graph != null) {
-			query = query.replaceAll("from <" + NCIT_URI + ">", "from <" + this.named_graph + ">");
-    	}
-    	*/
-        Vector v = null;
+		if (MODE == MODE_JENA) {
+			return executeQuery(serviceUrl, username, password, query);
+		}
+		Vector v = null;
         try {
 			if (this.password == null) {
 				String json = new HTTPUtils(this.restURL).runSPARQL(query, this.restURL);
-				//System.out.println(json);
-				//gov.nih.nci.evs.reportwriter.core.util.JSONUtils jsonUtils = new gov.nih.nci.evs.reportwriter.core.util.JSONUtils();
-				//gov.nih.nci.evs.restapi.util.JSONUtils jsonUtils = new gov.nih.nci.evs.restapi.util.JSONUtils();
 				JSONUtils jsonUtils = new JSONUtils();
 				v = jsonUtils.parseJSON(json);
 				v = jsonUtils.getResponseValues(v);
 
 			} else {
-				//gov.nih.nci.evs.restapi.util.RESTUtils restUtils = new gov.nih.nci.evs.restapi.util.RESTUtils(this.username, this.password, 1500000, 1500000);
 				RESTUtils restUtils = new RESTUtils(this.username, this.password, 1500000, 1500000);
 				String response = restUtils.runSPARQL(query, serviceUrl);
 				v = new gov.nih.nci.evs.restapi.util.JSONUtils().parseJSON(response);
@@ -4147,23 +4156,7 @@ bnode_07130346_a093_4c67_ad70_efd4d5bc5796_242618|Thorax|C12799|Maps_To|P375|Tho
 		return new ParserUtils().getResponseValues(v);
 	}
 
-    public Vector executeQuery(String restURL, String username, String password, String query) {
-		if (MODE == MODE_JENA) {
-			if (query.indexOf("graph") != -1 || query.indexOf("Graph") != -1) {
-				query = query.replace("Graph", "graph");
-				query = toJena(query);
-			}
-		}
-		HTTPUtils httpUtils = new HTTPUtils(restURL, username, password);
-		Vector v = null;
-		try {
-			String json = httpUtils.runSPARQL(query);
-			v = new JSONUtils().parseJSON(json);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return v;
-	}
+
 
 	public String construct_get_class_identifiers(String named_graph, boolean codeOnly) {
 		String prefixes = getPrefixes();
@@ -6258,6 +6251,24 @@ bnode_07130346_a093_4c67_ad70_efd4d5bc5796_242618|Thorax|C12799|Maps_To|P375|Tho
 		String t = removeGraphStmt(query);
 		t = trimBrackets(t);
 		return t;
+	}
+
+	public static String flatten(Vector v) {
+		return flatten(v, '@');
+	}
+
+
+	public static String flatten(Vector v, char ch) {
+		String line = "";
+		for (int i=0; i<v.size(); i++) {
+			String t = (String) v.elementAt(i);
+			t = t.trim();
+			if (t.endsWith("\n")) {
+				t = t.substring(0, t.length()-1);
+			}
+			line = line + t + ch;//"@";
+		}
+		return line;
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

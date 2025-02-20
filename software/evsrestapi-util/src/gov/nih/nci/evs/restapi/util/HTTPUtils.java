@@ -350,12 +350,9 @@ public class HTTPUtils {
 	}
 
 	public String runSPARQL(String query) {
-		System.out.println("restURL: " + restURL);
-
 		if (restURL == null) {
 			return null;
 		}
-		System.out.println("Instantiating RESTUtils ...");
 		return new RESTUtils(username, password, readTimeout, connectTimeout).runSPARQL(query, restURL);
 	}
 
@@ -376,8 +373,6 @@ public class HTTPUtils {
 
 		String json = new HTTPUtils(restURL).runSPARQL(query, restURL);
 		System.out.println(json);
-        //gov.nih.nci.evs.reportwriter.core.util.JSONUtils jsonUtils = new gov.nih.nci.evs.reportwriter.core.util.JSONUtils();
-        //gov.nih.nci.evs.restapi.util.JSONUtils jsonUtils = new gov.nih.nci.evs.restapi.util.JSONUtils();
         JSONUtils jsonUtils = new JSONUtils();
 
 		Vector w = jsonUtils.parseJSON(json);
