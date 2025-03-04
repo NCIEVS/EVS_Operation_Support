@@ -865,6 +865,26 @@ public class HierarchyHelper implements Serializable {
 		path2Roots(null, code);
 	}
 
+    public void printTree(String root) {
+		Vector v = get_transitive_closure_v4(root);
+		HierarchyHelper hh = new HierarchyHelper(v);
+		PrintWriter pw = null;
+		String outputfile = root + "_tree.txt";
+		try {
+			pw = new PrintWriter(outputfile, "UTF-8");
+			hh.printTree(pw);
+		} catch (Exception ex) {
+
+		} finally {
+			try {
+				pw.close();
+				System.out.println("Output file " + outputfile + " generated.");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
     public static void main(String[] args) {
 		Vector v = Utils.readFile("tvs_rel.txt");
 		HierarchyHelper test = new HierarchyHelper(v, 1);
