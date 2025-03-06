@@ -871,9 +871,9 @@ public class EVSStatistics {
 		return hmap;
 	}
 
-
 	public Vector getSupportedQualifiers(String named_graph) {
-		String query = construct_get_supported_qualifiers(named_graph);
+		//String query = construct_get_supported_qualifiers(named_graph);
+		String query = owlSPARQLUtils.construct_get_property_qualifiers(named_graph);
 		Vector v = executeQuery(query);
 		v = new SortUtils().quickSort(v);
 		return v;
