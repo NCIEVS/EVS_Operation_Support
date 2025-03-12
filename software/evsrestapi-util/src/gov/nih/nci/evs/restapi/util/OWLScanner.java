@@ -86,6 +86,7 @@ public class OWLScanner {
 	public HashMap code2LabelMap = null;
 	private HashMap propertyMap = null;
 	private HashMap associationMap = null;
+	HashMap propertyCode2LabelHashMap = null;
 
     public OWLScanner() {
 
@@ -108,7 +109,20 @@ public class OWLScanner {
 			String label = (String) u.elementAt(1);
 			code2LabelMap.put(code, label);
 		}
+		propertyCode2LabelHashMap = createPropertyCode2LabelHashMap();
     }
+
+	public HashMap createPropertyCode2LabelHashMap() {
+		Vector v = getSupportedProperties();
+		HashMap hmap = new HashMap();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			hmap.put((String) u.elementAt(1), (String) u.elementAt(0));
+
+		}
+		return hmap;
+	}
 
     public Vector get_owl_vec() {
 		return this.owl_vec;
@@ -3417,6 +3431,31 @@ C4910|<NHC0>C4910</NHC0>
 
 	public static Vector extractDisjointClasses(Vector owl_vec) {
 		return ScannerUtils.extractDisjointClasses(owl_vec);
+	}
+
+	public Vector getSupportedPropertyQualifiers(String AXIOM_FILE) {
+		Vector v = Utils.readFile(AXIOM_FILE);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+            String prop_code = (String) u.elementAt(2);
+            String prop_label = (String) propertyCode2LabelHashMap.get(prop_code);
+
+			for (int j=4; j<u.size(); j++) {
+				String s = (String) u.elementAt(j);
+				Vector u2 = StringUtils.parseData(s, '$');
+				String qual_code = (String) u2.elementAt(0);
+			    String qual_label = (String) propertyCode2LabelHashMap.get(qual_code);
+
+			    String t = prop_label + "|" + prop_code + "|" + qual_label + "|" + qual_code;
+			    if (!w.contains(t)) {
+					w.add(t);
+				}
+			}
+		}
+		w = new SortUtils().quickSort(w);
+		return w;
 	}
 
     public static void main(String[] args) {
