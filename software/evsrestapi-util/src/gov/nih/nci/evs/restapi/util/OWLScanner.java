@@ -1049,7 +1049,7 @@ public class OWLScanner {
 C4910|<A8 rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C165258"/>
 C4910|<NHC0>C4910</NHC0>
 */
-    public String parseProperty(String t) {
+    public static String parseProperty(String t) {
 		t = t.trim();
 		if (t.indexOf("rdf:resource") != -1) {
 			int n = t.indexOf("rdf:resource");
@@ -1552,7 +1552,7 @@ C4910|<NHC0>C4910</NHC0>
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public String extractClassId(String line) {
+    public static String extractClassId(String line) {
         String t = line;
         String classId = null;
 		if (t.indexOf(NAMESPACE_TARGET) != -1 && t.endsWith("-->")) {
