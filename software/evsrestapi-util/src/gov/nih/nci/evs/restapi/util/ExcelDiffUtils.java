@@ -1,4 +1,5 @@
 package gov.nih.nci.evs.restapi.util;
+
 import gov.nih.nci.evs.restapi.bean.*;
 import java.io.*;
 import java.io.BufferedReader;
@@ -10,12 +11,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.text.*;
 import java.util.*;
+import java.text.*;
 
 /**
  * <!-- LICENSE_TEXT_START -->
- * Copyright 2022 Guidehouse. This software was developed in conjunction
+ * Copyright 2020 MSC. This software was developed in conjunction
  * with the National Cancer Institute, and so to the extent government
  * employees are co-authors, any rights in such works shall be subject
  * to Title 17 of the United States Code, section 105.
@@ -30,21 +31,21 @@ import java.util.*;
  *      with the distribution.
  *   2. The end-user documentation included with the redistribution,
  *      if any, must include the following acknowledgment:
- *      "This product includes software developed by Guidehouse and the National
+ *      "This product includes software developed by MSC and the National
  *      Cancer Institute."   If no such end-user documentation is to be
  *      included, this acknowledgment shall appear in the software itself,
  *      wherever such third-party acknowledgments normally appear.
- *   3. The names "The National Cancer Institute", "NCI" and "Guidehouse" must
+ *   3. The names "The National Cancer Institute", "NCI" and "MSC" must
  *      not be used to endorse or promote products derived from this software.
  *   4. This license does not authorize the incorporation of this software
  *      into any third party proprietary programs. This license does not
  *      authorize the recipient to use any trademarks owned by either NCI
- *      or GUIDEHOUSE
+ *      or MSC
  *   5. THIS SOFTWARE IS PROVIDED "AS IS," AND ANY EXPRESSED OR IMPLIED
  *      WARRANTIES, (INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  *      OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE) ARE
  *      DISCLAIMED. IN NO EVENT SHALL THE NATIONAL CANCER INSTITUTE,
- *      GUIDEHOUSE, OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *      MSC, OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT,
  *      INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
  *      BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
  *      LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
@@ -63,14 +64,22 @@ import java.util.*;
  *     Initial implementation kim.ong@nih.gov
  *
  */
+
+
 public class ExcelDiffUtils {
     public String datafile1 = null;
     public String datafile2 = null;
     Vector headings = null;
-    boolean NORMALIZE = true;
+    //boolean NORMALIZE = true;
+    boolean NORMALIZE = false;
+    static int HEADING_ROW = 0;
 
     public ExcelDiffUtils() {
 
+	}
+
+	public static void set_HEADING_ROW(int row) {
+		HEADING_ROW = row;
 	}
 
 
@@ -90,11 +99,14 @@ public class ExcelDiffUtils {
 
 	public void run(PrintWriter pw) {
 		Vector v1 = Utils.readFile(datafile1);
-		String heading = (String) v1.elementAt(0);
+		String heading = (String) v1.elementAt(HEADING_ROW);
+
 		headings = split(heading);
+		Utils.dumpVector(heading, headings);
+
 		HashSet codes_1 = new HashSet();
 		HashMap hmap_1 = new HashMap();
-		for (int i=1; i<v1.size(); i++) {
+		for (int i=HEADING_ROW+1; i<v1.size(); i++) {
 			String line = (String) v1.elementAt(i);
 			line = line.trim();
 			if (line.length() >  0) {
@@ -111,15 +123,17 @@ public class ExcelDiffUtils {
 				hmap_1.put(code, hmap);
 			}
 		}
-
+		System.out.println("**hmap_1****" + hmap_1.keySet().size());
+        System.out.println(datafile2);
 		Vector v2 = Utils.readFile(datafile2);
-		heading = (String) v2.elementAt(0);
+		System.out.println(v2.size());
+		heading = (String) v2.elementAt(HEADING_ROW);
 		heading = heading.trim();
 		headings = split(heading);
 
 		HashSet codes_2 = new HashSet();
 		HashMap hmap_2 = new HashMap();
-		for (int i=1; i<v2.size(); i++) {
+		for (int i=HEADING_ROW+1; i<v2.size(); i++) {
 			String line = (String) v2.elementAt(i);
 			line = line.trim();
 			if (line.length() > 0) {
@@ -136,6 +150,7 @@ public class ExcelDiffUtils {
 				hmap_2.put(code, hmap);
 			}
 		}
+		System.out.println("**hmap_2****" + hmap_2.keySet().size());
 
         pw.println("\nOld file " + datafile1);
         pw.println("New file " + datafile2);
@@ -189,6 +204,34 @@ public class ExcelDiffUtils {
 		return buf.toString();
 	}
 
+	public void compareRowValues(PrintWriter pw, String code, String key, String value_1, String value_2) {
+		String delimiter = " || ";
+		Vector u1 = null;
+		if (value_1.indexOf(delimiter) != -1) {
+			value_1 = value_1.replace(delimiter, "$");
+			u1 = StringUtils.parseData(value_1, '$');
+			u1 = new SortUtils().quickSort(u1);
+		}
+		Vector u2 = null;
+		if (value_2.indexOf(delimiter) != -1) {
+			value_2 = value_2.replace(delimiter, "$");
+			u2 = StringUtils.parseData(value_2, '$');
+			u2 = new SortUtils().quickSort(u2);
+		}
+		for (int i=0; i<u1.size(); i++) {
+			String value = (String) u1.elementAt(i);
+			if (!u2.contains(value)) {
+				pw.println("deleted|" + code + "|" + key + "|" + value);
+			}
+		}
+		for (int i=0; i<u2.size(); i++) {
+			String value = (String) u2.elementAt(i);
+			if (!u1.contains(value)) {
+				pw.println("added|" + code + "|" + key + "|" + value);
+			}
+		}
+	}
+
 	public void compareRow(PrintWriter pw, String code, HashMap hmap_1, HashMap hmap_2) {
 		Iterator it1 = hmap_1.keySet().iterator();
 		while (it1.hasNext()) {
@@ -204,8 +247,14 @@ public class ExcelDiffUtils {
 			if (value_1.compareTo(value_2) != 0) {
 				value_1 = (String) hmap_1.get(key);
 				value_2 = (String) hmap_2.get(key);
-				pw.println("added|" + code + "|" + key + "|" + value_1);
-				pw.println("deleted|" + code + "|" + key + "|" + value_2);
+
+				System.out.println(value_1);
+				System.out.println(value_2);
+
+				// to be modified:
+				//pw.println("added|" + code + "|" + key + "|" + value_1);
+				//pw.println("deleted|" + code + "|" + key + "|" + value_2);
+				compareRowValues(pw, code, key, value_1, value_2);
 			}
 		}
 	}
@@ -310,6 +359,11 @@ public class ExcelDiffUtils {
 		}
 
 		ExcelDiffUtils diffUtils = new ExcelDiffUtils(datafile1, datafile2);
+
+		if (args.length > 2) {
+			int row = Integer.parseInt(args[2]);
+			diffUtils.set_HEADING_ROW(row);
+		}
 
 		PrintWriter pw = null;
 		int n1 = datafile1.lastIndexOf(".");
