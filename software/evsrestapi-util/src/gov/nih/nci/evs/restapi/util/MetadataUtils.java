@@ -108,20 +108,23 @@ public class MetadataUtils {
         initialize();
     }
 
+	public MetadataUtils(String serviceUrl, String named_graph, String username, String password) {
+		this.serviceUrl = serviceUrl;
+		this.restURL = serviceUrl;
+		this.namedGraph = named_graph;
+		this.username = username;
+		this.password = password;
+        initialize();
+    }
+
     public HashMap getBasePrefixUIDHashMap() {
 		return basePrefixUIDHashMap;
 	}
 
     public void initialize() {
 		this.sparql_endpoint = this.serviceUrl;
-		if (this.password == null) {
-			if (serviceUrl.indexOf("?") == -1) {
-				sparql_endpoint = serviceUrl + "?query=";
-			}
-			this.owlSPARQLUtils = new OWLSPARQLUtils(sparql_endpoint);
-	    } else {
-			this.owlSPARQLUtils = new OWLSPARQLUtils(sparql_endpoint, username, password);
-		}
+		this.owlSPARQLUtils = new OWLSPARQLUtils(sparql_endpoint, username, password);
+		owlSPARQLUtils.set_named_graph(this.namedGraph);
 		this.nameVersion2NamedGraphMap = owlSPARQLUtils.getNameVersion2NamedGraphMap();
 		//this.nameGraph2PredicateHashMap = createNameGraph2PredicateHashMap();
 		//this.basePrefixUIDHashMap = createBasePrefixUIDHashMap();
