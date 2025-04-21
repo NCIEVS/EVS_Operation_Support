@@ -118,46 +118,74 @@ public class AxiomRetrieval {
 			String propCode = (String) u.elementAt(2);
 
 			if (propCode.compareTo("P90") == 0) {
+				HashMap hmap = new HashMap();
+				if (axiomMap.containsKey("P90")) {
+					hmap = (HashMap) axiomMap.get("P90");
+				}
 				Synonym syn = ParserUtils.axiom2Synonym(line);
 				Vector axioms = new Vector();
-				if (axiomMap.containsKey(code)) {
-					axioms = (Vector) axiomMap.get(code);
+				if (hmap.containsKey(code)) {
+					axioms = (Vector) hmap.get(code);
 				}
 				axioms.add(syn);
-				axiomMap.put(code, axioms);
+				hmap.put(code, axioms);
+				axiomMap.put("P90", hmap);
 
 			} else if (propCode.compareTo("P97") == 0) {
+				HashMap hmap = new HashMap();
+				if (axiomMap.containsKey("P97")) {
+					hmap = (HashMap) axiomMap.get("P97");
+				}
 				Definition def = ParserUtils.axiom2Definition(line);
 				Vector axioms = new Vector();
-				if (axiomMap.containsKey(code)) {
-					axioms = (Vector) axiomMap.get(code);
+				if (hmap.containsKey(code)) {
+					axioms = (Vector) hmap.get(code);
 				}
 				axioms.add(def);
-				axiomMap.put(code, axioms);
+				hmap.put(code, axioms);
+				axiomMap.put("P97", hmap);
+
 			} else if (propCode.compareTo("P325") == 0) {
+				HashMap hmap = new HashMap();
+				if (axiomMap.containsKey("P325")) {
+					hmap = (HashMap) axiomMap.get("P325");
+				}
 				AltDefinition altdef = ParserUtils.axiom2AltDefinition(line);
 				Vector axioms = new Vector();
-				if (axiomMap.containsKey(code)) {
-					axioms = (Vector) axiomMap.get(code);
+				if (hmap.containsKey(code)) {
+					axioms = (Vector) hmap.get(code);
 				}
 				axioms.add(altdef);
-				axiomMap.put(code, axioms);
+				hmap.put(code, axioms);
+				axiomMap.put("P325", hmap);
+
 			} else if (propCode.compareTo("P211") == 0) {
+				HashMap hmap = new HashMap();
+				if (axiomMap.containsKey("P211")) {
+					hmap = (HashMap) axiomMap.get("P211");
+				}
 				GoAnnotation go = ParserUtils.axiom2GoAnnotation(line);
 				Vector axioms = new Vector();
-				if (axiomMap.containsKey(code)) {
-					axioms = (Vector) axiomMap.get(code);
+				if (hmap.containsKey(code)) {
+					axioms = (Vector) hmap.get(code);
 				}
 				axioms.add(go);
-				axiomMap.put(code, axioms);
+				hmap.put(code, axioms);
+				axiomMap.put("P211", hmap);
+
 			} else if (propCode.compareTo("P375") == 0) {
+				HashMap hmap = new HashMap();
+				if (axiomMap.containsKey("P375")) {
+					hmap = (HashMap) axiomMap.get("P375");
+				}
 				MapToEntry entry = ParserUtils.axiom2MapToEntry(line);
 				Vector axioms = new Vector();
-				if (axiomMap.containsKey(code)) {
-					axioms = (Vector) axiomMap.get(code);
+				if (hmap.containsKey(code)) {
+					axioms = (Vector) hmap.get(code);
 				}
 				axioms.add(entry);
-				axiomMap.put(code, axioms);
+				hmap.put(code, axioms);
+				axiomMap.put("P375", hmap);
 			}
 		}
 		return axiomMap;
@@ -189,46 +217,74 @@ public class AxiomRetrieval {
 					}
 					if (matched) {
 						if (propCode.compareTo("P90") == 0) {
+							HashMap hmap = new HashMap();
+							if (axiomMap.containsKey("P90")) {
+								hmap = (HashMap) axiomMap.get("P90");
+							}
 							Synonym syn = ParserUtils.axiom2Synonym(line);
 							Vector axioms = new Vector();
-							if (axiomMap.containsKey(code)) {
-								axioms = (Vector) axiomMap.get(code);
+							if (hmap.containsKey(code)) {
+								axioms = (Vector) hmap.get(code);
 							}
 							axioms.add(syn);
-							axiomMap.put(code, axioms);
+							hmap.put(code, axioms);
+							axiomMap.put("P90", hmap);
 
 						} else if (propCode.compareTo("P97") == 0) {
+							HashMap hmap = new HashMap();
+							if (axiomMap.containsKey("P97")) {
+								hmap = (HashMap) axiomMap.get("P97");
+							}
 							Definition def = ParserUtils.axiom2Definition(line);
 							Vector axioms = new Vector();
-							if (axiomMap.containsKey(code)) {
-								axioms = (Vector) axiomMap.get(code);
+							if (hmap.containsKey(code)) {
+								axioms = (Vector) hmap.get(code);
 							}
 							axioms.add(def);
-							axiomMap.put(code, axioms);
+							hmap.put(code, axioms);
+							axiomMap.put("P97", hmap);
+
 						} else if (propCode.compareTo("P325") == 0) {
+							HashMap hmap = new HashMap();
+							if (axiomMap.containsKey("P325")) {
+								hmap = (HashMap) axiomMap.get("P325");
+							}
 							AltDefinition altdef = ParserUtils.axiom2AltDefinition(line);
 							Vector axioms = new Vector();
-							if (axiomMap.containsKey(code)) {
-								axioms = (Vector) axiomMap.get(code);
+							if (hmap.containsKey(code)) {
+								axioms = (Vector) hmap.get(code);
 							}
 							axioms.add(altdef);
-							axiomMap.put(code, axioms);
+							hmap.put(code, axioms);
+							axiomMap.put("P325", hmap);
+
 						} else if (propCode.compareTo("P211") == 0) {
+							HashMap hmap = new HashMap();
+							if (axiomMap.containsKey("P211")) {
+								hmap = (HashMap) axiomMap.get("P211");
+							}
 							GoAnnotation go = ParserUtils.axiom2GoAnnotation(line);
 							Vector axioms = new Vector();
-							if (axiomMap.containsKey(code)) {
-								axioms = (Vector) axiomMap.get(code);
+							if (hmap.containsKey(code)) {
+								axioms = (Vector) hmap.get(code);
 							}
 							axioms.add(go);
-							axiomMap.put(code, axioms);
+							hmap.put(code, axioms);
+							axiomMap.put("P211", hmap);
+
 						} else if (propCode.compareTo("P375") == 0) {
+							HashMap hmap = new HashMap();
+							if (axiomMap.containsKey("P375")) {
+								hmap = (HashMap) axiomMap.get("P375");
+							}
 							MapToEntry entry = ParserUtils.axiom2MapToEntry(line);
 							Vector axioms = new Vector();
-							if (axiomMap.containsKey(code)) {
-								axioms = (Vector) axiomMap.get(code);
+							if (hmap.containsKey(code)) {
+								axioms = (Vector) hmap.get(code);
 							}
 							axioms.add(entry);
-							axiomMap.put(code, axioms);
+							hmap.put(code, axioms);
+							axiomMap.put("P375", hmap);
 						}
 					}
 				}
