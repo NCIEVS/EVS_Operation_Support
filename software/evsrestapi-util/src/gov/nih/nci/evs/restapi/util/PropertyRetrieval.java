@@ -141,7 +141,7 @@ public class PropertyRetrieval {
 					String line = (String) w.elementAt(j);
 					Vector u = gov.nih.nci.evs.restapi.util.StringUtils.parseData(line, '|');
 					String code = (String) u.elementAt(0);
-					String value = AxiomRetrieval.decodeSpecialChar((String) u.elementAt(2));
+					String value = decodeSpecialChar((String) u.elementAt(2));
 					Vector w1 = new Vector();
 					if (hmap.containsKey(code)) {
 						w1 = (Vector) hmap.get(code);
@@ -217,6 +217,16 @@ public class PropertyRetrieval {
 		}
 		Utils.saveToFile(propertyCode + ".txt", w0);
 	}
+
+	public static String decodeSpecialChar(String line) {
+		line = line.replace("&apos;", "'");
+		line = line.replace("&amp;", "&");
+		line = line.replace("&lt;", "<");
+		line = line.replace("&gt;", ">");
+		line = line.replace("&quot;", "\"");
+		return line;
+	}
+
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
