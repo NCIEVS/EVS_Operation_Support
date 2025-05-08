@@ -119,6 +119,7 @@ public class ConfigurationController {
 	public final static String branchroots = properties.getProperty("branchroots");
 	public final static String restrictedcodefile = properties.getProperty("restrictedcodefile");
 	public final static String requiredDataFile = properties.getProperty("requiredDataFile");
+	public final static String output_dir = properties.getProperty("output_dir");
 
 	/**
 	 * To be implemented by each descendant testcase.
