@@ -1,8 +1,21 @@
 package gov.nih.nci.evs.restapi.util;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.Vector;
 
 public class HTMLDecoder {
+
+	public static void run(String filename) {
+		Vector w = new Vector();
+		Vector v = Utils.readFile(filename);
+		int knt = 0;
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			String new_line = HTMLDecoder.decode(line);
+			w.add(new_line);
+		}
+		Utils.saveToFile(filename, w);
+	}
 
 	public static final String decode(final String input) {
         StringWriter writer = null;
