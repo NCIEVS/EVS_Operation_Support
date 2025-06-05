@@ -77,9 +77,11 @@ public class ExactMatchByTerm {
     static String sparqlRunnerDirectory = null;
     static HashSet branch = null;
     static HashMap sourceCode2LineMap = null;
+    static String SYNONYM_EXT = null;
 
 	static {
 		AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE_NAME;
+
 		System.out.println(AXIOM_FILE);
 		File file = new File(AXIOM_FILE);
 		if (!file.exists()) {
@@ -95,7 +97,16 @@ public class ExactMatchByTerm {
 
 		retiredConcepts = createRetiredConceptSet();
 		System.out.println("retired concepts: " + retiredConcepts.size());
-		term2CodesMap = createterm2CodesMap();
+		term2CodesMap = createTerm2CodesMap();
+
+		SYNONYM_EXT = ConfigurationController.synonymExt;
+		if (SYNONYM_EXT != null && SYNONYM_EXT.length() > 0) {
+			file = new File(SYNONYM_EXT);
+			if (file.exists()) {
+				expandTerm2CodesMap(SYNONYM_EXT);
+			}
+		}
+
 		NCIPTMap = createNCIPTMap();
 		System.out.println("NCIPTMap: " + NCIPTMap.keySet().size());
 
@@ -790,7 +801,7 @@ Cyclophosphamide/Fluoxymesterone/Mitolactol/Prednisone/Tamoxifen|C10000|P90|CTX/
 //Pacemaker Procedure|C99998|P90|Pacemaker Procedure|P383$PT|P384$NCI
 
 //Case sensitive match
-    public static HashMap createterm2CodesMap() {
+    public static HashMap createTerm2CodesMap() {
 		String filename = AXIOM_FILE;
 		HashMap hmap = new HashMap();
 		Vector v = readFile(filename);
@@ -1043,6 +1054,25 @@ Cyclophosphamide/Fluoxymesterone/Mitolactol/Prednisone/Tamoxifen|C10000|P90|CTX/
 //////////////////////////////////////////////////////////////////////////////////////////////
 	public static String matchByCode(String datafile, String outputfile) {
 		return run(datafile, outputfile, 0);
+	}
+
+	public static void expandTerm2CodesMap(String filename) {
+		Vector v = Utils.readFile(filename);
+        for (int i=0; i<v.size(); i++) {
+			String t = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(t, '|');
+			String code = (String) u.elementAt(1);
+			String term = (String) u.elementAt(0);
+			term = term.toLowerCase();
+			Vector w = new Vector();
+			if (term2CodesMap.containsKey(term)) {
+				w =	(Vector) term2CodesMap.get(term);
+			}
+			if (!w.contains(code)) {
+				w.add(code);
+			}
+			term2CodesMap.put(term, w);
+		}
 	}
 
 	public static String matchByCode(String datafile, String outputfile, int colIndex) {
