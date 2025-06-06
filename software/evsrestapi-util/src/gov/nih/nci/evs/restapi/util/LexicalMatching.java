@@ -1,6 +1,7 @@
 package gov.nih.nci.evs.restapi.util;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.common.*;
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -91,12 +92,20 @@ public class LexicalMatching {
     static HashMap signatureMap = null;
     static HashMap id2LabelMap = null;
 
-    static String FULL_SYN_FILE = "FULL_SYN.txt";
+
     static String STOPWORD_FILE = "stop_words.txt";
+
+    static String AXIOM_FILE_NAME = "axiom_ThesaurusInferred_forTS.txt";
+    static String FULL_SYN_FILE = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE_NAME;
 
     static {
 		long ms = System.currentTimeMillis();
-		STOP_WORDS = createStopWordSet(STOPWORD_FILE);
+		File file = new File(STOPWORD_FILE);
+
+		STOP_WORDS = new HashSet();
+		if (file.exists()) {
+			STOP_WORDS = createStopWordSet(STOPWORD_FILE);
+		}
 		stemmer = new PorterStemmer();
 		signatureMap = createSignatureMap();
 		id2LabelMap = createId2LabelMap();
