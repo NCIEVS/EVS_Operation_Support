@@ -671,12 +671,7 @@ public class ContainsSearchByTerm {
 	}
 
 	public static String encode(String t) {
-		t = t.replace("&apos;", "'");
-		t = t.replace("&lt;", "<");
-		t = t.replace("&gt;", ">");
-		t = t.replace("&quot;", "\"");
-		t = t.replace("&amp;", "&");
-        return t;
+		return HTMLDecoder.decode(t);
 	}
 
 	public static Vector encode(Vector v) {

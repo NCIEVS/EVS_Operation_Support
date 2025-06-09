@@ -6290,26 +6290,29 @@ bnode_07130346_a093_4c67_ad70_efd4d5bc5796_242618|Thorax|C12799|Maps_To|P375|Tho
         return (String) u.elementAt(0);
 	}
 
-/*
-	public static void main(String[] args) {
-		long ms = System.currentTimeMillis();
-
-		String serviceUrl = ConfigurationController.serviceUrl;
-		String namedGraph = ConfigurationController.namedGraph;
-		String username = ConfigurationController.username;
-		String password = ConfigurationController.password;
-
-		System.out.println("serviceUrl: " + serviceUrl);
-		System.out.println("namedGraph: " + namedGraph);
-
-	    OWLSPARQLUtils owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
-	    owlSPARQLUtils.set_named_graph(namedGraph);
-
-	    //Vector v = owlSPARQLUtils.getObjectPropertiesDomainRange(namedGraph);
-	    String version = owlSPARQLUtils.getVersion(namedGraph);
-        System.out.println("version: " + version);
-
-    }
-*/
+	public String construct_get_constains_search(String named_graph, String term) {
+		String prefixes = getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		term = term.toLowerCase();
+		buf.append("select distinct ?x_label ?x_code ?a_target ").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
+		buf.append("where  { ").append("\n");
+		buf.append("            	?x a owl:Class .").append("\n");
+		buf.append("            	?x :NHC0 ?x_code .").append("\n");
+		buf.append("             	?x rdfs:label ?x_label .").append("\n");
+		buf.append("").append("\n");
+		buf.append("                ?p2 a owl:AnnotationProperty .").append("\n");
+		buf.append(" ").append("\n");
+		buf.append("                ?a1 a owl:Axiom .").append("\n");
+		buf.append("                ?a1 owl:annotatedSource ?x .").append("\n");
+		buf.append("                ?a1 owl:annotatedProperty ?p2 .").append("\n");
+		buf.append("                ?p2 :NHC0 \"P90\"^^xsd:string .").append("\n");
+		buf.append("                ?a1 owl:annotatedTarget ?a_target .").append("\n");
+		buf.append("").append("\n");
+		buf.append("                FILTER(contains(lcase(?a_target), \"" + term + "\"))").append("\n");
+		buf.append("}").append("\n");
+		return buf.toString();
+	}
 }
 

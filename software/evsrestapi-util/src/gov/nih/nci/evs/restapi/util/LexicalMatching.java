@@ -164,55 +164,9 @@ public class LexicalMatching {
 		return this.owlSPARQLUtils;
 	}
 
-	public String construct_get_constains_search(String named_graph, String term) {
-		String prefixes = owlSPARQLUtils.getPrefixes();
-		StringBuffer buf = new StringBuffer();
-		buf.append(prefixes);
-		term = term.toLowerCase();
-		buf.append("select distinct ?x_label ?x_code ?a_target ").append("\n");
-		buf.append("from <" + named_graph + ">").append("\n");
-		buf.append("where  { ").append("\n");
-		buf.append("            	?x a owl:Class .").append("\n");
-		buf.append("            	?x :NHC0 ?x_code .").append("\n");
-		buf.append("             	?x rdfs:label ?x_label .").append("\n");
-		buf.append("").append("\n");
-		buf.append("                ?p2 a owl:AnnotationProperty .").append("\n");
-		buf.append(" ").append("\n");
-		buf.append("                ?a1 a owl:Axiom .").append("\n");
-		buf.append("                ?a1 owl:annotatedSource ?x .").append("\n");
-		buf.append("                ?a1 owl:annotatedProperty ?p2 .").append("\n");
-		buf.append("                ?p2 :NHC0 \"P90\"^^xsd:string .").append("\n");
-		buf.append("                ?a1 owl:annotatedTarget ?a_target .").append("\n");
-		buf.append("").append("\n");
-		buf.append("                FILTER(contains(lcase(?a_target), \"" + term + "\"))").append("\n");
-		buf.append("}").append("\n");
-		return buf.toString();
-	}
-
-	public Vector getConstainsSearch(String named_graph, String term) {
-		String query = construct_get_constains_search(named_graph, term);
-		Vector v = owlSPARQLUtils.executeQuery(query);
-		if (v == null) return null;
-		if (v.size() == 0) return v;
-		v = new ParserUtils().getResponseValues(v);
-		return new SortUtils().quickSort(v);
-	}
-
-	public static String getVariant(String t) {
-		String s = t.replace("neoplasms", "neoplasm");
-		s = s.replace("disorders", "disorder");
-		s = s.replace(" and unspecified", "");
-		s = s.replace(" NEC", "");
-		s = s.replace("'s", "");
-		s = s.replace("type 1", "type I");
-		s = s.replace("sarcomas", "sarcoma");
-
-		return s;
-	}
-
-//(E3-Independent) E2 Ubiquitin-Conjugating Enzyme|C150023|FULL_SYN|(E3-Independent) E2 Ubiquitin-Conjugating Enzyme|PT|NCI||
-
     public static String removeSpecialCharacters(String t) {
+		t = t.replace("/", " ");
+		t = t.replace("-", " ");
 		t = t.replace("(", " ");
 		t = t.replace(")", " ");
 		t = t.replace(",", " ");
@@ -289,54 +243,6 @@ public class LexicalMatching {
 		}
 		return words;
 	}
-
-    public static void containsSearch(String[] args) {
-		long ms = System.currentTimeMillis();
-		String serviceUrl = args[0];
-		String named_graph = args[1];
-		String username = args[2];
-		String password = args[3];
-		String termfile = args[4];
-
-		Vector w = new Vector();
-        LexicalMatching test = new LexicalMatching(serviceUrl, named_graph, username, password);
-        Vector v = readFile(termfile);
-        Vector res_vec = new Vector();
-        System.out.println(v.size());
-        int knt = 0;
-        int total = 0;
-        for (int i=1; i<v.size(); i++) {
-			int j = i+1;
-			String line = (String) v.elementAt(i);
-			line = line.trim();
-			Vector u = StringUtils.parseData(line, '\t');
-			String term = (String) u.elementAt(0);
-			String term0 = term;
-			if (term.length() > 0) {
-				total++;
-				System.out.println("(" + j + ") " + term);
-				w = test.getConstainsSearch(named_graph, term);
-				if (w == null || w.size() == 0) {
-					String variant = getVariant(term);
-					if (variant.compareTo(term) != 0) {
-						w = test.getConstainsSearch(named_graph, variant);
-					}
-				}
-
-				if (w != null && w.size() > 0) {
-					knt++;
-					for (int k=0; k<w.size(); k++) {
-						String s = (String) w.elementAt(k);
-						res_vec.add(term0 + "\t" + s);
-					}
-					Utils.dumpVector(term0, w);
-				}
-			}
-		}
-		System.out.println("" + knt + " out of " + total + " matches.");
-		Utils.saveToFile("result_" + termfile, res_vec);
-		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
-    }
 
     public static void sort(String filename) {
 		HashMap hmap = new HashMap();
@@ -428,46 +334,6 @@ public class LexicalMatching {
 		}
 	}
 
-    public static void match(String termfile) {
-		int total = 0;
-		Vector v = readFile(termfile);
-		int num_matches = 0;
-        for (int i=1; i<v.size(); i++) {
-			String term = (String) v.elementAt(i);
-			term = term.trim();
-			if (term.length() > 0) {
-				total++;
-				int j = i+1;
-				System.out.println("\n(" + j + ") " + term);
-				Vector w = tokenize(term);
-				for (int k=0; k<w.size(); k++) {
-					String word = (String) w.elementAt(k);
-					if (isKeyword(word)) {
-						if (isFiller(word)) {
-							System.out.println("\t" + word + " (*)");
-						} else {
-							System.out.println("\t" + word);
-						}
-					} else {
-						System.out.println("\t" + word + " (?)");
-					}
-				}
-				String signature = getSignature(term);
-				if (signatureMap.containsKey(signature)) {
-					System.out.println("\n\tMatches: ");
-					w = (Vector) signatureMap.get(signature);
-					for (int k=0; k<w.size(); k++) {
-						String code = (String) w.elementAt(k);
-						String label = (String) getLabel(code);
-						System.out.println("\t" + label + " (" + code + ")");
-					}
-					num_matches++;
-				}
-			}
-		}
-        System.out.println("" + num_matches + " out of " + total + " matches.");
-	}
-
 	public static boolean checkCoocurrence(String wd_1, String wd_2) {
 		String stemmed_wd_1 = stemTerm(wd_1);
 		String stemmed_wd_2 = stemTerm(wd_2);
@@ -485,11 +351,11 @@ public class LexicalMatching {
 		return false;
 	}
 
-    public static void run(String termfile) {
-		run(termfile, true, 0);
+    public static String run(String termfile) {
+		return run(termfile, true, 0);
 	}
 
-    public static void run(String termfile, boolean header, int term_col) {
+    public static String run(String termfile, boolean header, int term_col) {
 		int total = 0;
 		int num_matches = 0;
 		Vector v = readFile(termfile);
@@ -519,12 +385,80 @@ public class LexicalMatching {
 			}
 			w.add(line + "\t" + result);
 		}
-		Utils.saveToFile("result_" + termfile, w);
+		String outputfile = "result_" + termfile;
+		Utils.saveToFile(outputfile, w);
         System.out.println("" + num_matches + " out of " + total + " matches.");
+
+        return outputfile;
+	}
+
+	public static void analyze(String filename, int col) {
+		Vector v = readFile(filename);
+		Vector w = new Vector();
+		int istart = 0;
+        for (int i=istart; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '\t');
+			String term = (String) u.elementAt(col);
+			int j = i+1;
+			w.add("(" + j + ") " + term);
+			Vector wds = tokenize(term);
+			for (int k=0; k<wds.size(); k++) {
+				String word = (String) wds.elementAt(k);
+				if (isKeyword(word)) {
+					if (isFiller(word)) {
+						w.add("\t" + word + " (*)");
+					} else {
+						w.add("\t" + word);
+					}
+				} else {
+					w.add("\t" + word + " (?)");
+				}
+			}
+			w.add("\n");
+		}
+
+		Utils.saveToFile("analysis_" + filename, w);
+	}
+
+	public static void tallyResults(String filename, int result_col) {
+		Vector v = Utils.readFile(filename);
+		Vector w = new Vector();
+		Vector w1 = new Vector();
+		int total = 0;
+		int matched = 0;
+		int unmatched = 0;
+		HashSet hset = new HashSet();
+
+        for (int i=1; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '\t');
+			String t = (String) u.elementAt(0);
+			String s = (String) u.elementAt(result_col);
+			if (!hset.contains(t)) {
+				hset.add(t);
+				total++;
+				if (s.compareTo("No match") == 0) {
+					unmatched++;
+					w1.add(line);
+				} else {
+					matched++;
+					System.out.println(line);
+					w.add(line);
+				}
+			}
+		}
+		System.out.println("matched: " + matched);
+		System.out.println("unmatched: " + unmatched);
+		System.out.println("total: " + total);
+		Utils.saveToFile("matched_" + filename, w);
+		Utils.saveToFile("notmatched_" + filename, w1);
 	}
 
     public static void main(String[] args) {
-		String termfile = args[0];
-		run(termfile);
+		String termfile = "normalized_data_NCCN_regimens_05-08-2025.txt";
+		String outputfile = run(termfile, true, 1);
+		tallyResults(outputfile, 2);
+		analyze("notmatched_" + outputfile, 1);
 	}
 }
