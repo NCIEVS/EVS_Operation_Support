@@ -87,8 +87,8 @@ public class LexicalMatching {
 
     static PorterStemmer stemmer = null;
 
-    static HashSet STOP_WORDS = null;
-    static HashSet KEYWORDS = null;
+    public static HashSet STOP_WORDS = null;
+    public static HashSet KEYWORDS = null;
     static HashMap signatureMap = null;
     static HashMap id2LabelMap = null;
 
@@ -182,11 +182,14 @@ public class LexicalMatching {
 			String line = (String) v.elementAt(i);
 			Vector values = StringUtils.parseData(line, '|');
 			String term = (String) values.elementAt(3);
-			Vector w = tokenize(term);
-			for (int j=0; j<w.size(); j++) {
-				String word = (String) w.elementAt(j);
-				if (!hset.contains(word)) {
-					hset.add(word);
+			String type = (String) values.elementAt(2);
+			if (type.compareTo("P90") == 0) {
+				Vector w = tokenize(term);
+				for (int j=0; j<w.size(); j++) {
+					String word = (String) w.elementAt(j);
+					if (!hset.contains(word)) {
+						hset.add(word);
+					}
 				}
 			}
 		}
@@ -302,15 +305,18 @@ public class LexicalMatching {
 			Vector u = StringUtils.parseData(line, '|');
 			String term = (String) u.elementAt(3);
 			String code = (String) u.elementAt(1);
-			String signature = getSignature(term);
-			Vector w = new Vector();
-			if (hmap.containsKey(signature)) {
-				w = (Vector) hmap.get(signature);
+			String type = (String) u.elementAt(2);
+			if (type.compareTo("P90") == 0) {
+				String signature = getSignature(term);
+				Vector w = new Vector();
+				if (hmap.containsKey(signature)) {
+					w = (Vector) hmap.get(signature);
+				}
+				if (!w.contains(code)) {
+					w.add(code);
+				}
+				hmap.put(signature, w);
 			}
-			if (!w.contains(code)) {
-				w.add(code);
-			}
-			hmap.put(signature, w);
 		}
 		return hmap;
 	}
