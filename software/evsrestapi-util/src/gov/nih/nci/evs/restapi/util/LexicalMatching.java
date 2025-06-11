@@ -89,9 +89,8 @@ public class LexicalMatching {
 
     public static HashSet STOP_WORDS = null;
     public static HashSet KEYWORDS = null;
-    static HashMap signatureMap = null;
-    static HashMap id2LabelMap = null;
-
+    public static HashMap signatureMap = null;
+    public static HashMap id2LabelMap = null;
 
     static String STOPWORD_FILE = "stop_words.txt";
 
