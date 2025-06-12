@@ -321,6 +321,10 @@ public class LexicalMatching {
 	}
 
 	public static String lexicalMatch(String term) {
+		return lexicalMatch(term, false);
+	}
+
+	public static String lexicalMatch(String term, boolean codeOnly) {
 		if (term.length() == 0) return "No match";
 		//Vector w = tokenize(term);
 		String signature = getSignature(term);
@@ -329,8 +333,12 @@ public class LexicalMatching {
 			Vector w = (Vector) signatureMap.get(signature);
 			for (int k=0; k<w.size(); k++) {
 				String code = (String) w.elementAt(k);
-				String label = (String) getLabel(code);
-				buf.append(label + "|" + code).append("$");
+				if (codeOnly) {
+					buf.append(code).append("$");
+				} else {
+					String label = (String) getLabel(code);
+					buf.append(label + "|" + code).append("$");
+				}
 			}
 			String t = buf.toString();
 			return t.substring(0, t.length()-1);
