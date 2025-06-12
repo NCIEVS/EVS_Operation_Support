@@ -194,6 +194,14 @@ public class ExactMatchByTerm {
 		return retiredConcepts.contains(code);
 	}
 
+	public static Vector getMatchedCodes(String term) {
+		if (!caseSensitive) {
+			term = term.toLowerCase();
+		}
+		if (!term2CodesMap.containsKey(term)) return null;
+		return (Vector) term2CodesMap.get(term);
+	}
+
 	public static void extractProperties(String prop_code) {
 		long ms = System.currentTimeMillis();
 		String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
