@@ -334,10 +334,10 @@ public class LexicalMatching {
 			for (int k=0; k<w.size(); k++) {
 				String code = (String) w.elementAt(k);
 				if (codeOnly) {
-					buf.append(code).append("$");
+					buf.append(code).append("|");
 				} else {
 					String label = (String) getLabel(code);
-					buf.append(label + "|" + code).append("$");
+					buf.append(label + "$" + code).append("|");
 				}
 			}
 			String t = buf.toString();
