@@ -290,6 +290,7 @@ public class LexicalMatching {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			String label = (String) u.elementAt(0);
+			label = HTMLDecoder.decode(label);
 			String code = (String) u.elementAt(1);
 			hmap.put(code, label);
 		}
