@@ -723,6 +723,7 @@ public class HierarchyHelper implements Serializable {
 		return count;
 	}
 
+/*
     public int get_transitive_closure_v2(String code) {
 		int count = 0;
 		Vector v = null;
@@ -747,14 +748,13 @@ public class HierarchyHelper implements Serializable {
 		hset.clear();
 		return count;
 	}
+*/
 
-/*
-    public Vector get_transitive_closure_v3(String code) {
+    public Vector get_transitive_closure_v2(String code) {
 		Vector w = new Vector();
 		Vector v = null;
 		Stack stack = new Stack();
 		stack.push(code);
-		w.add(code);
 		HashSet hset = new HashSet();
 		while (!stack.isEmpty()) {
 			String next_code = (String) stack.pop();
@@ -770,10 +770,14 @@ public class HierarchyHelper implements Serializable {
 				}
 			}
 		}
-		hset.clear();
-		return w;
+		v = new Vector();
+		for (int i=0; i<w.size(); i++) {
+			code = (String) w.elementAt(i);
+			v.add(getLabel(code) + "|" + code);
+		}
+		return new SortUtils().quickSort(v);
 	}
-*/
+
     public Vector get_transitive_closure_v3(String code) {
 		Vector w = new Vector();
 		Vector v = null;
