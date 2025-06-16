@@ -67,14 +67,26 @@ public class MappingRunner {
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile;
 
 	static String requiredDataFile = ConfigurationController.requiredDataFile;
-	static HashMap ncitPTMap = null;
-	static HashMap ncitSYMap = null;
+	public static HashMap ncitPTMap = null;
+	public static HashMap ncitSYMap = null;
 
 	static {
         Vector required_data = Utils.readFile(requiredDataFile);
  		DataRetrieval dataRetrieval = new DataRetrieval(NCIT_OWL, required_data);
         ncitPTMap = dataRetrieval.createCode2ValuesMap("P90|P384$NCI|P383$PT");
         ncitSYMap = dataRetrieval.createCode2ValuesMap("P90|P384$NCI|P383$SY");
+	}
+
+	public static HashMap createCode2LabelMap() {
+		Vector v = Utils.readFile(PARENT_CHILD_FILE);
+		HashMap hmap = new HashMap();
+        for (int i=1; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			hmap.put((String) u.elementAt(1), HTMLDecoder.decode((String) u.elementAt(0)));
+            hmap.put((String) u.elementAt(3), HTMLDecoder.decode((String) u.elementAt(2)));
+		}
+		return hmap;
 	}
 
 	public static String vector2Delimited(Vector v, char delim) {
