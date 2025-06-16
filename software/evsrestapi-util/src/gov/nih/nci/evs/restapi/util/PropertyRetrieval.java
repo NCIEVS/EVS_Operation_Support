@@ -212,6 +212,7 @@ public class PropertyRetrieval {
 			Vector w = (Vector) hmap.get(code);
 			for (int i=0; i<w.size(); i++) {
 				String value = (String) w.elementAt(i);
+				value = HTMLDecoder.decode(value);
 				w0.add(code + "|" + propertyCode + "|" + value);
 			}
 		}

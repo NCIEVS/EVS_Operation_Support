@@ -67,32 +67,6 @@ import org.json.*;
  *
  */
 public class MappingUtils {
-/*
-    static String[] VARS = new String[] {"sourceCode",
-                                         "sourceName",
-                                         "sourceCodingScheme",
-                                         "sourceCodingSchemeVersion",
-                                         "sourceCodingSchemeNamespace",
-                                         "targetCodingScheme",
-                                         "associationName",
-                                         "rel",
-                                         "mapRank",
-                                         "targetCode",
-                                         "targetName",
-                                         "targetCodingScheme",
-                                         "targetCodingSchemeVersion",
-                                         "targetCodingSchemeNamespace"};
-
-	static VAR_HASHMAP = null;
-
-	static {
-		VAR_HASHMAP = new HashMap();
-		for (int j=0; j<VARS.length; j++) {
-			String var = VARS[j];
-			VAR_HASHMAP.put(var, var);
-		}
-	}
-*/
     JSONUtils jsonUtils = null;
     HTTPUtils httpUtils = null;
     String named_graph = null;

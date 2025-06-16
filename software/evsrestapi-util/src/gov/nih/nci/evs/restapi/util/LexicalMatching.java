@@ -183,6 +183,7 @@ public class LexicalMatching {
 			String term = (String) values.elementAt(3);
 			String type = (String) values.elementAt(2);
 			if (type.compareTo("P90") == 0) {
+				term = HTMLDecoder.decode(term);
 				Vector w = tokenize(term);
 				for (int j=0; j<w.size(); j++) {
 					String word = (String) w.elementAt(j);
@@ -238,6 +239,7 @@ public class LexicalMatching {
     public static Vector tokenize(String term) {
 		term = term.toLowerCase();
 		term = removeSpecialCharacters(term);
+		term = HTMLDecoder.decode(term);
 		Vector words = new Vector();
 		StringTokenizer st = new StringTokenizer(term);
 		while (st.hasMoreTokens()) {
@@ -304,6 +306,7 @@ public class LexicalMatching {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			String term = (String) u.elementAt(3);
+			term = HTMLDecoder.decode(term);
 			String code = (String) u.elementAt(1);
 			String type = (String) u.elementAt(2);
 			if (type.compareTo("P90") == 0) {

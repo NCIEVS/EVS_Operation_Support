@@ -169,11 +169,12 @@ public class AxiomExtractor {
 			 Vector u = StringUtils.parseData(line, '|');
 			 String code = (String) u.elementAt(1);
 			 if (hset.contains(code)) {
-				 System.out.println(line);
-				 System.out.println(code);
+				 //System.out.println(line);
+				 //System.out.println(code);
 				 String prop_code = (String) u.elementAt(2);
 				 if (prop_code.compareTo("P90") == 0) {
 					 String term = (String) u.elementAt(3);
+					 term = HTMLDecoder.decode(term);
 					 System.out.println(term);
 					 Vector w1 = tokenize(term);
 					 for (int j=0; j<w1.size(); j++) {

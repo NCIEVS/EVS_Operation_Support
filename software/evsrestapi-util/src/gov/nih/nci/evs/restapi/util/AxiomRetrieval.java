@@ -118,6 +118,7 @@ public class AxiomRetrieval {
 			String propCode = (String) u.elementAt(2);
 
 			if (propCode.compareTo("P90") == 0) {
+				line = HTMLDecoder.decode(line);
 				HashMap hmap = new HashMap();
 				if (axiomMap.containsKey("P90")) {
 					hmap = (HashMap) axiomMap.get("P90");
@@ -216,6 +217,7 @@ public class AxiomRetrieval {
 						}
 					}
 					if (matched) {
+						line = HTMLDecoder.decode(line);
 						if (propCode.compareTo("P90") == 0) {
 							HashMap hmap = new HashMap();
 							if (axiomMap.containsKey("P90")) {

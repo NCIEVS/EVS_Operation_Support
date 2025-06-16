@@ -2480,6 +2480,7 @@ C4910|<NHC0>C4910</NHC0>
 			String propertyName = (String) u.elementAt(3); // FULL_SYN
 			//String propertyCode = (String) u.elementAt(4); // P90
 			String term_name = (String) u.elementAt(4); //P90
+			term_name = HTMLDecoder.decode(term_name);
 			String qualifier_name = (String) u.elementAt(5);
 			//String qualifier_code = (String) u.elementAt(7);
 			String qualifier_value = (String) u.elementAt(6);
@@ -2883,6 +2884,7 @@ C4910|<NHC0>C4910</NHC0>
 			String label = (String) u.elementAt(0);
 			String code = (String) u.elementAt(1);
 			String term = (String) u.elementAt(3);
+			term = HTMLDecoder.decode(term);
 			String termType = "";
 			String termSource = "";
 			String subsourceName = "";
@@ -3191,6 +3193,7 @@ C4910|<NHC0>C4910</NHC0>
 			String code = (String) u.elementAt(0);
 			String prop_label = (String) u.elementAt(1);
 			String value = (String) u.elementAt(2);
+			value = HTMLDecoder.decode(value);
 			HashMap map = new HashMap();
 			if (hmap.containsKey(prop_label)) {
 				map = (HashMap) hmap.get(prop_label);
@@ -3331,6 +3334,7 @@ C4910|<NHC0>C4910</NHC0>
 					}
 				}
 				if (matched) {
+					line = HTMLDecoder.decode(line);
 					if (propCode.compareTo("P90") == 0) {
 						Synonym syn = ParserUtils.axiom2Synonym(line);
 						w.add(syn);
