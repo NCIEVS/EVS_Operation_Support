@@ -284,9 +284,53 @@ public class IndexUtils {
 		return w;
 	}
 
+	public Vector index_term(String term) {
+		Vector w = new Vector();
+		Vector words = term2Keywords(term);
+		int n = words.size();
+		int lcv = 0;
+		StringBuffer buf = new StringBuffer();
+		while (lcv < n) {
+			String word = (String) words.elementAt(lcv);
+			lcv++;
+			if (isKeyword(word)) {
+				buf.append(word).append(" ");
+			} else {
+				String t = buf.toString();
+				if (t.length() > 0) {
+					t = t.substring(0, t.length()-1);
+					w.add(t);
+				}
+				buf = new StringBuffer();
+			}
+		}
+		String t = buf.toString();
+		if (t.length() > 0) {
+			t = t.substring(0, t.length()-1);
+			w.add(t);
+		}
+		Vector v = new Vector();
+		for (int i=0; i<w.size(); i++) {
+			t = (String) w.elementAt(i);
+			Vector v1 = indexTerm(t);
+			if (v1 != null && v1.size() > 0) {
+				v.addAll(v1);
+			}
+		}
+		return new SortUtils().quickSort(v);
+	}
+
 	public Vector indexTerm(String term) {
 		Vector w = matchBySignature(term);
-		if (w != null && w.size() > 0) return w;
+		Vector w1 = new Vector();
+		if (w != null && w.size() > 0) {
+			for (int i=0; i<w.size(); i++) {
+				String code = (String) w.elementAt(i);
+				String label = getLabel(code);
+				w1.add(label + "|" + code);
+			}
+			return new SortUtils().quickSort(w1);
+		}
 
 		w = new Vector();
         Vector words = term2Keywords(term);
@@ -322,8 +366,10 @@ public class IndexUtils {
 			w.addAll(v0);
 			v0 = null;
 		}
-		Vector w1 = new Vector();
-		if (w == null || w.size() == 0) return w1;
+
+		if (w == null || w.size() == 0) {
+			return w1;
+		}
 		for (int i=0; i<w.size(); i++) {
 			String code = (String) w.elementAt(i);
 			String label = getLabel(code);
@@ -331,6 +377,7 @@ public class IndexUtils {
 		}
 		return new SortUtils().quickSort(w1);
 	}
+
 
     public Vector appendLabels(Vector codes) {
         Vector w = new Vector();
