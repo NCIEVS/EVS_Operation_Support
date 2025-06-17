@@ -273,12 +273,24 @@ public class IndexUtils {
 		return false;
 	}
 
+	public Vector removeFillers(Vector words) {
+		Vector w = new Vector();
+		for (int i=0; i<words.size(); i++) {
+			String word = (String) words.elementAt(i);
+			if (!isFiller(word)) {
+				w.add(word);
+			}
+		}
+		return w;
+	}
+
 	public Vector indexTerm(String term) {
 		Vector w = matchBySignature(term);
 		if (w != null && w.size() > 0) return w;
 
 		w = new Vector();
         Vector words = term2Keywords(term);
+        words = removeFillers(words);
         Vector v0 = new Vector();
         if (words == null || words.size() == 0) return w;
         String vbt = "";
