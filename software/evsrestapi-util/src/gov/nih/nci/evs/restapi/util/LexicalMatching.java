@@ -77,6 +77,8 @@ public class LexicalMatching {
     String named_graph_id = ":NHC0";
     String BASE_URI = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl";
 
+    static int MIM_LEN = 5;
+
     ParserUtils parser = new ParserUtils();
     HashMap nameVersion2NamedGraphMap = null;
     HashMap ontologyUri2LabelMap = null;
@@ -171,6 +173,7 @@ public class LexicalMatching {
 		t = t.replace(",", " ");
 		t = t.replace(";", " ");
 		t = t.replace("'s", " ");
+		t = t.replace(":", " ");
 		return t;
 	}
 
@@ -197,6 +200,9 @@ public class LexicalMatching {
 		return hset;
 	}
 
+
+
+
     public static String getSignature(String term) {
 		Vector words = tokenize(term);
 		Vector stemmed_words = new Vector();
@@ -204,9 +210,14 @@ public class LexicalMatching {
 			String word = (String) words.elementAt(i);
 			if (!isFiller(word)) {
 				String stemmed_word = stemTerm(word);
-				stemmed_words.add(stemmed_word);
+				if (stemmed_word.length() <= MIM_LEN) {
+					stemmed_words.add(word);
+				} else {
+					stemmed_words.add(stemmed_word);
+				}
 			}
 		}
+
 		stemmed_words = new SortUtils().quickSort(stemmed_words);
 		StringBuffer buf = new StringBuffer();
 		for (int i=0; i<stemmed_words.size(); i++) {
@@ -233,6 +244,9 @@ public class LexicalMatching {
 
 
 	public static String stemTerm(String term) {
+		if (term.length() <= MIM_LEN) {
+			return term;
+		}
 	    return stemmer.stem(term);
 	}
 
