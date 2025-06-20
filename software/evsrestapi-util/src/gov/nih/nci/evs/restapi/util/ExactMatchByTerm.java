@@ -78,6 +78,7 @@ public class ExactMatchByTerm {
     static HashSet branch = null;
     static HashMap sourceCode2LineMap = null;
     static String SYNONYM_EXT = null;
+    static String termfile = null;
 
 	static {
 		AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE_NAME;
@@ -91,13 +92,20 @@ public class ExactMatchByTerm {
 			System.out.println("INFO: " + AXIOM_FILE + " exists.");
 		}
 
-		//sparqlRunnerDirectory = ConfigurationController.sparqlRunnerDirectory;
-		//CONCEPT_STATUS_FILE = sparqlRunnerDirectory + File.separator + CONCEPT_STATUS_FILE;
 		sourceCode2LineMap = createSourceCode2LineMap();
 
 		retiredConcepts = createRetiredConceptSet();
 		System.out.println("retired concepts: " + retiredConcepts.size());
-		term2CodesMap = createTerm2CodesMap();
+
+		termfile = ConfigurationController.axiomfile;
+		file = new File(termfile);
+		if (!file.exists()) {
+			termfile = null;
+		} else {
+			System.out.println("INFO: " + termfile + " exists.");
+			System.out.println(termfile);
+		}
+		term2CodesMap = createTerm2CodesMap(termfile);
 
 		SYNONYM_EXT = ConfigurationController.synonymExt;
 		if (SYNONYM_EXT != null && SYNONYM_EXT.length() > 0) {
@@ -181,6 +189,7 @@ public class ExactMatchByTerm {
 			for (int j=0; j<u.size(); j++) {
 				String t = (String) u.elementAt(j);
 				if (t.startsWith("P385$")) {
+					line = HTMLDecoder.decode(line);
 					hmap.put(t, line);
 				}
 			}
@@ -275,10 +284,12 @@ public class ExactMatchByTerm {
 				if (u.contains("P383$SY") && u.contains("P384$" + source) ) {
 					w = new Vector();
 					String key = (String) u.elementAt(1);
+
 					if (hmap.containsKey(key)) {
 						w = (Vector) hmap.get(key);
 					}
 					String sy = (String) u.elementAt(3);
+					sy = HTMLDecoder.decode(sy);
 					if (!w.contains(sy)) {
 						w.add(sy);
 					}
@@ -800,18 +811,16 @@ public class ExactMatchByTerm {
 		return list;
 	}
 
-//axiom_ThesaurusInferred_forTS
-/*
-Cyclophosphamide/Fluoxymesterone/Mitolactol/Prednisone/Tamoxifen|C10000|P90|CD(P)TH|P383$AB|P384$NCI
-Cyclophosphamide/Fluoxymesterone/Mitolactol/Prednisone/Tamoxifen|C10000|P90|CTX/DBD/FXM/PRED/TMX|P383$AB|P384$NCI
-*/
-
-//Pacemaker Procedure|C99998|P90|Pacemaker Procedure|P383$PT|P384$NCI
-
 //Case sensitive match
     public static HashMap createTerm2CodesMap() {
-		String filename = AXIOM_FILE;
+		return createTerm2CodesMap(null);
+	}
+
+    public static HashMap createTerm2CodesMap(String filename) {
 		HashMap hmap = new HashMap();
+		if (filename == null) {
+			filename = AXIOM_FILE;
+		}
 		Vector v = readFile(filename);
         for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
@@ -819,6 +828,7 @@ Cyclophosphamide/Fluoxymesterone/Mitolactol/Prednisone/Tamoxifen|C10000|P90|CTX/
 			String prop_code = (String) u.elementAt(2);
 			if (prop_code.compareTo("P90") == 0) {
 				String term = (String) u.elementAt(3);
+				term = HTMLDecoder.decode(term);
 				String term_lc = term.toLowerCase();
 				if (!caseSensitive) {
 					term = term_lc;
@@ -853,6 +863,7 @@ Cyclophosphamide/Fluoxymesterone/Mitolactol/Prednisone/Tamoxifen|C10000|P90|CTX/
 					w = (Vector) hmap.get(code);
 				}
 				String term = (String) u.elementAt(3);
+				term = HTMLDecoder.decode(term);
 				if (!w.contains(term)) {
 					w.add(term);
 				}
