@@ -573,4 +573,27 @@ public class Utils {
 		return extractColumnData(filename, col_vec, delim);
 	}
 
+	public static Vector extractRowsFromFile(String filename, Vector req_vec) {
+//Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
+		Vector w = new Vector();
+		Vector v = Utils.readFile(filename);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			boolean match = true;
+			for (int j=0; j<u.size(); j++) {
+				for (int k=0; k<req_vec.size(); k++) {
+					String req = (String) req_vec.elementAt(k);
+					if (!u.contains(req)) {
+						match = false;
+						break;
+					}
+				}
+			}
+			if (match) {
+				w.add(line);
+			}
+		}
+		return new SortUtils().quickSort(w);
+	}
 }
