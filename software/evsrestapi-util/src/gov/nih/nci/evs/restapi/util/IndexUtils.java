@@ -389,6 +389,68 @@ public class IndexUtils {
 		return w;
 	}
 
+
+    public static Vector findAcronyms(String filename) {
+		HashSet hset = new HashSet();
+		Vector w = new Vector();
+		Vector v = Utils.readFile(filename);
+		int num = 0;
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (!line.startsWith("(") && line.indexOf("(") != -1) {
+				Vector u = StringUtils.parseData(line, ' ');
+				if (u.size() > 1) {
+					int k = -1;
+					for (k=0; k<u.size(); k++) {
+						String word = (String) u.elementAt(k);
+						int numChars = 0;
+						String t0 = null;
+						if (word.startsWith("(") && word.endsWith(")")) {
+							numChars = word.length()-2;
+							t0 = word.substring(1, word.length()-1);
+							if (k-numChars > 0) {
+								int lcv = k-numChars;
+								boolean match = true;
+								StringBuffer buf = new StringBuffer();
+
+								int n = 0;
+								for (int j=lcv; j<k; j++) {
+									String token = (String) u.elementAt(j);
+									char c = token.charAt(0);
+									char c0 = t0.charAt(n);
+
+									if (c != c0) {
+										match = false;
+										break;
+									} else {
+
+										String firstChar = "" + token.charAt(0);
+										firstChar = firstChar.toUpperCase();
+										token = firstChar + token.substring(1, token.length());
+										buf.append(token).append(" ");
+									}
+									n++;
+								}
+								if (match) {
+									String t = buf.toString();
+									t = t.trim();
+									String s = word.substring(1, word.length()-1);
+									s = s.toUpperCase();
+									if (!hset.contains(t + "|" + s)) {
+										w.add(t + "|" + s);
+										num++;
+										hset.add(t + "|" + s);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return new SortUtils().quickSort(w);
+	}
+
 }
 
 
