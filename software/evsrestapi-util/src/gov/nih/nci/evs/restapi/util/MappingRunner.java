@@ -103,7 +103,23 @@ public class MappingRunner {
 		return buf.toString();
 	}
 
+	public static Vector extractRowsFromAxiomFile(Vector req_vec) {
+		return Utils.extractRowsFromFile(AXIOM_FILE, req_vec);
+	}
+
+	public static void generateMappingTarget(Vector req_vec) {
+	    Vector w = extractRowsFromAxiomFile(req_vec);
+	    Utils.saveToFile(ConfigurationController.axiomfile, w);
+	}
+
 	public static String runExactMatch(String datafile, int col) {
+        return runExactMatch(datafile, null, col);
+	}
+
+	public static String runExactMatch(String datafile, Vector req_vec, int col) {
+		if (req_vec != null) {
+			generateMappingTarget(req_vec);
+		}
 		String outputfile = "results_" + datafile;
 		Vector v = Utils.readFile(datafile);
 		String heading = (String) v.elementAt(0);
