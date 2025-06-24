@@ -103,6 +103,32 @@ public class MappingRunner {
 		return buf.toString();
 	}
 
+	public static String STARTSWITH = "StartWith";
+	public static String CONTAINS = "Contains";
+
+	public static Vector extractRowsFromAxiomFile(String pattern, String algorithm) {
+		pattern = pattern.toLowerCase();
+		Vector w = new Vector();
+		Vector v = Utils.readFile(AXIOM_FILE);
+		HashMap hmap = new HashMap();
+        for (int i=1; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String t0 = (String) u.elementAt(0);
+			t0 = t0.toLowerCase();
+			if (algorithm.compareTo(STARTSWITH) == 0) {
+				if (t0.startsWith(pattern)) {
+					w.add(line);
+				}
+			} else if (algorithm.compareTo(CONTAINS) == 0) {
+				if (t0.indexOf(pattern) != -1) {
+					w.add(line);
+				}
+			}
+		}
+		return w;
+	}
+
 	public static Vector extractRowsFromAxiomFile(Vector req_vec) {
 		return Utils.extractRowsFromFile(AXIOM_FILE, req_vec);
 	}
