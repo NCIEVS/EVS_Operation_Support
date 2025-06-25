@@ -1,30 +1,23 @@
 package gov.nih.nci.evs.restapi.util;
-import gov.nih.nci.evs.restapi.appl.*;
+import gov.nih.nci.evs.restapi.config.*;
 
 import java.io.*;
 import java.util.*;
 
 public class ReportDataGenerator {
 
-	public static String NCIT_OWL_FILE = "ThesaurusInferred_forTS.owl";
-	public static String AXIOM_FILE = "axiom_ThesaurusInferred_forTS.txt";
-	public static String HIER_FILE = "parent_child.txt";
-	public static String ROLE_FILE = "roles.txt";
-	public static String SUBSET_FILE = "A8.txt";
-	public static String LABEL_FILE = "label.txt";
+    public static String REPORT_GENERATION_DIRECTORY = ConfigurationController.reportGenerationDirectory;
+	public static String HIER_FILE = REPORT_GENERATION_DIRECTORY + File.separator + ConfigurationController.hierfile;
+	public static String ROLE_FILE = REPORT_GENERATION_DIRECTORY + File.separator + ConfigurationController.rolefile;
+	public static String PROPERTY_FILE = REPORT_GENERATION_DIRECTORY + File.separator + ConfigurationController.propertyfile;
+	public static String NCIT_OWL_FILE = REPORT_GENERATION_DIRECTORY + File.separator + ConfigurationController.owlfile;
+	public static String AXIOM_FILE = REPORT_GENERATION_DIRECTORY + File.separator + ConfigurationController.axiomfile;
+	public static String SUBSET_FILE = REPORT_GENERATION_DIRECTORY + File.separator + ConfigurationController.subsetfile;
+	public static String LABEL_FILE = REPORT_GENERATION_DIRECTORY + File.separator + "label.txt";
 
-	public static String reformatDate(String dateStr) {
-		// from yyyy-MM-dd to MM/dd/yyyy
-		Vector v = StringUtils.parseData(dateStr, '-');
-		return (String) v.elementAt(1) + "/" + (String) v.elementAt(2) + "/" + (String) v.elementAt(0);
-	}
-
-	public static String getNamedGraphForDate(String dateStr) {
-		return (String) date2NamedGraphMap.get(dateStr);
-	}
-
-
+	static OWLScanner owlscanner = null;
 	public static HashMap date2NamedGraphMap = null;
+
 	static {
 		date2NamedGraphMap = new HashMap();
 		int currentYear = DateUtils.getCurrentYear();
@@ -37,8 +30,18 @@ public class ReportDataGenerator {
 		}
 	}
 
-    public static void generateLabelFile(String hierfile) {
-		Vector v = Utils.readFile(hierfile);
+	public static String reformatDate(String dateStr) {
+		// from yyyy-MM-dd to MM/dd/yyyy
+		Vector v = StringUtils.parseData(dateStr, '-');
+		return (String) v.elementAt(1) + "/" + (String) v.elementAt(2) + "/" + (String) v.elementAt(0);
+	}
+
+	public static String getNamedGraphForDate(String dateStr) {
+		return (String) date2NamedGraphMap.get(dateStr);
+	}
+
+    public static void generateLabelFile() {
+		Vector v = Utils.readFile(HIER_FILE);
 		Vector w = new Vector();
 		HashSet hset = new HashSet();
 		//EDQM Health Care Terminology|C148636|EDQM-HC Administrable Dose Form Terminology|C175439
@@ -63,42 +66,42 @@ public class ReportDataGenerator {
 	}
 
     public static void run() {
-		OWLScanner owlscanner = null;
-		String currentDir = System.getProperty("user.dir");
+		long ms = System.currentTimeMillis();
+		String currentWorkingDirectory = System.getProperty("user.dir");
+		String url = NCItDownload.NCIt_URI + NCItDownload.NCIT_ZIP_FILE;
+		String zipFilePath = REPORT_GENERATION_DIRECTORY + File.separator + NCItDownload.NCIT_ZIP_FILE;
 
-		System.out.println("Downloading " + NCItDownload.NCIT_ZIP_FILE + "...");
-		String zipFilePath = currentDir + File.separator + NCItDownload.NCIT_ZIP_FILE;
-		NCItDownload.download(NCItDownload.NCIt_URI + NCItDownload.NCIT_ZIP_FILE, new File(currentDir + File.separator + NCItDownload.NCIT_ZIP_FILE));
-		String targetDir = NCItDownload.NCIt_URI + NCItDownload.NCIT_ZIP_FILE;
-		NCItDownload.unzip(zipFilePath, currentDir);
-		System.out.println("NCI Thesaurus OWL dowloaded.");
+		try {
+			NCItDownload.download(url, zipFilePath);
+			NCItDownload.unzip(zipFilePath, REPORT_GENERATION_DIRECTORY);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	    owlscanner = new OWLScanner(currentDir + File.separator + NCIT_OWL_FILE);
-
+		OWLScanner owlscanner = new OWLScanner(NCIT_OWL_FILE);
 		Vector w = owlscanner.extractAxiomData(null);
-		Utils.saveToFile(currentDir + File.separator + AXIOM_FILE, w);
-		System.out.println("owlscanner.extractAxiomData completed - " + w.size());
+		Utils.saveToFile(AXIOM_FILE, w);
+		HTMLDecoder.run(AXIOM_FILE);
 
 		w = owlscanner.extractHierarchicalRelationships(owlscanner.get_owl_vec());
-		Utils.saveToFile(currentDir + File.separator + HIER_FILE, w);
-
-		String hierfile = currentDir + File.separator + HIER_FILE;
-		generateLabelFile(hierfile);
-		System.out.println("owlscanner.extractHierarchicalRelationships completed - " + w.size());
+		Utils.saveToFile(HIER_FILE, w);
+		HTMLDecoder.run(HIER_FILE);
 
 		w = owlscanner.extractOWLRestrictions(owlscanner.get_owl_vec());
-		Utils.saveToFile(currentDir + File.separator + ROLE_FILE, w);
-		System.out.println("owlscanner.extractOWLRestrictions completed - " + w.size());
+		Utils.saveToFile(ROLE_FILE, w);
 
 		w = owlscanner.extractAssociations(owlscanner.get_owl_vec(), "A8");
-		Utils.saveToFile(currentDir + File.separator + SUBSET_FILE, w);
-		System.out.println("owlscanner.extractAssociations completed - " + w.size());
+		Utils.saveToFile(SUBSET_FILE, w);
 
-   }
+		w = owlscanner.extractProperties(owlscanner.get_owl_vec());
+		Utils.saveToFile(PROPERTY_FILE, w);
+		HTMLDecoder.run(PROPERTY_FILE);
 
-   public static void main(String[] args) {
-	   run();
-   }
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	}
 
-
+	public static void main(String[] args) {
+		run();
+	}
 }
+

@@ -99,12 +99,14 @@ public class ConfigurationController {
 	public final static String password = properties.getProperty("password");
 	public final static String reportGenerationDirectory = properties.getProperty("reportGenerationDirectory");
 	public final static String rolefile = properties.getProperty("rolefile");
+	public final static String propertyfile = properties.getProperty("propertyfile");
 	public final static String serviceUrl = properties.getProperty("serviceUrl");
 	public final static String serviceUrls = properties.getProperty("serviceUrls");
 	public final static Vector serviceUrl_vec = StringUtils.parseData(serviceUrls, '|');
 	public final static String source_coding_scheme = properties.getProperty("source_coding_scheme");
 	public final static String source_coding_scheme_version = properties.getProperty("source_coding_scheme_version");
 	public final static String source_ns = properties.getProperty("source_ns");
+	public final static String subsetfile = properties.getProperty("subsetfile");
 	public final static String subsetCodeColumnNumber = properties.getProperty("subsetCodeColumnNumber");
 	public final static String target_coding_scheme = properties.getProperty("target_coding_scheme");
 	public final static String target_coding_scheme_version = properties.getProperty("target_coding_scheme_version");
