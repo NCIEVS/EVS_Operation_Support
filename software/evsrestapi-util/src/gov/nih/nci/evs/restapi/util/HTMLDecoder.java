@@ -17,7 +17,9 @@ public class HTMLDecoder {
 		Utils.saveToFile(filename, w);
 	}
 
-	public static final String decode(final String input) {
+	public static String decode(String input) {
+		input = input.replace("&apos;", "'");
+
         StringWriter writer = null;
         int len = input.length();
         int i = 1;
@@ -97,6 +99,7 @@ public class HTMLDecoder {
         return input;
     }
 
+//&apos;s
     private static final String[][] ESCAPES = {
         {"\"",     "quot"}, // " - double-quote
         {"&",      "amp"}, // & - ampersand
