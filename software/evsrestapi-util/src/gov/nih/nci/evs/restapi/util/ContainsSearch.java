@@ -222,6 +222,7 @@ Recombinant Amphiregulin|C1000|P90|CRDGF|P383$AB|P384$NCI
 		Vector output_vec = new Vector();
 		for (int i=1; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
+			System.out.println(line);
 			Vector u = StringUtils.parseData(line, '\t');
 			String t = (String) u.elementAt(col);
 			Vector w = contains(t);
@@ -229,9 +230,18 @@ Recombinant Amphiregulin|C1000|P90|CRDGF|P383$AB|P384$NCI
 			if (w.size() == 0) {
 				output_vec.add("\nNo match.");
 			} else {
-				for (int j=0; j<w.size(); j++) {
-					String code = (String) w.elementAt(j);
-					output_vec.add((String) id2LabelMap.get(code) + " (" + code + ")");
+				if (w.size() <= 100) {
+					for (int j=0; j<w.size(); j++) {
+						String code = (String) w.elementAt(j);
+						output_vec.add((String) id2LabelMap.get(code) + " (" + code + ")");
+					}
+				} else {
+					for (int j=0; j<w.size(); j++) {
+						String code = (String) w.elementAt(j);
+						output_vec.add((String) id2LabelMap.get(code) + " (" + code + ")");
+					}
+					output_vec.add("... ");
+					output_vec.add("Number of matched terms: " + w.size());
 				}
 			}
 		}
