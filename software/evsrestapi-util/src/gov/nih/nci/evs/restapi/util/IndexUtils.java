@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.text.similarity.*;
+import opennlp.tools.stemmer.PorterStemmer;
 
 /**
  * <!-- LICENSE_TEXT_START -->
@@ -59,6 +60,7 @@ public class IndexUtils {
 
 	public static String[] specialChars = new String[] {"{", "}", "(", ")", "'", ":", ";", ".", "," ,"\""};
 	public static HashSet specialCharsHashSet = toHashSet(specialChars);
+	static PorterStemmer stemmer = null;
 
 	String serviceUrl = null;
 	String namedGraph = null;
@@ -70,19 +72,29 @@ public class IndexUtils {
     public static HashSet KEYWORDS = null;
     public static HashMap signatureMap = null;
     public static HashMap id2LabelMap = null;
+    static int MIM_LEN = 5;
 
     static {
+		long ms = System.currentTimeMillis();
+		System.out.println("Initializing IndexUtils ...");
+		stemmer = new PorterStemmer();
 		STOP_WORDS = LexicalMatching.STOP_WORDS;
 		KEYWORDS = LexicalMatching.KEYWORDS;
 		signatureMap = LexicalMatching.signatureMap;
 		id2LabelMap = LexicalMatching.id2LabelMap;
 		System.out.println("KEYWORDS: " + KEYWORDS.size());
 		System.out.println("STOP_WORDS: " + STOP_WORDS.size());
+		System.out.println("Completed initializing IndexUtils.");
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
     public IndexUtils() {
 
     }
+
+	public static String stemTerm(String term) {
+		return LexicalMatching.stemTerm(term);
+	}
 
     public IndexUtils(String serviceUrl, String namedGraph, String username, String password) {
 		this.serviceUrl = serviceUrl;
@@ -262,15 +274,8 @@ public class IndexUtils {
 		return getCodeBySignature(signature);
 	}
 
-	public boolean cooccurrent(String word1, String word2) {
-		Vector words = new Vector();
-		words.add(word1);
-		words.add(word2);
-		Vector w = matchBySignature(words);
-		if (w != null && w.size() > 0) {
-			return true;
-		}
-		return false;
+	public boolean checkCoocurrence(String word1, String word2) {
+		return LexicalMatching.checkCoocurrence(word1, word2);
 	}
 
 	public Vector removeFillers(Vector words) {
@@ -284,100 +289,84 @@ public class IndexUtils {
 		return w;
 	}
 
-	public Vector index_term(String term) {
-		Vector w = new Vector();
-		Vector words = term2Keywords(term);
-		int n = words.size();
-		int lcv = 0;
-		StringBuffer buf = new StringBuffer();
-		while (lcv < n) {
-			String word = (String) words.elementAt(lcv);
-			lcv++;
-			if (isKeyword(word)) {
-				buf.append(word).append(" ");
-			} else {
-				String t = buf.toString();
-				if (t.length() > 0) {
-					t = t.substring(0, t.length()-1);
-					w.add(t);
-				}
-				buf = new StringBuffer();
-			}
-		}
-		String t = buf.toString();
-		if (t.length() > 0) {
-			t = t.substring(0, t.length()-1);
-			w.add(t);
-		}
-		Vector v = new Vector();
-		for (int i=0; i<w.size(); i++) {
-			t = (String) w.elementAt(i);
-			Vector v1 = indexTerm(t);
-			if (v1 != null && v1.size() > 0) {
-				v.addAll(v1);
-			}
-		}
-		return new SortUtils().quickSort(v);
-	}
-
 	public Vector indexTerm(String term) {
-		Vector w = matchBySignature(term);
 		Vector w1 = new Vector();
+		Vector w = matchBySignature(term);
 		if (w != null && w.size() > 0) {
 			for (int i=0; i<w.size(); i++) {
 				String code = (String) w.elementAt(i);
 				String label = getLabel(code);
 				w1.add(label + "|" + code);
 			}
-			return new SortUtils().quickSort(w1);
+			return w1;
 		}
-
 		w = new Vector();
         Vector words = term2Keywords(term);
         words = removeFillers(words);
         Vector v0 = new Vector();
-        if (words == null || words.size() == 0) return w;
-        String vbt = "";
-        Vector v = null;
-        String prevword = "";
-        String nextword = "";
-        while (words.size() > 0) {
-			nextword = (String) words.remove(0);
-			boolean cooccur = true;
-			if (prevword.length() > 0) {
-				cooccur = cooccurrent(prevword, nextword);
+        if (words == null || words.size() == 0) {
+			return w;
+		}
+
+        String prevword = null;
+        if (words.size() == 1) {
+			prevword = (String) words.remove(0);
+			w = matchBySignature(prevword);
+			if (w != null && w.size() > 0) {
+				for (int i=0; i<w.size(); i++) {
+					String code = (String) w.elementAt(i);
+					String label = getLabel(code);
+					w1.add(label + "|" + code);
+				}
+				return w1;
 			}
-			if (cooccur) {
-				vbt = vbt + " " + nextword;
+		}
+
+		boolean cooccur = true;
+		StringBuffer buf = new StringBuffer();
+		prevword = (String) words.remove(0);
+		buf.append(prevword);
+
+		while (words.size() > 0) {
+			String nextword = (String) words.remove(0);
+			cooccur = checkCoocurrence(prevword, nextword);
+			if (!cooccur) {
+				String t = buf.toString();
+				w = matchBySignature(t);
+				if (w != null && w.size() > 0) {
+					for (int i=0; i<w.size(); i++) {
+						String code = (String) w.elementAt(i);
+						String label = getLabel(code);
+						if (!w1.contains(label + "|" + code)) {
+							w1.add(label + "|" + code);
+						}
+					}
+				}
+				if (words.size() > 0) {
+					prevword = nextword;
+					buf = new StringBuffer();
+					buf.append(prevword);
+				}
 			} else {
-				if (v0 != null && v0.size() > 0) {
-					w.addAll(v0);
-					v0 = null;
-			    }
-				vbt = nextword;
+				buf.append(" ").append(nextword);
 			}
-			v = matchBySignature(vbt);
-			if (v != null && v.size() > 0) {
-				v0 = v;
-			}
-			prevword = nextword;
-		}
-		if (v0 != null && v0.size() > 0) {
-			w.addAll(v0);
-			v0 = null;
 		}
 
-		if (w == null || w.size() == 0) {
-			return w1;
+		if (buf.length() > 0) {
+			String t = buf.toString();
+			w = matchBySignature(t);
+			if (w != null && w.size() > 0) {
+				for (int i=0; i<w.size(); i++) {
+					String code = (String) w.elementAt(i);
+					String label = getLabel(code);
+					if (!w1.contains(label + "|" + code)) {
+						w1.add(label + "|" + code);
+					}
+				}
+			}
 		}
-		for (int i=0; i<w.size(); i++) {
-			String code = (String) w.elementAt(i);
-			String label = getLabel(code);
-			w1.add(label + "|" + code);
-		}
-		return new SortUtils().quickSort(w1);
+		return w1;
 	}
-
 
     public Vector appendLabels(Vector codes) {
         Vector w = new Vector();
@@ -388,7 +377,6 @@ public class IndexUtils {
 		w = new SortUtils().quickSort(w);
 		return w;
 	}
-
 
     public static Vector findAcronyms(String filename) {
 		HashSet hset = new HashSet();
@@ -450,7 +438,6 @@ public class IndexUtils {
 		}
 		return new SortUtils().quickSort(w);
 	}
-
 }
 
 

@@ -200,9 +200,6 @@ public class LexicalMatching {
 		return hset;
 	}
 
-
-
-
     public static String getSignature(String term) {
 		Vector words = tokenize(term);
 		Vector stemmed_words = new Vector();
@@ -210,11 +207,7 @@ public class LexicalMatching {
 			String word = (String) words.elementAt(i);
 			if (!isFiller(word)) {
 				String stemmed_word = stemTerm(word);
-				if (stemmed_word.length() <= MIM_LEN) {
-					stemmed_words.add(word);
-				} else {
-					stemmed_words.add(stemmed_word);
-				}
+				stemmed_words.add(stemmed_word);
 			}
 		}
 
