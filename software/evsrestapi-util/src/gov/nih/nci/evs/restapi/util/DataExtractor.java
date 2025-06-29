@@ -129,6 +129,27 @@ public class DataExtractor {
 	    return extractColumnData(filename, col_vec, delim);
 	}
 
+	public static Vector insertColumnData(Vector v, Vector values, int col) {
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '\t');
+			String value = (String) values.elementAt(i);
+			StringBuffer buf = new StringBuffer();
+			for (int j=0; j<col; j++) {
+				buf.append((String) u.elementAt(j)).append("\t");
+			}
+			buf.append(value).append("\t");
+			for (int j=col; j<u.size(); j++) {
+				buf.append((String) u.elementAt(j)).append("\t");
+			}
+			String s = buf.toString();
+			s = s.substring(0, s.length()-1);
+			w.add(s);
+		}
+		return w;
+	}
+
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		String filename = args[0];

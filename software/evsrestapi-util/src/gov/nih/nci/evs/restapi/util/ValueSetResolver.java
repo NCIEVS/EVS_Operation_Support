@@ -154,30 +154,7 @@ ALL Vitals Table|C178124|P90|Vitals Table|P383$PT|P384$PCDC|P386$ALL
 	}
 
 	public static String decode(String text) {
-		text = text.replace("&apos;", "'");
-		text = text.replace("&Ccedil;", "�");
-		text = text.replace("&ccedil;", "�");
-		text = text.replace("&Aacute;", "�");
-		text = text.replace("&Acirc;", "�");
-		text = text.replace("&Atilde;", "�");
-		text = text.replace("&Eacute;", "�");
-		text = text.replace("&Ecirc;", "�");
-		text = text.replace("&Iacute;", "�");
-		text = text.replace("&Ocirc;", "�");
-		text = text.replace("&Otilde;", "�");
-		text = text.replace("&Oacute;", "�");
-		text = text.replace("&Uacute;", "�");
-		text = text.replace("&aacute;", "�");
-		text = text.replace("&acirc;", "�");
-		text = text.replace("&atilde;", "�");
-		text = text.replace("&eacute;", "�");
-		text = text.replace("&ecirc;", "�");
-		text = text.replace("&iacute;", "�");
-		text = text.replace("&ocirc;", "�");
-		text = text.replace("&otilde;", "�");
-		text = text.replace("&oacute;", "�");
-		text = text.replace("&uacute;", "�");
-		return text;
+		return HTMLDecoder.decode(text);
 	}
 
 	private HashMap createCode2LabelMap(Vector w, int format) {
