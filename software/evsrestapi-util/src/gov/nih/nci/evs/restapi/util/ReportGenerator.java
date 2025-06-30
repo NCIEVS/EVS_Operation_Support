@@ -22,10 +22,14 @@ public class ReportGenerator {
     static HashMap propertyMap = null;
     static Vector properties = null;
     static Vector annotationProperties = null;
-    static HashMap annotationPropertyCode2LabelMap = null;
+
+    public static HashMap annotationPropertyCode2LabelMap = null;
+    public static HashMap annotationPropertyLabel2CodeMap = null;
 
     static Vector objectProperties = null;
-    static HashMap objectPropertyCode2LabelMap = null;
+    public static HashMap objectPropertyCode2LabelMap = null;
+    public static HashMap objectPropertyLabel2CodeMap = null;
+
     static HashMap subset_hmap = null;//create_subset_hmap();
     public static HashMap synonymMap = null;
 
@@ -36,18 +40,22 @@ public class ReportGenerator {
 		owlscanner = new OWLScanner(NCIT_OWL_FILE);
 		annotationProperties = owlscanner.extractAnnotationProperties(owlscanner.get_owl_vec());
 		annotationPropertyCode2LabelMap = new HashMap();
+		annotationPropertyLabel2CodeMap = new HashMap();
 		for (int i=0; i<annotationProperties.size(); i++) {
 			String line = (String) annotationProperties.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			annotationPropertyCode2LabelMap.put((String) u.elementAt(0),(String) u.elementAt(1));
+			annotationPropertyLabel2CodeMap.put((String) u.elementAt(1),(String) u.elementAt(0));
 		}
 
 		objectProperties = owlscanner.extractObjectProperties(owlscanner.get_owl_vec());
 		objectPropertyCode2LabelMap = new HashMap();
+		objectPropertyLabel2CodeMap = new HashMap();
 		for (int i=0; i<objectProperties.size(); i++) {
 			String line = (String) objectProperties.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			objectPropertyCode2LabelMap.put((String) u.elementAt(0),(String) u.elementAt(1));
+			objectPropertyLabel2CodeMap.put((String) u.elementAt(1),(String) u.elementAt(0));
 		}
 		subset_hmap = create_subset_hmap();
 		synonymMap = AxiomParser.loadSynonyms(AXIOM_FILE);
