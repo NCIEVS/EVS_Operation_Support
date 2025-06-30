@@ -198,6 +198,7 @@ public class ReportGenerator {
 		Utils.saveToFile(outputDir + File.separator + outputfile, v);
 	}
 
+////////////////////////////////////////////////////////////////////////////////////////////
 	public String getValues(String req, String code, String delim) {
 		HashMap hmap = (HashMap) dataHashMap.get(req);
 		if (hmap.containsKey(code)) {
@@ -237,6 +238,9 @@ public class ReportGenerator {
 		}
 		return buf.toString();
 	}
+////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 	public static Vector extractColumnData(String filename, String col_str, char delim) {
 		DataExtractor.dumpHeading(filename);
