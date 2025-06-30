@@ -198,11 +198,11 @@ public class ReportGenerator {
 		Utils.saveToFile(outputDir + File.separator + outputfile, v);
 	}
 
-	public String getValues(String req, String code) {
+	public String getValues(String req, String code, String delim) {
 		HashMap hmap = (HashMap) dataHashMap.get(req);
 		if (hmap.containsKey(code)) {
 			Vector w = (Vector) hmap.get(code);
-			String s = vector2Delimited(w, " \\ ");
+			String s = vector2Delimited(w, delim);
 			return s;
 		}
 		return "";
@@ -217,16 +217,19 @@ public class ReportGenerator {
 		return w;
 	}
 
-
 	public String getValues(String code) {
-		return getValues(this.dataReq, code);
+		return getValues(this.dataReq, code, " || ");
 	}
 
-	public String getValues(Vector dataReq, String code) {
+	public String getValues(String code, String delim) {
+		return getValues(this.dataReq, code, delim);
+	}
+
+	public String getValues(Vector dataReq, String code, String delim) {
 		StringBuffer buf = new StringBuffer();
 		for (int i=0; i<dataReq.size(); i++) {
 			String req = (String) dataReq.elementAt(i);
-			String s = getValues(req, code);
+			String s = getValues(req, code, delim);
 			buf.append(s);
 			if (i < dataReq.size()-1) {
 				buf.append("\t");
