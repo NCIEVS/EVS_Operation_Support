@@ -22,15 +22,15 @@ public class ReportGenerator {
     static HashMap propertyMap = null;
     static Vector properties = null;
     static Vector annotationProperties = null;
+    static Vector objectProperties = null;
 
     public static HashMap annotationPropertyCode2LabelMap = null;
     public static HashMap annotationPropertyLabel2CodeMap = null;
 
-    static Vector objectProperties = null;
     public static HashMap objectPropertyCode2LabelMap = null;
     public static HashMap objectPropertyLabel2CodeMap = null;
 
-    static HashMap subset_hmap = null;//create_subset_hmap();
+    public static HashMap subset_hmap = null;//create_subset_hmap();
     public static HashMap synonymMap = null;
 
     static {
@@ -103,6 +103,7 @@ public class ReportGenerator {
 	}
 
 	public Vector retrieveData(Vector dataReq) {
+		if (dataReq == null) return null;
 		DataRetrieval test = new DataRetrieval(NCIT_OWL_FILE, dataReq);
         Vector w = new Vector();
         for (int i=0; i<dataReq.size(); i++) {
@@ -142,7 +143,7 @@ public class ReportGenerator {
 		}
 	}
 
-    public String getLabel(String code) {
+    public static String getLabel(String code) {
 	    return hh.getLabel(code);
 	}
 
@@ -238,6 +239,13 @@ public class ReportGenerator {
 		}
 		return buf.toString();
 	}
+
+	public String getPT(String code, String source) {
+		String delim = "|";
+		String req = "P90|P383$PT|P384$" + source;
+		return getValues(req, code, delim);
+	}
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 
