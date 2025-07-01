@@ -318,6 +318,20 @@ public class ReportGenerator {
 		return w;
 	}
 
+	public static String generateReportHeader(String templateFile) {
+		StringBuffer buf = new StringBuffer();
+		TemplateLoader test = new TemplateLoader();
+		Template template = test.load(templateFile);
+        List<TemplateColumn> list = template.getColumns();
+        for (int i=0; i<list.size(); i++) {
+			TemplateColumn col = (TemplateColumn) list.get(i);
+			buf.append(col.getLabel()).append("\t");
+		}
+		String t = buf.toString();
+		t = t.substring(0, t.length()-1);
+		return t;
+	}
+
 	public Vector resolveValueSet(String rootConceptCode) {
 		if (!subset_hmap.containsKey(rootConceptCode)) {
 			return null;
