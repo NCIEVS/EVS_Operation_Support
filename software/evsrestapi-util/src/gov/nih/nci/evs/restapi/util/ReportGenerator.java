@@ -240,9 +240,42 @@ public class ReportGenerator {
 		return buf.toString();
 	}
 
-	public String getPT(String code, String source) {
-		String delim = "|";
-		String req = "P90|P383$PT|P384$" + source;
+	public String getPT(String code, String delim) {
+		String source = "NCI";
+		String termType = "SY";
+		return getTermName(code, termType, source, delim);
+	}
+
+	public String getSY(String code, String delim) {
+		String source = "NCI";
+		String termType = "SY";
+		return getTermName(code, termType, source, delim);
+	}
+
+	public String getNCIPT(String code, String delim) {
+		String source = "NCI";
+		String termType = "PT";
+		return getTermName(code, termType, source, delim);
+	}
+
+	public String getNCISY(String code, String delim) {
+		String source = "NCI";
+		String termType = "SY";
+		return getTermName(code, termType, source, delim);
+	}
+
+	public String getPT(String code, String source, String delim) {
+		String termType = "PT";
+		return getTermName(code, termType, source, delim);
+	}
+
+	public String getSY(String code, String source, String delim) {
+		String termType = "SY";
+		return getTermName(code, termType, source, delim);
+	}
+
+	public String getTermName(String code, String termType, String source, String delim) {
+		String req = "P90|P383$" + termType + "|P384$" + source;
 		return getValues(req, code, delim);
 	}
 
