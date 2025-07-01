@@ -341,6 +341,23 @@ public class ReportGenerator {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+    public Vector exportData(String req) {
+		if (!dataHashMap.containsKey(req)) {
+			return null;
+		}
+		HashMap hmap = (HashMap) dataHashMap.get(req);
+		Iterator it = hmap.keySet().iterator();
+		Vector w = new Vector();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			Vector values = (Vector) hmap.get(key);
+			for (int i=0; i<values.size(); i++) {
+				String value = (String) values.elementAt(i);
+				w.add(key + "|" + req + "|" + value);
+			}
+		}
+		return w;
+	}
 
 	public static Vector extractColumnData(String filename, String col_str, char delim) {
 		DataExtractor.dumpHeading(filename);
