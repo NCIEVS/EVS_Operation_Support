@@ -292,6 +292,10 @@ public class ReportGenerator {
 		return DataExtractor.insertColumnData(v, values, col);
 	}
 
+	public static Vector rearrageColumnData(String filename, String col_str, char delim) {
+		return DataExtractor.rearrageColumnData(filename, col_str, delim);
+	}
+
     public String getCodeListName(String codelistcode) {
 		Vector v1 = (Vector) synonymMap.get(codelistcode);
 		List parentAxioms = SpecialProperties.vector2List(v1);

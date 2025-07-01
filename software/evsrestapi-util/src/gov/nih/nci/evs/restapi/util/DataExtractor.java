@@ -150,6 +150,27 @@ public class DataExtractor {
 		return w;
 	}
 
+    public static Vector rearrageColumnData(String filename, String col_str, char delim) {
+		Vector v = Utils.readFile(filename);
+		Vector w = new Vector();
+		Vector col_indexes = StringUtils.parseData(col_str, '|');
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '\t');
+			int num_cols = u.size();
+			StringBuffer buf = new StringBuffer();
+			for (int j=0; j<num_cols; j++) {
+				int n = Integer.parseInt((String) col_indexes.elementAt(j));
+				String value = (String) u.elementAt(n);
+				buf.append(value).append("\t");
+			}
+			String s = buf.toString();
+			s = s.substring(0, s.length()-1);
+			w.add(s);
+		}
+		return w;
+	}
+
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		String filename = args[0];
