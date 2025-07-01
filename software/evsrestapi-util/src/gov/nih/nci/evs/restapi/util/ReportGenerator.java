@@ -279,8 +279,53 @@ public class ReportGenerator {
 		return getValues(req, code, delim);
 	}
 
-////////////////////////////////////////////////////////////////////////////////////////////
 
+	public Vector getRelatedConceptCodes(String code, String prop_code) {
+		String delim = "|";
+		String str = getValues(prop_code, code, delim);
+		return StringUtils.parseData(str, delim);
+	}
+
+	public Vector getRelatedConceptSourcePTs(String code, String prop_code, String source) {
+		Vector w = new Vector();
+		Vector codes = getRelatedConceptCodes(code, prop_code);
+		for (int i=0; i<codes.size(); i++) {
+			code = (String) codes.elementAt(i);
+			String pt = getPT(code, source, "|");
+			w.add(pt);
+		}
+		return w;
+	}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+	public static Vector exploreTemplateColumnLabels(String templateFile) {
+		Vector w = new Vector();
+		TemplateLoader test = new TemplateLoader();
+		Template template = test.load(templateFile);
+        List<TemplateColumn> list = template.getColumns();
+        for (int i=0; i<list.size(); i++) {
+			TemplateColumn col = (TemplateColumn) list.get(i);
+			w.add(col.getLabel());
+			Vector u = StringUtils.parseData(col.getLabel(), ' ');
+			Utils.dumpVector(col.getLabel(), u);
+			String key = (String) u.elementAt(0);
+			if (objectPropertyLabel2CodeMap.containsKey(key)) {
+				System.out.println((String) objectPropertyLabel2CodeMap.get(key));
+			} else if (annotationPropertyLabel2CodeMap.containsKey(key)) {
+				System.out.println((String) annotationPropertyLabel2CodeMap.get(key));
+			}
+		}
+		return w;
+	}
+
+	public Vector resolveValueSet(String rootConceptCode) {
+		if (!subset_hmap.containsKey(rootConceptCode)) {
+			return null;
+		}
+		return (Vector) subset_hmap.get(rootConceptCode);
+	}
+
+////////////////////////////////////////////////////////////////////////////////////////////
 
 
 	public static Vector extractColumnData(String filename, String col_str, char delim) {
