@@ -597,15 +597,5 @@ public class Utils {
 		return new SortUtils().quickSort(w);
 	}
 
-	public static Vector exploreTemplateColumnLabels(String templateFile) {
-		Vector w = new Vector();
-		TemplateLoader test = new TemplateLoader();
-		Template template = test.load(templateFile);
-        List<TemplateColumn> list = template.getColumns();
-        for (int i=0; i<list.size(); i++) {
-			TemplateColumn col = (TemplateColumn) list.get(i);
-			w.add(col.getLabel());
-		}
-		return w;
-	}
+
 }

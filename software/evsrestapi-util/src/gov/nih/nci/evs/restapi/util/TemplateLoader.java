@@ -204,6 +204,19 @@ public class TemplateLoader {
 		}
 	}
 
+
+	public Vector exploreTemplateColumnLabels(String templateFile) {
+		Vector w = new Vector();
+		Template template = load(templateFile);
+        List<TemplateColumn> list = template.getColumns();
+        for (int i=0; i<list.size(); i++) {
+			TemplateColumn col = (TemplateColumn) list.get(i);
+			w.add(col.getLabel());
+		}
+		return w;
+	}
+
+
     public static void main(String[] args) {
 		String templateFile = args[0];
 		TemplateLoader test = new TemplateLoader();
