@@ -386,6 +386,61 @@ public class ReportGenerator {
 		return SpecialProperties.getCDISCSubmissionValue(subsetcode, parentAxioms, code, axioms);
 	}
 
+	public static String[] header2DataReq(String templateFile, Vector dataMap) {
+		Vector reqVec = new Vector();
+		HashMap hmap = new HashMap();
+
+		for (int i=0; i<dataMap.size(); i++) {
+			String line = (String) dataMap.elementAt(i);
+			Vector u = StringUtils.parseData(line, '=');
+			hmap.put((String) u.elementAt(0), (String) u.elementAt(1));
+		}
+
+		Vector w = new TemplateLoader().exploreTemplateColumnLabels(templateFile);
+		Utils.dumpVector(templateFile, w);
+
+		String[] colData = new String[w.size()];
+		for (int i=0; i<w.size(); i++) {
+			colData[i] = "";
+			String t = (String) w.elementAt(i);
+			t = t.replace("NCIt", "NCI");
+			if (hmap.containsKey(t)) {
+				colData[i] = (String) hmap.get(t);
+			} else {
+				Vector u = StringUtils.parseData(t, ' ');
+				for (int j=0; j<u.size(); j++) {
+					String key = (String) u.elementAt(0);
+					if (objectPropertyLabel2CodeMap.containsKey(key)) {
+						colData[i] = (String) hmap.get(key);
+					} else if (annotationPropertyLabel2CodeMap.containsKey(key)) {
+						colData[i] = (String) hmap.get(key);
+					}
+				}
+			}
+		}
+		for (int i=0; i<w.size(); i++) {
+			String t = (String) w.elementAt(i);
+			if (colData[i] == "") {
+				colData[i] = (String) w.elementAt(i);
+			}
+		}
+		for (int i=0; i<w.size(); i++) {
+			String t = (String) w.elementAt(i);
+			Vector u = StringUtils.parseData(t, ' ');
+			String val =(String) u.elementAt(0);
+			String s = colData[i];
+			if (objectPropertyLabel2CodeMap.containsKey(val)) {
+				t = t.replace((String) u.elementAt(0), s);
+				colData[i] = t;
+
+			} else if (annotationPropertyLabel2CodeMap.containsKey(val)) {
+				t = t.replace((String) u.elementAt(0), s);
+				colData[i] = t;
+			}
+		}
+		return colData;
+	}
+
     public static void generateExcel(String dir, String excelfile, char delim) {
 		Text2Excel.generateExcel(dir, excelfile, delim);
 	}
