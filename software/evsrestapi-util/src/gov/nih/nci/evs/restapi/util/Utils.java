@@ -254,6 +254,15 @@ public class Utils {
 		return hset;
 	}
 
+	public static Vector array2Vector(String[] a) {
+		Vector v = new Vector();
+		for (int i=0; i<a.length; i++) {
+			String t = (String) a[i];
+			v.add(t);
+		}
+		return v;
+	}
+
 	public static Vector hashSet2Vector(HashSet hset) {
 		if (hset == null) return null;
 		Vector v = new Vector();
