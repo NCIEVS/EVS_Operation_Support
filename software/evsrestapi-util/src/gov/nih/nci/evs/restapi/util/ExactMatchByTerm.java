@@ -63,6 +63,8 @@ public class ExactMatchByTerm {
 	static String AXIOM_FILE_NAME = "axiom_ThesaurusInferred_forTS.txt";
 	static String HIER_FILE_NAME = "parent_child.txt";
 	static String AXIOM_FILE = null;
+	static String PROPERTY_FILE = null;
+
 	static HashMap term2CodesMap = null;
 	static HashMap NCIPTMap = null;
 	static HashMap NCISYMap = null;
@@ -82,6 +84,7 @@ public class ExactMatchByTerm {
 
 	static {
 		AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE_NAME;
+		PROPERTY_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.propertyfile;
 
 		System.out.println(AXIOM_FILE);
 		File file = new File(AXIOM_FILE);
@@ -1153,6 +1156,64 @@ public class ExactMatchByTerm {
 		System.out.println("matched codes: " + knt);
 		return outputfile;
 	}
+
+	public static String matchByProperty(String datafile, int col, String propertyCode) { // P319 FDA_UNII_Code
+		//C1000|P319|7MGE0HPM2H
+		long ms = System.currentTimeMillis();
+		int knt = 0;
+		boolean matched = false;
+		Vector no_matches = new Vector();
+		Vector matches = new Vector();
+		Vector w0 = new Vector();
+		Vector v = Utils.readFile(PROPERTY_FILE);
+		HashMap hmap = new HashMap();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(0);
+			String propCode = (String) u.elementAt(1);
+			String value = (String) u.elementAt(2);
+			if (propCode.compareTo(propertyCode) == 0) {
+				Vector w = new Vector();
+				if (hmap.containsKey(value)) {
+					w = (Vector) hmap.get(value);
+				}
+				if (!w.contains(code)) {
+					w.add(code);
+				}
+				hmap.put(value, w);
+			}
+		}
+
+		v = Utils.readFile(datafile);
+        String header = (String) v.elementAt(0);
+        Vector header_u = StringUtils.parseData(header, '\t');
+        String hdr = (String) header_u.elementAt(0);
+        w0.add(hdr + "\tMatched NCIt Code(s)\tNCI PT(s)\tNCI SY(s)");
+		for (int i=1; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String value = (String) u.elementAt(col);
+			if (hmap.containsKey(value)) {
+				Vector w = (Vector) hmap.get(value);
+				String matchData = getMatchedData(w);
+				w0.add(line + "\t" + Utils.vector2Delimited(w, "|") + "\t" + matchData);
+				matches.add(line + "\t" + Utils.vector2Delimited(w, "|") + "\t" + matchData);
+				matched = true;
+				knt++;
+			} else {
+				no_matches.add(line);
+				w0.add(line + "\tNo match");
+			}
+		}
+		String outputfile = "results_" + datafile;
+		Utils.saveToFile(outputfile, w0);
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		System.out.println(outputfile + " generated.");
+		System.out.println("matched property values: " + knt);
+		return outputfile;
+	}
+
 
 	public static Vector extractRowsFromAxiomFile(Vector req_vec) {
 //Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI

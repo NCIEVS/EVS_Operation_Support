@@ -244,6 +244,18 @@ public class Utils {
 		return s;
 	}
 
+	public static String vector2Delimited(Vector v, String delim) {
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<v.size(); i++) {
+			String value = (String) v.elementAt(i);
+			buf.append(value);
+			if (i < v.size()-1) {
+				buf.append(delim);
+			}
+		}
+		return buf.toString();
+	}
+
 	public static HashSet vector2HashSet(Vector v) {
 		if (v == null) return null;
 		HashSet hset = new HashSet();
