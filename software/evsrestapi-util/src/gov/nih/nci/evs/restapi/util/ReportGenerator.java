@@ -286,6 +286,11 @@ public class ReportGenerator {
 		return StringUtils.parseData(str, delim);
 	}
 
+	public Vector getRelatedConceptPTs(String code, String prop_code) {
+		String source = "NCI";
+		return getRelatedConceptSourcePTs(code, prop_code, source);
+	}
+
 	public Vector getRelatedConceptSourcePTs(String code, String prop_code, String source) {
 		Vector w = new Vector();
 		Vector codes = getRelatedConceptCodes(code, prop_code);
