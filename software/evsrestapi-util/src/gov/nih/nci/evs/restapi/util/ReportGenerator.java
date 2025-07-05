@@ -312,7 +312,7 @@ public class ReportGenerator {
 			TemplateColumn col = (TemplateColumn) list.get(i);
 			w.add(col.getLabel());
 			Vector u = StringUtils.parseData(col.getLabel(), ' ');
-			Utils.dumpVector(col.getLabel(), u);
+			//Utils.dumpVector(col.getLabel(), u);
 			String key = (String) u.elementAt(0);
 			if (objectPropertyLabel2CodeMap.containsKey(key)) {
 				System.out.println((String) objectPropertyLabel2CodeMap.get(key));
@@ -345,6 +345,29 @@ public class ReportGenerator {
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////
+	public static String getMethod4RetrievingRelatedConceptData(String s) {
+		Vector u = StringUtils.parseData(s, ' ');
+		if (u.size() == 2) {
+			String rel = (String) u.elementAt(0);
+			boolean bool = annotationPropertyCode2LabelMap.containsKey(rel);
+			if (annotationPropertyCode2LabelMap.containsKey(rel)) {
+				String t = (String) u.elementAt(1);
+				if (t.compareTo("Code") == 0) {
+					return "generator.vector2Delimited(generator.getRelatedConceptCodes(code, \"" + rel + "\"), \"|\")";
+				} else if (t.compareTo("PT") == 0) {
+					return "generator.vector2Delimited(generator.getRelatedConceptPTs(code, \"" + rel + "\"), \"|\")";
+				}
+			} else if (objectPropertyCode2LabelMap.containsKey(rel)) {
+				String t = (String) u.elementAt(1);
+				if (t.compareTo("Code") == 0) {
+					return "generator.vector2Delimited(generator.getRelatedConceptCodes(code, \"" + rel + "\"), \"|\")";
+				} else if (t.compareTo("PT") == 0) {
+					return "generator.vector2Delimited(generator.getRelatedConceptPTs(code, \"" + rel + "\"), \"|\")";
+				}
+			}
+		}
+		return null;
+	}
 
     public Vector exportData(String req) {
 		if (!dataHashMap.containsKey(req)) {
@@ -402,7 +425,7 @@ public class ReportGenerator {
 		}
 
 		Vector w = new TemplateLoader().exploreTemplateColumnLabels(templateFile);
-		Utils.dumpVector(templateFile, w);
+		//Utils.dumpVector(templateFile, w);
 
 		String[] colData = new String[w.size()];
 		for (int i=0; i<w.size(); i++) {
