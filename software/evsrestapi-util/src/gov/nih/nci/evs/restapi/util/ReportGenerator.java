@@ -202,6 +202,10 @@ public class ReportGenerator {
 ////////////////////////////////////////////////////////////////////////////////////////////
 	public String getValues(String req, String code, String delim) {
 		HashMap hmap = (HashMap) dataHashMap.get(req);
+		if (hmap == null) {
+			System.out.println("WARNING: " + req + " data not available.");
+			return "";
+		}
 		if (hmap.containsKey(code)) {
 			Vector w = (Vector) hmap.get(code);
 			String s = vector2Delimited(w, delim);
@@ -282,6 +286,10 @@ public class ReportGenerator {
 
 	public Vector getRelatedConceptCodes(String code, String prop_code) {
 		String delim = "|";
+
+		System.out.println("code: " + code);
+		System.out.println("prop_code: " + prop_code);
+
 		String str = getValues(prop_code, code, delim);
 		return StringUtils.parseData(str, delim);
 	}
@@ -337,7 +345,7 @@ public class ReportGenerator {
 		return t;
 	}
 
-	public Vector resolveValueSet(String rootConceptCode) {
+	public static Vector resolveValueSet(String rootConceptCode) {
 		if (!subset_hmap.containsKey(rootConceptCode)) {
 			return null;
 		}
@@ -439,9 +447,9 @@ public class ReportGenerator {
 				for (int j=0; j<u.size(); j++) {
 					String key = (String) u.elementAt(0);
 					if (objectPropertyLabel2CodeMap.containsKey(key)) {
-						colData[i] = (String) hmap.get(key);
+						colData[i] = (String) hmap.get(key) + " " + (String) u.elementAt(1);
 					} else if (annotationPropertyLabel2CodeMap.containsKey(key)) {
-						colData[i] = (String) hmap.get(key);
+						colData[i] = (String) hmap.get(key) + " " + (String) u.elementAt(1);
 					}
 				}
 			}
@@ -458,12 +466,65 @@ public class ReportGenerator {
 			String val =(String) u.elementAt(0);
 			String s = colData[i];
 			if (objectPropertyLabel2CodeMap.containsKey(val)) {
-				t = t.replace((String) u.elementAt(0), s);
-				colData[i] = t;
+				//t = t.replace((String) u.elementAt(0), s);
+				colData[i] = (String) objectPropertyLabel2CodeMap.get(val) + " " + (String) u.elementAt(1);
 
 			} else if (annotationPropertyLabel2CodeMap.containsKey(val)) {
-				t = t.replace((String) u.elementAt(0), s);
-				colData[i] = t;
+				//t = t.replace((String) u.elementAt(0), s);
+				colData[i] = (String) annotationPropertyLabel2CodeMap.get(val) + " " + (String) u.elementAt(1);
+			}
+		}
+		return colData;
+	}
+
+	public static String[] header2DataReq(Vector colHeaders, Vector dataMap) {
+		Vector reqVec = new Vector();
+		HashMap hmap = new HashMap();
+
+		for (int i=0; i<dataMap.size(); i++) {
+			String line = (String) dataMap.elementAt(i);
+			Vector u = StringUtils.parseData(line, '=');
+			hmap.put((String) u.elementAt(0), (String) u.elementAt(1));
+		}
+		Utils.dumpVector("colHeaders", colHeaders);
+
+		String[] colData = new String[colHeaders.size()];
+		for (int i=0; i<colHeaders.size(); i++) {
+			colData[i] = "";
+			String t = (String) colHeaders.elementAt(i);
+			t = t.replace("NCIt", "NCI");
+			if (hmap.containsKey(t)) {
+				colData[i] = (String) hmap.get(t);
+			} else {
+				Vector u = StringUtils.parseData(t, ' ');
+				for (int j=0; j<u.size(); j++) {
+					String key = (String) u.elementAt(0);
+					if (objectPropertyLabel2CodeMap.containsKey(key)) {
+						colData[i] = (String) hmap.get(key);
+					} else if (annotationPropertyLabel2CodeMap.containsKey(key)) {
+						colData[i] = (String) hmap.get(key);
+					}
+				}
+			}
+		}
+		for (int i=0; i<colHeaders.size(); i++) {
+			String t = (String) colHeaders.elementAt(i);
+			if (colData[i] == "") {
+				colData[i] = (String) colHeaders.elementAt(i);
+			}
+		}
+		for (int i=0; i<colHeaders.size(); i++) {
+			String t = (String) colHeaders.elementAt(i);
+			Vector u = StringUtils.parseData(t, ' ');
+			String val =(String) u.elementAt(0);
+			String s = colData[i];
+			if (objectPropertyLabel2CodeMap.containsKey(val)) {
+				//t = t.replace((String) u.elementAt(0), s);
+				colData[i] = (String) objectPropertyLabel2CodeMap.get(val);
+
+			} else if (annotationPropertyLabel2CodeMap.containsKey(val)) {
+				//t = t.replace((String) u.elementAt(0), s);
+				colData[i] = (String) annotationPropertyLabel2CodeMap.get(val);
 			}
 		}
 		return colData;
