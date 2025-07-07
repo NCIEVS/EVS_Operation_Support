@@ -77,7 +77,7 @@ public class LexicalMatching {
     String named_graph_id = ":NHC0";
     String BASE_URI = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl";
 
-    static int MIM_LEN = 5;
+    static int MIM_LEN = 8;
 
     ParserUtils parser = new ParserUtils();
     HashMap nameVersion2NamedGraphMap = null;

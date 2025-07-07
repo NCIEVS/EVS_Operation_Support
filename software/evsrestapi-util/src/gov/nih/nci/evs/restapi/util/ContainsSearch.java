@@ -249,6 +249,13 @@ Recombinant Amphiregulin|C1000|P90|CRDGF|P383$AB|P384$NCI
 		return "contains_" + filename;
 	}
 
+	public static String getLabel(String code) {
+		if (id2LabelMap.containsKey(code)) {
+			return (String) id2LabelMap.get(code);
+		}
+		return null;
+	}
+
 	public static void main(String[] args) {
 		String filename = args[0];
 		String outputfile = run(filename, 1);

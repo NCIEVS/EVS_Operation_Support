@@ -218,7 +218,7 @@ public class MappingRunner {
 		heading = heading + "\t" + "Matched NCIt Code(s)\tNCI PT(s)\tNCI SY(s)";
 		Vector w = new Vector();
 		output_vec.add(heading);
-		for (int i=1; i<v.size(); i++) {
+		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			u = StringUtils.parseData(line, '\t');
 			String term = (String) u.elementAt(col);

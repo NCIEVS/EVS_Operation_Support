@@ -72,7 +72,7 @@ public class IndexUtils {
     public static HashSet KEYWORDS = null;
     public static HashMap signatureMap = null;
     public static HashMap id2LabelMap = null;
-    static int MIM_LEN = 5;
+    static int MAX_MATCHES = 20;
 
     static {
 		long ms = System.currentTimeMillis();
@@ -149,8 +149,15 @@ public class IndexUtils {
 			for (int j=0; j<segments.size(); j++) {
 				String segment = (String) segments.elementAt(j);
 				Vector u = indexTerm(segment);
-				if (u != null && u.size() >0) {
+				if (u != null && u.size()>0 && u.size() <= MAX_MATCHES) {
 					addAll(v, u);
+				} else if (u != null && u.size()>0 && u.size() > MAX_MATCHES) {
+					Vector u1 = new Vector();
+					for (int k=0; k<MAX_MATCHES; k++) {
+						String t = (String) u.elementAt(k);
+						u1.add(t);
+					}
+					addAll(v, u1);
 				}
 			}
 		}
@@ -290,6 +297,8 @@ public class IndexUtils {
 	}
 
 	public Vector indexTerm(String term) {
+		//System.out.println("indexTerm: " + term);
+
 		Vector w1 = new Vector();
 		Vector w = matchBySignature(term);
 		if (w != null && w.size() > 0) {
@@ -324,31 +333,46 @@ public class IndexUtils {
 
 		boolean cooccur = true;
 		StringBuffer buf = new StringBuffer();
-		prevword = (String) words.remove(0);
-		buf.append(prevword);
 
-		while (words.size() > 0) {
-			String nextword = (String) words.remove(0);
-			cooccur = checkCoocurrence(prevword, nextword);
-			if (!cooccur) {
-				String t = buf.toString();
-				w = matchBySignature(t);
-				if (w != null && w.size() > 0) {
-					for (int i=0; i<w.size(); i++) {
-						String code = (String) w.elementAt(i);
-						String label = getLabel(code);
-						if (!w1.contains(label + "|" + code)) {
-							w1.add(label + "|" + code);
+		if (words.size() > 0) {
+			prevword = (String) words.remove(0);
+			//System.out.println("prevword: " + prevword);
+
+			buf.append(prevword);
+			while (words.size() > 0) {
+				String nextword = (String) words.remove(0);
+				//System.out.println("nextword: " + nextword);
+
+				cooccur = checkCoocurrence(prevword, nextword);
+				//System.out.println("cooccur: " + cooccur);
+
+				if (!cooccur) {
+					String t = buf.toString();
+					w = matchBySignature(t);
+					if (w != null && w.size() > 0) {
+						//Utils.dumpVector(t, w);
+
+						for (int i=0; i<w.size(); i++) {
+							String code = (String) w.elementAt(i);
+							String label = getLabel(code);
+							if (!w1.contains(label + "|" + code)) {
+								w1.add(label + "|" + code);
+							}
 						}
 					}
-				}
-				if (words.size() > 0) {
-					prevword = nextword;
 					buf = new StringBuffer();
-					buf.append(prevword);
+					buf.append(" ").append(nextword);
+
+					String s1 = buf.toString();
+					//System.out.println("s1: " + s1);
+				} else {
+					buf = new StringBuffer();
+					buf.append(" ").append(nextword);
+
+					String s2 = buf.toString();
+					//System.out.println("s1: " + s2);
+
 				}
-			} else {
-				buf.append(" ").append(nextword);
 			}
 		}
 
