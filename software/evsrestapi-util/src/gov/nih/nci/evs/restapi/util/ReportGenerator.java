@@ -30,6 +30,10 @@ public class ReportGenerator {
     public static HashMap objectPropertyCode2LabelMap = null;
     public static HashMap objectPropertyLabel2CodeMap = null;
 
+	public static String DATA_MAP = "data_map.txt";
+	public static HashMap dataReqSrc2TargetHashMap = null;
+	public static HashMap dataReqTarget2SrcHashMap = null;
+
     public static HashMap subset_hmap = null;//create_subset_hmap();
     public static HashMap synonymMap = null;
 
@@ -57,6 +61,22 @@ public class ReportGenerator {
 			objectPropertyCode2LabelMap.put((String) u.elementAt(0),(String) u.elementAt(1));
 			objectPropertyLabel2CodeMap.put((String) u.elementAt(1),(String) u.elementAt(0));
 		}
+
+		dataReqSrc2TargetHashMap = new HashMap();
+		dataReqTarget2SrcHashMap = new HashMap();
+		File f = new File(DATA_MAP);
+		if (f.exists()) {
+			Vector v = Utils.readFile(DATA_MAP);
+			for (int i=0; i<v.size(); i++) {
+				String line = (String) v.elementAt(i);
+				Vector u = StringUtils.parseData(line, '=');
+				dataReqSrc2TargetHashMap.put((String) u.elementAt(0), (String) u.elementAt(1));
+				dataReqTarget2SrcHashMap.put((String) u.elementAt(1), (String) u.elementAt(0));
+			}
+		} else {
+			System.out.println("File " + DATA_MAP + " does not exist.");
+		}
+
 		subset_hmap = create_subset_hmap();
 		synonymMap = AxiomParser.loadSynonyms(AXIOM_FILE);
 		System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
@@ -422,87 +442,31 @@ public class ReportGenerator {
 		return SpecialProperties.getCDISCSubmissionValue(subsetcode, parentAxioms, code, axioms);
 	}
 
-	public static String[] header2DataReq(String templateFile, Vector dataMap) {
-		Vector reqVec = new Vector();
-		HashMap hmap = new HashMap();
-
-		for (int i=0; i<dataMap.size(); i++) {
-			String line = (String) dataMap.elementAt(i);
-			Vector u = StringUtils.parseData(line, '=');
-			hmap.put((String) u.elementAt(0), (String) u.elementAt(1));
-		}
-
-		Vector w = new TemplateLoader().exploreTemplateColumnLabels(templateFile);
-		//Utils.dumpVector(templateFile, w);
-
-		String[] colData = new String[w.size()];
-		for (int i=0; i<w.size(); i++) {
-			colData[i] = "";
-			String t = (String) w.elementAt(i);
-			t = t.replace("NCIt", "NCI");
-			if (hmap.containsKey(t)) {
-				colData[i] = (String) hmap.get(t);
-			} else {
-				Vector u = StringUtils.parseData(t, ' ');
-				for (int j=0; j<u.size(); j++) {
-					String key = (String) u.elementAt(0);
-					if (objectPropertyLabel2CodeMap.containsKey(key)) {
-						colData[i] = (String) hmap.get(key) + " " + (String) u.elementAt(1);
-					} else if (annotationPropertyLabel2CodeMap.containsKey(key)) {
-						colData[i] = (String) hmap.get(key) + " " + (String) u.elementAt(1);
-					}
-				}
-			}
-		}
-		for (int i=0; i<w.size(); i++) {
-			String t = (String) w.elementAt(i);
-			if (colData[i] == "") {
-				colData[i] = (String) w.elementAt(i);
-			}
-		}
-		for (int i=0; i<w.size(); i++) {
-			String t = (String) w.elementAt(i);
-			Vector u = StringUtils.parseData(t, ' ');
-			String val =(String) u.elementAt(0);
-			String s = colData[i];
-			if (objectPropertyLabel2CodeMap.containsKey(val)) {
-				//t = t.replace((String) u.elementAt(0), s);
-				colData[i] = (String) objectPropertyLabel2CodeMap.get(val) + " " + (String) u.elementAt(1);
-
-			} else if (annotationPropertyLabel2CodeMap.containsKey(val)) {
-				//t = t.replace((String) u.elementAt(0), s);
-				colData[i] = (String) annotationPropertyLabel2CodeMap.get(val) + " " + (String) u.elementAt(1);
-			}
-		}
-		return colData;
+	public static String[] header2DataReq(String templateFile) {
+		Vector colData = new TemplateLoader().exploreTemplateColumnLabels(templateFile);
+		Utils.dumpVector("columns", colData);
+		return header2DataReq(colData);
 	}
 
-	public static String[] header2DataReq(Vector colHeaders, Vector dataMap) {
+	public static String[] header2DataReq(Vector colHeaders) {
+		Utils.dumpVector("colHeaders", colHeaders);
 		Vector reqVec = new Vector();
 		HashMap hmap = new HashMap();
-
-		for (int i=0; i<dataMap.size(); i++) {
-			String line = (String) dataMap.elementAt(i);
-			Vector u = StringUtils.parseData(line, '=');
-			hmap.put((String) u.elementAt(0), (String) u.elementAt(1));
-		}
-		Utils.dumpVector("colHeaders", colHeaders);
-
 		String[] colData = new String[colHeaders.size()];
 		for (int i=0; i<colHeaders.size(); i++) {
 			colData[i] = "";
 			String t = (String) colHeaders.elementAt(i);
 			t = t.replace("NCIt", "NCI");
-			if (hmap.containsKey(t)) {
-				colData[i] = (String) hmap.get(t);
+			if (dataReqSrc2TargetHashMap.containsKey(t)) {
+				colData[i] = (String) dataReqSrc2TargetHashMap.get(t);
 			} else {
 				Vector u = StringUtils.parseData(t, ' ');
 				for (int j=0; j<u.size(); j++) {
 					String key = (String) u.elementAt(0);
 					if (objectPropertyLabel2CodeMap.containsKey(key)) {
-						colData[i] = (String) hmap.get(key);
+						colData[i] = (String) dataReqSrc2TargetHashMap.get(key);
 					} else if (annotationPropertyLabel2CodeMap.containsKey(key)) {
-						colData[i] = (String) hmap.get(key);
+						colData[i] = (String) dataReqSrc2TargetHashMap.get(key);
 					}
 				}
 			}
@@ -519,15 +483,40 @@ public class ReportGenerator {
 			String val =(String) u.elementAt(0);
 			String s = colData[i];
 			if (objectPropertyLabel2CodeMap.containsKey(val)) {
-				//t = t.replace((String) u.elementAt(0), s);
-				colData[i] = (String) objectPropertyLabel2CodeMap.get(val);
+				colData[i] = (String) objectPropertyLabel2CodeMap.get(val) + " " + (String) u.elementAt(1);
 
 			} else if (annotationPropertyLabel2CodeMap.containsKey(val)) {
-				//t = t.replace((String) u.elementAt(0), s);
-				colData[i] = (String) annotationPropertyLabel2CodeMap.get(val);
+				colData[i] = (String) annotationPropertyLabel2CodeMap.get(val) + " " + (String) u.elementAt(1);
 			}
 		}
 		return colData;
+	}
+
+    public static String dataReq2Header(Vector dataReq) {
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<dataReq.size(); i++) {
+			String line = (String) dataReq.elementAt(i);
+			if (dataReqTarget2SrcHashMap.containsKey(line)) {
+				buf.append(line).append("\t");
+			} else {
+				Vector u = StringUtils.parseData(line, ' ');
+				if (u.size() == 2) {
+					String prop_code = (String) u.elementAt(0);
+					if (annotationPropertyCode2LabelMap.containsKey(prop_code)) {
+						String prop_label = (String) annotationPropertyCode2LabelMap.get(prop_code);
+						buf.append(prop_label + " " + (String) u.elementAt(1) + "\t");
+					} else if (objectPropertyCode2LabelMap.containsKey(prop_code)) {
+						String prop_label = (String) objectPropertyCode2LabelMap.get(prop_code);
+						buf.append(prop_label + " " + (String) u.elementAt(1) + "\t");
+					}
+				} else {
+					buf.append(line).append("\t");
+				}
+			}
+		}
+		String t = buf.toString();
+		t = t.substring(t.length()-1);
+		return t;
 	}
 
     public static void generateExcel(String dir, String excelfile, char delim) {
