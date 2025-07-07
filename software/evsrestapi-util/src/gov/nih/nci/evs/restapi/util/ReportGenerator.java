@@ -83,6 +83,38 @@ public class ReportGenerator {
 		System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
+    public static HashMap getAxiomMap(String data_req) {
+		HashMap hmap = new HashMap();
+		OWLScanner scanner = new OWLScanner(NCIT_OWL_FILE);
+		Vector v = scanner.getAxioms(AXIOM_FILE, data_req);//"P90|P384$CDISC|P383$SY");
+		String id = null;
+		for (int i=0; i<v.size(); i++) {
+			Object obj = v.elementAt(i);
+			if (obj instanceof String) {
+				id = (String) obj;
+			} else if (obj instanceof Synonym) {
+				Synonym syn = (Synonym) obj;
+				id = syn.getCode();
+			} else if (obj instanceof Definition) {
+				Definition def = (Definition) obj;
+				id = def.getCode();
+			} else if (obj instanceof AltDefinition) {
+				AltDefinition def = (AltDefinition) obj;
+				id = def.getCode();
+			} else if (obj instanceof GoAnnotation) {
+				GoAnnotation go = (GoAnnotation) obj;
+				id = go.getCode();
+			}
+			Vector w = new Vector();
+			if (hmap.containsKey(id)) {
+				w = (Vector) hmap.get(id);
+			}
+			w.add(obj);
+			hmap.put(id, w);
+		}
+		return hmap;
+	}
+
 ///////////////////////////////////////////////////////////
 	public static void generateDataMap() {
     	Vector w = getDistinctQualifiers(AXIOM_FILE);
