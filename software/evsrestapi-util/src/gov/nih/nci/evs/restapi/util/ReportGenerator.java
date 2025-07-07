@@ -74,7 +74,8 @@ public class ReportGenerator {
 				dataReqTarget2SrcHashMap.put((String) u.elementAt(1), (String) u.elementAt(0));
 			}
 		} else {
-			System.out.println("File " + DATA_MAP + " does not exist.");
+			System.out.println("Generating " + DATA_MAP + " ... ");
+			generateDataMap();
 		}
 
 		subset_hmap = create_subset_hmap();
@@ -82,6 +83,95 @@ public class ReportGenerator {
 		System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
+///////////////////////////////////////////////////////////
+	public static void generateDataMap() {
+    	Vector w = getDistinctQualifiers(AXIOM_FILE);
+    	Vector w2 = interpret(w);
+    	Vector v = annotationProperties;
+    	Vector w3 = properties2RequiredData(v);
+    	w2.addAll(w3);
+    	Utils.saveToFile(DATA_MAP, w2);
+	}
+
+	public static Vector properties2RequiredData(Vector v) {
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String s0 = (String) u.elementAt(0);
+			String s1 = (String) u.elementAt(1);
+			w.add(s1 + "=" + s0);
+		}
+		return new SortUtils().quickSort(w);
+	}
+
+    public static Vector interpret(Vector v) {
+		Vector w = new Vector();
+		//Vector v = Utils.readFile(filename);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String prop_code = (String) u.elementAt(0);
+			if (prop_code.compareTo("P97") == 0 && u.size() == 2) {
+				String t = (String) u.elementAt(1);
+				Vector u2 = StringUtils.parseData(t, '$');
+				w.add((String) u2.elementAt(1) + " Definition=" + line);
+			} else if (prop_code.compareTo("P325") == 0 && u.size() == 2) {
+				String t = (String) u.elementAt(1);
+				Vector u2 = StringUtils.parseData(t, '$');
+				w.add((String) u2.elementAt(1) + " Definition=" + line);
+			} else if (prop_code.compareTo("P90") == 0 && u.size() == 3) {
+				String t = (String) u.elementAt(1);
+				Vector u2 = StringUtils.parseData(t, '$');
+				String term_type = (String) u2.elementAt(1);
+				t = (String) u.elementAt(2);
+				u2 = StringUtils.parseData(t, '$');
+				String term_src = (String) u2.elementAt(1);
+				w.add(term_src + " " + term_type + "=" + line);
+			}
+		}
+		return w;
+	}
+
+    public static Vector getDistinctQualifiers(String axiomfile) {
+		Vector w = new Vector();
+		Vector v = Utils.readFile(axiomfile);
+		SortUtils sortUtils = new SortUtils();
+		HashSet hset = new HashSet();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String prop_code = (String) u.elementAt(2);
+			if (prop_code.compareTo("P375") != 0 && prop_code.compareTo("P211") != 0) {
+				Vector w0 = new Vector();
+				w0.add(prop_code);
+				Vector w1 = new Vector();
+				for (int j=4; j<u.size(); j++) {
+					String s = (String) u.elementAt(j);
+					if (s.indexOf("P381") == -1 && s.indexOf("P385") == -1 && s.indexOf("P395") == -1 && s.indexOf("P391") == -1 && s.indexOf("P387") == -1) {
+						w1.add(s);
+					}
+				}
+				w1 = sortUtils.quickSort(w1);
+				w0.addAll(w1);
+				StringBuffer buf = new StringBuffer();
+				for (int j=0; j<w0.size(); j++) {
+					String s = (String) w0.elementAt(j);
+					buf.append(s).append("|");
+				}
+				String t = buf.toString();
+				t = t.substring(0, t.length()-1);
+				if (!hset.contains(t)) {
+					hset.add(t);
+					w.add(t);
+				}
+			}
+		}
+		w = sortUtils.quickSort(w);
+		return w;
+	}
+
+///////////////////////////////////////////////////////////
 	public Vector getSubsetMemberCodes(String subsetCode) {
         return (Vector) subset_hmap.get(subsetCode);
 	}
