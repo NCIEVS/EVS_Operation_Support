@@ -93,11 +93,13 @@ public class LexicalMatching {
     public static HashSet KEYWORDS = null;
     public static HashMap signatureMap = null;
     public static HashMap id2LabelMap = null;
+    static HashSet retiredConcepts = new HashSet();
 
     static String STOPWORD_FILE = "stop_words.txt";
 
     static String AXIOM_FILE_NAME = "axiom_ThesaurusInferred_forTS.txt";
     static String FULL_SYN_FILE = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE_NAME;
+    static String CONCEPT_STATUS_FILE = "P310.txt";
 
     static {
 		long ms = System.currentTimeMillis();
@@ -111,7 +113,47 @@ public class LexicalMatching {
 		signatureMap = createSignatureMap();
 		id2LabelMap = createId2LabelMap();
 		KEYWORDS = createKeywordSet(FULL_SYN_FILE);
+
+		retiredConcepts = createRetiredConceptSet();
+		System.out.println("retired concepts: " + retiredConcepts.size());
+
 		System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
+	public static void extractProperties(String prop_code) {
+		long ms = System.currentTimeMillis();
+		String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
+		String owlfile = reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
+		System.out.println(owlfile);
+		OWLScanner scanner = new OWLScanner(owlfile);
+		Vector w = scanner.extractProperties(scanner.get_owl_vec(), prop_code);
+		String outputfile = prop_code + ".txt";
+		Utils.saveToFile(outputfile, w);
+		System.out.println(outputfile + " generated.");
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
+    public static HashSet createRetiredConceptSet() {
+		HashSet hset = new HashSet();
+		/*
+		File file = new File(CONCEPT_STATUS_FILE);
+		if (!file.exists()) {
+			System.out.println("WARNING: " + CONCEPT_STATUS_FILE + " does not exist.");
+			extractProperties("P310");
+		}
+		*/
+		extractProperties("P310");
+		Vector v = Utils.readFile(CONCEPT_STATUS_FILE);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String status = (String) u.elementAt(2);
+			if (status.compareTo("Retired_Concept") == 0) {
+				String code = (String) u.elementAt(0);
+				hset.add(code);
+			}
+		}
+		return hset;
 	}
 
 	public static Vector readFile(String datafile) {
@@ -335,21 +377,31 @@ public class LexicalMatching {
 		return lexicalMatch(term, false);
 	}
 
+	public static boolean is_retired(String code) {
+		return retiredConcepts.contains(code);
+	}
+
 	public static String lexicalMatch(String term, boolean codeOnly) {
 		if (term.length() == 0) return "No match";
-		//Vector w = tokenize(term);
+		int knt = 0;
 		String signature = getSignature(term);
 		if (signatureMap.containsKey(signature)) {
 			StringBuffer buf = new StringBuffer();
 			Vector w = (Vector) signatureMap.get(signature);
 			for (int k=0; k<w.size(); k++) {
 				String code = (String) w.elementAt(k);
-				if (codeOnly) {
-					buf.append(code).append("|");
-				} else {
-					String label = (String) getLabel(code);
-					buf.append(label + "$" + code).append("|");
+				if (!is_retired(code)) {
+					if (codeOnly) {
+						buf.append(code).append("|");
+					} else {
+						String label = (String) getLabel(code);
+						buf.append(label + "$" + code).append("|");
+					}
+					knt++;
 				}
+			}
+			if (knt == 0) {
+				return "No match";
 			}
 			String t = buf.toString();
 			return t.substring(0, t.length()-1);
@@ -414,6 +466,30 @@ public class LexicalMatching {
         System.out.println("" + num_matches + " out of " + total + " matches.");
 
         return outputfile;
+	}
+
+	public static Vector analyze(Vector v) {
+		Vector w = new Vector();
+        for (int i=0; i<v.size(); i++) {
+			String term = (String) v.elementAt(i);
+			int j = i+1;
+			w.add("(" + j + ") " + term);
+			Vector wds = tokenize(term);
+			for (int k=0; k<wds.size(); k++) {
+				String word = (String) wds.elementAt(k);
+				if (isKeyword(word)) {
+					if (isFiller(word)) {
+						w.add("\t" + word + " (*)");
+					} else {
+						w.add("\t" + word);
+					}
+				} else {
+					w.add("\t" + word + " (?)");
+				}
+			}
+			w.add("\n");
+		}
+		return w;
 	}
 
 	public static void analyze(String filename, int col) {

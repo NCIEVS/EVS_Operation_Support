@@ -71,8 +71,6 @@ public class ExactMatchByTerm {
 	static HashMap sourcePTMap = null;
 	static HashMap sourceCode2NCItCodesMap = null;
 	static HashMap code2FULLSYNMap = null;
-	//static String SOURCE = ConfigurationController.source;
-
     static boolean caseSensitive = false;
     static HashSet retiredConcepts = new HashSet();
     static String CONCEPT_STATUS_FILE = "P310.txt";
@@ -229,11 +227,14 @@ public class ExactMatchByTerm {
 
     public static HashSet createRetiredConceptSet() {
 		HashSet hset = new HashSet();
+		/*
 		File file = new File(CONCEPT_STATUS_FILE);
 		if (!file.exists()) {
 			System.out.println("WARNING: " + CONCEPT_STATUS_FILE + " does not exist.");
 			extractProperties("P310");
 		}
+		*/
+		extractProperties("P310");
 		Vector v = Utils.readFile(CONCEPT_STATUS_FILE);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
