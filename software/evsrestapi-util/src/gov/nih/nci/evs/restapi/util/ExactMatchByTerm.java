@@ -941,9 +941,6 @@ public class ExactMatchByTerm {
 				codes.add(code);
 			}
 		}
-
-		//Utils.dumpVector("codes", codes);
-
 		StringBuffer buf = new StringBuffer();
 		String s = null;
 		//CODES
