@@ -36,6 +36,7 @@ public class ReportGenerator {
 
     public static HashMap subset_hmap = null;//create_subset_hmap();
     public static HashMap synonymMap = null;
+    static HashSet published_valuesets = null;
 
     static {
 		long ms = System.currentTimeMillis();
@@ -78,9 +79,31 @@ public class ReportGenerator {
 			generateDataMap();
 		}
 
+		//Publish_Value_Set 	P372
+		String prop_code = "P372";
+		Vector published_vaueset_vec = owlscanner.extractProperties(owlscanner.get_owl_vec(), prop_code);
+
+		published_valuesets = new HashSet();
+		for (int i=0; i<published_vaueset_vec.size(); i++) {
+			String line = (String) published_vaueset_vec.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String yesOrNo = (String) u.elementAt(2);
+			if (yesOrNo.compareTo("Yes") == 0) {
+				published_valuesets.add((String) u.elementAt(0));
+			}
+		}
+
 		subset_hmap = create_subset_hmap();
 		synonymMap = AxiomParser.loadSynonyms(AXIOM_FILE);
 		System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
+	public static boolean is_published_valueset(String code) {
+		return published_valuesets.contains(code);
+	}
+
+	public static Vector getSubclassCodes(String code) {
+		return hh.getSubclassCodes(code);
 	}
 
     public static HashMap getAxiomMap(String data_req) {
@@ -487,11 +510,94 @@ public class ReportGenerator {
 		return t;
 	}
 
+/*
 	public static Vector resolveValueSet(String rootConceptCode) {
 		if (!subset_hmap.containsKey(rootConceptCode)) {
 			return null;
 		}
 		return (Vector) subset_hmap.get(rootConceptCode);
+	}
+*/
+
+	public static Vector resolveValueSet(String root) {
+		return resolveValueSet(root, 0, true);
+	}
+
+	public static Vector resolveValueSet(String root, int subsetLevel) {
+		return resolveValueSet(root, subsetLevel, false);
+	}
+
+	public static Vector resolveValueSet(String root, int subsetLevel, boolean includeRootMembers) {
+		Stack stack = new Stack();
+		Vector w = new Vector();
+		stack.push("0|" + root);
+		while (!stack.isEmpty()) {
+			String s = (String) stack.pop();
+			System.out.println(s);
+			Vector u = StringUtils.parseData(s, '|');
+			String levelStr = (String) u.elementAt(0);
+
+			String code = (String) u.elementAt(1);
+			if (includeRootMembers) {
+				if (is_published_valueset(code)) {
+					String label = getLabel(code);
+					Vector members = (Vector) subset_hmap.get(code);
+					for (int k=0; k<members.size(); k++) {
+						String member_code = (String) members.elementAt(k);
+						String member_label = getLabel(member_code);
+						String t = label + "|" + code + "|" + member_label + "|" + member_code;
+						if (!w.contains(t)) {
+							w.add(t);
+						}
+					}
+				}
+			}
+			Vector subs = getSubclassCodes(code);
+
+            if (subs == null) {
+				System.out.println("getSubclassCodes(" + code + ") returns null.");
+				if (is_published_valueset(code)) {
+					String label = getLabel(code);
+					Vector members = (Vector) subset_hmap.get(code);
+					for (int k=0; k<members.size(); k++) {
+						String member_code = (String) members.elementAt(k);
+						String member_label = getLabel(member_code);
+						String t = label + "|" + code + "|" + member_label + "|" + member_code;
+						if (!w.contains(t)) {
+							w.add(t);
+						}
+					}
+				}
+			} else {
+				System.out.println("subs.size(): " + subs.size());
+				Utils.dumpVector(code, subs);
+				int level = Integer.parseInt(levelStr);
+				if (level == subsetLevel) {
+					for (int j=0; j<subs.size(); j++) {
+						String sub = (String) subs.elementAt(j);
+						if (is_published_valueset(sub)) {
+							String label = getLabel(code);
+							Vector members = (Vector) subset_hmap.get(sub);
+							for (int k=0; k<members.size(); k++) {
+								String member_code = (String) members.elementAt(k);
+								String member_label = getLabel(member_code);
+								String t = label + "|" + code + "|" + member_label + "|" + member_code;
+								if (!w.contains(t)) {
+									w.add(t);
+								}
+							}
+						}
+					}
+				} else {
+					int nextLevel = level + 1;
+					for (int j=0; j<subs.size(); j++) {
+						String sub = (String) subs.elementAt(j);
+						stack.push("" + nextLevel + "|" + sub);
+					}
+				}
+			}
+		}
+        return w;
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////
