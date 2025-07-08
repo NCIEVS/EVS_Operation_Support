@@ -296,12 +296,29 @@ public class IndexUtils {
 		return w;
 	}
 
+	public Vector findExactMatches(String t, Vector v) {
+		Vector w = new Vector();
+		if (v == null) {
+			return w;
+		}
+		if (v == null || v.size() == 0) return w;
+		for (int i=0; i<v.size(); i++) {
+			String code = (String) v.elementAt(i);
+			String label = getLabel(code);
+			if (label.compareToIgnoreCase(t) == 0) {
+				w.add(code);
+			}
+		}
+		if (w.size() == 0) return v;
+		return w;
+	}
+
 	public Vector indexTerm(String term) {
 		boolean debug = false;
 		if (debug) System.out.println("indexTerm: " + term);
-
 		Vector w1 = new Vector();
 		Vector w = matchBySignature(term);
+		w = findExactMatches(term, w);
 		if (w != null && w.size() > 0) {
 			for (int i=0; i<w.size(); i++) {
 				String code = (String) w.elementAt(i);
@@ -317,12 +334,12 @@ public class IndexUtils {
         if (words == null || words.size() == 0) {
 			return w;
 		}
-
         String prevword = null;
         String nextword = null;
         if (words.size() == 1) {
 			prevword = (String) words.remove(0);
 			w = matchBySignature(prevword);
+			w = findExactMatches(prevword, w);
 			if (w != null && w.size() > 0) {
 				for (int i=0; i<w.size(); i++) {
 					String code = (String) w.elementAt(i);
@@ -332,24 +349,19 @@ public class IndexUtils {
 				return w1;
 			}
 		}
-
 		boolean cooccur = true;
 		StringBuffer buf = new StringBuffer();
-
 		if (words.size() > 0) {
 			prevword = (String) words.remove(0);
 			if (debug) System.out.println("prevword: " + prevword);
-
 			buf.append(prevword);
 			while (words.size() > 0) {
 				if (buf.length() > 0) {
 					String t = buf.toString();
-
 					if (debug) System.out.println("t: " + t);
-
 					w = matchBySignature(t);
+					w = findExactMatches(t, w);
 					if (debug) Utils.dumpVector(t, w);
-
 					if (w != null && w.size() > 0) {
 						for (int i=0; i<w.size(); i++) {
 							String code = (String) w.elementAt(i);
@@ -362,7 +374,19 @@ public class IndexUtils {
 				}
 
 				nextword = (String) words.remove(0);
-				if (debug) System.out.println("nextword: " + nextword);
+				w = matchBySignature(nextword);
+				w = findExactMatches(nextword, w);
+				if (w != null && w.size() > 0) {
+					if (debug) Utils.dumpVector(nextword, w);
+
+					for (int i=0; i<w.size(); i++) {
+						String code = (String) w.elementAt(i);
+						String label = getLabel(code);
+						if (!w1.contains(label + "|" + code)) {
+							w1.add(label + "|" + code);
+						}
+					}
+				}
 
 				cooccur = checkCoocurrence(prevword, nextword);
 				if (debug) System.out.println("cooccur: " + cooccur);
@@ -370,9 +394,9 @@ public class IndexUtils {
 				if (!cooccur) {
 					String t = buf.toString();
 					w = matchBySignature(t);
+					w = findExactMatches(t, w);
 					if (w != null && w.size() > 0) {
 						if (debug) Utils.dumpVector(t, w);
-
 						for (int i=0; i<w.size(); i++) {
 							String code = (String) w.elementAt(i);
 							String label = getLabel(code);
@@ -396,11 +420,9 @@ public class IndexUtils {
 
 		if (buf.length() > 0) {
 			String t = buf.toString();
-
 			if (debug) System.out.println("final: " + t);
-
 			w = matchBySignature(t);
-
+			w = findExactMatches(t, w);
 			if (debug) Utils.dumpVector(t, w);
 			if (w != null && w.size() > 0) {
 				for (int i=0; i<w.size(); i++) {
@@ -412,6 +434,7 @@ public class IndexUtils {
 				}
 			} else {
 				w = matchBySignature(nextword);
+				w = findExactMatches(nextword, w);
 				if (debug) Utils.dumpVector(nextword, w);
 				if (w != null && w.size() > 0) {
 					for (int i=0; i<w.size(); i++) {
