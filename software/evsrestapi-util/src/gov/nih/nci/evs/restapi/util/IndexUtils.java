@@ -315,16 +315,26 @@ public class IndexUtils {
 
 	public Vector indexTerm(String term) {
 		boolean debug = false;
+		return indexTerm(term, debug);
+	}
+
+	public Vector indexTerm(String term, boolean debug) {
 		if (debug) System.out.println("indexTerm: " + term);
+		term = term.trim();
+		if (term == null || term.length() == 0) return null;
+
 		Vector w1 = new Vector();
 		Vector w = matchBySignature(term);
 		w = findExactMatches(term, w);
+		if (debug) Utils.dumpVector("Step 1: " + term, w);
+
 		if (w != null && w.size() > 0) {
 			for (int i=0; i<w.size(); i++) {
 				String code = (String) w.elementAt(i);
 				String label = getLabel(code);
 				w1.add(label + "|" + code);
 			}
+			if (debug) Utils.dumpVector("Step 2: " + term, w1);
 			return w1;
 		}
 		w = new Vector();

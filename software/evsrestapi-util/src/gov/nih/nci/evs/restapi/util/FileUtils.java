@@ -146,6 +146,19 @@ public class FileUtils
         return w;
     }
 
+    public static Vector listFileNames(String path) {
+		Vector textfiles = listFiles(path);
+		Vector filenames = new Vector();
+		for (int i=0; i<textfiles.size(); i++) {
+			File file = (File) textfiles.elementAt(i);
+			String filename = file.getAbsolutePath();
+			filename = filename.replace("\\", "/");
+			filenames.add(filename);
+		}
+		return filenames;
+	}
+
+
 	public static void copyDirectory(String sourceDirectoryLocation, String destinationDirectoryLocation)
 		throws IOException {
 		File target_dir = new File(destinationDirectoryLocation);
