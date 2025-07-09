@@ -72,28 +72,6 @@ public class HTMLHierarchy {
 		hh = new HierarchyHelper(parent_child_vec);
 	}
 
-/*
-	public Vector sortByLabel(Vector codes) {
-		HashMap label2CodeMap = new HashMap();
-		Vector w = new Vector();
-		Vector labels = new Vector();
-		for (int i=0; i<codes.size(); i++) {
-			String code = (String) codes.elementAt(i);
-			String label = (String) hh.getLabel(code);
-			labels.add(label);
-		    label2CodeMap.put(label, code);
-		}
-		labels = new SortUtils().quickSort(labels);
-		for (int i=0; i<labels.size(); i++) {
-			int j = labels.size()-i-1;
-			String label = (String) labels.elementAt(j);
-			String code = (String) label2CodeMap.get(label);
-			w.add(code);
-		}
-		return w;
-	}
-*/
-
 	public Vector sortByLabel(Vector codes) {
 		Vector w = new Vector();
 		for (int i=0; i<codes.size(); i++) {
@@ -104,14 +82,12 @@ public class HTMLHierarchy {
 			}
 		}
 		w = new SortUtils().quickSort(w);
-		Utils.dumpVector("displayNames", w);
 		Vector v = new Vector();
 		for (int i=0; i<w.size(); i++) {
 			String line = (String) w.elementAt(i);
 			Vector u = StringUtils.parseData(line);
 			v.add((String) u.elementAt(1));
 		}
-		Utils.dumpVector("codes", v);
 		return v;
 	}
 
@@ -209,7 +185,7 @@ public class HTMLHierarchy {
 		out.println("</html>");
     }
 
-    public static void run(String datafile, String title, String root) {
+    public static String run(String datafile, String title, String root) {
         long ms = System.currentTimeMillis();
 		PrintWriter pw = null;
 		int n = datafile.lastIndexOf(".");
@@ -230,7 +206,7 @@ public class HTMLHierarchy {
 			}
 		}
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
-
+		return outputfile;
 	}
 
     public static void main(String[] args) {
