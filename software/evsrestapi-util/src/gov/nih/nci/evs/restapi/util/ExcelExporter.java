@@ -134,6 +134,32 @@ public class ExcelExporter {
 		return null;
     }
 
+    public static String export(String excelfile, int sheetNum, String outputdir) throws IOException {
+		int n = excelfile.lastIndexOf(".");
+		String textfile = ExcelExporter.getSheetName(excelfile, sheetNum) + ".txt";
+		textfile = textfile.replace(" ", "_");
+		textfile = outputdir + File.separator + textfile;
+
+        try {
+			XSSFWorkbook workbook = new XSSFWorkbook(new File(excelfile));
+			XSSFSheet sheet = workbook.getSheetAt(sheetNum); // Get the first sheet
+			FileWriter writer = new FileWriter(textfile);
+			for (Row row : sheet) {
+				for (Cell cell : row) {
+					String cellValue = cell.toString();
+					writer.write(cellValue + "\t"); // Use tab as delimiter
+				}
+				writer.write("\n");
+			}
+			writer.close();
+			workbook.close();
+			return textfile;
+    	} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+    }
+
     public static String run(String excelfile) {
 		return run(excelfile, 0);
     }
