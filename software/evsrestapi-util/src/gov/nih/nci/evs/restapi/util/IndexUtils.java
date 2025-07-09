@@ -141,6 +141,11 @@ public class IndexUtils {
 	}
 
 	public Vector indexNarrative(String narrative) {
+		boolean debug = false;
+		return indexNarrative(narrative, debug);
+	}
+
+	public Vector indexNarrative(String narrative, boolean debug) {
 		Vector w = toSentences(narrative);
 		Vector v = new Vector();
 		for (int i=0; i<w.size(); i++) {
@@ -148,7 +153,7 @@ public class IndexUtils {
 			Vector segments = toSegments(sentence);
 			for (int j=0; j<segments.size(); j++) {
 				String segment = (String) segments.elementAt(j);
-				Vector u = indexTerm(segment);
+				Vector u = indexTerm(segment, debug);
 				if (u != null && u.size()>0 && u.size() <= MAX_MATCHES) {
 					addAll(v, u);
 				} else if (u != null && u.size()>0 && u.size() > MAX_MATCHES) {
