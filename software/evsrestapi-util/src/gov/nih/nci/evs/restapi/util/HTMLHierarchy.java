@@ -69,10 +69,10 @@ public class HTMLHierarchy {
     public void initialize() {
 		Vector parent_child_vec = Utils.readFile(datafile);
 		System.out.println("parent_child_vec: " + parent_child_vec.size());
-
 		hh = new HierarchyHelper(parent_child_vec);
 	}
 
+/*
 	public Vector sortByLabel(Vector codes) {
 		HashMap label2CodeMap = new HashMap();
 		Vector w = new Vector();
@@ -92,6 +92,27 @@ public class HTMLHierarchy {
 		}
 		return w;
 	}
+*/
+
+	public Vector sortByLabel(Vector codes) {
+		Vector w = new Vector();
+		for (int i=0; i<codes.size(); i++) {
+			String code = (String) codes.elementAt(i);
+			String label = hh.getLabel(code);
+			if (label != null && label.length() > 0) {
+				w.add(label + "|" + code);
+			}
+		}
+		w = new SortUtils().quickSort(w);
+		Vector v = new Vector();
+		for (int i=0; i<w.size(); i++) {
+			String line = (String) w.elementAt(i);
+			Vector u = StringUtils.parseData(line);
+			v.add((String) u.elementAt(1));
+		}
+		return v;
+	}
+
 
     public void setTitle(String title) {
 		this.title = title;
@@ -125,7 +146,6 @@ public class HTMLHierarchy {
 
 		Vector subs = hh.getSubclassCodes(code);
 		if (subs != null) {
-			//subs = sortByLabel(subs);
 			for (int j=0; j<subs.size(); j++) {
 				String sub = (String) subs.elementAt(j);
 				writeNode(out, sub);
@@ -142,14 +162,12 @@ public class HTMLHierarchy {
 		} else {
 			Vector codes = hh.getRoots();
 			codes = sortByLabel(codes);
-
 			for (int i=0; i<codes.size(); i++) {
 				int k = codes.size()-i-1;
 				String code = (String) codes.elementAt(k);
 				stack.push(code);
 			}
 	    }
-
 		while (!stack.isEmpty()) {
             String code = (String) stack.pop();
             writeNode(out, code);
@@ -161,7 +179,7 @@ public class HTMLHierarchy {
 		out.println("<html lang=\"en\">");
 		out.println("<head>");
 		out.println("	<meta charset=\"UTF-8\">");
-		out.println("	<title>NCI Thesaurus</title>");
+		out.println("	<title>" + title + "</title>");
 		out.println("	<style>");
 		out.println("	html { margin:0; padding:0; font-size:62.5%; }");
 		out.println("	body { max-width:800px; min-width:300px; margin:0 auto; padding:20px 10px; font-size:14px; font-size:1.4em; }");
@@ -184,21 +202,6 @@ public class HTMLHierarchy {
 		out.println("	// html demo");
 		out.println("	$('#html').jstree();");
 		out.println("");
-		/*
-		out.println("	// inline data demo");
-		out.println("	$('#data').jstree({");
-		out.println("		'core' : {");
-		out.println("			'data' : [");
-		out.println("				{ \"text\" : \"Root node\", \"children\" : [");
-		out.println("						{ \"text\" : \"Child node 1\" },");
-		out.println("						{ \"text\" : \"Child node 2\" }");
-		out.println("				]}");
-		out.println("			]");
-		out.println("		}");
-		out.println("	});");
-		out.println("");
-		*/
-
 		out.println("	</script>");
 		out.println("</body>");
 		out.println("</html>");

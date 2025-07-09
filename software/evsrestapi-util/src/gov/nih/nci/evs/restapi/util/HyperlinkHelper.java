@@ -54,10 +54,28 @@ import java.util.*;
  *
  */
 public class HyperlinkHelper {
-	private static String HYPER_LINK = "https://nciterms.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&code=";
+	private static String HYPER_LINK = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
 
 	public static String toHyperlink(String code) {
-		return toHyperlink(HYPER_LINK, code);
+		if (isNCItCode(code)) {
+			return toHyperlink(HYPER_LINK, code);
+		} else {
+			return code;
+		}
+	}
+
+
+	public static boolean isNCItCode(String code) {
+		char c = code.charAt(0);
+		if (c != 'C') return false;
+		String s = code.substring(1, code.length());
+		try {
+			int n = Integer.parseInt(s);
+			return true;
+		} catch(Exception ex) {
+
+		}
+		return false;
 	}
 
 	public static String toHyperlink(String hyperlink, String code) {

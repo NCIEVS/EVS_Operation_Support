@@ -535,6 +535,32 @@ public class IndexUtils {
 		}
 		return new SortUtils().quickSort(w);
 	}
+
+    public static Vector toHierarchyFormat(String datafile, String prefix) {
+		Vector w = new Vector();
+		String rootCode = null;
+		Vector v = Utils.readFile(datafile);
+		String label = null;
+		int knt = 0;
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.trim();
+			if (line.length() > 0) {
+				if (line.startsWith("(")) {
+					int n = line.lastIndexOf(")");
+					label = line.substring(n+1, line.length());
+					knt++;
+					rootCode = prefix + knt;
+
+				} else {
+					if (line.indexOf("|") != -1) {
+						w.add(label + "|" + rootCode + "|" + line);
+					}
+				}
+			}
+		}
+		return w;
+	}
 }
 
 
