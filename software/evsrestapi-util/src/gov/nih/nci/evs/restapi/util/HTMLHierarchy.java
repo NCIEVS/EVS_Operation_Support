@@ -104,12 +104,14 @@ public class HTMLHierarchy {
 			}
 		}
 		w = new SortUtils().quickSort(w);
+		Utils.dumpVector("displayNames", w);
 		Vector v = new Vector();
 		for (int i=0; i<w.size(); i++) {
 			String line = (String) w.elementAt(i);
 			Vector u = StringUtils.parseData(line);
 			v.add((String) u.elementAt(1));
 		}
+		Utils.dumpVector("codes", v);
 		return v;
 	}
 

@@ -542,20 +542,24 @@ public class IndexUtils {
 		Vector v = Utils.readFile(datafile);
 		String label = null;
 		int knt = 0;
+		int sub_knt = 0;
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			line = line.trim();
-			if (line.length() > 0) {
-				if (line.startsWith("(")) {
-					int n = line.lastIndexOf(")");
-					label = line.substring(n+1, line.length());
-					knt++;
-					rootCode = prefix + knt;
+			if (line.startsWith("(")) {
+				if (label != null && sub_knt == 0) {
+					w.add(label + "|" + rootCode + "|No match|NA");
+				}
+				int n = line.lastIndexOf(")");
+				label = line.substring(n+1, line.length());
+				knt++;
+				rootCode = prefix + knt;
+				sub_knt = 0;
 
-				} else {
-					if (line.indexOf("|") != -1) {
-						w.add(label + "|" + rootCode + "|" + line);
-					}
+			} else {
+				if (line.indexOf("|") != -1) {
+					w.add(label + "|" + rootCode + "|" + line);
+					sub_knt++;
 				}
 			}
 		}
