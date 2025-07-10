@@ -135,7 +135,7 @@ public class MappingRunner {
 
 	public static void generateMappingTarget(Vector req_vec) {
 	    Vector w = extractRowsFromAxiomFile(req_vec);
-	    Utils.saveToFile(ConfigurationController.axiomfile, w);
+	    Utils.saveToFile(ConfigurationController.termfile, w);
 	}
 
 	public static String runExactMatch(String datafile, int col) {
