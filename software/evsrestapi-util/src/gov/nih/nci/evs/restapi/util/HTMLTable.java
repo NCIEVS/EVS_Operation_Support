@@ -54,7 +54,8 @@ import java.util.*;
  *
  */
 public class HTMLTable {
-    static String NCIT_URL = "https://nciterms.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&&ns=ncit&code=";
+    //static String NCIT_URL = "https://nciterms.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&&ns=ncit&code=";
+    static String NCIT_URL = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
 
     public static String hyperlink(String url, String code) {
 		return "<a href=\"" + url + code + "\">" + code + "</a>";
@@ -379,19 +380,9 @@ public class HTMLTable {
 	}
 
 	public static void main(String[] args) {
-		/*
-		String serviceUrl = args[0];
-		String named_graph = args[1];
-		String username = args[2];
-		String password = args[3];
-		String inputfile = args[4];
-		String outputfile = new HTMLTableDataConverter(serviceUrl, named_graph, username, password).convert(inputfile);
-		System.out.println(outputfile + " generated.");
-		*/
-
-		String outputfile = "table_data_03-27-2023.txt";
-		Vector v = Utils.readFile(outputfile);
-		outputfile = new HTMLTable().generate(v, '|');
-		System.out.println(outputfile + " generated.");
+		String datafile = args[0];
+		Vector v = Utils.readFile(datafile);
+		datafile = new HTMLTable().generate(v, '|');
+		System.out.println(datafile + " generated.");
 	}
 }
