@@ -125,7 +125,8 @@ public class HTMLTable {
 	public static void printBanner(PrintWriter out) {
 		out.println("<div>");
 		out.println("  <img");
-		out.println("      src=\"https://nciterms.nci.nih.gov/ncitbrowser/images/evs-logo-swapped.gif\"");
+		//out.println("      src=\"https://nciterms.nci.nih.gov/ncitbrowser/images/evs-logo-swapped.gif\"");
+		out.println("      src=\"https://www.cancer.gov//sites/g/files/xnrzdm211/files/ncids_header/logos/Logo_NCI.svg\"");
 		out.println("      alt=\"EVS Logo\"");
 		out.println("      width=\"100%\"");
 		out.println("      height=\"26\"");
@@ -152,6 +153,7 @@ public class HTMLTable {
 	}
 
     public static void printHeader(PrintWriter out, String pageTitle) {
+		/*
 		out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">");
 		out.println("<html xmlns:c=\"http://java.sun.com/jsp/jstl/core\">");
 		out.println("<head>");
@@ -174,8 +176,9 @@ public class HTMLTable {
 		out.println("<div style='clear:both;margin-top:-5px;padding:8px;height:32px;color:white;background-color:#C31F40'>");
 		out.println("  <a href=\"http://www.cancer.gov\" target=\"_blank\">");
 		out.println("    <img");
-		out.println("        src=\"https://nciterms.nci.nih.gov/ncitbrowser/images/banner-red.png\"");
+		//out.println("        src=\"https://nciterms.nci.nih.gov/ncitbrowser/images/banner-red.png\"");
 		//out.println("        src=\"https://nciterms.nci.nih.gov/ncitbrowser/images/nci-banner-1.gif\"");
+		out.println("      src=\"https://www.cancer.gov//sites/g/files/xnrzdm211/files/ncids_header/logos/Logo_NCI.svg\"");
 		out.println("        width=\"955\"");
 		out.println("        height=\"39\"");
 		out.println("        border=\"0\"");
@@ -186,10 +189,41 @@ public class HTMLTable {
 		out.println("<!-- end nci banner -->");
 		out.println("");
 
-		printBanner(out);
+		//printBanner(out);
 
 		out.println("");
 		out.println("");
+		out.println("<center>");
+		out.println("<h1>" + pageTitle + "</h1>");
+		*/
+		out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">");
+		out.println("<html xmlns:c=\"http://java.sun.com/jsp/jstl/core\">");
+		out.println("<head>");
+		out.println("<title>test_insert_after</title>");
+		out.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
+		out.println("<style>");
+		out.println("table {");
+		out.println("    border-collapse: collapse;");
+		out.println("}");
+		out.println("table, td, th {");
+		out.println("    border: 1px solid black;");
+		out.println("}");
+		out.println("</style>");
+		out.println("</head>");
+		out.println("<body>");
+		out.println("<div>");
+		out.println("  <center>");
+		out.println("  <img");
+		out.println("      src=\"https://www.cancer.gov//sites/g/files/xnrzdm211/files/ncids_header/logos/Logo_NCI.svg\"");
+		out.println("      alt=\"EVS Logo\"");
+		out.println("      width=\"955\"");
+		out.println("      height=\"39\"");
+		out.println("      border=\"0\"");
+		out.println("      alt=\"National Cancer Institute\"");
+		out.println("      usemap=\"#external-evs\"");
+		out.println("  />");
+		out.println("  </center>");
+		out.println("</div>");
 		out.println("<center>");
 		out.println("<h1>" + pageTitle + "</h1>");
 		out.println("<p>");
@@ -232,16 +266,6 @@ public class HTMLTable {
 		}
 		return '\t';
 	}
-
-/*
-    public static void printTable(PrintWriter out,
-        String tableLabel,
-        Vector th_vec,
-        Vector data_vec) {
-		char delim = searchDelimiter(data_vec);
-		printTable(out, tableLabel, th_vec, data_vec, delim);
-	}
-*/
 
     public static void printTable(PrintWriter out,
         String tableLabel,
@@ -377,6 +401,19 @@ public class HTMLTable {
 		Vector v = Utils.readFile(outputfile);
 		outputfile = new HTMLTable().generate(v, '\t');
 		System.out.println(outputfile + " generated.");
+	}
+
+    public static void delimitedText2HTMLTable(String inputfile) {
+        char delim = '\t';
+        delimitedText2HTMLTable(inputfile, delim);
+	}
+
+    public static void delimitedText2HTMLTable(String inputfile, char delim) {
+		String outputfile = new HTMLTableDataConverter().convert(inputfile);
+		System.out.println(outputfile + " generated.");
+		Vector v = Utils.readFile(outputfile);
+		String htmlfile = new HTMLTable().generate(v, delim);
+		System.out.println(htmlfile + " generated.");
 	}
 
 	public static void main(String[] args) {
