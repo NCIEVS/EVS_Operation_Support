@@ -98,10 +98,11 @@ public class ExactMatchByTerm {
 		retiredConcepts = createRetiredConceptSet();
 		System.out.println("retired concepts: " + retiredConcepts.size());
 
-		termfile = ConfigurationController.axiomfile;
+		termfile = ConfigurationController.termfile;
 		file = new File(termfile);
 		if (!file.exists()) {
-			termfile = null;
+			System.out.println("INFO: term file does not exists, use AXIOM_FILE as default");
+			termfile = AXIOM_FILE;
 		} else {
 			System.out.println("INFO: " + termfile + " exists.");
 			System.out.println(termfile);

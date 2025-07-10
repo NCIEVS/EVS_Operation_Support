@@ -114,6 +114,7 @@ public class ConfigurationController {
 	public final static String term_column = properties.getProperty("term_column");
 	public final static String term_file_delim = properties.getProperty("term_file_delim");
 	public final static String term_file_heading = properties.getProperty("term_file_heading");
+	public final static String termfile = properties.getProperty("termfile");
 	public final static String termfiles = properties.getProperty("termfiles");
 	public final static String username = properties.getProperty("username");
 	public final static String primitiveConceptRoots = properties.getProperty("primitiveConceptRoots");
