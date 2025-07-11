@@ -385,6 +385,10 @@ public class FormatUtils {
 		HTMLTable.delimitedText2HTMLTable(inputfile);
 	}
 
+	public static void delimitedText2HTMLTable(String inputfile, char delim) {
+		HTMLTable.delimitedText2HTMLTable(inputfile, delim);
+	}
+
 	public static void delimitedText2Excel(String inputfile) {
 		char delim = '\t';
 		delimitedText2Excel(inputfile, delim);

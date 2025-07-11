@@ -555,6 +555,50 @@ public class LexicalMatching {
 		Utils.saveToFile("notmatched_" + filename, w1);
 	}
 
+    public static String resultFile2HierarchyData(String filename) {
+		int termCol = 0;
+		int codesCol = 1;
+		String prefix = "c";
+		return resultFile2HierarchyData(filename, termCol, codesCol, prefix);
+	}
+
+    public static String resultFile2HierarchyData(String filename, int termCol, int codesCol, String prefix) {
+		Vector v = Utils.readFile(filename);
+		Vector w = new Vector();
+		for (int i=1; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '\t');
+			String term = (String) u.elementAt(termCol);
+			String codes = (String) u.elementAt(codesCol);
+			String t = term + "|" + prefix + i;
+			if (codes.compareTo("No match") == 0) {
+				w.add(t + "|No match|NA");
+			} else {
+				Vector u2 = StringUtils.parseData(codes, '|');
+				for (int j=0; j<u2.size(); j++) {
+					String code = (String) u2.elementAt(j);
+					String label = (String) id2LabelMap.get(code);
+					w.add(t + "|" + label + "|" + code);
+				}
+			}
+		}
+		String outputfile = "hierarchy_" + filename;
+		Utils.saveToFile(outputfile, w);
+		return outputfile;
+	}
+
+    public static String resultFile2HTMLHierarchy(String filename, int termCol, int codesCol, String prefix) {
+		String datafile = resultFile2HierarchyData(filename, termCol, codesCol, prefix);
+		Vector w = Utils.readFile(datafile);
+		String root = null;
+		int n = datafile.lastIndexOf(".");
+		String title = datafile.substring(0, n);
+		String htmlfile = HTMLHierarchy.run(w, title, root);
+		w = Utils.removeNodeCodes(htmlfile, prefix);
+		Utils.saveToFile(htmlfile, w);
+		return htmlfile;
+	}
+
     public static void main(String[] args) {
 		String termfile = "normalized_data_NCCN_regimens_05-08-2025.txt";
 		String outputfile = run(termfile, true, 1);
