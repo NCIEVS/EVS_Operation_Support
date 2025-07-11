@@ -140,7 +140,8 @@ public class ASCII2HTMLTreeConverter {
         TreeItem ti = new ASCIITreeUtils().createTreeItem(parent_child_vec);
         HashMap hmap = new HashMap();
         hmap.put("<Root>", ti);
-        String url = "https://nciterms.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI%20Thesaurus&code=";
+        String url = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
+        //String url = "https://nciterms.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI%20Thesaurus&code=";
         new SimpleTreeUtils().writeTree2HTML(hmap, url, htmlfile);
     }
 
