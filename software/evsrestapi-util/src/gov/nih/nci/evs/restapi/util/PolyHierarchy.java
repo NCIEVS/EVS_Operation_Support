@@ -1,0 +1,223 @@
+package gov.nih.nci.evs.restapi.util;
+import gov.nih.nci.evs.restapi.appl.*;
+import gov.nih.nci.evs.restapi.bean.*;
+import gov.nih.nci.evs.restapi.common.*;
+import gov.nih.nci.evs.restapi.config.*;
+import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.nio.file.*;
+import java.util.*;
+import java.util.*;
+import java.util.regex.*;
+import org.json.*;
+
+/**
+ * <!-- LICENSE_TEXT_START -->
+ * Copyright 2022 Guidehouse. This software was developed in conjunction
+ * with the National Cancer Institute, and so to the extent government
+ * employees are co-authors, any rights in such works shall be subject
+ * to Title 17 of the United States Code, section 105.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *   1. Redistributions of source code must retain the above copyright
+ *      notice, this list of conditions and the disclaimer of Article 3,
+ *      below. Redistributions in binary form must reproduce the above
+ *      copyright notice, this list of conditions and the following
+ *      disclaimer in the documentation and/or other materials provided
+ *      with the distribution.
+ *   2. The end-user documentation included with the redistribution,
+ *      if any, must include the following acknowledgment:
+ *      "This product includes software developed by Guidehouse and the National
+ *      Cancer Institute."   If no such end-user documentation is to be
+ *      included, this acknowledgment shall appear in the software itself,
+ *      wherever such third-party acknowledgments normally appear.
+ *   3. The names "The National Cancer Institute", "NCI" and "Guidehouse" must
+ *      not be used to endorse or promote products derived from this software.
+ *   4. This license does not authorize the incorporation of this software
+ *      into any third party proprietary programs. This license does not
+ *      authorize the recipient to use any trademarks owned by either NCI
+ *      or GUIDEHOUSE
+ *   5. THIS SOFTWARE IS PROVIDED "AS IS," AND ANY EXPRESSED OR IMPLIED
+ *      WARRANTIES, (INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *      OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE) ARE
+ *      DISCLAIMED. IN NO EVENT SHALL THE NATIONAL CANCER INSTITUTE,
+ *      GUIDEHOUSE, OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *      INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *      BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *      LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *      CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *      LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *      ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *      POSSIBILITY OF SUCH DAMAGE.
+ * <!-- LICENSE_TEXT_END -->
+ */
+
+/**
+ * @author EVS Team
+ * @version 1.0
+ *
+ * Modification history:
+ *     Initial implementation kim.ong@nih.gov
+ *
+ */
+public class PolyHierarchy {
+    static String REQUIRED_DATA_FILE = ConfigurationController.requiredDataFile;
+	static Vector req_data_vec = null;
+    static String DATA_INFO_FILE = "data_map.txt";
+    static HashMap data_info_hashmap = null;
+    static HashMap dataMap = null;
+    static HashMap propertyMap = null;
+    static HashMap synonymMap = null;
+    static OWLScanner scanner = null;
+
+    static HierarchyHelper hh = null;
+    static Vector association_vec = null;
+    static HashMap associationMap = null;
+    static HashSet published_valuesets = null;
+    static HashMap a8Map = null;
+
+    static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
+	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
+	static String RESTRICTION_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.rolefile; //"roles.txt";
+	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
+
+    static Vector extensible_list_vec = null;
+    static HashMap extensibleMap = null;
+
+    static HashMap supportedPropertyCode2LabelMap = new HashMap();
+    static HashMap supportedPropertyLabel2CodeMap = new HashMap();
+
+    static HashMap subset_hmap = null;
+    static Vector published_vaueset_vec = null;
+
+    static Vector parent_child_vec = null;
+
+    static {
+		parent_child_vec = Utils.readFile(PARENT_CHILD_FILE);
+		hh = new HierarchyHelper(parent_child_vec);
+		scanner = new OWLScanner(NCIT_OWL);
+		//HashMap associationMap = scanner.getAssociationMap();
+		//subset_hmap = create_subset_hmap();
+
+		HashMap propertyMap = scanner.getPropertyMap(scanner.get_owl_vec());
+		a8Map = (HashMap) propertyMap.get("A8");
+
+        String prop_code = "P372";
+		published_vaueset_vec = scanner.extractProperties(scanner.get_owl_vec(), prop_code);
+
+		published_valuesets = new HashSet();
+		for (int i=0; i<published_vaueset_vec.size(); i++) {
+			String line = (String) published_vaueset_vec.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String yesOrNo = (String) u.elementAt(2);
+			if (yesOrNo.compareTo("Yes") == 0) {
+				published_valuesets.add((String) u.elementAt(0));
+			}
+		}
+	}
+
+	public HashMap create_parent_child_hmap() {
+		HashMap hmap = new HashMap();
+		for (int i=0; i<parent_child_vec.size(); i++) {
+			String line = (String) parent_child_vec.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String parent_code = (String) u.elementAt(1);
+			String child_code = (String) u.elementAt(3);
+			Vector w = new Vector();
+			if (hmap.containsKey(parent_code)) {
+				w = (Vector) hmap.get(parent_code);
+			}
+			w.add(child_code);
+			hmap.put(parent_code, w);
+		}
+		return hmap;
+	}
+
+	public static String getLabel(String code) {
+		return hh.getLabel(code);
+	}
+
+
+	public static Vector getSubclassCodes(String code) {
+		return hh.getSubclassCodes(code);
+	}
+
+	public PolyHierarchy(String owlfile) {
+
+	}
+
+	public static boolean is_published_valueset(String code) {
+		return published_valuesets.contains(code);
+	}
+
+	public static String getIndentation(int n) {
+	    StringBuffer buf = new StringBuffer();
+	    for (int i=0; i<n; i++) {
+			buf.append("\t");
+		}
+		return buf.toString();
+	}
+
+	public static String INVERSE_ISA = "[Inverse_Is_A]";
+	public static String CONCEPT_IN_SUBSET = "[Subset_Concept]";
+
+	public static Vector traverse(String root, int maxLevel) {
+		Stack stack = new Stack();
+		Vector w = new Vector();
+		stack.push(INVERSE_ISA + "|0|" + root);
+		stack.push(CONCEPT_IN_SUBSET + "|0|" + root);
+
+		while (!stack.isEmpty()) {
+			String s = (String) stack.pop();
+			Vector u = StringUtils.parseData(s, '|');
+			String rel = (String) u.elementAt(0);
+			String levelStr = (String) u.elementAt(1);
+			int level = Integer.parseInt(levelStr);
+			String code = (String) u.elementAt(2);
+			if (level == 0) {
+				w.add(getLabel(code) + " (" + code + ")");
+			} else {
+				w.add(getIndentation(level) + rel + " " + getLabel(code) + " (" + code + ")");
+			}
+			level++;
+			if (level <= maxLevel) {
+				if (is_published_valueset(code)) {
+					String label = getLabel(code);
+					Vector members = (Vector) a8Map.get(code);
+					for (int k=0; k<members.size(); k++) {
+						String member_code = (String) members.elementAt(k);
+						String member_label = getLabel(member_code);
+						String t = CONCEPT_IN_SUBSET + "|" + level + "|" + member_code;
+						stack.push(t);
+					}
+				}
+				Vector subs = getSubclassCodes(code);
+				if (subs != null) {
+					for (int k=0; k<subs.size(); k++) {
+						String sub = (String) subs.elementAt(k);
+						String t = INVERSE_ISA + "|" + level + "|" + sub;
+						stack.push(t);
+					}
+				}
+			}
+		}
+        return w;
+	}
+
+	public static void main(String[] args) {
+		String root = args[0];
+		String maxLevelStr = args[1];
+		int maxLevel = Integer.parseInt(maxLevelStr);
+		Vector w = traverse(root, maxLevel);
+		Utils.saveToFile(root + ".txt", w);
+	}
+}
