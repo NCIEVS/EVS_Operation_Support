@@ -66,6 +66,11 @@ public class HTMLHierarchy {
         initialize();
 	}
 
+    public HTMLHierarchy(Vector parent_child_vec) {
+        this.datafile = null;
+        hh = new HierarchyHelper(parent_child_vec);
+	}
+
     public void initialize() {
 		Vector parent_child_vec = Utils.readFile(datafile);
 		System.out.println("parent_child_vec: " + parent_child_vec.size());
@@ -193,6 +198,32 @@ public class HTMLHierarchy {
 		try {
 			pw = new PrintWriter(outputfile, "UTF-8");
             HTMLHierarchy htmlHierarchy = new HTMLHierarchy(datafile);
+            htmlHierarchy.run(pw, title, root);
+
+		} catch (Exception ex) {
+
+		} finally {
+			try {
+				pw.close();
+				System.out.println("Output file " + outputfile + " generated.");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		return outputfile;
+	}
+
+    public static String run(Vector parent_child_vec, String title, String root) {
+        long ms = System.currentTimeMillis();
+		PrintWriter pw = null;
+		String outputfile = title.toLowerCase();
+		outputfile = outputfile.replace(" ", "_");
+		outputfile = outputfile + ".html";
+
+		try {
+			pw = new PrintWriter(outputfile, "UTF-8");
+            HTMLHierarchy htmlHierarchy = new HTMLHierarchy(parent_child_vec);
             htmlHierarchy.run(pw, title, root);
 
 		} catch (Exception ex) {

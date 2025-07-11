@@ -618,5 +618,57 @@ public class Utils {
 		return new SortUtils().quickSort(w);
 	}
 
+/////////////////////////////////////////////////////////////////////////////////////////
+	public static Vector removeNodeCodes(String htmlfile, String prefix) {
+		Vector v = Utils.readFile(htmlfile);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			int n = line.indexOf("(" + prefix);
+			if (n != -1 && line.endsWith(")")) {
+				String t = line.substring(0, n-1);
+				w.add(t);
+			} else {
+				w.add(line);
+			}
+		}
+		return w;
+	}
 
+    public static Vector toHierarchyFormat(String datafile, String prefix) {
+		return toHierarchyFormat(Utils.readFile(datafile), prefix, "No match");
+    }
+
+    public static Vector toHierarchyFormat(Vector v, String prefix) {
+		return toHierarchyFormat(v, prefix, "No match");
+    }
+
+    public static Vector toHierarchyFormat(Vector v, String prefix, String childNodeLabel) {
+		Vector w = new Vector();
+		String rootCode = null;
+		String label = null;
+		int knt = 0;
+		int sub_knt = 0;
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.trim();
+			if (line.startsWith("(")) {
+				if (label != null && sub_knt == 0) {
+					w.add(label + "|" + rootCode + "|" + childNodeLabel + "|NA");
+				}
+				int n = line.lastIndexOf(")");
+				label = line.substring(n+1, line.length());
+				knt++;
+				rootCode = prefix + knt;
+				sub_knt = 0;
+
+			} else {
+				if (line.indexOf("|") != -1) {
+					w.add(label + "|" + rootCode + "|" + line);
+					sub_knt++;
+				}
+			}
+		}
+		return w;
+	}
 }

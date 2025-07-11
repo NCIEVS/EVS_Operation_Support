@@ -380,4 +380,37 @@ public class FormatUtils {
 		buf.append("</table>").append("\n");
         return buf.toString();
     }
+
+	public static void delimitedText2HTMLTable(String inputfile) {
+		HTMLTable.delimitedText2HTMLTable(inputfile);
+	}
+
+	public static void delimitedText2Excel(String inputfile) {
+		char delim = '\t';
+		delimitedText2Excel(inputfile, delim);
+	}
+
+	public static void delimitedText2Excel(String inputfile, char delim) {
+		Vector datafile_vec = new Vector();
+		datafile_vec.add(inputfile);
+		int n = inputfile.lastIndexOf(".");
+		String t = inputfile.substring(0, n);
+		Vector sheetLabel_vec = new Vector();
+		sheetLabel_vec.add(t);
+		String excelfile = t + ".xlsx";
+		new ExcelWriter().writeToXSSF(datafile_vec, excelfile, delim, sheetLabel_vec, null);
+	}
+
+	public static String list2HTMLHierarchy(String filename) {
+		String prefix = "c";
+		Vector w = Utils.toHierarchyFormat(Utils.readFile(filename), prefix);
+		String root = null;
+		int n = filename.lastIndexOf(".");
+		String title = filename.substring(0, n);
+		String htmlfile = HTMLHierarchy.run(w, title, root);
+		w = Utils.removeNodeCodes(htmlfile, prefix);
+		Utils.saveToFile(htmlfile, w);
+		return htmlfile;
+	}
+
 }
