@@ -213,6 +213,61 @@ public class PolyHierarchy {
         return w;
 	}
 
+	public static int BOTH = 0;
+	public static int ISA_ONLY = 1;
+	public static int SUBSET_ONLY = 2;
+
+	public static Vector traverse(String root, int maxLevel, int type) {
+		Stack stack = new Stack();
+		Vector w = new Vector();
+		if (type == BOTH || type == ISA_ONLY) {
+			stack.push(INVERSE_ISA + "|0|" + root);
+		}
+		if (type == BOTH || type == SUBSET_ONLY) {
+			stack.push(CONCEPT_IN_SUBSET + "|0|" + root);
+		}
+
+		while (!stack.isEmpty()) {
+			String s = (String) stack.pop();
+			Vector u = StringUtils.parseData(s, '|');
+			String rel = (String) u.elementAt(0);
+			String levelStr = (String) u.elementAt(1);
+			int level = Integer.parseInt(levelStr);
+			String code = (String) u.elementAt(2);
+			if (level == 0) {
+				w.add(getLabel(code) + " (" + code + ")");
+			} else {
+				w.add(getIndentation(level) + rel + " " + getLabel(code) + " (" + code + ")");
+			}
+			level++;
+			if (level <= maxLevel) {
+				if (type == BOTH || type == SUBSET_ONLY) {
+					if (is_published_valueset(code)) {
+						String label = getLabel(code);
+						Vector members = (Vector) a8Map.get(code);
+						for (int k=0; k<members.size(); k++) {
+							String member_code = (String) members.elementAt(k);
+							String member_label = getLabel(member_code);
+							String t = CONCEPT_IN_SUBSET + "|" + level + "|" + member_code;
+							stack.push(t);
+						}
+					}
+			    }
+			    if (type == BOTH || type == ISA_ONLY) {
+					Vector subs = getSubclassCodes(code);
+					if (subs != null) {
+						for (int k=0; k<subs.size(); k++) {
+							String sub = (String) subs.elementAt(k);
+							String t = INVERSE_ISA + "|" + level + "|" + sub;
+							stack.push(t);
+						}
+					}
+				}
+			}
+		}
+        return w;
+	}
+
 	public static void main(String[] args) {
 		String root = args[0];
 		String maxLevelStr = args[1];
