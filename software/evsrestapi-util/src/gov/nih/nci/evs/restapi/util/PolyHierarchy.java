@@ -333,6 +333,42 @@ public class PolyHierarchy {
 		HTMLHierarchy.run(parent_child_vec, title, root);
 	}
 
+	public static int findMaxLevel(String root) {
+		Stack stack = new Stack();
+		Vector w = new Vector();
+		String sub = root;
+		int level = 0;
+		stack.push(sub + "|" + level);
+		int maxLevel = -1;
+		int numNodes = 0;
+		while (!stack.isEmpty()) {
+			String s = (String) stack.pop();
+			numNodes++;
+			Vector u = StringUtils.parseData(s, '|');
+			sub = (String) u.elementAt(0);
+			String code = sub;
+			String levelStr = (String) u.elementAt(1);
+			level = Integer.parseInt(levelStr);
+			if (level > maxLevel) {
+				maxLevel = level;
+			}
+			level++;
+			Vector subs = getSubclassCodes(code);
+			if (subs != null) {
+				for (int k=0; k<subs.size(); k++) {
+					sub = (String) subs.elementAt(k);
+					String label = getLabel(sub);
+					stack.push(sub + "|" + level);
+				}
+			}
+		}
+		System.out.println(getLabel(root) + " (" + root + ")");
+		System.out.println("Branch size: " + numNodes);
+		System.out.println("Maximum level: " + maxLevel);
+        return maxLevel;
+	}
+
+
 	public static void main(String[] args) {
 		String root = args[0];
 		String maxLevelStr = args[1];
