@@ -125,6 +125,7 @@ public class PolyHierarchy {
 		}
 	}
 
+/*
 	public HashMap create_parent_child_hmap() {
 		HashMap hmap = new HashMap();
 		for (int i=0; i<parent_child_vec.size(); i++) {
@@ -139,10 +140,13 @@ public class PolyHierarchy {
 			w.add(child_code);
 			hmap.put(parent_code, w);
 		}
+		hmap.put("<Root>", "Root node");
 		return hmap;
 	}
+*/
 
 	public static String getLabel(String code) {
+		if (code.compareTo("<Root>") == 0) return "Root node";
 		return hh.getLabel(code);
 	}
 
@@ -266,6 +270,67 @@ public class PolyHierarchy {
 			}
 		}
         return w;
+	}
+
+	public static Vector generateHierarchyData(String root, int maxLevel, int type) {
+		Stack stack = new Stack();
+		Vector w = new Vector();
+		String sup = "<Root>";
+		String sub = root;
+		int level = 0;
+
+		if (type == BOTH || type == ISA_ONLY) {
+			stack.push(getLabel(sup) + "|" + sup + "|" + getLabel(sub) + "|" + sub + "|" + INVERSE_ISA + "|" + level);
+		}
+		if (type == BOTH || type == SUBSET_ONLY) {
+			stack.push(getLabel(sup) + "|" + sup + "|" + getLabel(sub) + "|" + sub + "|" + CONCEPT_IN_SUBSET + "|" + level);
+		}
+
+		while (!stack.isEmpty()) {
+			String s = (String) stack.pop();
+			Vector u = StringUtils.parseData(s, '|');
+			sup = (String) u.elementAt(1);
+			sub = (String) u.elementAt(3);
+			String code = sub;
+			String rel = (String) u.elementAt(4);
+			String levelStr = (String) u.elementAt(5);
+			level = Integer.parseInt(levelStr);
+			w.add(getLabel(sup) + "|" + sup + "|" + getLabel(sub) + "|" + sub + "|" + rel + "|" + level);
+			level++;
+			if (level <= maxLevel) {
+				if (type == BOTH || type == SUBSET_ONLY) {
+					if (is_published_valueset(code)) {
+						String label = getLabel(code);
+						Vector members = (Vector) a8Map.get(code);
+						for (int k=0; k<members.size(); k++) {
+							String member_code = (String) members.elementAt(k);
+							String member_label = getLabel(member_code);
+							stack.push(label + "|" + code + "|" + member_label + "|" + member_code + "|" + CONCEPT_IN_SUBSET + "|" + level);
+						}
+					}
+			    }
+			    if (type == BOTH || type == ISA_ONLY) {
+					Vector subs = getSubclassCodes(code);
+					if (subs != null) {
+						for (int k=0; k<subs.size(); k++) {
+							sub = (String) subs.elementAt(k);
+							String label = getLabel(code);
+							stack.push(label + "|" + code + "|" + getLabel(sub) + "|" + sub + "|" + INVERSE_ISA + "|" + level);
+						}
+					}
+				}
+			}
+		}
+        return w;
+	}
+
+	public static void generateHTMLTree(String asciitreedatafile, String title, String root) {
+		HTMLHierarchy.run(asciitreedatafile, title, root);
+	}
+
+	public static void generateHTMLTree(String title, String root, int maxLevel, int type) {
+		Vector parent_child_vec = generateHierarchyData(root, maxLevel, type);
+		HTMLHierarchy.run(parent_child_vec, title, root);
 	}
 
 	public static void main(String[] args) {
