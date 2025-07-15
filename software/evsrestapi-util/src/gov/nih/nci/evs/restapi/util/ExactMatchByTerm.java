@@ -63,6 +63,7 @@ public class ExactMatchByTerm {
 	static String AXIOM_FILE_NAME = "axiom_ThesaurusInferred_forTS.txt";
 	static String HIER_FILE_NAME = "parent_child.txt";
 	static String AXIOM_FILE = null;
+	static String NCIT_OWL = null;
 	static String PROPERTY_FILE = null;
 
 	static HashMap term2CodesMap = null;
@@ -83,6 +84,7 @@ public class ExactMatchByTerm {
 	static {
 		AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE_NAME;
 		PROPERTY_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.propertyfile;
+        NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
 
 		System.out.println(AXIOM_FILE);
 		File file = new File(AXIOM_FILE);
@@ -755,4 +757,59 @@ public class ExactMatchByTerm {
 		return new SortUtils().quickSort(w);
 	}
 
+	public static void setupAndRunEactMatch(String mappingTarget, String datafile, int col) {
+		Vector dataVec = new Vector();
+		dataVec.add("P90|P384$NCI|P383$PT");
+		dataVec.add("P90|P384$NCI|P383$SY");
+		DataRetrieval test = new DataRetrieval(NCIT_OWL, dataVec);
+		HashMap ptMap = test.createCode2ValuesMap("P90|P384$NCI|P383$PT");
+		HashMap syMap = test.createCode2ValuesMap("P90|P384$NCI|P383$SY");
+		HashMap term2CodesMap = null;
+		if (mappingTarget == null) {
+			term2CodesMap = DataRetrieval.createTerm2CodesMap(AXIOM_FILE);
+		} else {
+			String reqs = mappingTarget;//"P90|P383$PT|P384$NCI";
+			Vector w = DataRetrieval.extractRowsFromAxiomFile(reqs);
+			term2CodesMap = DataRetrieval.createTerm2CodesMap(w);
+		}
+		Vector w = new Vector();
+		Vector v = Utils.readFile(datafile);
+		String line = (String) v.elementAt(0);
+		Vector u = StringUtils.parseData(line, '\t');
+		String heading = (String) u.elementAt(col);
+		w.add(heading + "\t" + "Matched NCIt Code(s)	NCI PT(s)	NCI SY(s)");
+		for (int i=1; i<v.size(); i++) {
+			line = (String) v.elementAt(i);
+			u = StringUtils.parseData(line, '|');
+			String term = (String) u.elementAt(col);
+			term = term.toLowerCase();
+			if (term2CodesMap.containsKey(term)) {
+				Vector codes = (Vector) term2CodesMap.get(term);
+				String codeStr = Utils.vector2Delimited(codes, "|");
+				StringBuffer ptBuf = new StringBuffer();
+				StringBuffer syBuf = new StringBuffer();
+				for (int j=0; j<codes.size(); j++) {
+					String code = (String) codes.elementAt(j);
+					if (ptMap.containsKey(code)) {
+						ptBuf.append(Utils.vector2Delimited((Vector) ptMap.get(code), "|")).append("$");
+					}
+					if (syMap.containsKey(code)) {
+						syBuf.append(Utils.vector2Delimited((Vector) syMap.get(code), "|")).append("$");
+					}
+				}
+				String s1 = ptBuf.toString();
+				if (s1.length() > 0) {
+					s1 = s1.substring(0, s1.length()-1);
+				}
+				String s2 = syBuf.toString();
+				if (s2.length() > 0) {
+					s2 = s2.substring(0, s2.length()-1);
+				}
+				w.add(term + "\t" + codeStr + "\t" + s1 + "\t" + s2);
+			} else {
+				w.add(term + "\tNo match");
+			}
+		}
+        Utils.saveToFile("results_" + datafile, w);
+	}
 }
