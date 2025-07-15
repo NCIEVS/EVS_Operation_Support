@@ -272,6 +272,19 @@ public class PolyHierarchy {
         return w;
 	}
 
+    public static void hierarchyData2ASCIITree(String filename) {
+		Vector w = new Vector();
+		Vector v = Utils.readFile(filename);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String sup = (String) u.elementAt(0);
+			String indent = getIndentation(Integer.parseInt((String) u.elementAt(5)));
+			w.add(indent + (String) u.elementAt(2) + " (" + (String) u.elementAt(3) + ")");
+		}
+		Utils.saveToFile("tree_" + filename, w);
+	}
+
 	public static Vector generateHierarchyData(String root, int maxLevel, int type) {
 		Stack stack = new Stack();
 		Vector w = new Vector();
