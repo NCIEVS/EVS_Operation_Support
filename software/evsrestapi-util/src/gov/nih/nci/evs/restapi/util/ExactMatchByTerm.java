@@ -757,7 +757,7 @@ public class ExactMatchByTerm {
 		return new SortUtils().quickSort(w);
 	}
 
-	public static void setupAndRunEactMatch(String mappingTarget, String datafile, int col) {
+	public static void setupAndRunExactMatch(String mappingTarget, String datafile, int col) {
 		Vector dataVec = new Vector();
 		dataVec.add("P90|P384$NCI|P383$PT");
 		dataVec.add("P90|P384$NCI|P383$SY");
