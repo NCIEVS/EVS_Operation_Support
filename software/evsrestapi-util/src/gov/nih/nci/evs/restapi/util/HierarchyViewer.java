@@ -67,6 +67,12 @@ import javax.swing.tree.TreePath;
  *
  */
 public class HierarchyViewer {
+
+	public static void run(String datafile) {
+		JFrame frame = new TreeFrame(datafile);
+		frame.show();
+	}
+
 	public static void main(String[] args) {
 		String datafile = args[0];
 		JFrame frame = new TreeFrame(datafile);
