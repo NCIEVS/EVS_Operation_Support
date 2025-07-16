@@ -173,6 +173,26 @@ public class ExcelExporter {
 		return null;
     }
 
+    public static void exportExcelSheets(String excelfile, String outputDir) {
+        Vector w = getSheetNames(excelfile);
+        Utils.dumpVector(excelfile, w);
+        File f = new File(outputDir);
+        if (!f.exists()) {
+			f.mkdir();
+		}
+
+		Vector textfiles = new Vector();
+		for (int sheet_num=0; sheet_num<w.size(); sheet_num++) {
+			try {
+				String textfile = export(excelfile, sheet_num, outputDir);
+				System.out.println(textfile + " generated.");
+				textfiles.add(textfile);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
 	public static void main(String[] args) {
         String excelfile = args[0];
         String sheetStr = args[1];
