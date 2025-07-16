@@ -285,6 +285,26 @@ public class PolyHierarchy {
 		Utils.saveToFile("tree_" + filename, w);
 	}
 
+    public static Vector extractCodesFromHierarchyData(String hierdatafile) {
+		Vector v = Utils.readFile(hierdatafile);
+		Vector codes = new Vector();
+		for (int i=0; i<v. size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String sup_code = (String) u.elementAt(1);
+			String sub_code = (String) u.elementAt(3);
+			if (sup_code.compareTo("<Root>") != 0) {
+				if (!codes.contains(sup_code)) {
+					codes.add(sup_code);
+				}
+			}
+			if (!codes.contains(sub_code)) {
+				codes.add(sub_code);
+			}
+		}
+		return codes;
+	}
+
 	public static Vector generateHierarchyData(String root, int maxLevel, int type) {
 		Stack stack = new Stack();
 		Vector w = new Vector();
