@@ -417,4 +417,14 @@ public class FormatUtils {
 		return htmlfile;
 	}
 
+	public static void toTabDelimited(String barDelimitedFile) {
+		Vector w = new Vector();
+		Vector v = Utils.readFile(barDelimitedFile);
+		for (int i=0; i<v. size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.replace("|", "\t");
+			w.add(line);
+		}
+		Utils.saveToFile(barDelimitedFile, w);
+	}
 }
