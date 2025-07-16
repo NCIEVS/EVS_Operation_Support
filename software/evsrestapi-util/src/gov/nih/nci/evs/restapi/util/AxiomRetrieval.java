@@ -194,12 +194,12 @@ public class AxiomRetrieval {
 
 	public static HashMap getAxiomMap(Vector req_data_vec) {
 		HashMap axiomMap = new HashMap();
+		Vector v = Utils.readFile(AXIOM_FILE);
 		for (int k=0; k<req_data_vec.size(); k++) {
 			String req_data = (String) req_data_vec.elementAt(k);
 			Vector w = new Vector();
 			Vector u0 = StringUtils.parseData(req_data, '|');
 			String propCode = (String) u0.elementAt(0);
-			Vector v = Utils.readFile(AXIOM_FILE);
 			for (int i=0; i<v.size(); i++) {
 				String line = (String) v.elementAt(i);
 				Vector u = StringUtils.parseData(line, '|');
