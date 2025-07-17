@@ -124,6 +124,7 @@ public class ConfigurationController {
 	public final static String requiredDataFile = properties.getProperty("requiredDataFile");
 	public final static String output_dir = properties.getProperty("output_dir");
 	public final static String synonymExt = properties.getProperty("synonymExt");
+	public final static String userDownloadDir = properties.getProperty("userDownloadDir");
 
 	/**
 	 * To be implemented by each descendant testcase.
