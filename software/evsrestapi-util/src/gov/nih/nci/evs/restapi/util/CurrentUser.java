@@ -240,6 +240,53 @@ public class CurrentUser {
         }
     }
 
+	public static String getMainClassAndArgs() {
+		return System.getProperty("sun.java.command");
+	}
+
+	public static String getMainClassFullPathName() {
+		String mainClass = getMainClassAndArgs();
+		return System.getProperty("user.dir") + File.separator + mainClass + ".class";
+	}
+
+	public static long getMainClassLastModified() {
+		String filename = getMainClassFullPathName();
+		File f = new File(filename);
+		return f.lastModified();
+	}
+
+	public static long findLatestClassLastModified() {
+		List<String> filenames = CurrentUser.findFilesInCurrDirectory();
+		long latest = (long) 0.0;
+		for (int i=0; i<filenames.size(); i++) {
+			String filename = (String) filenames.get(i);
+			if (filename.endsWith(".class")) {
+				long lastModified = new File(filename).lastModified();
+				if (lastModified > latest) {
+					latest = lastModified;
+				}
+			}
+		}
+		return latest;
+	}
+
+	public static List getFilesCreatedAfterASpecificTime(long time) {
+		List<String> filenames = CurrentUser.findFilesInCurrDirectory();
+		ArrayList list = new ArrayList();
+		for (int i=0; i<filenames.size(); i++) {
+			String filename = (String) filenames.get(i);
+			long lastModified = new File(filename).lastModified();
+			if (time < lastModified){
+				list.add(filename);
+			}
+		}
+		return list;
+	}
+
+	public static List getNewlyCreatedFiles() {
+		return getFilesCreatedAfterASpecificTime(findLatestClassLastModified());
+	}
+
 	public static void main(String[] args) {
 		String today = getToday("yyyy-MM-dd");
         List list = searchDownloadFiles(today);
