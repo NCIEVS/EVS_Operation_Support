@@ -314,6 +314,45 @@ public class CurrentUser {
 		return getFilesCreatedAfterASpecificTime(findLatestClassLastModified());
 	}
 
+	public static Vector list2Vector(List list) {
+		Vector v = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			Object obj = list.get(i);
+			v.add(obj);
+		}
+		return v;
+	}
+
+	public static void saveNewlyCreatedFiles() {
+		String targetDir = null;
+		saveNewlyCreatedFiles(targetDir);
+	}
+
+	public static void saveNewlyCreatedFiles(String targetDir) {
+		if (targetDir == null) {
+			targetDir = "output_" + StringUtils.getToday();
+		}
+		File dir = new File(targetDir);
+		if (!dir.exists()) {
+			dir.mkdir();
+		}
+		List filenames = CurrentUser.getNewlyCreatedFiles();
+		for (int i=0; i<filenames.size(); i++) {
+			String filename = (String) filenames.get(i);
+			String name = new File(filename).getName();
+			System.out.println(targetDir + File.separator + name);
+			CurrentUser.copyFile(filename, targetDir + File.separator + name);
+		}
+	}
+
+	public static void deleteNewlyCreatedFiles() {
+		List filenames = CurrentUser.getNewlyCreatedFiles();
+		for (int i=0; i<filenames.size(); i++) {
+			String filename = (String) filenames.get(i);
+			new File(filename).delete();
+		}
+	}
+
 	public static void main(String[] args) {
 		String today = getToday("yyyy-MM-dd");
         List list = searchDownloadFiles(today);
