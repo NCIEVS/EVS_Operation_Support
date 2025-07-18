@@ -427,6 +427,19 @@ public class CurrentUser {
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
+	public static void deletReportGenerationData() {
+		long ms = System.currentTimeMillis();
+		Vector files = new Vector();
+		files.add(NCItDownload.NCIT_ZIP_FILE);
+		files.add(NCIT_OWL);
+		files.add(AXIOM_FILE);
+		files.add(HIER_FILE);
+		files.add(ROLE_FILE);
+		files.add(PROPERTY_FILE);
+		files.add(VS_FILE);
+		CurrentUser.deleteFiles(files);
+	}
+
 	public static void test(String[] args) {
 		String today = getToday("yyyy-MM-dd");
         List list = searchDownloadFiles(today);
