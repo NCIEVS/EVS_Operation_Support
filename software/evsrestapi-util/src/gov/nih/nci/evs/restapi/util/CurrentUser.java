@@ -37,6 +37,15 @@ import java.io.FilenameFilter;
 
 public class CurrentUser {
 
+	static String HIER_FILE = "parent_child.txt";
+	static String ROLE_FILE = "roles.txt";
+	static String PROPERTY_FILE = "properties.txt";
+	static String OBJECT_PROPERTY_FILE = "objectProperies.txt";
+	static String SEMANTIC_TYPE_FILE = "P106.txt";
+	static String NCIT_OWL = "ThesaurusInferred_forTS.owl";
+	static String AXIOM_FILE = "axiom_ThesaurusInferred_forTS.txt";
+	static String VS_FILE = "A8.txt";
+
 	public CurrentUser() {
 
 	}
@@ -347,13 +356,78 @@ public class CurrentUser {
 
 	public static void deleteNewlyCreatedFiles() {
 		List filenames = CurrentUser.getNewlyCreatedFiles();
+		deleteFiles(list2Vector(filenames));
+	}
+
+	public static void copyFiles(String targetDir, Vector filenames) {
+		String currentDir = System.getProperty("user.dir");
+		copyFiles(currentDir, targetDir, filenames);
+	}
+
+	public static void copyFiles(String sourceDir, String targetDir, Vector filenames) {
+		for (int i=0; i<filenames.size(); i++) {
+			String filename = (String) filenames.elementAt(i);
+			String source = sourceDir + File.separator + filename;
+			String target = targetDir + File.separator + filename;
+			boolean bool = copyFile(source, target);
+		}
+	}
+
+	public static void deleteFiles(Vector filenames) {
 		for (int i=0; i<filenames.size(); i++) {
 			String filename = (String) filenames.get(i);
 			new File(filename).delete();
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void reportGenerationSetUp() {
+		long ms = System.currentTimeMillis();
+		String currentWorkingDirectory = System.getProperty("user.dir");
+
+		String url = NCItDownload.NCIt_URI + NCItDownload.NCIT_ZIP_FILE;
+		Vector files = new Vector();
+		try {
+        	NCItDownload.download();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if (!new File(NCIT_OWL).exists()) {
+			System.out.println(NCIT_OWL + " does not exist -- program aborts.");
+			return;
+		}
+		files.add(NCIT_OWL);
+        OWLScanner owlscanner = new OWLScanner(NCIT_OWL);
+
+		Vector w = owlscanner.extractAxiomData(null);
+		Utils.saveToFile(AXIOM_FILE, w);
+		HTMLDecoder.run(AXIOM_FILE);
+		files.add(AXIOM_FILE);
+
+		w = owlscanner.extractHierarchicalRelationships(owlscanner.get_owl_vec());
+		Utils.saveToFile(HIER_FILE, w);
+		HTMLDecoder.run(HIER_FILE);
+		files.add(HIER_FILE);
+
+		w = owlscanner.extractOWLRestrictions(owlscanner.get_owl_vec());
+		Utils.saveToFile(ROLE_FILE, w);
+		files.add(ROLE_FILE);
+
+		w = owlscanner.extractProperties(owlscanner.get_owl_vec());
+		Utils.saveToFile(PROPERTY_FILE, w);
+		HTMLDecoder.run(PROPERTY_FILE);
+		files.add(PROPERTY_FILE);
+
+		w = owlscanner.extractAssociations(owlscanner.get_owl_vec(), "A8");
+		Utils.saveToFile(VS_FILE, w);
+		files.add(VS_FILE);
+
+		Utils.dumpVector("files", files);
+		CurrentUser.copyFiles(ConfigurationController.reportGenerationDirectory, files);
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
+	public static void test(String[] args) {
 		String today = getToday("yyyy-MM-dd");
         List list = searchDownloadFiles(today);
         System.out.println("searchDownloadFiles: " + today);
