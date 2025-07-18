@@ -56,20 +56,20 @@ public class CurrentUser {
 		}
 
 		List<String> files = findFilesInDirectory(new File(sourceDir));
-		Vector filesToCopy = new Vector();
+		Vector filesToMove = new Vector();
 		Vector w = new Vector();
 		for (int i=0; i<files.size(); i++) {
 			String f = (String) files.get(i);
 			if (f.endsWith("." + fileExt)) {
-				filesToCopy.add(new File(f).getName());
+				filesToMove.add(new File(f).getName());
 				System.out.println(new File(f).getName());
 			}
 		}
 
 		System.out.println(sourceDir);
 		System.out.println(targetDir);
-		System.out.println(filesToCopy.size());
-	    FileUtils.copyFile(sourceDir, targetDir, filesToCopy);
+		System.out.println(filesToMove.size());
+	    FileUtils.copyFile(sourceDir, targetDir, filesToMove);
         int knt = 0;
 		for (int i=0; i<files.size(); i++) {
 			String f = (String) files.get(i);
@@ -77,6 +77,33 @@ public class CurrentUser {
 				new File(f).delete();
 				knt++;
 			}
+		}
+		System.out.println("Number of files moved: " + knt);
+	}
+
+	public static void moveFiles(String targetDir, Vector filesToMove) {
+	    String sourceDir = FileUtils.getCurrentWorkingDirectory();
+	    moveFiles(sourceDir, targetDir, filesToMove);
+	}
+
+	public static void moveFiles(String sourceDir, String targetDir, Vector filesToMove) {
+		File dir = new File(targetDir);
+		if (!dir.exists()) {
+			dir.mkdir();
+			System.out.println("Directory " + targetDir + " created.");
+		} else {
+			System.out.println("Directory " + targetDir + " already exists.");
+		}
+
+		System.out.println(sourceDir);
+		System.out.println(targetDir);
+		System.out.println(filesToMove.size());
+	    FileUtils.copyFile(sourceDir, targetDir, filesToMove);
+        int knt = 0;
+		for (int i=0; i<filesToMove.size(); i++) {
+			String f = (String) filesToMove.get(i);
+			new File(f).delete();
+			knt++;
 		}
 		System.out.println("Number of files moved: " + knt);
 	}
