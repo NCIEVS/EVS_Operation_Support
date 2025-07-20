@@ -438,6 +438,7 @@ public class CurrentUser {
 		files.add(PROPERTY_FILE);
 		files.add(VS_FILE);
 		CurrentUser.deleteFiles(files);
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 	public static void test(String[] args) {
