@@ -209,6 +209,8 @@ public class ReportSubmitter {
 			generator.run();
 			System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 			System.out.println("Reports " + report + " generated.");
+		} else {
+			System.out.println("Report " + report + " is not sspported.");
 		}
 
 
