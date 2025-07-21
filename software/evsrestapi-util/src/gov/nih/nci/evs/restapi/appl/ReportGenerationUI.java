@@ -122,7 +122,7 @@ public class ReportGenerationUI {
 		if (!f.exists()) {
 			System.out.println("WARNING: NCIT_OWL_FILE " + ConfigurationController.owlfile + " does not exist.");
 		} else {
-			System.out.println("WARNING: NCIT_OWL_FILE " + ConfigurationController.owlfile + " exists.");
+			System.out.println("INFO: NCIT_OWL_FILE " + ConfigurationController.owlfile + " exists.");
 			owlscanner = new OWLScanner(NCIT_OWL_FILE);
 		}
 
