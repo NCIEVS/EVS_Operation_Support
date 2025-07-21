@@ -63,6 +63,19 @@ import java.util.*;
  */
 public class DelimitedDataExtractor {
 
+	public static HashMap extract(String filename, int keyCol, int valueCol, char delim) {
+		Vector w = Utils.readFile(filename);
+		HashMap hmap = new HashMap();
+		for (int i=0; i<w.size(); i++) {
+			String line = (String) w.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			String key = (String) u.elementAt(keyCol);
+			String value = (String) u.elementAt(valueCol);
+			hmap.put(key, value);
+		}
+		return hmap;
+	}
+
 	public static Vector extract(String filename, String delim_columns, char delim) {
 		Vector w = StringUtils.parseData(delim_columns, delim);
 		Vector columns = new Vector();

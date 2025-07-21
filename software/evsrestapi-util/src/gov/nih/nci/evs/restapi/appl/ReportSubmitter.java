@@ -40,8 +40,8 @@ public class ReportSubmitter {
 	HashMap semanticTypeMap = null;
 
 	boolean REPORT_GENERATION_MODE = true;
-	static OWLScanner owlscanner = new OWLScanner(NCIT_OWL_FILE);
-
+	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
+	static OWLScanner owlscanner = null;
 	Vector output_vec = null;
 
 	public static void reportGenerationSetUp() {
@@ -58,7 +58,16 @@ public class ReportSubmitter {
 
     static {
 		PRIMITIVE_CONCEPT_ROOTS = ConfigurationController.primitiveConceptRoots;
+		/*
+		File f = new File(NCIT_OWL);
+		if (!f.exists()) {
+			System.out.println("WARNING: " + NCIT_OWL + " does not exist.");
+		} else {
+			owlscanner = new OWLScanner(NCIT_OWL);
+		}
+		*/
 	}
+
 
 	public static void generateAxiomFile() {
 		 Vector w = owlscanner.extractAxiomData(null);
