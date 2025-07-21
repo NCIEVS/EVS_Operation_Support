@@ -322,7 +322,6 @@ public class PrimitiveConceptFinder {
 			String code = (String) codes.elementAt(i);
 			String label = (String) code2LabelMap.get(code);
 			Vector subs = test.getBranchCodes(code);
-
 			Utils.dumpVector(label + " (" + code + ")", subs);
 
 /*

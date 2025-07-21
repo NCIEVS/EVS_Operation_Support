@@ -304,19 +304,7 @@ public class LinguisticAnalyzer {
 	}
 
 	public static void main(String[] args) {
-		long ms = System.currentTimeMillis();
-		String filename = "cancer_types.txt";
-        File file = new File(filename);
-        Vector v = null;
-        if (!file.exists()) {
-			v = searchForCancerTypes();
-			Utils.saveToFile("cancer_types.txt", v);
-		} else {
-            v = Utils.readFile(filename);
-		}
-		run(v);
-		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		run();
 	}
-
 }
 

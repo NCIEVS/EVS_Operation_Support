@@ -180,7 +180,38 @@ public class ReportSubmitter {
 			PrimitiveConceptFinder.run(PRIMITIVE_CONCEPT_ROOTS);
 			System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 			System.out.println("Reports " + report + " generated.");
+
+		} else if (report.compareTo("Linguistic Analysis") == 0) { //NLM work
+			long ms = System.currentTimeMillis();
+			LinguisticAnalyzer.run();
+			System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+			System.out.println("Reports " + report + " generated.");
+
+		} else if (report.compareTo("3D Pie Chart") == 0) {
+			long ms = System.currentTimeMillis();
+			ApachePoiPieChartCSByOWL.generatePieChart(ApachePoiPieChartCSByOWL.ncit_version);
+			System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+			System.out.println("Reports " + report + " generated.");
+
+		} else if (report.compareTo("Pediatric Subset Reports") == 0) {
+			long ms = System.currentTimeMillis();
+			new PediatricSubsetsGeneratorByOWL(NCIT_OWL).run();
+			System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+			System.out.println("Reports " + report + " generated.");
+
+		} else if (report.compareTo("Is-A Hierarchy QA") == 0) {
+			long ms = System.currentTimeMillis();
+			String serviceUrl = ConfigurationController.serviceUrl;
+			String namedGraph = ConfigurationController.namedGraph;
+			String username = ConfigurationController.username;
+			String password = ConfigurationController.password;
+			IsAHierarchyQA generator = new IsAHierarchyQA(serviceUrl, namedGraph, username, password);
+			generator.run();
+			System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+			System.out.println("Reports " + report + " generated.");
 		}
+
+
 	}
 
     public static Vector listFilesInDirectory() {
