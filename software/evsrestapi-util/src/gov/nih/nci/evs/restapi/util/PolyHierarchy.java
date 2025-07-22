@@ -101,6 +101,10 @@ public class PolyHierarchy {
 
     static Vector parent_child_vec = null;
 
+	public static int BOTH = 0;
+	public static int ISA_ONLY = 1;
+	public static int SUBSET_ONLY = 2;
+
     static {
 		parent_child_vec = Utils.readFile(PARENT_CHILD_FILE);
 		hh = new HierarchyHelper(parent_child_vec);
@@ -108,8 +112,12 @@ public class PolyHierarchy {
 		//HashMap associationMap = scanner.getAssociationMap();
 		//subset_hmap = create_subset_hmap();
 
-		HashMap propertyMap = scanner.getPropertyMap(scanner.get_owl_vec());
-		a8Map = (HashMap) propertyMap.get("A8");
+		//HashMap propertyMap = scanner.getPropertyMap(scanner.get_owl_vec());
+		//a8Map = (HashMap) propertyMap.get("A8");
+
+		Vector v = scanner.extractAssociations(scanner.get_owl_vec(), "A8");
+		a8Map = DataRetrieval.vector2MultiValuedPropMap(v);
+		a8Map = DataRetrieval.generateInverseHashMap(a8Map);
 
         String prop_code = "P372";
 		published_vaueset_vec = scanner.extractProperties(scanner.get_owl_vec(), prop_code);
@@ -200,9 +208,6 @@ public class PolyHierarchy {
         return w;
 	}
 
-	public static int BOTH = 0;
-	public static int ISA_ONLY = 1;
-	public static int SUBSET_ONLY = 2;
 
 	public static Vector traverse(String root, int maxLevel, int type) {
 		Stack stack = new Stack();
