@@ -92,7 +92,7 @@ public class ReportSubmitter {
 	 public static void generateValueSetFile() {
 		 Vector w = owlscanner.extractAssociations(owlscanner.get_owl_vec(), "A8");
 		 Utils.saveToFile(VS_FILE, w);
-		 System.out.println(ROLE_FILE + " generated.");
+		 System.out.println(VS_FILE + " generated.");
 	 }
 
 	 public static void generateAssociationFile() {

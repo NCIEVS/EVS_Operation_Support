@@ -125,26 +125,6 @@ public class PolyHierarchy {
 		}
 	}
 
-/*
-	public HashMap create_parent_child_hmap() {
-		HashMap hmap = new HashMap();
-		for (int i=0; i<parent_child_vec.size(); i++) {
-			String line = (String) parent_child_vec.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String parent_code = (String) u.elementAt(1);
-			String child_code = (String) u.elementAt(3);
-			Vector w = new Vector();
-			if (hmap.containsKey(parent_code)) {
-				w = (Vector) hmap.get(parent_code);
-			}
-			w.add(child_code);
-			hmap.put(parent_code, w);
-		}
-		hmap.put("<Root>", "Root node");
-		return hmap;
-	}
-*/
-
 	public static String getLabel(String code) {
 		if (code.compareTo("<Root>") == 0) return "Root node";
 		return hh.getLabel(code);
@@ -197,6 +177,8 @@ public class PolyHierarchy {
 				if (is_published_valueset(code)) {
 					String label = getLabel(code);
 					Vector members = (Vector) a8Map.get(code);
+					members = sortCodesByLabels(members);
+
 					for (int k=0; k<members.size(); k++) {
 						String member_code = (String) members.elementAt(k);
 						String member_label = getLabel(member_code);
@@ -206,6 +188,7 @@ public class PolyHierarchy {
 				}
 				Vector subs = getSubclassCodes(code);
 				if (subs != null) {
+					subs = sortCodesByLabels(subs);
 					for (int k=0; k<subs.size(); k++) {
 						String sub = (String) subs.elementAt(k);
 						String t = INVERSE_ISA + "|" + level + "|" + sub;
@@ -249,6 +232,7 @@ public class PolyHierarchy {
 					if (is_published_valueset(code)) {
 						String label = getLabel(code);
 						Vector members = (Vector) a8Map.get(code);
+						members = sortCodesByLabels(members);
 						for (int k=0; k<members.size(); k++) {
 							String member_code = (String) members.elementAt(k);
 							String member_label = getLabel(member_code);
@@ -260,6 +244,7 @@ public class PolyHierarchy {
 			    if (type == BOTH || type == ISA_ONLY) {
 					Vector subs = getSubclassCodes(code);
 					if (subs != null) {
+						subs = sortCodesByLabels(subs);
 						for (int k=0; k<subs.size(); k++) {
 							String sub = (String) subs.elementAt(k);
 							String t = INVERSE_ISA + "|" + level + "|" + sub;
@@ -305,6 +290,29 @@ public class PolyHierarchy {
 		return codes;
 	}
 
+	public static Vector sortCodesByLabels(Vector codes) {
+		HashMap code2LabelMap = new HashMap();
+		Vector labels = new Vector();
+		for (int i=0; i<codes.size(); i++) {
+			String code = (String) codes.elementAt(i);
+			String label = getLabel(code);
+			labels.add(label);
+			code2LabelMap.put(label, code);
+		}
+		labels = new SortUtils().quickSort(labels);
+		Vector w = new Vector();
+		for (int i=0; i<labels.size(); i++) {
+			int j = labels.size()-i-1;
+			String label = (String) labels.elementAt(j);
+			String code = (String) code2LabelMap.get(label);
+			w.add(code);
+		}
+		if (code2LabelMap.keySet().size() != codes.size()) {
+			System.out.println("WARNING: " + " Multi-valued key encountered.");
+		}
+		return w;
+	}
+
 	public static Vector generateHierarchyData(String root, int maxLevel, int type) {
 		Stack stack = new Stack();
 		Vector w = new Vector();
@@ -335,6 +343,7 @@ public class PolyHierarchy {
 					if (is_published_valueset(code)) {
 						String label = getLabel(code);
 						Vector members = (Vector) a8Map.get(code);
+						members = sortCodesByLabels(members);
 						for (int k=0; k<members.size(); k++) {
 							String member_code = (String) members.elementAt(k);
 							String member_label = getLabel(member_code);
@@ -345,6 +354,7 @@ public class PolyHierarchy {
 			    if (type == BOTH || type == ISA_ONLY) {
 					Vector subs = getSubclassCodes(code);
 					if (subs != null) {
+						subs = sortCodesByLabels(subs);
 						for (int k=0; k<subs.size(); k++) {
 							sub = (String) subs.elementAt(k);
 							String label = getLabel(code);
