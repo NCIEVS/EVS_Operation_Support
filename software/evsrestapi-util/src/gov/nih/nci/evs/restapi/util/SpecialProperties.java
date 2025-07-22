@@ -10,7 +10,6 @@ import java.nio.charset.Charset;
 
 
 public class SpecialProperties {
-
 	SpecialProperties() {
 
 	}
@@ -66,11 +65,13 @@ public class SpecialProperties {
 		return list;
 	}
 
-
 	public static String getCDISCSubmissionValue(String codelistCode, List<Synonym> parentAxioms, String code, List<Synonym> axioms) {
+		String termSource = "CDISC";
+		return getCDISCSubmissionValue(codelistCode, parentAxioms, code, axioms, termSource);
+	}
 
+	public static String getCDISCSubmissionValue(String codelistCode, List<Synonym> parentAxioms, String code, List<Synonym> axioms, String termSource) {
 		if (code == null) {
-			String termSource = "CDISC";
 			String termType = "PT";
 			String sourceCode = null;
 			String subsourceName = null;
@@ -78,14 +79,12 @@ public class SpecialProperties {
 			   termSource, termType, sourceCode, subsourceName);
 
 			if (cdisc_pts == null || cdisc_pts.size() == 0) {
-				System.out.println("\nINFO: No CDISC PT is found.");
+				System.out.println("\nINFO: No " + termSource + " PT is found.");
 				return null;
 			} else if (cdisc_pts.size() == 1) {
 				return cdisc_pts.get(0);
 			}
 		}
-
-		String termSource = "CDISC";
 		String termType = "PT";
 		String sourceCode = null;
 		String subsourceName = null;
@@ -93,7 +92,7 @@ public class SpecialProperties {
 	       termSource, termType, sourceCode, subsourceName);
 
 	    if (cdisc_pts == null || cdisc_pts.size() == 0) {
-			System.out.println("\nINFO: No CDISC PT is found.");
+			System.out.println("\nINFO: No " + termSource + " PT is found.");
 			return null;
 		} else if (cdisc_pts.size() == 1) {
 			return cdisc_pts.get(0);
@@ -111,7 +110,6 @@ public class SpecialProperties {
 		}
 
 	    String nci_ab = nci_abs.get(0);
-		termSource = "CDISC";
 		termType = "PT";
 		sourceCode = nci_ab;
 		subsourceName = null;
@@ -122,6 +120,11 @@ public class SpecialProperties {
 
 	public static String getCodeListName(String parentCode, List<Synonym> parentAxioms) {
 		String termSource = "CDISC";
+		return getCodeListName(parentCode, parentAxioms, termSource);
+	}
+
+
+	public static String getCodeListName(String parentCode, List<Synonym> parentAxioms, String termSource) {
 		String termType = "SY";
 		String sourceCode = null;
 		String subsourceName = null;
@@ -129,12 +132,12 @@ public class SpecialProperties {
 	       termSource, termType, sourceCode, subsourceName);
 
 	    if (cdisc_sys == null || cdisc_sys.size() == 0) {
-			System.out.println("\nINFO: No CDISC SY is found in " + parentCode);
+			System.out.println("\nINFO: No " + termSource + " SY is found in " + parentCode);
 			return null;
 		} else if (cdisc_sys.size() == 1) {
 			return cdisc_sys.get(0);
 		} else {
-			System.out.println("\nINFO: Multiple CDISC SYs are found in " + parentCode);
+			System.out.println("\nINFO: Multiple " + termSource + " SYs are found in " + parentCode);
 			return cdisc_sys.get(0);
 		}
 	}
