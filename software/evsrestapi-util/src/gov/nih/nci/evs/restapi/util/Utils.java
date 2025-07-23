@@ -416,7 +416,7 @@ public class Utils {
 	}
 
     public static Vector create_construct_statement(String method_name, String params, String filename) {
-		Vector u = Utils.readFile(filename);
+		Vector u = readFile(filename);
 		Vector w = new Vector();
 		StringBuffer buf = new StringBuffer();
 		w.add("public String " + method_name + "(" + params + ") {");
@@ -450,6 +450,7 @@ public class Utils {
         }
     }
 
+/*
     public static Vector readFile(String filename) {
         Charset encoding = Charset.defaultCharset();
 		File file = new File(filename);
@@ -460,6 +461,27 @@ public class Utils {
 		}
 		return null;
     }
+*/
+
+	public static Vector readFile(String filename) {
+		Vector v = new Vector();
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(filename));
+			String line = reader.readLine();
+			while (line != null) {
+				if (line != null) {
+					v.add(line);
+				}
+				line = reader.readLine();
+			}
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return v;
+	}
+
 
     private static Vector handleFile(File file, Charset encoding) throws IOException {
         try (InputStream in = new FileInputStream(file);
@@ -483,15 +505,16 @@ public class Utils {
         String s = "";
         while ((r = reader.read()) != -1) {
             char ch = (char) r;
-            if (ch == 10) {
-				s = s.trim();
+            //if (ch == 10) {
+			if (ch == '\n') {
+				//s = s.trim();
 				w.add(s);
 				s = "";
 			} else {
 				s = s + ch;
 			}
         }
-        s = s.trim();
+        //s = s.trim();
         if (s.length() > 0) {
 			w.add(s);
 		}
@@ -526,7 +549,7 @@ public class Utils {
 
 	////////////////////////////////////////////////////////////////////////
 	public static HashSet extractColumnData(String filename, int col, char delim) {
-		Vector v = Utils.readFile(filename);
+		Vector v = readFile(filename);
 		HashSet hset = new HashSet();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
@@ -560,14 +583,14 @@ public class Utils {
 	}
 
 	public static void dumpHeading(String filename, char delim) {
-		Vector v = Utils.readFile(filename);
+		Vector v = readFile(filename);
         String line = (String) v.elementAt(0);
         Vector u = StringUtils.parseData(line, delim);
         Utils.dumpVector(line, u);
 	}
 
 	public static Vector extractColumnData(String filename, Vector<Integer> col_vec, char delim) {
-		Vector v = Utils.readFile(filename);
+		Vector v = readFile(filename);
         Vector w = new Vector();
         String heading = extractRowData((String) v.elementAt(0), col_vec, delim);
         w.add(heading);
@@ -597,7 +620,7 @@ public class Utils {
 	public static Vector extractRowsFromFile(String filename, Vector req_vec) {
 //Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
 		Vector w = new Vector();
-		Vector v = Utils.readFile(filename);
+		Vector v = readFile(filename);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
@@ -620,7 +643,7 @@ public class Utils {
 
 /////////////////////////////////////////////////////////////////////////////////////////
 	public static Vector removeNodeCodes(String htmlfile, String prefix) {
-		Vector v = Utils.readFile(htmlfile);
+		Vector v = readFile(htmlfile);
 		Vector w = new Vector();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
@@ -636,7 +659,7 @@ public class Utils {
 	}
 
     public static Vector toHierarchyFormat(String datafile, String prefix) {
-		return toHierarchyFormat(Utils.readFile(datafile), prefix, "No match");
+		return toHierarchyFormat(readFile(datafile), prefix, "No match");
     }
 
     public static Vector toHierarchyFormat(Vector v, String prefix) {
