@@ -694,4 +694,20 @@ public class Utils {
 		}
 		return w;
 	}
+
+	public static boolean isPureAscii(String v) {
+		return Charset.forName("US-ASCII").newEncoder().canEncode(v);
+	}
+
+	public static Vector searchForNonASCII(String filename) {
+	    Vector v = readFile(filename);
+	    Vector w = new Vector();
+	    for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (!isPureAscii(line)) {
+				w.add(line);
+			}
+		}
+		return w;
+	}
 }

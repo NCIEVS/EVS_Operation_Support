@@ -145,6 +145,71 @@ public class ASCII2HTMLTreeConverter {
         new SimpleTreeUtils().writeTree2HTML(hmap, url, htmlfile);
     }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public static int getMaxIndentationNumber(String filename, String indent) {
+		int max = -1;
+		Vector v = Utils.readFile(filename);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			int n = getIndentationNumber(line, indent);
+			if (n > max) {
+				max = n;
+			}
+		}
+		return max;
+	}
+
+	public static int getIndentationNumber(String line, String indent) {
+		int n = 0;
+		if (line == null) return -1;
+		while (line.startsWith(indent)) {
+			line = line.substring(indent.length(), line.length());
+			n++;
+		}
+		return n;
+	}
+
+	public static String removeIndentation(String line, String indent) {
+		int n = 0;
+		if (line == null) return null;
+		while (line.startsWith(indent)) {
+			line = line.substring(indent.length(), line.length());
+		}
+		return line;
+	}
+
+	public static Vector flattenAsciiTree(String asciiTreeFile, String indent) {
+		int max = getMaxIndentationNumber(asciiTreeFile, indent);
+		String[] values = new String[max+1];
+		Vector v = Utils.readFile(asciiTreeFile);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			int numIndent = getIndentationNumber(line, indent);
+			String t = removeIndentation(line, indent);
+			t = displayName2BarDelimited(t);
+			if (t.startsWith("[")) {
+				int n = t.indexOf("]");
+				if (n != -1) {
+					t = t.substring(n+2, t.length());
+				}
+			}
+			values[numIndent] = t;
+			if (numIndent > 0) {
+				w.add(values[numIndent-1] + "|" + t);
+			}
+		}
+		return w;
+	}
+
+	public static String displayName2BarDelimited(String line) {
+		int n = line.lastIndexOf("(");
+		String s1 = line.substring(0, n-1);
+		String s2 = line.substring(n+1, line.length()-1);
+		return s1 + "|" + s2;
+	}
+
+
     public static void main(String[] args) {
         String parent_child_file = args[0];
         Vector parent_child_vec = Utils.readFile(parent_child_file);
