@@ -179,6 +179,11 @@ public class ASCII2HTMLTreeConverter {
 	}
 
 	public static Vector flattenAsciiTree(String asciiTreeFile, String indent) {
+		boolean removeLeadingCloseBracket = true;
+		return flattenAsciiTree(asciiTreeFile, indent, removeLeadingCloseBracket);
+	}
+
+	public static Vector flattenAsciiTree(String asciiTreeFile, String indent, boolean removeLeadingCloseBracket) {
 		int max = getMaxIndentationNumber(asciiTreeFile, indent);
 		String[] values = new String[max+1];
 		Vector v = Utils.readFile(asciiTreeFile);
@@ -188,10 +193,12 @@ public class ASCII2HTMLTreeConverter {
 			int numIndent = getIndentationNumber(line, indent);
 			String t = removeIndentation(line, indent);
 			t = displayName2BarDelimited(t);
-			if (t.startsWith("[")) {
-				int n = t.indexOf("]");
-				if (n != -1) {
-					t = t.substring(n+2, t.length());
+			if (removeLeadingCloseBracket) {
+				if (t.startsWith("[")) {
+					int n = t.indexOf("]");
+					if (n != -1) {
+						t = t.substring(n+2, t.length());
+					}
 				}
 			}
 			values[numIndent] = t;
