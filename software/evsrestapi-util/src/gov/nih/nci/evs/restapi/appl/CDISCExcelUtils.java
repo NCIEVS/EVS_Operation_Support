@@ -91,31 +91,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class CDISCExcelUtils {
 
-	public static void run(String[] args) throws IOException {
-	    Workbook workbook = new XSSFWorkbook();
-	    Sheet sheet = workbook.createSheet("Color Test");
-	    Row row = sheet.createRow(0);
-
-	    CellStyle style = workbook.createCellStyle();
-	    style.setFillForegroundColor(IndexedColors.GREEN.getIndex());
-	    Font font = workbook.createFont();
-		font.setColor(IndexedColors.RED.getIndex());
-		style.setFont(font);
-
-	    Cell cell1 = row.createCell(0);
-	    cell1.setCellValue("ID");
-	    cell1.setCellStyle(style);
-
-	    Cell cell2 = row.createCell(1);
-	    cell2.setCellValue("NAME");
-	    cell2.setCellStyle(style);
-
-	    FileOutputStream fos =new FileOutputStream(new File("D:/xlsx/cp.xlsx"));
-	    workbook.write(fos);
-	    fos.close();
-	    System.out.println("Done");
-	}
-
 	private static String getCellData(Cell cell) {
 		String value = null;
 		if (cell == null) {
@@ -143,109 +118,230 @@ public class CDISCExcelUtils {
 	}
 
 
-/*
-	private static String getCellData(Cell cell) {
-		String value = null;
-		if (cell == null) {
+	public static boolean reformat(String xlsfile, int sheetIndex, Vector<Integer> rowNumbers, short colorIndex, String outputfile) {
+		FileOutputStream fileOut = null;
+		try {
+			InputStream inp = new FileInputStream(xlsfile);
+			Workbook wb = WorkbookFactory.create(inp);
+			Sheet sheet = wb.getSheetAt(sheetIndex);
+
+			for (int i=0; i<rowNumbers.size(); i++) {
+				int rowNumber = rowNumbers.elementAt(i).intValue();
+				Row row = sheet.getRow(rowNumber);
+				System.out.println("row number " + rowNumber + " selected.");
+				row.setHeight((short)-1);
+
+				CellStyle cellStyle = wb.createCellStyle();
+				Font font= wb.createFont();
+				font.setFontName("Arial");
+				font.setBold(false);
+				font.setItalic(false);
+
+				cellStyle.setWrapText(true);
+				cellStyle.setBorderTop(BorderStyle.THIN);
+				cellStyle.setBorderBottom(BorderStyle.THIN);
+				cellStyle.setBorderLeft(BorderStyle.THIN);
+				cellStyle.setBorderRight(BorderStyle.THIN);
+				cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+				cellStyle.setFillBackgroundColor(colorIndex);
+				cellStyle.setFillForegroundColor(colorIndex);
+				cellStyle.setFont(font);
+
+				for (int k = 0; k < row.getLastCellNum(); k++) {
+				   row.getCell(k).setCellStyle(cellStyle);
+				}
+			}
+
+			fileOut = new FileOutputStream(outputfile);
+			wb.write(fileOut);
+			System.out.println(xlsfile + " is modified and saved as " + outputfile);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return false;
+
+		} finally {
+			try {
+				fileOut.close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static Vector<Integer> findCodeListRows(String xlsfile) {
+		int sheetIndex = 0;
+		return findCodeListRows(xlsfile, sheetIndex);
+	}
+
+	public static Vector<Integer> findCodeListRows(String xlsfile, int sheetIndex) {
+		boolean status = false;
+		Vector rowNumbers = new Vector();
+		try {
+			InputStream inp = new FileInputStream(xlsfile);
+			Workbook wb = WorkbookFactory.create(inp);
+			Sheet sheet = wb.getSheetAt(sheetIndex);
+			Iterator rows = sheet.rowIterator();
+			int row_num = 0;
+			while (rows.hasNext()) {
+				HSSFRow row = (HSSFRow) rows.next();
+				Cell cell = row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+				String codelistCode = getCellData(cell);
+				if (codelistCode == null || codelistCode.compareTo("null") == 0 || codelistCode.length() == 0 || codelistCode.compareTo("") == 0) {
+					rowNumbers.add(Integer.valueOf(row_num));
+				}
+				row_num++;
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
 			return null;
 		}
-		switch (cell.getCellType()) {
-			case HSSFCell.CELL_TYPE_STRING:
-				value = cell.getStringCellValue();
-				break;
-			case HSSFCell.CELL_TYPE_FORMULA:
-				value = cell.getCellFormula();
-				break;
-			case HSSFCell.CELL_TYPE_NUMERIC:
-				HSSFDataFormatter dataFormatter = new HSSFDataFormatter();
-				value = dataFormatter.formatCellValue(cell);
-				break;
-			case HSSFCell.CELL_TYPE_BLANK:
-				value = null;
-				break;
-			case HSSFCell.CELL_TYPE_ERROR:
-				value = "#ERROR#";
-				break;
-		}
-		return value;
+		return rowNumbers;
 	}
-*/
 
-	public static String reformat(String xlsfile) {
-		String outputfile = "modified_" + xlsfile;
-		System.out.println(xlsfile);
+    public static boolean hightlightFirstRow(String excelfile) {
 		int sheetIndex = 0;
+		return hightlightFirstRow(excelfile, sheetIndex);
+	}
+
+    public static boolean hightlightFirstRow(String excelfile, int sheetIndex) {
+		String outputfile = excelfile;
+		return hightlightFirstRow(excelfile, sheetIndex, outputfile);
+	}
+
+    public static boolean hightlightFirstRow(String excelfile, String outputfile) {
+	     int sheetIndex = 0;
+	     return hightlightFirstRow(excelfile, sheetIndex, outputfile);
+	}
+
+    public static boolean hightlightFirstRow(String excelfile, int sheetIndex, String outputfile) {
+		try {
+			FileInputStream inputStream = new FileInputStream(new File(excelfile));
+			HSSFWorkbook resultWorkbook = new HSSFWorkbook(inputStream);
+			HSSFSheet resultSheet = resultWorkbook.getSheetAt(sheetIndex);
+
+			resultSheet.setColumnWidth(0, 8 * 256);   //A
+			resultSheet.setColumnWidth(1, 10 * 256);  //B
+			resultSheet.setColumnWidth(2, 12 * 256);  //C
+			resultSheet.setColumnWidth(3, 35 * 256);  //D
+			resultSheet.setColumnWidth(4, 35 * 256);  //E
+			resultSheet.setColumnWidth(5, 35 * 256);  //F
+			resultSheet.setColumnWidth(6, 64 * 256);  //G
+			resultSheet.setColumnWidth(7, 64 * 256);  //H
+
+			HSSFRow sheetrow = resultSheet.getRow(0);
+			Font font= resultWorkbook.createFont();
+			font.setFontName("Arial");
+			font.setBold(true);
+			font.setItalic(false);
+			font.setFontHeightInPoints((short) 12);
+
+			HSSFCellStyle style = resultWorkbook.createCellStyle();
+			style.setFont(font);
+
+			style.setWrapText(true);   //Wrapping text
+			style.setVerticalAlignment(VerticalAlignment.CENTER);
+			style.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+			style.setFillBackgroundColor(IndexedColors.YELLOW.getIndex());
+			style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+			style.setBorderTop(BorderStyle.THIN);
+			style.setBorderBottom(BorderStyle.THIN);
+			style.setBorderLeft(BorderStyle.THIN);
+			style.setBorderRight(BorderStyle.THIN);
+			style.setVerticalAlignment(VerticalAlignment.CENTER);
+			style.setAlignment(HorizontalAlignment.CENTER);
+
+			for(int i=0; i<sheetrow.getLastCellNum(); i++) {
+			    sheetrow.getCell(i).setCellStyle(style);//Cell number
+			}
+			FileOutputStream outFile =new FileOutputStream(new File(outputfile));
+			resultWorkbook.write(outFile);
+			return true;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return false;
+	}
+
+	public static boolean assignSheetName(String xlsfile, int sheetIndex, String sheetName) {
+		System.out.println(xlsfile);
 		boolean status = false;
 		FileOutputStream fileOut = null;
 		try {
 			InputStream inp = new FileInputStream(xlsfile);
 			Workbook wb = WorkbookFactory.create(inp);
-			//HSSFSheet sheet = wb.getSheetAt(sheetIndex);
+			wb.setSheetName(sheetIndex, sheetName);
+			FileOutputStream outFile =new FileOutputStream(new File(xlsfile));
+			wb.write(outFile);
+			return true;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return false;
+	}
+
+	public static boolean reformat(String xlsfile, int sheetIndex, String sheetName) {
+		boolean status = reformat(xlsfile, sheetIndex);
+		if (sheetName == null) {
+			String timestamp = StringUtils.getToday("yyyy-mm-dd");
+			sheetName = sheetName + " " + timestamp;
+		}
+		status = assignSheetName(xlsfile, sheetIndex, sheetName);
+		return status;
+	}
+
+	public static boolean reformat(String xlsfile, int sheetIndex) {
+		String outputfile = xlsfile;
+        hightlightFirstRow(xlsfile, 0, outputfile);
+        short colorIndex = IndexedColors.LIGHT_TURQUOISE.getIndex();
+	    boolean status = reformat(outputfile, sheetIndex, findCodeListRows(xlsfile), colorIndex, outputfile);
+	    if (status) {
+			status = setTextWrap(outputfile, sheetIndex, outputfile);
+			System.out.println(outputfile + " generated.");
+			return true;
+		} else {
+			System.out.println("Generation of " + outputfile + " is NOT successful.");
+			return false;
+		}
+	}
+
+	public static boolean setTextWrap(String xlsfile, int sheetIndex, String outputfile) {
+		System.out.println(xlsfile);
+		boolean status = false;
+		FileOutputStream fileOut = null;
+		try {
+			InputStream inp = new FileInputStream(xlsfile);
+			Workbook wb = WorkbookFactory.create(inp);
 			Sheet sheet = wb.getSheetAt(sheetIndex);
 			HSSFRow row;
 			HSSFCell cell;
-			sheet.setColumnWidth(0, 8 * 256);   //A
-			sheet.setColumnWidth(1, 8 * 256);   //B
-			sheet.setColumnWidth(2, 12 * 256);  //C
-			sheet.setColumnWidth(3, 35 * 256);  //D
-			sheet.setColumnWidth(4, 35 * 256);  //E
-			sheet.setColumnWidth(5, 35 * 256);  //F
-			sheet.setColumnWidth(6, 64 * 256);  //G
-			sheet.setColumnWidth(7, 35 * 256);  //H
 
             int n = xlsfile.lastIndexOf(".");
-			String sheetName = xlsfile.substring(0,n);
+			String sheetName = xlsfile.substring(0, n);
 			sheetName = sheetName.replace("_", " ");
-			sheetName = sheetName + " " + StringUtils.getToday();
+			String timestamp = StringUtils.getToday("yyyy-mm-dd");
+			sheetName = sheetName + " " + timestamp;
 			wb.setSheetName(sheetIndex, sheetName);
-
-			Font font= wb.createFont();
-			font.setFontName("Arial");
-			font.setBold(false);
-			font.setItalic(false);
 
 			Iterator rows = sheet.rowIterator();
 			int row_num = 0;
-			while (rows.hasNext())
-			{
-				StringBuffer buf = new StringBuffer();
+			while (rows.hasNext()) {
 				row = (HSSFRow) rows.next();
 				row.setHeight((short)-1);
-
-				cell = row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-				boolean costlistRow = false;
-				String costlistCode = getCellData(cell);
-
-				if (costlistCode == null || costlistCode.compareTo("null") == 0 || costlistCode.compareTo("") == 0) {
-					costlistRow = true;
-				}
-
+                CellStyle cellStyle = null;
 				for(int i=0; i<row.getLastCellNum(); i++) {
                     cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
- 				    CellStyle cellStyle = cell.getCellStyle();
-					cellStyle.setWrapText(true);   //Wrapping text
-					if (row_num == 0) {
-						cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-					} else {
-						cellStyle.setVerticalAlignment(VerticalAlignment.TOP);
-					}
-					if (costlistRow) {
-						cellStyle.setFillBackgroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
-						cellStyle.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
-						//cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-						//System.out.println("Row: " + row_num + " Col: " + i + " color: " + IndexedColors.LIGHT_TURQUOISE.getIndex());
-						cellStyle.setFont(font);
-				    }
-
+ 				    cellStyle = cell.getCellStyle();
+					cellStyle.setWrapText(true);
 					cellStyle.setBorderTop(BorderStyle.THIN);
 					cellStyle.setBorderBottom(BorderStyle.THIN);
 					cellStyle.setBorderLeft(BorderStyle.THIN);
 					cellStyle.setBorderRight(BorderStyle.THIN);
 					cell.setCellStyle(cellStyle);
 				}
-				row_num++;
 			}
-            outputfile = "modified_" + xlsfile;
 			fileOut = new FileOutputStream(outputfile);
 			wb.write(fileOut);
 			status = true;
@@ -253,15 +349,29 @@ public class CDISCExcelUtils {
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			status = false;
 
 		} finally {
 			try {
 				fileOut.close();
 			} catch (Exception ex) {
 				ex.printStackTrace();
+				status = false;
 			}
 		}
-		return null;
+		return status;
+	}
+
+	public static void copyfile(String src_file, String target_file) {
+	    FileUtils.copyfile(src_file, target_file);
+    }
+
+	public static void main(String[] args) {
+		String xlsfile = args[0];
+		copyfile(xlsfile, "bak_" + xlsfile);
+		int sheetIndex = 0;
+		String sheetName = "ICHM11 Terminology " + StringUtils.getToday("yyyy-mm-dd");
+		boolean status = reformat(xlsfile, sheetIndex, sheetName);
 	}
 }
 
