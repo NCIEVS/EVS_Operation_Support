@@ -251,7 +251,31 @@ public class CDISCSubsetReportQA {
 				Utils.dumpVector(code, w);
 			}
 		}
-		System.out.println(SOURCE + " definition QA produces " + num_errors + " errors.");
+		System.out.println(SOURCE + " definition QA produces " + num_errors + " warnings.");
+	}
+
+	public void reviewSourceSynonyms() {
+		int num_errors = 0;
+		for (int i=0; i<reportData.size(); i++) {
+			String line = (String) reportData.elementAt(i);
+			Vector u = StringUtils.parseData(line, '\t');
+			String code = (String) u.elementAt(0);
+			Vector w = (Vector) sourceSYMap.get(code);
+			if (w == null) {
+				num_errors++;
+				System.out.println("ERROR: " + SOURCE + " " + "synonyms" + " does not exist for code " + code);
+			} else if (w.size() == 1) {
+				String expectedValue = (String) w.elementAt(0);
+			    String reportValue = (String) u.elementAt(5);
+			    if (expectedValue.compareTo(reportValue) != 0) {
+					num_errors++;
+					System.out.println("ERROR: Incorrect " + SOURCE + " " + "synonyms value in report found for code " + code);
+					System.out.println("\t: Reported value: " + reportValue);
+					System.out.println("\t: Expected value: " + expectedValue);
+				}
+			}
+		}
+		System.out.println(SOURCE + " synonym QA produces " + num_errors + " messages.");
 	}
 
     public static Vector merge(String indent, Vector v1 , Vector v2) {
@@ -322,8 +346,11 @@ public class CDISCSubsetReportQA {
 		//qa.run(max_cases);
 		qa.reviewCodeListNames();
 		qa.reviewSubmissionValues();
-		qa.reviewNCIPTs();
+
 		qa.reviewSourceDefinitions();
+		qa.reviewSourceSynonyms();
+		qa.reviewNCIPTs();
+
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
