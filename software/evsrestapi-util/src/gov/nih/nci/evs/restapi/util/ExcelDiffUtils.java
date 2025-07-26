@@ -313,17 +313,34 @@ public class ExcelDiffUtils {
 	    return textfile;
     }
 
+
+	public static String exportXLSFile(String excelFilePath) {
+		int n = excelFilePath.lastIndexOf(".");
+		String textfile = excelFilePath.substring(0, n) + ".txt";
+		try {
+			Vector w = ExcelReadWriteUtils.readXLSFile(excelFilePath);
+			Utils.saveToFile(textfile , w);
+			System.out.println(textfile + " generated.");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return textfile;
+	}
+
+    public void run() {
+		run(this.datafile1, this.datafile2);
+	}
+
     public void run(String datafile1, String datafile2) {
 		long ms = System.currentTimeMillis();
-
-/*
+		/*
 		if (datafile1.endsWith(".xls")) {
-			datafile1 = exportExcelSheet(datafile1);
+			datafile1 = exportXLSFile(datafile1);
 		}
 		if (datafile2.endsWith(".xls")) {
-			datafile2 = exportExcelSheet(datafile2);
+			datafile2 = exportXLSFile(datafile2);
 		}
-*/
+		*/
 		PrintWriter pw = null;
 		int n1 = datafile1.lastIndexOf(".");
 		int n2 = datafile2.lastIndexOf(".");
@@ -350,40 +367,7 @@ public class ExcelDiffUtils {
 		long ms = System.currentTimeMillis();
 		String datafile1 = args[0];
 		String datafile2 = args[1];
-
-		if (datafile1.endsWith(".xls")) {
-			datafile1 = exportExcelSheet(datafile1);
-		}
-		if (datafile2.endsWith(".xls")) {
-			datafile2 = exportExcelSheet(datafile2);
-		}
-
-		ExcelDiffUtils diffUtils = new ExcelDiffUtils(datafile1, datafile2);
-
-		if (args.length > 2) {
-			int row = Integer.parseInt(args[2]);
-			diffUtils.set_HEADING_ROW(row);
-		}
-
-		PrintWriter pw = null;
-		int n1 = datafile1.lastIndexOf(".");
-		int n2 = datafile2.lastIndexOf(".");
-		String outputfile = datafile1.substring(0, n1) + "_" + datafile2.substring(0, n2) + ".txt";
-		try {
-			pw = new PrintWriter(outputfile, "UTF-8");
-            diffUtils.run(pw);
-
-		} catch (Exception ex) {
-
-		} finally {
-			try {
-				pw.close();
-				System.out.println("Output file " + outputfile + " generated.");
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-
+		new ExcelDiffUtils(datafile1, datafile2).run();
         System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
