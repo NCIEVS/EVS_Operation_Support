@@ -797,6 +797,42 @@ public class OWLSPARQLUtils {
 		return v;
 	}
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public String construct_get_ontology_version_info() {
+		String prefixes = getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		buf.append("SELECT ?x_version_info").append("\n");
+		buf.append("{").append("\n");
+		buf.append("    {").append("\n");
+		buf.append("	    ?x a owl:Ontology .").append("\n");
+		buf.append("	    ?x owl:versionInfo ?x_version_info").append("\n");
+		buf.append("    }").append("\n");
+		buf.append("").append("\n");
+		return buf.toString();
+	}
+
+	public Vector getOntologyVersionInfo() {
+        Vector v = executeQuery(construct_get_ontology_version_info());
+        if (v == null) return null;
+        if (v.size() == 0) return v;
+        return new SortUtils().quickSort(v);
+	}
+
+	public String get_ontology_version() {
+		try {
+			Vector v = getOntologyVersionInfo();
+			if (v != null && v.size() > 0) {
+				String version = (String) v.elementAt(0);
+				version = new ParserUtils().getValue(version);
+				return version;
+			}
+		} catch (Exception ex) {
+
+		}
+	    return null;
+	}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public String construct_get_ontology_version_info(String named_graph) {
 		String prefixes = getPrefixes();

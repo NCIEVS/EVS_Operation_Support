@@ -745,7 +745,7 @@ public class SimpleTreeUtils {
 
 		out.println("");
 		out.println("	function on_node_clicked(code) {");
-		out.println("	    var url = \"https://nciterms.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI%20Thesaurus&code=\" + code;");
+		out.println("	    var url = \"https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/\" + code;");
 		out.println("		window.open(url, '_blank', 'top=100, left=100, height=740, width=780, status=no, menubar=yes, resizable=yes, scrollbars=yes, toolbar=yes, location=no, directories=no');");
 		out.println("	}");
 		out.println("");

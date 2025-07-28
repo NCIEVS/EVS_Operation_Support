@@ -430,17 +430,17 @@ public class ExcelReadWriteUtils {
 	}
 
 	public static String getNCItHyperlink(String code) {
-        String line = "https://nciterms.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=" + code;
+        String line = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/" + code;
         return line;
     }
 
 	public static String getNCImHyperlink(String code) {
-        String line = "https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?dictionary=NCI%20Metathesaurus&code=" + code;
+        String line = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/" + code;
         return line;
 	}
 
 	public static String getSourceHyperlink(String source, String code) {
-        String line = "https://nciterms.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=" + source + "&code=" + code;
+        String line = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/" + code;
         line = line.replace(" ", "%20");
         return line;
     }

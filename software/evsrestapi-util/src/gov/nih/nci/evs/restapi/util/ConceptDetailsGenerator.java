@@ -63,8 +63,8 @@ public class ConceptDetailsGenerator {
 	HierarchyHelper hh = null;
 	Vector parent_child_vec = null;
 	String TREE_VARIABLE_NAME = "demoList";
-	String HYPERLINK = "https://nciterms65.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&type=terminology&key=null&b=1&n=0&vse=null&code=";
-
+	//String HYPERLINK = "https://nciterms65.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&type=terminology&key=null&b=1&n=0&vse=null&code=";
+	String HYPERLINK = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
 	HashMap propertyHashMap = null;
 
 	public ConceptDetailsGenerator() {

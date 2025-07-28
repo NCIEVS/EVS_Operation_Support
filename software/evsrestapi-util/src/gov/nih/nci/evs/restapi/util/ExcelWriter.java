@@ -163,8 +163,8 @@ public class ExcelWriter {
 	static int XLS = 2;
 
 	static String CONFIGFILE = "config.txt";
-	static String hypperlinkURL = "https://nciterms.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&ns=ncit&code=";
-	static String browserURL = "https://nciterms.nci.nih.gov/ncitbrowser/";
+	static String hypperlinkURL = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
+	static String browserURL = "https://evsexplore.semantics.cancer.gov/evsexplore/";
 
 	short oddRowForegroundColor = IndexedColors.LIGHT_GREEN.getIndex();
     short evenRowForegroundColor = IndexedColors.WHITE.getIndex();
