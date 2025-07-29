@@ -383,12 +383,15 @@ document.addEventListener('keyup', doc_keyUp, false);
 	}
 
 
-                        function onValueSetNodeClicked(node_id) {
+            function onValueSetNodeClicked(node_id) {
 				var url="https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/"+ node_id;
-				window.location.href = url;
-				return false ;
+				window.open(url, "", "alwaysRaised,dependent,status,scrollbars,resizable,width=800,height=600");
 			}
 
+            function onNodeClicked(node_id) {
+				var url="https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/"+ node_id;
+				window.open(url, "", "alwaysRaised,dependent,status,scrollbars,resizable,width=800,height=600");
+			}
 
                         function getCheckedVocabularies() {
                         alert("getCheckedVocabularies");
