@@ -44,6 +44,21 @@ public class ReportSubmitter {
 	static OWLScanner owlscanner = null;
 	Vector output_vec = null;
 
+	public static OWLScanner getOWLScanner() {
+		return owlscanner;
+	}
+
+	public static void clearOWLScanner() {
+		if (owlscanner != null) {
+			owlscanner.clear();
+		}
+	}
+
+	public static void setOWLScanner(OWLScanner owl_scanner) {
+		owlscanner.clear();
+		owlscanner = owl_scanner;
+	}
+
 	public static void reportGenerationSetUp() {
 		CurrentUser.reportGenerationSetUp();
 	}
@@ -57,15 +72,8 @@ public class ReportSubmitter {
 	}
 
     static {
+		owlscanner = new OWLScanner(NCIT_OWL);
 		PRIMITIVE_CONCEPT_ROOTS = ConfigurationController.primitiveConceptRoots;
-		/*
-		File f = new File(NCIT_OWL);
-		if (!f.exists()) {
-			System.out.println("WARNING: " + NCIT_OWL + " does not exist.");
-		} else {
-			owlscanner = new OWLScanner(NCIT_OWL);
-		}
-		*/
 	}
 
 
@@ -124,7 +132,6 @@ public class ReportSubmitter {
 			System.out.println("Reports " + report + " generated.");
 		} else if (report.compareTo("EVS Statistics") == 0) {
 			long ms = System.currentTimeMillis();
-			//EVSStatistics evsStatistics = new EVSStatistics(serviceUrl, namedGraph, username, password);
 			String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
 			EVSStatisticsByOWL evsStatistics = new EVSStatisticsByOWL(NCIT_OWL);
 			evsStatistics.generate();

@@ -100,7 +100,6 @@ public class ReportGenerationUI {
 	Vector semanticTypes = new Vector();
 	Vector objectProperies = new Vector();
 
-
 	OWLSPARQLUtils owlSPARQLUtils = null;
 	String username = null;
 	String password = null;
@@ -113,8 +112,9 @@ public class ReportGenerationUI {
 	HashMap semanticTypeMap = null;
 
 	boolean REPORT_GENERATION_MODE = true;
-	OWLScanner owlscanner = null;
+	//static OWLScanner owlscanner = ReportSubmitter.getOWLScanner();
 	Vector output_vec = null;
+
 	private void createWindow() {
 		frame = new JFrame("Report Generation");
 		frame.setLayout(new GridLayout(10, 1));
@@ -123,7 +123,6 @@ public class ReportGenerationUI {
 			System.out.println("WARNING: NCIT_OWL_FILE " + ConfigurationController.owlfile + " does not exist.");
 		} else {
 			System.out.println("INFO: NCIT_OWL_FILE " + ConfigurationController.owlfile + " exists.");
-			owlscanner = new OWLScanner(NCIT_OWL_FILE);
 		}
 
 		frame.addWindowListener(new WindowAdapter() {
