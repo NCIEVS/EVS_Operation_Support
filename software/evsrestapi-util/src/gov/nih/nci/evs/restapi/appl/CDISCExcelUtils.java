@@ -188,7 +188,7 @@ public class CDISCExcelUtils {
 				HSSFRow row = (HSSFRow) rows.next();
 				Cell cell = row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 				String codelistCode = getCellData(cell);
-				if (codelistCode == null || codelistCode.compareTo("null") == 0 || codelistCode.length() == 0 || codelistCode.compareTo("") == 0) {
+				if (codelistCode == null || codelistCode.compareTo("null") == 0 || codelistCode.length() == 0) {
 					rowNumbers.add(Integer.valueOf(row_num));
 				}
 				row_num++;
@@ -370,7 +370,7 @@ public class CDISCExcelUtils {
 		String xlsfile = args[0];
 		copyfile(xlsfile, "bak_" + xlsfile);
 		int sheetIndex = 0;
-		String sheetName = "ICHM11 Terminology " + StringUtils.getToday("yyyy-mm-dd");
+		String sheetName = "ICH M11 Terminology " + StringUtils.getToday("yyyy-MM-dd");
 		boolean status = reformat(xlsfile, sheetIndex, sheetName);
 	}
 }
