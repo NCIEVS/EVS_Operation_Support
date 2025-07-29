@@ -77,7 +77,7 @@ public class SimpleTreeUtils {
     private boolean CHECKBOX_OPTION = true;
     private String node_clicked_method_name = "onValueSetNodeClicked";
     private boolean collapse_all_at_initialization = false;
-    private boolean hyperlink_code = false;
+    public boolean hyperlink_code = true;
 
     public SimpleTreeUtils() {
         this.checkboxid2NodeIdMap = new HashMap();
@@ -493,7 +493,7 @@ public class SimpleTreeUtils {
 			return ti._text;
 		}
 		if (hyperlink_code) {
-	    	return ti._text + "&nbsp;<a href=\"#\" onclick=\"" + node_clicked_method_name + "('" + ti._code + "');return false;\" " + getTabIndex() + ">" + ti._code + "</a>";
+	    	return ti._text + "&nbsp;<a href=\"#\" onclick=\"" + node_clicked_method_name + "('" + ti._code + "');return false;\" " + getTabIndex() + ">(" + ti._code + ")</a>";
 		} else {
 			return "<a href=\"#\" onclick=\"" + node_clicked_method_name + "('" + ti._code + "');return false;\" " + getTabIndex() + ">" + ti._text + "</a>";
 		}

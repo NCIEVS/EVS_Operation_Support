@@ -416,6 +416,45 @@ public class PolyHierarchy {
         return maxLevel;
 	}
 
+    public static void generateDynamicHTMLTree(String root, int maxLevel, Vector replace_vec, Vector by_vec) {
+		Vector parent_child_vector = generateHierarchyData(root, maxLevel, ISA_ONLY);
+		parent_child_vector.remove(0);
+		String parent_child_file = root + "_tree" + ".txt";
+		Utils.saveToFile(parent_child_file, parent_child_vector);
+		int n = parent_child_file.lastIndexOf(".");
+		String htmlfile = parent_child_file.substring(0, n) + ".html";
+		ASCII2HTMLTreeConverter.generateDynamicHTMLTree(parent_child_file, htmlfile);
+		/*
+		Vector replace_vec = new Vector();
+		Vector by_vec = new Vector();
+		replace_vec.add("/ncitbrowser/js/");
+		by_vec.add("");
+		replace_vec.add("/ncitbrowser/images/");
+		by_vec.add("");
+		*/
+		if (replace_vec != null && replace_vec.size() > 0) {
+			substitute(htmlfile, replace_vec, by_vec);
+		}
+	}
+
+	public static void substitute(String filename, Vector replace_vec, Vector by_vec) {
+		Vector v = Utils.readFile(filename);
+		int n = filename.lastIndexOf(".");
+		String backupfile = "bak_" + filename;
+		Utils.saveToFile(backupfile, v);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			for (int j=0; j<replace_vec.size(); j++) {
+				String replace = (String) replace_vec.elementAt(j);
+				String by = (String) by_vec.elementAt(j);
+				line = line.replace(replace, by);
+			}
+			w.add(line);
+		}
+		Utils.saveToFile(filename, w);
+	}
+
 
 	public static void main(String[] args) {
 		String root = args[0];
