@@ -185,6 +185,7 @@ public class ReportSubmitter {
 		} else if (report.compareTo("PrimitiveConcepts") == 0) {
 			long ms = System.currentTimeMillis();
 			PrimitiveConceptFinder.run(PRIMITIVE_CONCEPT_ROOTS);
+			PrimitiveConceptFinder.generateTree();
 			System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 			System.out.println("Reports " + report + " generated.");
 
@@ -278,10 +279,6 @@ public class ReportSubmitter {
 		String oldVersion = (String) w.elementAt(0);
 		String newVersion = (String) w.elementAt(1);
 		return oldVersion + "|" + newVersion;
-	}
-
-	public static void main(String[] args) {
-
 	}
 }
 

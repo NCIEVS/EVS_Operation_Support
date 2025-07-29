@@ -173,6 +173,24 @@ public class FileUtils
 		});
 	}
 
+	public static boolean fileDiff(String filename1, String filename2) {
+		System.out.println("First file: " + filename1);
+		System.out.println("Second file: " + filename2);
+		Vector v1 = Utils.readFile(filename1);
+		Vector v2 = Utils.readFile(filename2);
+		if (v1.size() != v2.size())  return false;
+		for (int i=0; i<v1.size(); i++) {
+			String line1 = (String) v1.elementAt(i);
+			String line2 = (String) v2.elementAt(i);
+			if (line1.compareTo(line2) != 0) {
+				System.out.println(line1);
+				System.out.println(line2);
+				return false;
+			}
+		}
+		return true;
+	}
+
     public static void main(String[] args) {
 		String currentWorkingDir = getCurrentWorkingDirectory();
 		System.out.println("getCurrentWorkingDirectory: " + currentWorkingDir);
