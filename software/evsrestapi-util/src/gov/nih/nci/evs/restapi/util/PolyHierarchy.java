@@ -416,22 +416,47 @@ public class PolyHierarchy {
         return maxLevel;
 	}
 
-    public static void generateDynamicHTMLTree(String root, int maxLevel, Vector replace_vec, Vector by_vec) {
-		Vector parent_child_vector = generateHierarchyData(root, maxLevel, ISA_ONLY);
-		parent_child_vector.remove(0);
-		String parent_child_file = root + "_tree" + ".txt";
-		Utils.saveToFile(parent_child_file, parent_child_vector);
-		int n = parent_child_file.lastIndexOf(".");
-		String htmlfile = parent_child_file.substring(0, n) + ".html";
-		ASCII2HTMLTreeConverter.generateDynamicHTMLTree(parent_child_file, htmlfile);
-		/*
+    public static void generateDynamicHTMLTree(String root, int maxLevel) {
 		Vector replace_vec = new Vector();
 		Vector by_vec = new Vector();
 		replace_vec.add("/ncitbrowser/js/");
 		by_vec.add("");
 		replace_vec.add("/ncitbrowser/images/");
 		by_vec.add("");
-		*/
+		generateDynamicHTMLTree(root, maxLevel, replace_vec, by_vec);
+	}
+
+    public static void generateDynamicHTMLTree(String root, int maxLevel, Vector replace_vec, Vector by_vec) {
+		int type = ISA_ONLY;
+		Vector parent_child_vector = generateHierarchyData(root, maxLevel, type);
+		parent_child_vector.remove(0);
+		String parent_child_file = root + "_tree" + ".txt";
+		Utils.saveToFile(parent_child_file, parent_child_vector);
+        generateDynamicHTMLTree(parent_child_file, replace_vec, by_vec);
+	}
+
+    public static void generateDynamicHTMLTree(String root, int maxLevel, Vector replace_vec, Vector by_vec, int type) {
+		Vector parent_child_vector = generateHierarchyData(root, maxLevel, type);
+		parent_child_vector.remove(0);
+		String parent_child_file = root + "_tree" + ".txt";
+		Utils.saveToFile(parent_child_file, parent_child_vector);
+        generateDynamicHTMLTree(parent_child_file, replace_vec, by_vec);
+	}
+
+    public static void generateDynamicHTMLTree(String parent_child_file) {
+		Vector replace_vec = new Vector();
+		Vector by_vec = new Vector();
+		replace_vec.add("/ncitbrowser/js/");
+		by_vec.add("");
+		replace_vec.add("/ncitbrowser/images/");
+		by_vec.add("");
+		generateDynamicHTMLTree(parent_child_file, replace_vec, by_vec);
+	}
+
+    public static void generateDynamicHTMLTree(String parent_child_file, Vector replace_vec, Vector by_vec) {
+		int n = parent_child_file.lastIndexOf(".");
+		String htmlfile = parent_child_file.substring(0, n) + ".html";
+		ASCII2HTMLTreeConverter.generateDynamicHTMLTree(parent_child_file, htmlfile);
 		if (replace_vec != null && replace_vec.size() > 0) {
 			substitute(htmlfile, replace_vec, by_vec);
 		}
