@@ -44,16 +44,17 @@ public class CDISCSubsetReportQA {
     HashMap nciPTMap = null;
     HashMap sourceDefMap = null;
     static String NCI = "NCI";
-    static String SOURCE = "ICH";
+    String sourceName = "ICH"; //either CDISC or ICH
 
     Vector codelistcodes = null;
     HashMap codelistcode2LineMap = null;
 
-    static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
+    static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
 	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
 
-	public CDISCSubsetReportQA(String textfile) {
+	public CDISCSubsetReportQA(String textfile, String sourceName) {
 		this.textfile = textfile;
+		this.sourceName = sourceName;
 		initialize();
 	}
 
@@ -66,11 +67,11 @@ public class CDISCSubsetReportQA {
 		synonymMap = AxiomParser.loadSynonyms(AXIOM_FILE);
 
 		this.req_data_vec = new Vector();
-		String sourcePT = "P90|P384$" + SOURCE + "|P383$PT";
-		String sourceSY = "P90|P384$" + SOURCE + "|P383$SY";
+		String sourcePT = "P90|P384$" + sourceName + "|P383$PT";
+		String sourceSY = "P90|P384$" + sourceName + "|P383$SY";
 		String nciAB = "P90|P384$" + NCI + "|P383$AB";
 		String nciPT = "P90|P384$" + NCI + "|P383$PT";
-		String sourceDef = "P325|P378$" + SOURCE;
+		String sourceDef = "P325|P378$" + sourceName;
 
 		req_data_vec.add(sourcePT);
 		req_data_vec.add(sourceSY);
@@ -104,18 +105,18 @@ public class CDISCSubsetReportQA {
 	}
 
     public void reviewCodeListNames() {
-		// codelistname is the ICH SY of the codelistcode concept, it has nothing to do with any member concept of the code list.
-		// All codelistcode should have exactly one ICH SY; there won't be any ambiguity in determining codelistname.
+		// codelistname is the CDISC/ICH SY of the codelistcode concept, it has nothing to do with any member concept of the code list.
+		// All codelistcode should have exactly one CDISC/ICH SY; there won't be any ambiguity in determining codelistname.
 		int num_errors = 0;
 		for (int i=0; i<codelistcodes.size(); i++) {
 			String codelistcode = (String) codelistcodes.elementAt(i);
 			Vector w = (Vector) sourceSYMap.get(codelistcode);
 			if (w == null) {
 				num_errors++;
-				System.out.println("ERROR: " + SOURCE + " " + "SY" + " does not exist for codeListCode " + codelistcode);
+				System.out.println("ERROR: " + sourceName + " " + "SY" + " does not exist for codeListCode " + codelistcode);
 			} else if (w.size() > 1) {
 				num_errors++;
-				System.out.println("ERROR: Multiple " + SOURCE + " " + "SY" + " found for codeListCode " + codelistcode);
+				System.out.println("ERROR: Multiple " + sourceName + " " + "SY" + " found for codeListCode " + codelistcode);
 				Utils.dumpVector(codelistcode, w);
 			} else {
 				String line = (String) codelistcode2LineMap.get(codelistcode);
@@ -143,13 +144,13 @@ public class CDISCSubsetReportQA {
 			Vector w = (Vector) sourcePTMap.get(code);
 			if (w == null) {
 				num_errors++;
-				System.out.println("ERROR: " + SOURCE + " " + "PT" + " does not exist for codeListCode " + codelistcode);
+				System.out.println("ERROR: " + sourceName + " " + "PT" + " does not exist for codeListCode " + codelistcode);
 			} else if (w.size() == 1) {
 				String expectedValue = (String) w.elementAt(0);
 			    String reportValue = (String) u.elementAt(4);
 			    if (expectedValue.compareTo(reportValue) != 0) {
 					num_errors++;
-					System.out.println("ERROR: Incorrect " + SOURCE + "submission value in report found for codeListCode " + codelistcode);
+					System.out.println("ERROR: Incorrect " + sourceName + "submission value in report found for codeListCode " + codelistcode);
 					System.out.println("\t: Reported value: " + reportValue);
 					System.out.println("\t: Expected value: " + expectedValue);
 				}
@@ -170,13 +171,13 @@ public class CDISCSubsetReportQA {
 					for (int j=0; j<syns.size(); j++) {
 						Synonym syn = (Synonym) syns.elementAt(j);
 						if ((syn.getSourceCode() != null && syn.getSourceCode().compareTo(nci_ab) == 0)
-						  & (syn.getTermSource() != null && syn.getTermSource().compareTo(SOURCE) == 0)
+						  & (syn.getTermSource() != null && syn.getTermSource().compareTo(sourceName) == 0)
 						  & (syn.getTermGroup() != null && syn.getTermGroup().compareTo("PT") == 0)) {
 							String expectedValue = syn.getTermName();
 							String reportValue = (String) u.elementAt(4);
 							if (expectedValue.compareTo(reportValue) != 0) {
 								num_errors++;
-								System.out.println("ERROR: Incorrect " + SOURCE + "submission value in report found for (codeListCode " + codelistcode + ", " +
+								System.out.println("ERROR: Incorrect " + sourceName + "submission value in report found for (codeListCode " + codelistcode + ", " +
 								code + ")");
 								System.out.println("\t: Reported value: " + reportValue);
 								System.out.println("\t: Expected value: " + expectedValue);
@@ -188,14 +189,14 @@ public class CDISCSubsetReportQA {
 						}
 					}
 					if (!match_found) {
-						System.out.println("ERROR: Incorrect " + SOURCE + "submission value in report found for (codeListCode " + codelistcode + ", " +
+						System.out.println("ERROR: Incorrect " + sourceName + "submission value in report found for (codeListCode " + codelistcode + ", " +
 						code + ") - expected value not found.");
 						num_errors++;
 					}
 				}
 			}
 		}
-		System.out.println(SOURCE + " Submission Value QA produces " + num_errors + " errors.");
+		System.out.println(sourceName + " Submission Value QA produces " + num_errors + " errors.");
 	}
 
 	public void reviewNCIPTs() {
@@ -235,23 +236,23 @@ public class CDISCSubsetReportQA {
 			Vector w = (Vector) sourceDefMap.get(code);
 			if (w == null) {
 				num_errors++;
-				System.out.println("ERROR: " + SOURCE + " " + "definition" + " does not exist for code " + code);
+				System.out.println("ERROR: " + sourceName + " " + "definition" + " does not exist for code " + code);
 			} else if (w.size() == 1) {
 				String expectedValue = (String) w.elementAt(0);
 			    String reportValue = (String) u.elementAt(6);
 			    if (expectedValue.compareTo(reportValue) != 0) {
 					num_errors++;
-					System.out.println("ERROR: Incorrect " + SOURCE + " " + "definition value in report found for code " + code);
+					System.out.println("ERROR: Incorrect " + sourceName + " " + "definition value in report found for code " + code);
 					System.out.println("\t: Reported value: " + reportValue);
 					System.out.println("\t: Expected value: " + expectedValue);
 				}
 			} else {
 				num_errors++;
-				System.out.println("WARNING: Multiple " + SOURCE + " " + "definition found for code " + code);
+				System.out.println("WARNING: Multiple " + sourceName + " " + "definition found for code " + code);
 				Utils.dumpVector(code, w);
 			}
 		}
-		System.out.println(SOURCE + " definition QA produces " + num_errors + " warnings.");
+		System.out.println(sourceName + " definition QA produces " + num_errors + " warnings.");
 	}
 
 	public void reviewSourceSynonyms() {
@@ -263,19 +264,19 @@ public class CDISCSubsetReportQA {
 			Vector w = (Vector) sourceSYMap.get(code);
 			if (w == null) {
 				num_errors++;
-				System.out.println("ERROR: " + SOURCE + " " + "synonyms" + " does not exist for code " + code);
+				System.out.println("ERROR: " + sourceName + " " + "synonyms" + " does not exist for code " + code);
 			} else if (w.size() == 1) {
 				String expectedValue = (String) w.elementAt(0);
 			    String reportValue = (String) u.elementAt(5);
 			    if (expectedValue.compareTo(reportValue) != 0) {
 					num_errors++;
-					System.out.println("ERROR: Incorrect " + SOURCE + " " + "synonyms value in report found for code " + code);
+					System.out.println("ERROR: Incorrect " + sourceName + " " + "synonyms value in report found for code " + code);
 					System.out.println("\t: Reported value: " + reportValue);
 					System.out.println("\t: Expected value: " + expectedValue);
 				}
 			}
 		}
-		System.out.println(SOURCE + " synonym QA produces " + num_errors + " messages.");
+		System.out.println(sourceName + " synonym QA produces " + num_errors + " messages.");
 	}
 
     public static Vector merge(String indent, Vector v1 , Vector v2) {
@@ -338,15 +339,13 @@ public class CDISCSubsetReportQA {
 	}
 
 	public static void main(String[] args) throws IOException {
-		String textfile = args[0];
-		CDISCSubsetReportQA qa = new CDISCSubsetReportQA(textfile);
-		String max_cases_str = args[1];
-		int max_cases = Integer.parseInt(max_cases_str);
 		long ms = System.currentTimeMillis();
-		//qa.run(max_cases);
+		String textfile = args[0];
+		String sourceName = args[1];
+		CDISCSubsetReportQA qa = new CDISCSubsetReportQA(textfile, sourceName);
+
 		qa.reviewCodeListNames();
 		qa.reviewSubmissionValues();
-
 		qa.reviewSourceDefinitions();
 		qa.reviewSourceSynonyms();
 		qa.reviewNCIPTs();
