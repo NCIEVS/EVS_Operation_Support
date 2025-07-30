@@ -70,16 +70,27 @@ public class SpecialProperties {
 	}
 
 	public static String getCDISCSubmissionValue(String codelistCode, List<Synonym> parentAxioms, String code, List<Synonym> axioms) {
+		System.out.println("(1) getCDISCSubmissionValue (" + codelistCode + "," + code + ")");
 		String termSource = "CDISC";
 		return getCDISCSubmissionValue(codelistCode, parentAxioms, code, axioms, termSource);
 	}
 
 	public static String getCDISCSubmissionValue(String codelistCode, List<Synonym> parentAxioms, String code, List<Synonym> axioms, String termSource) {
+		System.out.println("(2) getCDISCSubmissionValue (" + codelistCode + "," + code + ")");
 		String subsourceName = null;
 	    return getCDISCSubmissionValue(codelistCode, parentAxioms, code, axioms, termSource, subsourceName);
 	}
 
+	public static Vector list2Vector(List list) {
+		Vector w = new Vector();
+		for (int i=0; i<list.size(); i++) {
+	         w.add(list.get(i));
+	    }
+	    return w;
+	}
+
 	public static String getCDISCSubmissionValue(String codelistCode, List<Synonym> parentAxioms, String code, List<Synonym> axioms, String termSource, String subsourceName) {
+        System.out.println("(3) getCDISCSubmissionValue (" + codelistCode + "," + code + ")");
 		if (code == null) {
 			String termType = "PT";
 			String sourceCode = null;
@@ -108,6 +119,8 @@ public class SpecialProperties {
 	    List<String> cdisc_pts = getSynonymsWithQualifiers(axioms,
 	       termSource, termType, sourceCode, null);
 
+	    //Utils.dumpVector("cdisc_pts of " + code, list2Vector(cdisc_pts));
+
 	    if (cdisc_pts == null || cdisc_pts.size() == 0) {
 			System.out.println("\nINFO (2): getCDISCSubmissionValue No " + termSource + " PT is found for (codelistCode " + codelistCode + ", code " + code + ")");
 			return null;
@@ -115,6 +128,7 @@ public class SpecialProperties {
 			return cdisc_pts.get(0);
 		}
 
+        System.out.println("continue -- Multiple PTs encountered for (codelistCode " + codelistCode + ", code " + code + ")");
 		termSource = "NCI";
 		termType = "AB";
 
@@ -138,6 +152,7 @@ public class SpecialProperties {
 		subsourceName = null;
 	    List<String> results = getSynonymsWithQualifiers(axioms,
 	       termSource, termType, sourceCode, subsourceName);
+
 	    if (results == null) {
 			System.out.println("\nINFO (4): getCDISCSubmissionValue No NCI AB is found in (codelistCode " + codelistCode + ", code " + code + ")");
 			return null;

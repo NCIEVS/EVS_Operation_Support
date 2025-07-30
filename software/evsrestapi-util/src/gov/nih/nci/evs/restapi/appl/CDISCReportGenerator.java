@@ -1,7 +1,7 @@
 package gov.nih.nci.evs.restapi.appl;
-import gov.nih.nci.evs.restapi.config.*;
 import gov.nih.nci.evs.restapi.util.*;
 import gov.nih.nci.evs.restapi.bean.*;
+import gov.nih.nci.evs.restapi.config.*;
 
 import java.io.*;
 import java.text.*;
@@ -49,7 +49,7 @@ public class CDISCReportGenerator {
 			generateDataMap();
 		}
 		data_info_hashmap = load_data_info();
-		System.out.println("data_info_hashmap: " + data_info_hashmap.keySet().size());
+		//System.out.println("data_info_hashmap: " + data_info_hashmap.keySet().size());
 
 		hh = new HierarchyHelper(Utils.readFile(PARENT_CHILD_FILE));
 		scanner = new OWLScanner(NCIT_OWL);
@@ -195,23 +195,6 @@ public class CDISCReportGenerator {
 		Vector u = StringUtils.parseData(heading, '\t');
 		Utils.dumpVector(heading, u);
 	}
-
-/*
-	public static void main1(String[] args) {
-		//CDISC ADaM Terminology (Code C81222)
-
-		long ms = System.currentTimeMillis();
-		String heading = "NCI Preferred Term\tCDISC Definition\tCDISC PT\tCDISC SY";
-		heading = "Code	Codelist Code	Codelist Extensible (Yes/No)	Codelist Name	" + sourceName + " Submission Value	" + sourceName + " Synonym(s)	" + sourceName + " Definition	NCI Preferred Term";
-		Vector u = StringUtils.parseData(heading, '\t');
-		Utils.dumpVector(heading, u);
-
-		Vector v = generateDataRequirements(heading);
-		Utils.dumpVector(heading, v);
-
-		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
-	}
-*/
 
 	public static Vector getSubclassCodes(String code) {
 		return hh.getSubclassCodes(code);
@@ -408,11 +391,22 @@ public class CDISCReportGenerator {
 		for (int i=0; i<subs.size(); i++) {
 			String sub_code = (String) subs.elementAt(i);
 			String extensible = (String) extensibleMap.get(sub_code);
+			if (extensible == null) {
+				extensible = "";
+			}
+
 			if (published_valuesets.contains(sub_code)) {
 				List parentAxioms = getSynonyms(sub_code);
-				List axioms = null;//getSynonyms(member_code);
+
+				List axioms = getSynonyms(code);
 				String member_code = null;
-				String cdiscSubmissionValue = SpecialProperties.getCDISCSubmissionValue(sub_code, parentAxioms, null, null, sourceName, subSourceName);
+
+				String cdiscSubmissionValue = SpecialProperties.getCDISCSubmissionValue(sub_code, parentAxioms, member_code, null, sourceName);
+
+if (cdiscSubmissionValue == null) {
+	System.out.println("ERROR cdiscSubmissionValue: (" + sub_code + " " + code + ")");
+}
+
 				String codeListName = SpecialProperties.getCodeListName(sub_code, parentAxioms, sourceName);
 
 				cdisc_syns = getPropertyValues((Vector) cdisc_syn_map.get(sub_code), sub_code);
@@ -427,15 +421,10 @@ public class CDISCReportGenerator {
 					member_code = (String) members.elementAt(j);
 	                parentAxioms = getSynonyms(sub_code);
 	                axioms = getSynonyms(member_code);
-
-	                cdiscSubmissionValue = "";
-	                //try {
-						cdiscSubmissionValue = SpecialProperties.getCDISCSubmissionValue(sub_code, parentAxioms, member_code, axioms, sourceName, subSourceName);
-					//} catch (Exception ex) {
-					if (cdiscSubmissionValue == null) {
+	                cdiscSubmissionValue = SpecialProperties.getCDISCSubmissionValue(sub_code, parentAxioms, member_code, axioms, sourceName, subSourceName);
+					if (cdiscSubmissionValue == null || cdiscSubmissionValue.length() == 0) {
 						System.out.println("ERROR: SubmissionValue does not exist for (" + sub_code + ", " + member_code + ")");
 					}
-
 	                codeListName = "";
 	                try {
 						codeListName = SpecialProperties.getCodeListName(sub_code, parentAxioms, sourceName);
@@ -479,6 +468,9 @@ public class CDISCReportGenerator {
 		Vector w = generator.resolveValueSet(code);
 		String label = getLabel(code);
 		String textfile = label + ".txt";
+
+		Utils.saveToFile(textfile, w);
+
 		Vector replace_vec = new Vector();
 		Vector by_vec = new Vector();
 		replace_vec.add("\tnull\t");
@@ -490,7 +482,6 @@ public class CDISCReportGenerator {
 		String sheetName = label + " " + StringUtils.getToday("yyyy-MM-dd");
 		String xlsfile = null;
 		try {
-			//ExcelReadWriteUtils.writeXLSFile(textfile, delim, sheetName);
 			xlsfile = ExcelReadWriteUtils.writeXLSFile(textfile, delim, sheetName);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -505,14 +496,9 @@ public class CDISCReportGenerator {
 		String sourceName = args[0];
 		String subSourceName = args[1];
 		String root = args[2]; //C217023
-
 		CDISCReportGenerator generator = new CDISCReportGenerator(
 		    sourceName, subSourceName);
 		generator.run(root);
 	}
 }
 
-/*
-Code	Codelist Code	Codelist Extensible (Yes/No)	Codelist Name	CDISC Submission Value	CDISC Synonym(s)	CDISC Definition	NCI Preferred Term
-C208382		No	Acute Physiology and Chronic Health Evaluation II Clinical Classification Parameter Code	APCH1PC	Acute Physiology and Chronic Health Evaluation II Clinical Classification Parameter Code	A parameter code codelist for the Acute Physiology and Chronic Health Evaluation II Clinical Classification (APACHE II) to support the calculation of total score in ADaM.	CDISC ADaM Acute Physiology and Chronic Health Evaluation II Clinical Classification Parameter Code Terminology
-*/
