@@ -1,6 +1,7 @@
 package gov.nih.nci.evs.restapi.util;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.common.*;
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -80,11 +81,29 @@ public class LogicalExpression {
     static HashMap transitionMatrix = null;
     static Vector absorbingStates = null;
     static int MAX_LENGTH = 10;
-    HashMap rangeHashMap = null;
+    static HashMap rangeHashMap = null;
+    static HashMap pathMap = null; //createPathMap();
+    static HashMap path2RoleGroupMap = null;//createPath2RoleGroupMap
+    static String NS = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl";//#C3720
 
+    static {
+		pathMap = createPathMap();
+		path2RoleGroupMap = createPath2RoleGroupMap();
+	}
+/*
 	public HashMap getRangeHashMap() {
 		return this.rangeHashMap;
 	}
+*/
+    public LogicalExpression() {
+		this.serviceUrl = ConfigurationController.serviceUrl;
+    	this.named_graph = ConfigurationController.namedGraph;
+    	this.username = ConfigurationController.username;
+    	this.password = ConfigurationController.password;
+        this.owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
+        this.owlSPARQLUtils.set_named_graph(named_graph);
+        rangeHashMap = getRangeHashMap(named_graph);
+    }
 
     public LogicalExpression(String serviceUrl, String named_graph, String username, String password) {
 		this.serviceUrl = serviceUrl;
@@ -98,6 +117,18 @@ public class LogicalExpression {
 
     public OWLSPARQLUtils getOWLSPARQLUtils() {
 		return this.owlSPARQLUtils;
+	}
+
+	public String getLabel(String code) {
+		Vector v = owlSPARQLUtils.getLabelByCode(code);
+		if (v != null) {
+			return (String) v.elementAt(0);
+		}
+		return null;
+	}
+
+	public Vector getSuperclassesByCode(String code) {
+		return owlSPARQLUtils.getSuperclassesByCode(named_graph, code);
 	}
 
 	public String construct_get_domain(String named_graph) {
@@ -133,10 +164,10 @@ public class LogicalExpression {
 
 	public Vector getDomain(String named_graph) {
         String query = construct_get_domain(named_graph);
+        System.out.println(query);
         Vector v = owlSPARQLUtils.executeQuery(query);
         if (v == null) return null;
         if (v.size() == 0) return v;
-        //v = new ParserUtils().getResponseValues(v);
         return new SortUtils().quickSort(v);
 	}
 
@@ -187,6 +218,7 @@ public class LogicalExpression {
 
 	public Vector getRange(String named_graph) {
         String query = construct_get_range(named_graph);
+        System.out.println(query);
         Vector v = owlSPARQLUtils.executeQuery(query);
         if (v == null) return null;
         if (v.size() == 0) return v;
@@ -394,19 +426,19 @@ public class LogicalExpression {
         return hmap;
     }
 
-	public static void main(String[] args) {
-		long ms = System.currentTimeMillis();
-		String serviceUrl = args[0];
-		String named_graph = args[1];
-		String username = args[2];
-		String password = args[3];
-		String code = args[4];
-        LogicalExpression test = new LogicalExpression(serviceUrl, named_graph, username, password);
+	public HashMap run(String named_graph, String code) {
+		String label = getLabel(code);
+		System.out.println(label + " (" + code + ")");
+		HashMap path2HashMap = new HashMap();
+        LogicalExpression test = new LogicalExpression();
         Vector paths = new Vector();
+        //test
+        paths.add("E|I");
+
         paths.add("E|I|O|C");
         paths.add("E|I|O|R");
         paths.add("E|I|O|U|O|R");
-        paths.add("E|I|O|U|O|I|O|R");
+        paths.add("E|I|O|U|O|I|O|R"); //role groups
         HashMap hmap = test.getLogicalExpressionData(named_graph, code, paths);
         Iterator it = hmap.keySet().iterator();
         while (it.hasNext()) {
@@ -414,15 +446,329 @@ public class LogicalExpression {
 			Vector v = (Vector) hmap.get(path);
 			HashMap hmap2 = test.sortRestrictions(path, v);
 			if (hmap2.keySet().size() > 0) {
-				Iterator it2 = hmap2.keySet().iterator();
-				while (it2.hasNext()) {
-					String key = (String) it2.next();
-					Vector values = (Vector) hmap2.get(key);
-					Utils.dumpVector(key, values);
+				path2HashMap.put(path, hmap2);
+			}
+		}
+		return path2HashMap;
+	}
+
+	public static void dumpPath2HashMap(HashMap path2HashMap) {
+		Iterator it = path2HashMap.keySet().iterator();
+		while (it.hasNext()) {
+			String path = (String) it.next();
+			String tureOrFalse = (String) path2RoleGroupMap.get(path);
+			String t = translatePath(path);
+			System.out.println(t);
+			if (tureOrFalse != null && tureOrFalse.compareTo("true") == 0) {
+				System.out.println("Note: The following roles form a role group because it's an union of an collection of intersection of a pair of roles:");
+			}
+			HashMap hmap2 = (HashMap) path2HashMap.get(path);
+			Iterator it2 = hmap2.keySet().iterator();
+			while (it2.hasNext()) {
+				String key = (String) it2.next();
+				Vector values = (Vector) hmap2.get(key);
+				Utils.dumpVector("Simple Restriction(s)", appendRange(values));
+			}
+		}
+	}
+
+	public static Vector getAllRanges(HashMap path2HashMap) {
+		Vector ranges = new Vector();
+		Iterator it = path2HashMap.keySet().iterator();
+		while (it.hasNext()) {
+			String path = (String) it.next();
+			String tureOrFalse = (String) path2RoleGroupMap.get(path);
+			String t = translatePath(path);
+			HashMap hmap2 = (HashMap) path2HashMap.get(path);
+			Iterator it2 = hmap2.keySet().iterator();
+			while (it2.hasNext()) {
+				String key = (String) it2.next();
+				Vector values = (Vector) hmap2.get(key);
+				for (int i=0; i<values.size(); i++) {
+					String line = (String) values.elementAt(i);
+					Vector v = StringUtils.parseData(line, '|');
+					String role = (String) v.elementAt(1);
+					String range = (String) rangeHashMap.get(role);
+					if (!ranges.contains(range)) {
+						ranges.add(range);
+					}
 				}
 			}
 		}
-		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		return new SortUtils().quickSort(ranges);
+	}
 
+	public static void getDomainAndRangeData(String named_graph) {
+        LogicalExpression test = new LogicalExpression();
+        HashMap domainHashMap = test.getDomainHashMap(named_graph);
+        Utils.dumpHashMap("domainHashMap", domainHashMap);
+
+        HashMap rangeHashMap = test.getRangeHashMap(named_graph);
+        Utils.dumpHashMap("rangeHashMap", rangeHashMap);
+	}
+
+    public static HashMap createPathMap() {
+		HashMap hmap = new HashMap();
+		hmap.put("E", "owl:equivalentClass");
+		hmap.put("I", "owl:intersectionOf");
+		hmap.put("U", "owl:unionOf");
+		hmap.put("R", "owl:Restriction");
+		hmap.put("O", "<Any Other>");
+		return hmap;
+	}
+
+    public static HashMap createPath2RoleGroupMap() {
+		HashMap hmap = new HashMap();
+		hmap.put("E|I|O|U|O|I|O|R", "true");
+		return hmap;
+	}
+
+	//Disease_May_Have_Molecular_Abnormality|R89|C45443|RNF213-ALK Fusion Protein Expression
+	public static String appendRange(String line) {
+		Vector v = StringUtils.parseData(line, '|');
+		String role = (String) v.elementAt(1);
+		return line + " (Range: " + (String) rangeHashMap.get(role) + ")";
+	}
+
+	public static Vector appendRange(Vector w) {
+		Vector w0 = new Vector();
+		for (int i=0; i<w.size(); i++) {
+			String line = (String) w.elementAt(i);
+			w0.add(appendRange(line));
+		}
+		return w0;
+	}
+
+	public static String translatePath(String path) {
+		Vector v = StringUtils.parseData(path, '|');
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<v.size(); i++) {
+			String element = (String) v.elementAt(i);
+			buf.append((String) pathMap.get(element));
+			if (i < v.size() - 1) {
+				buf.append(" --> ");
+			}
+		}
+		return buf.toString();
+	}
+
+//C37193
+    public static Vector getRoleGroups(HashMap path2HashMap, String path) { //"E|I|O|U|O|I|O|R"
+    	Vector v = new Vector();
+		HashMap hmap2 = (HashMap) path2HashMap.get(path);
+		Iterator it2 = hmap2.keySet().iterator();
+		while (it2.hasNext()) {
+			String key = (String) it2.next();
+			Vector values = (Vector) hmap2.get(key);
+			v.addAll(values);
+		}
+		return v;
+	}
+
+	public static Vector findRolesWithRange(Vector v, String range) {
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String role = (String) u.elementAt(1);
+			String role_range = (String) rangeHashMap.get(role);
+			if (role_range.compareTo(range) == 0) {
+				w.add(line);
+			}
+		}
+		return w;
+	}
+
+	public static String findRangeOfRoleGroup(Vector w) {
+		Vector w0 = new Vector();
+		for (int i=0; i<w.size(); i++) {
+			String line = (String) w.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String role = (String) u.elementAt(1);
+			String range = (String) rangeHashMap.get(role);
+			if (!w0.contains(range)) {
+				w0.add(range);
+				if (w0.size() > 1) return null;
+			}
+		}
+		return (String) w0.elementAt(0);
+	}
+
+	public static void dumpRoles(Vector v) {
+		//Disease_May_Have_Cytogenetic_Abnormality|R114|C45440|t(2;17)(p23;q35)
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			System.out.println("\t" + (String) u.elementAt(0) + "\t" + (String) u.elementAt(3) + " (" + (String) u.elementAt(2) + ")");
+		}
+		System.out.println("\n");
+	}
+
+	public static void dumpRoleGroups(Vector v) {
+		System.out.println("\tRole Group(s)");
+		int i = 0;
+		while (i < v.size()) {
+			if (i > 0) {
+				System.out.println("\n\tor");
+			}
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			System.out.println("\t" + (String) u.elementAt(0) + "\t" + (String) u.elementAt(3) + " (" + (String) u.elementAt(2) + ")");
+			i++;
+			line = (String) v.elementAt(i);
+			u = StringUtils.parseData(line, '|');
+			System.out.println("\t" + (String) u.elementAt(0) + "\t" + (String) u.elementAt(3) + " (" + (String) u.elementAt(2) + ")");
+		    i++;
+		}
+		System.out.println("\n");
+	}
+
+	public String construct_get_superclass(String named_graph, String code) {
+		String prefixes = owlSPARQLUtils.getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		buf.append("select distinct ?x_code ?x_label ?y").append("\n");
+		buf.append("{").append("\n");
+		buf.append("graph <" + named_graph + ">").append("\n");
+		buf.append("	{").append("\n");
+		buf.append("            ?x a owl:Class .").append("\n");
+		buf.append("            ?x :NHC0 ?x_code .").append("\n");
+		buf.append("            ?x :NHC0 \"" + code + "\"^^xsd:string . ").append("\n");
+		buf.append("            ?x rdfs:label ?x_label .").append("\n");
+		buf.append("            ?x owl:equivalentClass ?e .").append("\n");
+		buf.append("            ?e owl:intersectionOf ?i .").append("\n");
+		buf.append("            ?i ?p ?y .").append("\n");
+		buf.append("	}").append("\n");
+		buf.append("}").append("\n");
+		return buf.toString();
+	}
+
+	public Vector getSuperclasses(String named_graph, String code) {
+		String query = construct_get_superclass(named_graph, code);
+		Vector v = executeQuery(query);
+		if (v == null) return null;
+		if (v.size() == 0) return v;
+		v = new ParserUtils().getResponseValues(v);
+		return v;
+	}
+
+    public Vector getParents(String named_graph, String code) {
+		Vector v = getSuperclasses(named_graph, code);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (line.indexOf(NS) != -1) {
+				int n = line.lastIndexOf("#");
+				String parent_code = line.substring(n+1, line.length());
+				String label = getLabel(parent_code);
+				w.add(label + " (" + parent_code + ")");
+			}
+		}
+		return w;
+	}
+
+	public static void run(String code) {
+		long ms = System.currentTimeMillis();
+		String named_graph = ConfigurationController.namedGraph;
+		LogicalExpression le = new LogicalExpression();
+		HashMap hmap = le.run(named_graph, code);
+		Vector ranges = getAllRanges(hmap);
+		Utils.dumpVector("ranges", ranges);
+
+		Vector roleGroupVec = new Vector();
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String path = (String) it.next();
+			String tureOrFalse = (String) path2RoleGroupMap.get(path);
+			if (tureOrFalse != null && tureOrFalse.compareTo("true") == 0) {
+				HashMap hmap2 = (HashMap) hmap.get(path);
+				Iterator it2 = hmap2.keySet().iterator();
+				while (it2.hasNext()) {
+					String key = (String) it2.next();
+					roleGroupVec.addAll((Vector) hmap2.get(key));
+				}
+			}
+		}
+		Utils.dumpVector("roleGroupVec", roleGroupVec);
+		Vector simpleRoleVec = new Vector();
+		it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String path = (String) it.next();
+			String tureOrFalse = (String) path2RoleGroupMap.get(path);
+			if (tureOrFalse == null || tureOrFalse.compareTo("false") == 0) {
+				HashMap hmap2 = (HashMap) hmap.get(path);
+				Iterator it2 = hmap2.keySet().iterator();
+				while (it2.hasNext()) {
+					String key = (String) it2.next();
+					simpleRoleVec.addAll((Vector) hmap2.get(key));
+				}
+			}
+		}
+	    Utils.dumpVector("Simple roles", simpleRoleVec);
+
+	    System.out.println("Logical definition of " + le.getLabel(code) + " (" + code + ")");
+        Vector parents = le.getParents(named_graph, code);
+
+        Vector w0 = new Vector();
+        w0.add("Logical definition of " + le.getLabel(code) + " (" + code + ")");
+
+	    System.out.println("\nParent(s)");
+	    w0.add("\nParent(s)");
+	    for (int i=0; i<parents.size(); i++) {
+			String parent = (String) parents.elementAt(i);
+			System.out.println("\t" + parent);
+			w0.add("\t" + parent);
+		}
+	    System.out.println("\n");
+	    w0.add("\n");
+	    for (int i=0; i<ranges.size(); i++) {
+			String range = (String) ranges.elementAt(i);
+			System.out.println(range);
+			w0.add(range);
+
+            Vector roles = findRolesWithRange(simpleRoleVec, range);
+            if (roles.size() > 0) {
+            	dumpRoles(roles);
+
+				for (int j=0; j<roles.size(); j++) {
+					String line = (String) roles.elementAt(j);
+					Vector u = StringUtils.parseData(line, '|');
+					w0.add("\t" + (String) u.elementAt(0) + "\t" + (String) u.elementAt(3) + " (" + (String) u.elementAt(2) + ")");
+				}
+				w0.add("\n");
+
+			}
+
+            Vector roleGroups = findRolesWithRange(roleGroupVec, range);
+            if (roleGroups.size() > 0) {
+            	dumpRoleGroups(roleGroups);
+
+				w0.add("\tRole Group(s)");
+				int j = 0;
+				while (j < roleGroups.size()) {
+					if (j > 0) {
+						w0.add("\n\tor");
+					}
+					String line = (String) roleGroups.elementAt(j);
+					Vector u = StringUtils.parseData(line, '|');
+					w0.add("\t" + (String) u.elementAt(0) + "\t" + (String) u.elementAt(3) + " (" + (String) u.elementAt(2) + ")");
+					j++;
+					line = (String) roleGroups.elementAt(i);
+					u = StringUtils.parseData(line, '|');
+					w0.add("\t" + (String) u.elementAt(0) + "\t" + (String) u.elementAt(3) + " (" + (String) u.elementAt(2) + ")");
+					j++;
+				}
+				w0.add("\n");
+			}
+		}
+		Utils.saveToFile("logical_expression_" + code + "_" + StringUtils.getToday() + ".txt", w0);
+
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
+	public static void main(String[] args) {
+		long ms = System.currentTimeMillis();
+		String code = args[0];
+		run(code);
 	}
 }

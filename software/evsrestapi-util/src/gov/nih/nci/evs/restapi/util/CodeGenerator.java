@@ -221,13 +221,11 @@ public class CodeGenerator {
 		out.println("}");
 	}
 
-    public static void main(String[] args) {
-		String className = args[0];
-		String queryfile = args[1];
+    public static void run(String className, String queryfile) {
 		String outputfile = className + ".java";
 		System.out.println(queryfile);
 		int n = queryfile.lastIndexOf("_query");
-		if(n ==  -1) {
+		if(n == -1) {
 			System.out.println("queryfile: " + queryfile);
 			System.out.println("ERROR: Incorrect naming of query file (example: sparql_query.txt.)");
 			System.exit(1);
@@ -249,6 +247,12 @@ public class CodeGenerator {
 			}
 		}
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
+    public static void main(String[] args) {
+		String className = args[0];
+		String queryfile = args[1];
+		run(className, queryfile);
 	}
 
 }
