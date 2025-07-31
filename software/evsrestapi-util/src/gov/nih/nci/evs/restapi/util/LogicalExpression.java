@@ -432,9 +432,6 @@ public class LogicalExpression {
 		HashMap path2HashMap = new HashMap();
         LogicalExpression test = new LogicalExpression();
         Vector paths = new Vector();
-        //test
-        paths.add("E|I");
-
         paths.add("E|I|O|C");
         paths.add("E|I|O|R");
         paths.add("E|I|O|U|O|R");
@@ -667,7 +664,7 @@ public class LogicalExpression {
 		return w;
 	}
 
-	public static void run(String code) {
+	public static String run(String code) {
 		long ms = System.currentTimeMillis();
 		String named_graph = ConfigurationController.namedGraph;
 		LogicalExpression le = new LogicalExpression();
@@ -761,14 +758,16 @@ public class LogicalExpression {
 				w0.add("\n");
 			}
 		}
-		Utils.saveToFile("logical_expression_" + code + "_" + StringUtils.getToday() + ".txt", w0);
-
+		String outputfile = "logical_expression_" + code + "_" + StringUtils.getToday() + ".txt";
+		Utils.saveToFile(outputfile, w0);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		return outputfile;
 	}
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		String code = args[0];
-		run(code);
+		String outputfile = run(code);
+		System.out.println(outputfile + " generated.");
 	}
 }

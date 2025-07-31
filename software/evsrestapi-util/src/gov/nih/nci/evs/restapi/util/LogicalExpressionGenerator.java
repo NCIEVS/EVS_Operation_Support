@@ -87,7 +87,7 @@ public class LogicalExpressionGenerator {
         Vector parents = (Vector) hmap.get("E|I|O|C");
         Vector parent_vec = new Vector();
         if (parents != null && parents.size() > 0) {
-			buf.append("Parent").append("\n");
+			buf.append("Parent(s)").append("\n");
 			for (int i=0; i<parents.size(); i++) {
 				String line = (String) parents.elementAt(i);
 				Vector u = StringUtils.parseData(line, '|');
@@ -288,13 +288,6 @@ public class LogicalExpressionGenerator {
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
-		/*
-		String serviceUrl = ConfigurationController.serviceUrl;
-		String named_graph = ConfigurationController.namedGraph;
-		String username = ConfigurationController.username;
-		String password = ConfigurationController.password;
-		*/
-
 		String serviceUrl = args[0];
 		String named_graph = args[1];
 		String username = args[2];
