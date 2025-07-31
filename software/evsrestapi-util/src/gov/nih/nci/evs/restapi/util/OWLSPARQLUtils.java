@@ -6283,49 +6283,6 @@ bnode_07130346_a093_4c67_ad70_efd4d5bc5796_242618|Thorax|C12799|Maps_To|P375|Tho
         return new SortUtils().quickSort(v);
 	}
 
-	public String construct_get_version(String named_graph) {
-		System.out.println("named_graph: " + named_graph);
-
-		StringBuffer buf = new StringBuffer();
-		//buf.append("PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>").append("\n");
-		buf.append("PREFIX owl:<http://www.w3.org/2002/07/owl#>").append("\n");
-		//buf.append("PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>").append("\n");
-		buf.append("PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>").append("\n");
-		buf.append("PREFIX dc:<http://purl.org/dc/elements/1.1/>").append("\n");
-
-        //String prefixes = getPrefixes();
-        //StringBuffer buf = new StringBuffer();
-        //buf.append(prefixes);
-        //buf.append("SELECT ?x_version_info ?x_dc_date ?x_comment").append("\n");
-
-        buf.append("SELECT ?x_version_info").append("\n");
-        buf.append("{").append("\n");
-        buf.append("    graph <" + named_graph + ">").append("\n");
-        buf.append("    {").append("\n");
-        buf.append("            ?x a owl:Ontology .").append("\n");
-        buf.append("            ?x owl:versionInfo ?x_version_info .").append("\n");
-        //buf.append("            ?x dc:date ?x_dc_date .").append("\n");
-        //buf.append("            ?x rdfs:comment ?x_comment").append("\n");
-        buf.append("    }").append("\n");
-        buf.append("}").append("\n");
-        return buf.toString();
-	}
-
-
-	public String getVersion(String named_graph) {
-        String query = construct_get_version(named_graph);
-        System.out.println(query);
-        Vector v = executeQuery(query);
-        if (v == null) {
-			System.out.println("v == null???");
-			return null;
-		}
-        if (v.size() == 0) return null;
-        String line = (String) v.elementAt(0);
-        Vector u = StringUtils.parseData(line, '|');
-        return (String) u.elementAt(0);
-	}
-
 	public String construct_get_constains_search(String named_graph, String term) {
 		String prefixes = getPrefixes();
 		StringBuffer buf = new StringBuffer();
@@ -6349,6 +6306,29 @@ bnode_07130346_a093_4c67_ad70_efd4d5bc5796_242618|Thorax|C12799|Maps_To|P375|Tho
 		buf.append("                FILTER(contains(lcase(?a_target), \"" + term + "\"))").append("\n");
 		buf.append("}").append("\n");
 		return buf.toString();
+	}
+
+	public String construct_get_version(String named_graph) {
+		String prefixes = getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		buf.append("select ?version ").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
+		buf.append("where  { ").append("\n");
+		buf.append("    ?x a owl:Ontology .").append("\n");
+		buf.append("    ?x owl:versionInfo ?version .").append("\n");
+		buf.append("}").append("\n");
+		buf.append("").append("\n");
+		return buf.toString();
+	}
+
+	public String getVersion(String named_graph) {
+		String query = construct_get_version(named_graph);
+		Vector v = executeQuery(query);
+		if (v == null) return null;
+		if (v.size() == 0) return null;
+		v = new ParserUtils().getResponseValues(v);
+		return (String) v.elementAt(0);
 	}
 }
 
