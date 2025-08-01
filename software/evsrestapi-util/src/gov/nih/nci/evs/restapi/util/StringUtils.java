@@ -835,4 +835,61 @@ public class StringUtils {
 		String decoded = HTMLDecoder.decode(encoded);
 		return decoded;
 	}
+
+    static boolean isNCItCode(String str) {
+		if (str == null || str.length() == 0) return false;
+		char c = str.charAt(0);
+		if (c != 'C') return false;
+		String s = str.substring(1, str.length());
+		try {
+			int i = Integer.parseInt(s);
+			if (str.length() < 8) return true;
+		} catch (Exception ex) {
+
+		}
+		return false;
+	}
+
+	public static Vector scanNCItCodes(String line) {
+		String str = "";
+		String prev_code = "";
+
+		Vector w = new Vector();
+		int i = 0;
+		boolean istart = false;
+		while (i < line.length()) {
+			char c = line.charAt(i);
+			if (c != 'C') {
+				if (istart) {
+					str = str + c;
+					if (isNCItCode(str)) {
+						if (prev_code == "") {
+							prev_code = str;
+						} else {
+							if (str.substring(0, str.length()-1).compareTo(prev_code) == 0) {
+								prev_code = str;
+							}
+						}
+					} else {
+						if (prev_code.length() > 0) {
+							if (!w.contains(prev_code)) {
+								w.add(prev_code);
+								prev_code = "";
+							}
+						}
+					}
+				} else {
+					str = "";
+				}
+			} else {
+				if (isNCItCode(str)) {
+					w.add(str);
+				}
+				istart = true;
+				str = "C";
+			}
+			i++;
+		}
+		return w;
+	}
 }
