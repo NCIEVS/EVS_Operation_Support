@@ -139,13 +139,19 @@ public class OWL2HTML {
 		out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
 		out.println("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
 		out.println("	<head>");
-		out.println("		<meta name=\"description\" content=\"A Tree from HTML Lists\">");
-		out.println("		<meta http-equiv=\"pragma\" content=\"nocache\">");
-		out.println("		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
-		out.println("		<title>" + textfile + "</title>");
 
-		out.println("<script type=\"text/javascript\" src=\"event_simulate.js\"></script>");
-		out.println("<script type=\"text/javascript\" src=\"value_set_tree_navigation.js\"></script>");
+      out.println("		<meta name=\"description\" content=\"A Tree from HTML Lists\">");
+      out.println("		<meta http-equiv=\"pragma\" content=\"nocache\">");
+      out.println("		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
+      int n = textfile.lastIndexOf(",");
+      String title = (String) textfile.substring(0, n);
+      out.println("		<title>" + title + "</title>");
+      out.println("		<script>");
+      out.println("            function onValueSetNodeClicked(node_id) {");
+      out.println("				var url=\"https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/\"+ node_id;");
+      out.println("				window.open(url, \"\", \"alwaysRaised,dependent,status,scrollbars,resizable,width=800,height=600\");");
+      out.println("			}");
+      out.println("		</script>");
 
 		out.println("<style>");
 		out.println(".tooltip {");
