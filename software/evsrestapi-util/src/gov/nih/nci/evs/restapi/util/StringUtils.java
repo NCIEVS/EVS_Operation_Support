@@ -836,6 +836,10 @@ public class StringUtils {
 		return decoded;
 	}
 
+	public static String toCamelCase(String text, char delimiter) {
+		return CaseUtils.toCamelCase(text, false, delimiter);
+	}
+
     public static boolean isNCItCode(String str) {
 		if (str == null || str.length() == 0) return false;
 		char c = str.charAt(0);
