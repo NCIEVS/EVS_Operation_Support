@@ -836,9 +836,34 @@ public class StringUtils {
 		return decoded;
 	}
 
+	public static Vector toCamelCase(String text) {
+		return header2CamelCase(text);
+	}
+
 	public static String toCamelCase(String text, char delimiter) {
 		return CaseUtils.toCamelCase(text, false, delimiter);
 	}
+
+    public static Vector header2CamelCase(String header) {
+		char delim = '\t';
+		return header2CamelCase(header, delim);
+	}
+
+    public static Vector header2CamelCase(String header, char delim) {
+		Vector w0 = new Vector();
+		Vector w = StringUtils.parseData(header, delim);
+		for (int i=0; i<w.size(); i++) {
+			String t = (String) w.elementAt(i);
+			t = StringUtils.toCamelCase(t, ' ');
+			t = t.replace("(s)", "s");
+			int n = t.lastIndexOf("(");
+			if (n != -1) {
+				t = t.substring(0, n);
+			}
+			w0.add(t);
+		}
+		return w0;
+    }
 
     public static boolean isNCItCode(String str) {
 		if (str == null || str.length() == 0) return false;
