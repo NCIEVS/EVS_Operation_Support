@@ -113,10 +113,10 @@ public class CDISCSubsetReportQA {
 			Vector w = (Vector) sourceSYMap.get(codelistcode);
 			if (w == null) {
 				num_errors++;
-				System.out.println("ERROR: " + sourceName + " " + "SY" + " does not exist for codeListCode " + codelistcode);
+				System.out.println("\nERROR: " + sourceName + " " + "SY" + " does not exist for codeListCode " + codelistcode);
 			} else if (w.size() > 1) {
 				num_errors++;
-				System.out.println("ERROR: Multiple " + sourceName + " " + "SY" + " found for codeListCode " + codelistcode);
+				System.out.println("\nERROR: Multiple " + sourceName + " " + "SY" + " found for codeListCode " + codelistcode);
 				Utils.dumpVector(codelistcode, w);
 			} else {
 				String line = (String) codelistcode2LineMap.get(codelistcode);
@@ -125,9 +125,9 @@ public class CDISCSubsetReportQA {
 				String expectedValue = (String) w.elementAt(0);
 				if (expectedValue.compareTo(reportValue) != 0) {
 					num_errors++;
-					System.out.println("ERROR: Incorrect codelistname in report found for codeListCode " + codelistcode);
-					System.out.println("\t: Reported value: " + reportValue);
-					System.out.println("\t: Expected value: " + expectedValue);
+					System.out.println("\nERROR: Incorrect codelistname in report found for codeListCode " + codelistcode);
+					System.out.println("\tReported value: " + reportValue);
+					System.out.println("\tExpected value: " + expectedValue);
 				}
 			}
 		}
@@ -150,18 +150,18 @@ public class CDISCSubsetReportQA {
 			    String reportValue = (String) u.elementAt(4);
 			    if (expectedValue.compareTo(reportValue) != 0) {
 					num_errors++;
-					System.out.println("ERROR: Incorrect " + sourceName + "submission value in report found for codeListCode " + codelistcode);
-					System.out.println("\t: Reported value: " + reportValue);
-					System.out.println("\t: Expected value: " + expectedValue);
+					System.out.println("\nERROR: Incorrect " + sourceName + "submission value in report found for codeListCode " + codelistcode);
+					System.out.println("\tReported value: " + reportValue);
+					System.out.println("\tExpected value: " + expectedValue);
 				}
 			} else {
 				w = (Vector) nciABMap.get(codelistcode);
 				if (w == null || w.size() == 0) {
 					num_errors++;
-					System.out.println("ERROR: " + NCI + " " + "AB" + " does not exist for codelistcode " + codelistcode);
+					System.out.println("\nERROR: " + NCI + " " + "AB" + " does not exist for codelistcode " + codelistcode);
 				} else if (w.size() > 1) {
 					num_errors++;
-					System.out.println("ERROR: Multiple " + NCI + " " + "AB" +  " found for codeListCode " + codelistcode);
+					System.out.println("\nERROR: Multiple " + NCI + " " + "AB" +  " found for codeListCode " + codelistcode);
 					Utils.dumpVector(codelistcode, w);
 				} else {
 					String nci_ab = (String) w.elementAt(0);
@@ -177,10 +177,10 @@ public class CDISCSubsetReportQA {
 							String reportValue = (String) u.elementAt(4);
 							if (expectedValue.compareTo(reportValue) != 0) {
 								num_errors++;
-								System.out.println("ERROR: Incorrect " + sourceName + "submission value in report found for (codeListCode " + codelistcode + ", " +
+								System.out.println("\nERROR: Incorrect " + sourceName + "submission value in report found for (codeListCode " + codelistcode + ", " +
 								code + ")");
-								System.out.println("\t: Reported value: " + reportValue);
-								System.out.println("\t: Expected value: " + expectedValue);
+								System.out.println("\tReported value: " + reportValue);
+								System.out.println("\tExpected value: " + expectedValue);
 								num_errors++;
 							}
 							if (!match_found) {
@@ -189,7 +189,7 @@ public class CDISCSubsetReportQA {
 						}
 					}
 					if (!match_found) {
-						System.out.println("ERROR: Incorrect " + sourceName + "submission value in report found for (codeListCode " + codelistcode + ", " +
+						System.out.println("\nERROR: Incorrect " + sourceName + "submission value in report found for (codeListCode " + codelistcode + ", " +
 						code + ") - expected value not found.");
 						num_errors++;
 					}
@@ -208,15 +208,15 @@ public class CDISCSubsetReportQA {
 			Vector w = (Vector) nciPTMap.get(code);
 			if (w == null) {
 				num_errors++;
-				System.out.println("ERROR: " + NCI + " " + "PT" + " does not exist for code " + code);
+				System.out.println("\nERROR: " + NCI + " " + "PT" + " does not exist for code " + code);
 			} else if (w.size() == 1) {
 				String expectedValue = (String) w.elementAt(0);
 			    String reportValue = (String) u.elementAt(7);
 			    if (expectedValue.compareTo(reportValue) != 0) {
 					num_errors++;
-					System.out.println("ERROR: Incorrect " + NCI + "PT value in report found for code " + code);
-					System.out.println("\t: Reported value: " + reportValue);
-					System.out.println("\t: Expected value: " + expectedValue);
+					System.out.println("\nERROR: Incorrect " + NCI + "PT value in report found for code " + code);
+					System.out.println("\tReported value: " + reportValue);
+					System.out.println("\tExpected value: " + expectedValue);
 				}
 			} else {
 				num_errors++;
@@ -243,13 +243,44 @@ public class CDISCSubsetReportQA {
 			    if (expectedValue.compareTo(reportValue) != 0) {
 					num_errors++;
 					System.out.println("ERROR: Incorrect " + sourceName + " " + "definition value in report found for code " + code);
-					System.out.println("\t: Reported value: " + reportValue);
-					System.out.println("\t: Expected value: " + expectedValue);
+					System.out.println("\tReported value: " + reportValue);
+					System.out.println("\tExpected value: " + expectedValue);
 				}
+/*
 			} else {
 				num_errors++;
-				System.out.println("WARNING: Multiple " + sourceName + " " + "definition found for code " + code);
+				System.out.println("INFO: Multiple " + sourceName + " " + "definition found for code " + code);
 				Utils.dumpVector(code, w);
+			}
+*/
+			} else {
+				String reportValue = (String) u.elementAt(6);
+				reportValue = reportValue.replace("; ", "|");
+				u = StringUtils.parseData(reportValue, '|');
+				if (u.size() != w.size()) {
+					num_errors++;
+					System.out.println("\nERROR: Incorrect " + sourceName + " " + "definition value in report found for code " + code);
+					Utils.dumpVector("\tReported values: ", u);
+					Utils.dumpVector("\tExpected values: ", w);
+				} else {
+					w = new SortUtils().quickSort(w);
+					u = new SortUtils().quickSort(u);
+					boolean bool = true;
+					for (int k=0; k<w.size(); k++) {
+						String t1 = (String) w.elementAt(k);
+						String t2 = (String) u.elementAt(k);
+						if (t1.compareTo(t2) != 0) {
+							bool = false;
+							break;
+						}
+					}
+					if (!bool) {
+						num_errors++;
+						System.out.println("\nERROR: Incorrect " + sourceName + " " + "definition value in report found for code " + code);
+						Utils.dumpVector("\tReported values: ", u);
+						Utils.dumpVector("\tExpected values: ", w);
+					}
+				}
 			}
 		}
 		System.out.println(sourceName + " definition QA produces " + num_errors + " warnings.");
@@ -264,16 +295,45 @@ public class CDISCSubsetReportQA {
 			Vector w = (Vector) sourceSYMap.get(code);
 			if (w == null) {
 				num_errors++;
-				System.out.println("ERROR: " + sourceName + " " + "synonyms" + " does not exist for code " + code);
+				System.out.println("INFO: " + sourceName + " " + "synonyms" + " does not exist for code " + code);
 			} else if (w.size() == 1) {
 				String expectedValue = (String) w.elementAt(0);
 			    String reportValue = (String) u.elementAt(5);
 			    if (expectedValue.compareTo(reportValue) != 0) {
 					num_errors++;
-					System.out.println("ERROR: Incorrect " + sourceName + " " + "synonyms value in report found for code " + code);
-					System.out.println("\t: Reported value: " + reportValue);
-					System.out.println("\t: Expected value: " + expectedValue);
+					System.out.println("\nERROR: Incorrect " + sourceName + " " + "synonyms value in report found for code " + code);
+					System.out.println("\tReported value: " + reportValue);
+					System.out.println("\tExpected value: " + expectedValue);
 				}
+			} else {
+				String reportValue = (String) u.elementAt(5);
+				reportValue = reportValue.replace("; ", "|");
+				u = StringUtils.parseData(reportValue, '|');
+				if (u.size() != w.size()) {
+					num_errors++;
+					System.out.println("\nERROR: Incorrect " + sourceName + " " + "synonyms value in report found for code " + code);
+					Utils.dumpVector("\tReported values: ", u);
+					Utils.dumpVector("\tExpected values: ", w);
+				} else {
+					w = new SortUtils().quickSort(w);
+					u = new SortUtils().quickSort(u);
+					boolean bool = true;
+					for (int k=0; k<w.size(); k++) {
+						String t1 = (String) w.elementAt(k);
+						String t2 = (String) u.elementAt(k);
+						if (t1.compareTo(t2) != 0) {
+							bool = false;
+							break;
+						}
+					}
+					if (!bool) {
+						num_errors++;
+						System.out.println("\nERROR: Incorrect " + sourceName + " " + "synonyms value in report found for code " + code);
+						Utils.dumpVector("\tReported values: ", u);
+						Utils.dumpVector("\tExpected values: ", w);
+					}
+				}
+
 			}
 		}
 		System.out.println(sourceName + " synonym QA produces " + num_errors + " messages.");
@@ -343,7 +403,6 @@ public class CDISCSubsetReportQA {
 		String textfile = args[0];
 		String sourceName = args[1];
 		CDISCSubsetReportQA qa = new CDISCSubsetReportQA(textfile, sourceName);
-
 		qa.reviewCodeListNames();
 		qa.reviewSubmissionValues();
 		qa.reviewSourceDefinitions();
