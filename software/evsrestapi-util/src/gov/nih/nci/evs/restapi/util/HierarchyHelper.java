@@ -889,6 +889,63 @@ public class HierarchyHelper implements Serializable {
 		}
 	}
 
+	public Vector appendParentConceptdData(String filename) {
+		Vector v = Utils.readFile(filename);
+		Vector w = new Vector();
+		String colName = "Parent Concepts";
+		w.add((String) v.elementAt(0) + "\t" + colName);
+		v.remove(0);
+		Vector w1 = appendParentConcepts(v);
+		w.addAll(w1);
+		return w;
+	}
+
+	public Vector appendParentConcepts(Vector lines) {
+		Vector w = new Vector();
+		for (int i=0; i<lines.size(); i++) {
+			String line = (String) lines.elementAt(i);
+			w.add(appendParentConcepts(line));
+		}
+		return w;
+    }
+
+	public static String vector2DelimitedString(Vector v, char delim) {
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<v.size(); i++) {
+			String t = (String) v.elementAt(i);
+			buf.append(t);
+			if (i < v.size()-1) {
+				buf.append("" + delim);
+			}
+		}
+		return buf.toString();
+	}
+
+	public String appendParentConcepts(String line) {
+		Vector u = StringUtils.parseData(line, '\t');
+		if (u.contains("No match")) return line;
+        String t0 = (String) u.elementAt(0);
+        String codestr = (String) u.elementAt(1);
+        String super_display_names = "";
+        Vector w1 = new Vector();
+        Vector w2 = new Vector();
+        Vector codes = StringUtils.parseData(codestr, '|');
+        for (int i=0; i<codes.size(); i++) {
+			String code = (String) codes.elementAt(i);
+			Vector v1 = getSuperclassCodes(code);
+			Vector parents = new Vector();
+			for (int k=0; k<v1.size(); k++) {
+				String super_code = (String) v1.elementAt(k);
+				String super_label = getLabel(super_code);
+				String sup = super_label + " (" + super_code + ")";
+				parents.add(sup);
+			}
+			w1.add(vector2DelimitedString(parents, '$'));
+		}
+		String retstr = vector2DelimitedString(w1, '|');
+		return line + "\t" + retstr;
+	}
+
     public static void main(String[] args) {
 		Vector v = Utils.readFile("tvs_rel.txt");
 		HierarchyHelper test = new HierarchyHelper(v, 1);
