@@ -946,6 +946,70 @@ public class HierarchyHelper implements Serializable {
 		return line + "\t" + retstr;
 	}
 
+    // format class\tlabel\tparents ('|' delimited)
+	public static void generateUserTree(String filename) {
+		Vector w = new Vector();
+		int n = 0;
+		HashMap label2CodeMap = new HashMap();
+		Vector v = Utils.readFile(filename);
+		for (int i=1; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '\t');
+			if (u.size() == 2) {
+				System.out.println("WARNING: " + line + " -- No Parent");
+				u.add("root");
+			}
+			String parents = (String) u.elementAt(2);
+			Vector u2 = StringUtils.parseData(parents, '|');
+			String className = (String) u.elementAt(0);
+			String label = (String) u.elementAt(1);
+			for (int j=0; j<u2.size(); j++) {
+				String parent = (String) u2.elementAt(j);
+				parent = parent.trim();
+				if (!label2CodeMap.containsKey(parent)) {
+					n++;
+					label2CodeMap.put(parent, "c_" + n);
+				}
+				if (!label2CodeMap.containsKey(label)) {
+					n++;
+					label2CodeMap.put(label, "c_" + n);
+				}
+				w.add(parent + "|" + (String) label2CodeMap.get(parent) + "|" + label + "|" + (String) label2CodeMap.get(label));
+			}
+		}
+		String heirdata = "hier_" + filename;
+		Utils.saveToFile(heirdata, w);
+		System.out.println("Printing tree...");
+
+		HierarchyHelper hh = new HierarchyHelper(w);
+		PrintWriter pw = null;
+		String asciitreefile = "tree_" + filename;
+		try {
+			pw = new PrintWriter(asciitreefile, "UTF-8");
+			hh.printTree(pw);
+		} catch (Exception ex) {
+
+		} finally {
+			try {
+				pw.close();
+				System.out.println("Output file " + asciitreefile + " generated.");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		System.out.println("Done.");
+		Vector w1 = new Vector();
+		v = Utils.readFile(asciitreefile);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			n = line.lastIndexOf("(");
+			line = line.substring(0, n);
+			w1.add(line);
+		}
+		Utils.saveToFile(asciitreefile, w1);
+	}
+
+
     public static void main(String[] args) {
 		Vector v = Utils.readFile("tvs_rel.txt");
 		HierarchyHelper test = new HierarchyHelper(v, 1);
