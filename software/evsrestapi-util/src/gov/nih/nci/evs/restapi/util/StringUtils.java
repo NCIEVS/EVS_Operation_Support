@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.URI;
 import java.text.*;
 import java.util.*;
+import java.util.regex.*;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.nio.file.*;
@@ -62,6 +63,7 @@ import org.apache.commons.text.*;
  */
 public class StringUtils {
 
+    static String DATE_PATTERN = "^[0-3]?[0-9]/[0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2}$";
 	public static Vector parseData(String t, String delimStr) {
 		String delim_vec = "|$%#&*@^!?<>-+=:;\"";
 		for (int i=0; i<delim_vec.length(); i++) {
@@ -73,6 +75,12 @@ public class StringUtils {
 			}
 		}
 		return null;
+	}
+
+	public static boolean datePatternMatched(String date) {
+		Pattern pattern = Pattern.compile(DATE_PATTERN);
+		Matcher matcher = pattern.matcher(date);
+		return matcher.matches();
 	}
 
 	public static String replace(String s, String from, String to) {
