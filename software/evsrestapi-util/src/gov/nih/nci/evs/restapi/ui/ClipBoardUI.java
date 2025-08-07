@@ -1,6 +1,6 @@
 package gov.nih.nci.evs.restapi.ui;
-import gov.nih.nci.evs.restapi.config.*;
 import gov.nih.nci.evs.restapi.util.*;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.AWTException;
@@ -16,8 +16,8 @@ import static java.awt.event.KeyEvent.*;
 
 import java.awt.*;
 
-
 public class ClipBoardUI {
+
     public String OUTPUT_DIR = "output";
     public String PREFIX = "F";
     JFrame frame = null;
@@ -218,11 +218,13 @@ public class ClipBoardUI {
         return defaultToolkit.getSystemClipboard();
     }
 
+/*
     public static void main(String args[]) {
         ClipBoardUI ui = null;//new ClipBoardUI();
-        String outputDir = ConfigurationController.output_dir;
+        String outputDir = ConfigurationController.nccn_output_dir;
         String prefix = "F";
         ui = new ClipBoardUI(outputDir, prefix);
         ui.initialize();
 	}
+*/
 }
