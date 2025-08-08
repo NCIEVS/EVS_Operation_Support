@@ -946,23 +946,24 @@ public class HierarchyHelper implements Serializable {
 		return line + "\t" + retstr;
 	}
 
-    // format class\tlabel\tparents ('|' delimited)
-	public static void generateUserTree(String filename) {
+	public static String generateUserTree(String filename) {
 		Vector w = new Vector();
 		int n = 0;
 		HashMap label2CodeMap = new HashMap();
+		label2CodeMap.put("Root", "c_0");
 		Vector v = Utils.readFile(filename);
 		for (int i=1; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '\t');
 			if (u.size() == 2) {
 				System.out.println("WARNING: " + line + " -- No Parent");
-				u.add("root");
+				u.add("Root");
 			}
 			String parents = (String) u.elementAt(2);
 			Vector u2 = StringUtils.parseData(parents, '|');
 			String className = (String) u.elementAt(0);
 			String label = (String) u.elementAt(1);
+			label = label.trim();
 			for (int j=0; j<u2.size(); j++) {
 				String parent = (String) u2.elementAt(j);
 				parent = parent.trim();
@@ -998,18 +999,83 @@ public class HierarchyHelper implements Serializable {
 				ex.printStackTrace();
 			}
 		}
-		System.out.println("Done.");
+
 		Vector w1 = new Vector();
 		v = Utils.readFile(asciitreefile);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			n = line.lastIndexOf("(");
-			line = line.substring(0, n);
+			line = line.substring(0, n-1);
 			w1.add(line);
 		}
 		Utils.saveToFile(asciitreefile, w1);
+		Vector orphans = findOrphans(asciitreefile);
+		Vector roots = findRootsInASCIITreeFile(asciitreefile);
+		insertOrphans(asciitreefile, orphans);
+		System.out.println("Done.");
+		return asciitreefile;
 	}
 
+	public static Vector findOrphans(String asciitreefile) {
+		Vector v = Utils.readFile(asciitreefile);
+		boolean start = false;
+		Vector orphans = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (line.compareTo("Root") == 0) {
+				start = true;
+			}
+			if (start && line.compareTo("Root") != 0) {
+				if (!line.startsWith("\t")) {
+					break;
+				}
+				orphans.add(line.substring(1, line.length()));
+			}
+		}
+		return orphans;
+	}
+
+	public static Vector findRootsInASCIITreeFile(String asciitreefile) {
+		Vector v = Utils.readFile(asciitreefile);
+		Vector roots = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (line.compareTo("Root") != 0 && !line.startsWith("\t")) {
+				roots.add(line);
+			}
+		}
+		return new SortUtils().quickSort(roots);
+	}
+
+	public static void insertOrphans(String asciitreefile, Vector orphans) {
+		for (int i=0; i<orphans.size(); i++) {
+			String orphan = (String) orphans.elementAt(i);
+			insertOrphan(asciitreefile, orphan);
+		}
+	}
+
+	public static void insertOrphan(String asciitreefile, String orphan) {
+		Vector roots = findRootsInASCIITreeFile(asciitreefile);
+		String root = null;
+		for (int i=0; i<roots.size(); i++) {
+			root = (String) roots.elementAt(i);
+			if (root.compareTo(orphan) >= 0) {
+				break;
+			}
+		}
+		Vector w = new Vector();
+		Vector v = Utils.readFile(asciitreefile);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (line.compareTo(root) == 0) {
+				w.add(orphan);
+			}
+			if (line.compareTo("Root") != 0 && line.compareTo("\t" + orphan) != 0) {
+				w.add(line);
+			}
+		}
+		Utils.saveToFile(asciitreefile, w);
+	}
 
     public static void main(String[] args) {
 		Vector v = Utils.readFile("tvs_rel.txt");
