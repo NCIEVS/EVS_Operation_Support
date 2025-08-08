@@ -978,6 +978,7 @@ public class HierarchyHelper implements Serializable {
 			}
 		}
 		String heirdata = "hier_" + filename;
+		w = new SortUtils().quickSort(w);
 		Utils.saveToFile(heirdata, w);
 		System.out.println("Printing tree...");
 

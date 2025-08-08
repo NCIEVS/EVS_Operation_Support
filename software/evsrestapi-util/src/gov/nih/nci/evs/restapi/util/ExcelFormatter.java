@@ -416,6 +416,13 @@ v.	H is a width of 35
 			HSSFRow sheetrow = resultSheet.getRow(0); // Row number
 			HSSFCellStyle style = resultWorkbook.createCellStyle();
 
+			Font font= resultWorkbook.createFont();
+			font.setFontName("Arial");
+			font.setBold(true);
+			font.setItalic(false);
+			font.setFontHeightInPoints((short) 12);
+
+            style.setFont(font);
 			style.setWrapText(true);   //Wrapping text
 			style.setVerticalAlignment(VerticalAlignment.CENTER);
 			/*
