@@ -955,28 +955,32 @@ public class HierarchyHelper implements Serializable {
 		for (int i=1; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '\t');
-			if (u.size() == 2) {
+			if (u.size() == 1) {
+				System.out.println("Incomplete data - " + line);
+			} else if (u.size() == 2) {
 				System.out.println("WARNING: " + line + " -- No Parent");
 				u.add("Root");
 			}
-			String parents = (String) u.elementAt(2);
-			Vector u2 = StringUtils.parseData(parents, '|');
-			String className = (String) u.elementAt(0);
-			String label = (String) u.elementAt(1);
-			label = label.trim();
-			for (int j=0; j<u2.size(); j++) {
-				String parent = (String) u2.elementAt(j);
-				parent = parent.trim();
-				if (!label2CodeMap.containsKey(parent)) {
-					n++;
-					label2CodeMap.put(parent, "c_" + n);
+			if (u.size() == 3) {
+				String parents = (String) u.elementAt(2);
+				Vector u2 = StringUtils.parseData(parents, '|');
+				String className = (String) u.elementAt(0);
+				String label = (String) u.elementAt(1);
+				label = label.trim();
+				for (int j=0; j<u2.size(); j++) {
+					String parent = (String) u2.elementAt(j);
+					parent = parent.trim();
+					if (!label2CodeMap.containsKey(parent)) {
+						n++;
+						label2CodeMap.put(parent, "c_" + n);
+					}
+					if (!label2CodeMap.containsKey(label)) {
+						n++;
+						label2CodeMap.put(label, "c_" + n);
+					}
+					w.add(parent + "|" + (String) label2CodeMap.get(parent) + "|" + label + "|" + (String) label2CodeMap.get(label));
 				}
-				if (!label2CodeMap.containsKey(label)) {
-					n++;
-					label2CodeMap.put(label, "c_" + n);
-				}
-				w.add(parent + "|" + (String) label2CodeMap.get(parent) + "|" + label + "|" + (String) label2CodeMap.get(label));
-			}
+	    	}
 		}
 		String heirdata = "hier_" + filename;
 		w = new SortUtils().quickSort(w);
