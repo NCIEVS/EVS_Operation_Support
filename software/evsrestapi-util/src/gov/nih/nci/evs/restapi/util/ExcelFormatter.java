@@ -122,12 +122,30 @@ v.	H is a width of 35
 					cell.setCellStyle(cellStyle);
 				}
 		    }
-			//break;
 			row_num++;
 		}
 	}
 
 	public static String reformat(String xlsfile, String outputfile) {
+		Vector<Integer> widths = new Vector();
+		widths.add(Integer.valueOf(8 * 256));
+		widths.add(Integer.valueOf(8 * 256));
+		widths.add(Integer.valueOf(12 * 256));
+		widths.add(Integer.valueOf(35 * 256));
+		widths.add(Integer.valueOf(35 * 256));
+		widths.add(Integer.valueOf(35 * 256));
+		widths.add(Integer.valueOf(64 * 256));
+		widths.add(Integer.valueOf(35 * 256));
+		return reformat(xlsfile, outputfile, widths);
+	}
+
+	public static String reformat(String xlsfile, String outputfile, Vector<Integer> widths) {
+		 short firstRowColor = IndexedColors.YELLOW.getIndex();
+		return reformat(xlsfile, outputfile, widths, firstRowColor);
+	}
+
+
+	public static String reformat(String xlsfile, String outputfile, Vector<Integer> widths, short firstRowColor) {
 		if (outputfile == null) {
 			outputfile = "modified_" + xlsfile;
 			System.out.println(xlsfile);
@@ -142,6 +160,12 @@ v.	H is a width of 35
 			HSSFRow row = null;
 			HSSFCell cell = null;
 
+            for (int k=0; k<widths.size(); k++) {
+				Integer int_obj = (Integer) widths.elementAt(k);
+				int m = int_obj.intValue();
+				sheet.setColumnWidth(k, m);
+			}
+			/*
 			sheet.setColumnWidth(0, 8 * 256);   //A
 			sheet.setColumnWidth(1, 8 * 256);   //B
 			sheet.setColumnWidth(2, 12 * 256);  //C
@@ -150,6 +174,7 @@ v.	H is a width of 35
 			sheet.setColumnWidth(5, 35 * 256);  //F
 			sheet.setColumnWidth(6, 64 * 256);  //G
 			sheet.setColumnWidth(7, 35 * 256);  //H
+			*/
 
             int n = xlsfile.lastIndexOf(".");
 			//String sheetName = xlsfile.substring(0,n);
@@ -209,6 +234,13 @@ v.	H is a width of 35
 			row = null;
 			cell = null;
 
+
+            for (int k=0; k<widths.size(); k++) {
+				Integer int_obj = (Integer) widths.elementAt(k);
+				int m = int_obj.intValue();
+				sheet.setColumnWidth(k, m);
+			}
+			/*
 			sheet.setColumnWidth(0, 8 * 256);   //A
 			sheet.setColumnWidth(1, 12 * 256);  //B
 			sheet.setColumnWidth(2, 35 * 256);  //C
@@ -219,6 +251,7 @@ v.	H is a width of 35
 			sheet.setColumnWidth(7, 64 * 256);  //H
 			sheet.setColumnWidth(8, 64 * 256);  //I
 			sheet.setColumnWidth(9, 64 * 256);  //J
+			*/
 
             n = xlsfile.lastIndexOf(".");
 			//String sheetName = xlsfile.substring(0,n);
@@ -295,7 +328,7 @@ v.	H is a width of 35
 		}
 		//hightlightFirstRow(outputfile, 1);
 		//hightlightFirstRow(outputfile, 2);
-		hightlightFirstRow(outputfile, 0);
+		hightlightFirstRow(outputfile, 0, firstRowColor);
 		return outputfile;
 	}
 
@@ -369,65 +402,12 @@ v.	H is a width of 35
 		return value;
 	}
 
-/*
-    private static String getCellData(Cell cell) {
-        switch (cell.getCellTypeEnum()) {
-            case BOOLEAN:
-                System.out.print(cell.getBooleanCellValue());
-                Boolean bool_obj = cell.getBooleanCellValue();
-                boolean bool = Boolean.valueOf(bool_obj);
-                return "" + bool;
-
-            case STRING:
-                return (cell.getRichStringCellValue().getString());
-
-            case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    return ("" + cell.getDateCellValue());
-                } else {
-                    return ("" + cell.getNumericCellValue());
-                }
-
-            case FORMULA:
-                return(cell.getCellFormula().toString());
-
-            case BLANK:
-                return "";
-
-            default:
-                return "";
-        }
-    }
-*/
-/*
-	private static String getCellData(Cell cell) {
-		String value = null;
-		if (cell == null) {
-			return null;
-		}
-		switch (cell.getCellType()) {
-			case HSSFCell.CELL_TYPE_STRING:
-				value = cell.getStringCellValue();
-				break;
-			case HSSFCell.CELL_TYPE_FORMULA:
-				value = cell.getCellFormula();
-				break;
-			case HSSFCell.CELL_TYPE_NUMERIC:
-				HSSFDataFormatter dataFormatter = new HSSFDataFormatter();
-				value = dataFormatter.formatCellValue(cell);
-				break;
-			case HSSFCell.CELL_TYPE_BLANK:
-				value = null;
-				break;
-			case HSSFCell.CELL_TYPE_ERROR:
-				value = "#ERROR#";
-				break;
-		}
-		return value;
-	}
-*/
-
     public static void hightlightFirstRow(String excelfile, int sheetIndex) {
+		short colorIndex = IndexedColors.YELLOW.getIndex();
+		hightlightFirstRow(excelfile, sheetIndex, colorIndex);
+	}
+
+    public static void hightlightFirstRow(String excelfile, int sheetIndex, short colorIndex) {
 		try {
 			FileInputStream inputStream = new FileInputStream(new File(excelfile));
 			HSSFWorkbook resultWorkbook = new HSSFWorkbook(inputStream);
@@ -438,8 +418,13 @@ v.	H is a width of 35
 
 			style.setWrapText(true);   //Wrapping text
 			style.setVerticalAlignment(VerticalAlignment.CENTER);
+			/*
 			style.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
 			style.setFillBackgroundColor(IndexedColors.YELLOW.getIndex());
+			*/
+			style.setFillForegroundColor(colorIndex);
+			style.setFillBackgroundColor(colorIndex);
+
 			style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
 			style.setBorderTop(BorderStyle.THIN);
@@ -463,7 +448,16 @@ v.	H is a width of 35
 
 	public static void main(String[] args) {
 		String xlsfile = args[0];
-		reformat(xlsfile, xlsfile);
+		FileUtils.copyfile(xlsfile, "bak_" + xlsfile);
+		//Regimen Name	Disease Name	Indication(s)	Template ID	Last Modified Date
+		Vector widths = new Vector();
+		widths.add(Integer.valueOf(36 * 256));
+		widths.add(Integer.valueOf(36 * 256));
+		widths.add(Integer.valueOf(48 * 256));
+		widths.add(Integer.valueOf(8 * 256));
+		widths.add(Integer.valueOf(16 * 256));
+		short firstRowColor = IndexedColors.LIGHT_GREEN.getIndex();
+		reformat(xlsfile, xlsfile, widths, firstRowColor);
 	}
 }
 
