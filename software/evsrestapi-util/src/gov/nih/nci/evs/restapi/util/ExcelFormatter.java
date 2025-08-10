@@ -483,12 +483,16 @@ v.	H is a width of 35
 		return col_widths;
 	}
 
-	public static void main(String[] args) {
-		String xlsfile = args[0];
+	public static void reformat(String xlsfile, short firstRowColor) {
 		FileUtils.copyfile(xlsfile, "bak_" + xlsfile);
 		Vector<Integer> widths = getColWidthEstimates(xlsfile, 0);
-		short firstRowColor = IndexedColors.LIGHT_GREEN.getIndex();
 		reformat(xlsfile, xlsfile, widths, firstRowColor);
+	}
+
+	public static void main(String[] args) {
+		String xlsfile = args[0];
+		short firstRowColor = IndexedColors.LIGHT_GREEN.getIndex();
+		reformat(xlsfile, firstRowColor);
 	}
 }
 
