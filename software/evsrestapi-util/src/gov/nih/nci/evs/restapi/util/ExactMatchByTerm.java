@@ -526,7 +526,7 @@ public class ExactMatchByTerm {
 	}
 
 	public static String run(String datafile, String outputfile, int colIndex) {
-		boolean generateXLS = true;
+		boolean generateXLS = false;
 		return run(datafile, outputfile, colIndex, generateXLS);
 	}
 
