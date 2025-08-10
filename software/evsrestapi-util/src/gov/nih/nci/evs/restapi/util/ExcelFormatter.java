@@ -240,19 +240,6 @@ v.	H is a width of 35
 				int m = int_obj.intValue();
 				sheet.setColumnWidth(k, m);
 			}
-			/*
-			sheet.setColumnWidth(0, 8 * 256);   //A
-			sheet.setColumnWidth(1, 12 * 256);  //B
-			sheet.setColumnWidth(2, 35 * 256);  //C
-			sheet.setColumnWidth(3, 24 * 256);  //D
-			sheet.setColumnWidth(4, 12 * 256);  //E
-			sheet.setColumnWidth(5, 35 * 256);  //F
-			sheet.setColumnWidth(6, 35 * 256);  //G
-			sheet.setColumnWidth(7, 64 * 256);  //H
-			sheet.setColumnWidth(8, 64 * 256);  //I
-			sheet.setColumnWidth(9, 64 * 256);  //J
-			*/
-
             n = xlsfile.lastIndexOf(".");
 			//String sheetName = xlsfile.substring(0,n);
 			font= wb.createFont();
@@ -453,16 +440,53 @@ v.	H is a width of 35
 		}
 	}
 
+	public static Vector<Integer> getColWidthEstimates(String xlsfile, int sheet_num) {
+		Vector col_widths = new Vector();
+        try {
+        	String textfile = ExcelDiffUtils.exportXLSFile(xlsfile);
+        	System.out.println(textfile + " generated.");
+        	Vector v = Utils.readFile(textfile);
+			String line = (String) v.elementAt(0);
+			Vector u = StringUtils.parseData(line, '\t');
+        	int numCol = u.size();
+         	int[] widths = new int[numCol];
+        	for (int k=0; k<numCol; k++) {
+				widths[k] = 0;
+			}
+        	for (int i=0; i<v.size(); i++) {
+				line = (String) v.elementAt(i);
+				u = StringUtils.parseData(line, '\t');
+				for (int j=0; j<u.size(); j++) {
+					String value = (String) u.elementAt(j);
+					int length = value.length();
+					if (length > widths[j]) {
+						widths[j] = length;
+					}
+				}
+			}
+			for (int k=0; k<numCol; k++) {
+				int n = widths[k];
+				int m = 0;
+				if (n > 0 && n <= 50) {
+					m = 16 * 256;
+				} else if (n < 500) {
+					m = 36 * 256;
+				} else {
+					m = 60 * 256;
+				}
+				col_widths.add(Integer.valueOf(m));
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return col_widths;
+	}
+
 	public static void main(String[] args) {
 		String xlsfile = args[0];
 		FileUtils.copyfile(xlsfile, "bak_" + xlsfile);
-		//Regimen Name	Disease Name	Indication(s)	Template ID	Last Modified Date
-		Vector widths = new Vector();
-		widths.add(Integer.valueOf(36 * 256));
-		widths.add(Integer.valueOf(36 * 256));
-		widths.add(Integer.valueOf(48 * 256));
-		widths.add(Integer.valueOf(8 * 256));
-		widths.add(Integer.valueOf(16 * 256));
+		Vector<Integer> widths = getColWidthEstimates(xlsfile, 0);
 		short firstRowColor = IndexedColors.LIGHT_GREEN.getIndex();
 		reformat(xlsfile, xlsfile, widths, firstRowColor);
 	}
