@@ -6,6 +6,7 @@ import java.net.*;
 import java.util.*;
 import java.nio.file.*;
 import java.nio.charset.Charset;
+import org.apache.poi.ss.usermodel.IndexedColors;
 
 /**
  * <!-- LICENSE_TEXT_START -->
@@ -525,11 +526,11 @@ public class ExactMatchByTerm {
 	}
 
 	public static String run(String datafile, String outputfile, int colIndex) {
+		boolean generateXLS = true;
+		return run(datafile, outputfile, colIndex, generateXLS);
+	}
 
-		System.out.println("datafile: " + datafile);
-		System.out.println("outputfile: " + outputfile);
-		System.out.println("colIndex: " + colIndex);
-
+	public static String run(String datafile, String outputfile, int colIndex, boolean generateXLS) {
 		int col = colIndex;
 		long ms = System.currentTimeMillis();
 		Vector no_matches = new Vector();
@@ -587,6 +588,22 @@ public class ExactMatchByTerm {
 		Utils.saveToFile("matches_" + outputfile, matches);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 		System.out.println(outputfile + " generated.");
+
+        if (generateXLS) {
+			String textfile = outputfile;
+			int n = textfile.lastIndexOf(".");
+			String sheetName = textfile.substring(0, n);
+			String xlsfile = null;
+			char delim = '\t';
+			try {
+				xlsfile = ExcelReadWriteUtils.writeXLSFile(textfile, delim, sheetName);
+				short firstRowColor = IndexedColors.LIGHT_GREEN.getIndex();
+				ExcelFormatter.reformat(xlsfile, firstRowColor);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+
 		return outputfile;
 	}
 
