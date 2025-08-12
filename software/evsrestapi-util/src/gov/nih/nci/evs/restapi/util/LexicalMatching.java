@@ -210,12 +210,14 @@ public class LexicalMatching {
     public static String removeSpecialCharacters(String t) {
 		t = t.replace("/", " ");
 		t = t.replace("-", " ");
+		t = t.replace("—", " ");
 		t = t.replace("(", " ");
 		t = t.replace(")", " ");
 		t = t.replace(",", " ");
 		t = t.replace(";", " ");
 		t = t.replace("'s", " ");
 		t = t.replace(":", " ");
+		t = t.replace("+", " ");
 		return t;
 	}
 

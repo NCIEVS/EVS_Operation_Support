@@ -63,9 +63,9 @@ import opennlp.tools.stemmer.PorterStemmer;
 
 
 public class Normalizer {
-	public static HashSet STOP_WORD_SET = null;
-	public static String SYNONYM_FILE = "synonym.txt";
-	public static String DISCARDED_WORD_FILE = "discarded.txt";
+	public static HashSet STOP_WORD_SET = new HashSet();
+	//public static String SYNONYM_FILE = "synonym.txt";
+	//public static String DISCARDED_WORD_FILE = "discarded.txt";
 	public static String STOP_WORD_FILE = "stop_words.txt";
     static PorterStemmer stemmer = null;
 
@@ -219,9 +219,6 @@ public class Normalizer {
 				terms.add(s2);
 
 				Vector w = tokenize(s2, applyStem);
-				//Utils.dumpVector(s2, w);
-				//ALK and ALK gene fusions
-
 				Vector w1 = new Vector();
 				for (int k=0; k<w.size(); k++) {
 					String t = (String) w.elementAt(k);
@@ -319,19 +316,186 @@ public class Normalizer {
 		return w;
 	}
 
-/*
-	public static void main(String[] args) {
-		long ms = System.currentTimeMillis();
-		Vector w1 = normalize("RelevantMolecularTargets.txt", 1);
-		Vector w2 = normalize("RelevantMolecularTargets.txt", 2);
-		w1.addAll(w2);
-		w1 = removeDuplicates(w1);
-		w1 = new SortUtils().quickSort(w1);
-        Utils.saveToFile("tokens.txt", w1);
-        System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	public static Vector run(Vector terms) {
+		char delim = '\t';
+		return run(terms, delim);
 	}
-*/
-	public static void main(String[] args) {
+
+
+	public static Vector run(Vector terms, char delim) {
+		Vector w = new Vector();
+		for (int i=0; i<terms.size(); i++) {
+			String term = (String) terms.elementAt(i);
+			w.add(term + delim + run(term));
+		}
+		return w;
+	}
+
+	public static boolean isAllDigits(String str) {
+		try {
+			int n = Integer.parseInt(str);
+		} catch (Exception ex) {
+			return false;
+		}
+		return true;
+	}
+
+	public static String run(String term) {
+		System.out.println("term: " + term);
+		System.out.println("\tStep 1");
+		String t = term.replaceAll("[^\\x00-\\x7F]", "*");
+		Vector u = StringUtils.parseData(t, '*');
+		if (u.size() > 1) {
+			t = (String) u.elementAt(0);
+		}
+		term = t;
+		int n1 = term.indexOf("(");
+		int n2 = term.indexOf(")");
+		if (n1 != -1 && n2 != -1 && n2 > n1) {
+			String bracket_term = term.substring(n1+1, n2);
+			String bracket_term_uc = bracket_term.toUpperCase();
+
+			System.out.println("bracket_term: " + bracket_term);
+			System.out.println("bracket_term_uc: " + bracket_term_uc);
+
+			t = null;
+			if (bracket_term_uc.compareTo(bracket_term) != 0) {
+				t = term.substring(0, n1-1);
+				t = term.replace("(" + bracket_term + ")", "");
+				t = t.replace(bracket_term, "");
+				t = t.replace("()", "");
+				t = t.trim();
+
+				System.out.println("t: " + t);
+			}
+
+			if (t != null) {
+				term = t;
+				term = term.replace(" /", "/");
+			}
+		}
+		System.out.println("\tStep 2 " + term);
+		String term_lc = term.toLowerCase();
+		term_lc = term_lc.replace(" + ", "/");
+		term_lc = term_lc.replace("adjuvant ", " ");
+		term_lc = term_lc.replace("weekly ", "");
+		term_lc = term_lc.replace(" /", "/");
+		term_lc = term_lc.replace("/ ", "/");
+		term_lc = term_lc.replace(" or ", "/");
+		term_lc = term_lc.replace("  ", " ");
+
+		System.out.println("\tStep 3");
+
+		int n = term_lc.indexOf("every ");
+		if (n != -1) {
+			term_lc = term_lc.substring(0, n);
+			term_lc = term_lc.trim();
+		}
+
+        n = term_lc.lastIndexOf("days ");
+        if (n != -1) {
+			term_lc = term_lc.substring(0, n-1);
+			return term_lc;
+		}
+
+		n = term_lc.indexOf("followed by ");
+		if (n != -1) {
+			term_lc = term_lc.substring(0, n);
+			term_lc = term_lc.trim();
+		}
+		n = term_lc.indexOf("with concurrent ");
+		if (n != -1) {
+			term_lc = term_lc.substring(0, n);
+			term_lc = term_lc.trim();
+		}
+
+		n = term_lc.indexOf("reinduction chemotherapy");
+		if (n != -1) {
+			term_lc = term_lc.substring(0, n);
+			term_lc = term_lc.trim();
+		}
+
+        n = term_lc.lastIndexOf(" - consolidation");
+        if (n != -1) {
+			term_lc = term_lc.substring(0, n-1);
+			term_lc = term_lc.trim();
+			//return term_lc;
+		}
+
+        n = term_lc.lastIndexOf(" - induction");
+        if (n != -1) {
+			term_lc = term_lc.substring(0, n-1);
+			term_lc = term_lc.trim();
+			//return term_lc;
+		}
+
+        n = term_lc.lastIndexOf("continuous infusion");
+        if (n != -1) {
+			term_lc = term_lc.substring(0, n-1);
+			term_lc = term_lc.trim();
+			//return term_lc;
+		}
+        n = term_lc.lastIndexOf(" - consolidation");
+        if (n != -1) {
+			term_lc = term_lc.substring(0, n-1);
+			term_lc = term_lc.trim();
+			//return term_lc;
+		}
+
+        n = term_lc.lastIndexOf(" - induction");
+        if (n != -1) {
+			term_lc = term_lc.substring(0, n-1);
+			term_lc = term_lc.trim();
+			//return term_lc;
+		}
+
+        n = term_lc.lastIndexOf(" - age");
+        if (n != -1) {
+			term_lc = term_lc.substring(0, n-1);
+			term_lc = term_lc.trim();
+			//return term_lc;
+		}
+
+        n = term_lc.lastIndexOf("- maintenance");
+        if (n != -1) {
+			term_lc = term_lc.substring(0, n-1);
+			term_lc = term_lc.trim();
+			//return term_lc;
+		}
+
+        System.out.println("\tStep 4");
+		n = term_lc.indexOf(" ");
+		boolean bool = true;
+		if (n == -1) {
+			Vector u2 = StringUtils.parseData(term_lc, '/');
+			if (u2.size() > 1) {
+				u2 = new SortUtils().quickSort(u2);
+				StringBuffer buf = new StringBuffer();
+				for (int j=0; j<u2.size(); j++) {
+					String t1 = (String) u2.elementAt(j);
+					if (isAllDigits(t1)) {
+						bool = false;
+						break;
+					}
+					buf.append(t1);
+					if (j < u2.size()-1) {
+						buf.append("/");
+					}
+				}
+				if (bool) {
+					term_lc = buf.toString();
+				}
+			}
+		}
+        System.out.println("\tStep 5");
+
+		if (term_lc.startsWith("augmented") && !term_lc.startsWith("regiment")) {
+			term_lc = term_lc + " regimen";
+		}
+		return term_lc;
+	}
+
+	public static void main6(String[] args) {
 		long ms = System.currentTimeMillis();
 		Vector w1 = normalize("RelevantMolecularTargets.txt", 0, 1);
 		Vector w2 = normalize("RelevantMolecularTargets.txt", 0, 2);
@@ -342,15 +506,15 @@ public class Normalizer {
         System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
-/*
 	public static void main(String[] args) {
-		String filename = args[0];
-		Vector v = readFile(filename);
-		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			parseMatchData(line);
-		}
+		String term = "Standard-Dose Cytarabine/IDArubicin (5 + 2) – Re-Induction";
+		String normalized_term = run(term);
+
+		System.out.println(term);
+		System.out.println(normalized_term);
+
 	}
-*/
+
 }
 
+//Standard-Dose Cytarabine/IDArubicin (5 + 2) – Re-Induction
