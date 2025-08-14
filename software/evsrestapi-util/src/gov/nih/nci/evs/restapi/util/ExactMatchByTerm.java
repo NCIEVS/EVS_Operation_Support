@@ -131,32 +131,6 @@ public class ExactMatchByTerm {
 
         branch = new HashSet();
         Vector codes = null;
-
-        String restrictedcodefile = ConfigurationController.restrictedcodefile;
-        if (restrictedcodefile != null && restrictedcodefile.compareTo("null") != 0) {
-			 codes = Utils.readFile(restrictedcodefile);
-			 branch = Utils.vector2HashSet(codes);
-
-		} else {
-			String branchfile = ConfigurationController.branchfile;
-			if (branchfile != null && branchfile.compareTo("null") != 0) {
-				file = new File(branchfile);
-				if (!file.exists()) {
-					System.out.println(branchfile + " does not exists.");
-					String HIER_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile;
-					Vector v = Utils.readFile(HIER_FILE);
-					HierarchyHelper hh = new HierarchyHelper(v);
-					int n = branchfile.indexOf(".");
-					String root = branchfile.substring(0, n);//"C62634";
-					codes = extractBranchCodes(root);
-					Utils.saveToFile(branchfile, codes);
-				} else {
-					System.out.println(branchfile + " exists.");
-					codes = Utils.readFile(branchfile);
-				}
-				branch = Utils.vector2HashSet(codes);
-			}
-		}
 	}
 
 	public static Vector extractBranchCodes(String root) {
@@ -531,6 +505,10 @@ public class ExactMatchByTerm {
 	}
 
 	public static String run(String datafile, String outputfile, int colIndex, boolean generateXLS) {
+		return run(new HashSet(), datafile, outputfile, colIndex, generateXLS);
+	}
+
+	public static String run(HashSet branch, String datafile, String outputfile, int colIndex, boolean generateXLS) {
 		int col = colIndex;
 		long ms = System.currentTimeMillis();
 		Vector no_matches = new Vector();
@@ -539,6 +517,7 @@ public class ExactMatchByTerm {
         Vector w = new Vector();
         String header = (String) v.elementAt(0);
         w.add(header + "\tMatched NCIt Code(s)\tNCI PT(s)\tNCI SY(s)");
+
         no_matches.add(header);
         matches.add(header + "\tMatched NCIt Code(s)\tNCI PT(s)\tNCI SY(s)");
 		for (int i=1; i<v.size(); i++) {
