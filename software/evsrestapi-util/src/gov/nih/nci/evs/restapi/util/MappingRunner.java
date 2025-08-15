@@ -207,7 +207,8 @@ public class MappingRunner {
 		return outputfile;
 	}
 
-	public static String runContainsSearch(String datafile, int col) {
+	public static String runContainsSearch(String termfile, String datafile, int col) {
+		ContainsSearch cs = new ContainsSearch(termfile);
 		//String outputfile = ContainsSearch.run(filename, col);
 		long ms = System.currentTimeMillis();
 		String outputfile = "results_" + datafile;
@@ -218,12 +219,12 @@ public class MappingRunner {
 		heading = heading + "\t" + "Matched NCIt Code(s)\tNCI PT(s)\tNCI SY(s)";
 		Vector w = new Vector();
 		output_vec.add(heading);
-		for (int i=0; i<v.size(); i++) {
+		for (int i=1; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			u = StringUtils.parseData(line, '\t');
 			String term = (String) u.elementAt(col);
 			term = term.toLowerCase();
-			w = ContainsSearch.contains(term);
+			w = cs.search(term);
 			if (w.size() == 0) {
 				output_vec.add(line + "\tNo match");
 			} else if (w.size() == 1) {
