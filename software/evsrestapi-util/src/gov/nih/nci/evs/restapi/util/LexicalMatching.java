@@ -497,13 +497,13 @@ public class LexicalMatching {
 	public static void analyze(String filename, int col) {
 		Vector v = readFile(filename);
 		Vector w = new Vector();
-		int istart = 0;
+		int istart = 1;
         for (int i=istart; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
+			int j = i+1;
+			w.add("(" + j + ") " + line);
 			Vector u = StringUtils.parseData(line, '\t');
 			String term = (String) u.elementAt(col);
-			int j = i+1;
-			w.add("(" + j + ") " + term);
 			Vector wds = tokenize(term);
 			for (int k=0; k<wds.size(); k++) {
 				String word = (String) wds.elementAt(k);
