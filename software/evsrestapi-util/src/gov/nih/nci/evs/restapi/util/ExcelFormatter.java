@@ -126,6 +126,7 @@ v.	H is a width of 35
 		}
 	}
 
+/*
 	public static String reformat(String xlsfile, String outputfile) {
 		Vector<Integer> widths = new Vector();
 		widths.add(Integer.valueOf(8 * 256));
@@ -138,6 +139,7 @@ v.	H is a width of 35
 		widths.add(Integer.valueOf(35 * 256));
 		return reformat(xlsfile, outputfile, widths);
 	}
+*/
 
 	public static String reformat(String xlsfile, String outputfile, Vector<Integer> widths) {
 		 short firstRowColor = IndexedColors.YELLOW.getIndex();
