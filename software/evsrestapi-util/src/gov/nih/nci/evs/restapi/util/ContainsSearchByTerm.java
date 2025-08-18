@@ -99,7 +99,9 @@ public class ContainsSearchByTerm {
 		NCIPTMap = createNCIPTMap();
 		NCISYMap = createNCISYMap();
 		code2FULLSYNMap = createCode2FULLSYNMap();
+		branch = new HashSet();
 
+/*
 		String branchfile = ConfigurationController.branchfile;
         branch = new HashSet();
         Vector codes = null;
@@ -117,6 +119,7 @@ public class ContainsSearchByTerm {
 		} else {
 			System.out.println("No restriction on branches - search will be performed against the entire NCI Thesaurus.");
 		}
+*/
 
         String wd1 = null;
         String wd2 = null;
@@ -335,11 +338,13 @@ public class ContainsSearchByTerm {
 			Vector u = StringUtils.parseData(line, '|');
 			String code = (String) u.elementAt(1);
 			boolean flag = true;
+			/*
 			if (branch != null && branch.size() > 0) {
 				if (!branch.contains(code)) {
 					flag = false;
 				}
 			}
+			*/
 			if (flag) {
 				String prop_code = (String) u.elementAt(2);
 				if (prop_code.compareTo("P90") == 0) {
@@ -561,7 +566,7 @@ public class ContainsSearchByTerm {
 	}
 
 
-
+/*
 	public static void constructBranchFile(String branchRoots, String outputfile) {
 		System.out.println("branchRoots: " + branchRoots);
 		String HIER_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile;
@@ -579,6 +584,7 @@ public class ContainsSearchByTerm {
 		Utils.saveToFile(outputfile, w);
 		System.out.println(outputfile + " generated.");
 	}
+*/
 
 	public static String run(String datafile, String outputfile, int colIndex) {
 		int col = colIndex;
@@ -698,15 +704,15 @@ public class ContainsSearchByTerm {
 		long ms = System.currentTimeMillis();
 		String datafile = args[0];
 		int n = datafile.lastIndexOf(".");
-		String outputfile = "contains_iter1_" + datafile.substring(0, n) + "_" + StringUtils.getToday() + ".txt";
-		String resultfile = ContainsSearchByTerm.run(datafile, outputfile, 0);
+		String outputfile = "contains_" + datafile.substring(0, n) + "_" + StringUtils.getToday() + ".txt";
+		int col = 0;
+		if (args.length > 1) {
+			String colStr = args[1];
+			col = Integer.parseInt(colStr);
+		}
+		String resultfile = ContainsSearchByTerm.run(datafile, outputfile, col);
 		encodeFile(resultfile);
-
-		//outputfile = "iter2_" + datafile;
-		//resultfile = ContainsSearchByTerm.run2(resultfile, outputfile);
-		//outputfile = "iter3_" + datafile;
-		//String outputfile = LexicalMatchRunner.run(resultfile, outputfile);
-		//System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 }
