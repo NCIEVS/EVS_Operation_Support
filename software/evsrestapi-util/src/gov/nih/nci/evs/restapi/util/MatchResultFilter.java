@@ -431,23 +431,89 @@ public class MatchResultFilter {
 							}
 						}
 					}
-				} else {
-					codes_0 = new Vector();
 				}
-
-				boolean matched = false;
 				if (codes.size() > 0) {
 					String matchData = getMatchedData(codes);
 					w.add(line + "\t" + matchData);
 					matches.add(line + "\t" + matchData);
-					matched = true;
-					System.out.println(line0);
-					System.out.println(line + "\t" + matchData);
 				} else {
 					no_matches.add(line);
 					w.add(line + "\tNo match");
-					System.out.println(line0);
-					System.out.println(line + "\tNo match");
+				}
+			}
+		}
+		Utils.saveToFile(outputfile, w);
+		Utils.saveToFile("no_matches_" + outputfile, no_matches);
+		Utils.saveToFile("matches_" + outputfile, matches);
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		System.out.println(outputfile + " generated.");
+
+        if (generateXLS) {
+			String textfile = outputfile;
+			int n = textfile.lastIndexOf(".");
+			String sheetName = textfile.substring(0, n);
+			String xlsfile = null;
+			char delim = '\t';
+			try {
+				xlsfile = ExcelReadWriteUtils.writeXLSFile(textfile, delim, sheetName);
+				short firstRowColor = IndexedColors.LIGHT_GREEN.getIndex();
+				ExcelFormatter.reformat(xlsfile, firstRowColor);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		return outputfile;
+	}
+
+	public static String flatten(String datafile, String outputfile, boolean generateXLS) {
+		long ms = System.currentTimeMillis();
+		Vector no_matches = new Vector();
+		Vector matches = new Vector();
+        Vector v = Utils.readFile(datafile);
+        Vector w = new Vector();
+        String header = (String) v.elementAt(0);
+        w.add(header);
+        matches.add(header);
+        Vector u0 = StringUtils.parseData(header, '\t');
+        int m = -1;
+        StringBuffer b = new StringBuffer();
+		for (int i=0; i<u0.size(); i++) {
+			String s = (String) u0.elementAt(i);
+			b.append(s).append("\t");
+			if (s.compareTo("Matched NCIt Code(s)") == 0) {
+				m = i;
+				break;
+			}
+		}
+		String s1 = b.toString();
+		s1 = s1.substring(0, s1.length()-1);
+		no_matches.add(s1);
+		for (int i=1; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.trim();
+			String line0 = line;
+			if (line.length() > 0) {
+				Vector u = StringUtils.parseData(line, '\t');
+				StringBuffer buf = new StringBuffer();
+				for (int k=0; k<m; k++) {
+					buf.append((String) u.elementAt(k));
+					if (k < m-1) {
+						buf.append("\t");
+					}
+				}
+				line = buf.toString();
+				String codeStr = (String) u.elementAt(m);
+				Vector codes = StringUtils.parseData(codeStr, '|');
+				if (codes.size() > 0) {
+					for (int k=0; k<codes.size(); k++) {
+						String cd = (String) codes.elementAt(k);
+						String matchData = getMatchedData(cd);
+						w.add(line + "\t" + matchData);
+						matches.add(line + "\t" + matchData);
+					}
+				} else {
+					no_matches.add(line);
+					w.add(line + "\tNo match");
 				}
 			}
 		}
