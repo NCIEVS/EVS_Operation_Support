@@ -7,6 +7,7 @@ import java.net.*;
 import java.util.*;
 import java.nio.file.*;
 import java.nio.charset.Charset;
+import org.apache.poi.ss.usermodel.IndexedColors;
 
 /**
  * <!-- LICENSE_TEXT_START -->
@@ -698,6 +699,31 @@ public class ContainsSearchByTerm {
 		Vector v = Utils.readFile(filename);
 		v = encode(v);
 		Utils.saveToFile(filename, v);
+	}
+
+	public static String run(String datafile, int col, boolean generateXLS) {
+		long ms = System.currentTimeMillis();
+		int n = datafile.lastIndexOf(".");
+		String outputfile = "contains_" + datafile.substring(0, n) + ".txt";
+		String resultfile = ContainsSearchByTerm.run(datafile, outputfile, col);
+		ContainsSearchByTerm.encodeFile(resultfile);
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		System.out.println(resultfile + " generated.");
+
+        if (generateXLS) {
+			String textfile = resultfile;
+			n = textfile.lastIndexOf(".");
+			String sheetName = textfile.substring(0, n);
+			String xlsfile = null;
+			char delim = '\t';
+			try {
+				xlsfile = ExcelReadWriteUtils.writeXLSFile(textfile, delim, sheetName);
+				ExcelFormatter.reformat(xlsfile, IndexedColors.LIGHT_GREEN.getIndex());
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		return resultfile;
 	}
 
 	public static void main(String[] args) {
