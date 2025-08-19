@@ -1,5 +1,4 @@
 package gov.nih.nci.evs.restapi.util;
-import gov.nih.nci.evs.restapi.config.*;
 
 import java.io.*;
 import java.text.*;
@@ -86,9 +85,17 @@ public class ContainsSearch {
 	public static Vector discardedDis_vec = new Vector();
 	static HashMap definitionMap = null;
     static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
+
+    public String named_graph = null;
+    String serviceUrl = null;
+    String username = null;
+    String password = null;
+    public OWLSPARQLUtils owlSPARQLUtils = null;
+
 	static {
 		//AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
 		stemmer = new PorterStemmer();
+		//System.out.println(AXIOM_FILE);
 		File file = new File(AXIOM_FILE);
 		definitionMap = new HashMap();
 		if (!file.exists()) {
@@ -100,11 +107,13 @@ public class ContainsSearch {
 		}
 	}
 
+
+
     public static void createDefinitionMap() {
 		Vector v = Utils.readFile(AXIOM_FILE);
 		for (int i=0; i<v.size(); i++) {
 			String t = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(t, '|');
+			Vector u = parseData(t, '|');
 			String code = (String) u.elementAt(1);
 			String prop_code = (String) u.elementAt(2);
 			if (prop_code.compareTo("P97") == 0) {
@@ -119,6 +128,17 @@ public class ContainsSearch {
 	}
 
 	public ContainsSearch() {
+
+	}
+
+	public ContainsSearch(String serviceUrl, String named_graph, String username, String password) {
+		this.serviceUrl = serviceUrl;
+		this.named_graph = named_graph;
+		this.username = username;
+		this.password = password;
+
+		owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
+		owlSPARQLUtils.set_named_graph(named_graph);
 
 	}
 
@@ -153,7 +173,7 @@ public class ContainsSearch {
 		for (int i=0; i<SYNONYM_VEC.size(); i++) {
 			String wd_pair = (String) SYNONYM_VEC.elementAt(i);
 			wd_pair = wd_pair.toLowerCase();
-			Vector u = StringUtils.parseData(wd_pair, '|');
+			Vector u = parseData(wd_pair, '|');
 			wd1 = (String) u.elementAt(0);
 			wd2 = (String) u.elementAt(1);
 
@@ -181,8 +201,8 @@ public class ContainsSearch {
 
 			} else {
 
-				wd1 = AxiomExtractor.stemTerm(wd1);
-				wd2 = AxiomExtractor.stemTerm(wd2);
+				wd1 = stemTerm(wd1);
+				wd2 = stemTerm(wd2);
 				w = new Vector();
 				if (SYNONYM_MAP.containsKey(wd1)) {
 					w = (Vector) SYNONYM_MAP.get(wd1);
@@ -223,9 +243,7 @@ public class ContainsSearch {
 				SYNONYM_MAP2.put(wd2, w);
 			}
 		}
-
 		//dumpMultiValuedHashMap("SYNONYM_MAP", SYNONYM_MAP);
-
 		System.out.println("Initialization of ContainsSearch completed.");
 	}
 
@@ -314,17 +332,15 @@ public class ContainsSearch {
     public static Vector parseData(String line, char delimiter) {
 		if(line == null) return null;
 		Vector w = new Vector();
-		StringBuffer buf = new StringBuffer();
-		for (int i=0; i<line.length(); i++) {
-			char c = line.charAt(i);
-			if (c == delimiter) {
-				w.add(buf.toString());
-				buf = new StringBuffer();
-			} else {
-				buf.append(c);
-			}
+		String t = line;
+		int n = t.indexOf("" + delimiter);
+		while (n != -1) {
+			String s = t.substring(0, n);
+			w.add(s);
+			t = t.substring(n+1, t.length());
+			n = t.indexOf("" + delimiter);
 		}
-		w.add(buf.toString());
+		w.add(t);
 		return w;
 	}
 
@@ -604,10 +620,7 @@ public class ContainsSearch {
 		if (propertyName.compareTo("Relationships") == 0) {
 			propertyName = "list_relationships";
 		}
-		//propertyName = propertyName.replace(" ", "+");
 		String hyperlink = "https://aapmbdsc.azurewebsites.net/?KeyElementName=" + name + "&PropertyName=" + propertyName;
-		//hyperlink = hyperlink.replace("�", "&ndash;");
-		//hyperlink = encode(hyperlink);
 		hyperlink = "<a href=\"" + hyperlink + "\">" + propertyName_0 + "</a>";
 		return hyperlink;
 	}
@@ -615,8 +628,6 @@ public class ContainsSearch {
 
 	public static boolean isPureAscii(String v) {
 		return Charset.forName("US-ASCII").newEncoder().canEncode(v);
-	// or "ISO-8859-1" for ISO Latin 1
-	// or StandardCharsets.US_ASCII with JDK1.7+
 	}
 
 	public String xmlEscapeText(String t) {
@@ -703,7 +714,7 @@ public class ContainsSearch {
 		Vector w = new Vector();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, delim);
+			Vector u = parseData(line, delim);
 			StringBuffer buf = new StringBuffer();
 			for (int j=0; j<u.size(); j++) {
 				Integer int_obj = Integer.valueOf(j);
@@ -724,7 +735,7 @@ public class ContainsSearch {
 		HashSet hset = new HashSet();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, delim);
+			Vector u = parseData(line, delim);
 			String value = (String) u.elementAt(col);
 			if (!hset.contains(value)) {
 				hset.add(value);
@@ -732,12 +743,11 @@ public class ContainsSearch {
 		}
 		return hset;
 	}
-//C192234	Operational Ontology for Radiation Oncology Prostate Cancer Terminology	C104495	Other Race
 
     public static void exploreContent(String filename, char delim) {
         Vector v = readFile(filename);
         String firstLine = (String) v.elementAt(0);
-        Vector u = StringUtils.parseData(firstLine, delim);
+        Vector u = parseData(firstLine, delim);
         Utils.dumpVector(firstLine, u);
 	}
 
@@ -749,7 +759,7 @@ public class ContainsSearch {
         HashMap hmap = new HashMap();
         for (int i=1; i<v1.size(); i++) {
 			String line = (String) v1.elementAt(i);
-			Vector u = StringUtils.parseData(line, '\t');
+			Vector u = parseData(line, '\t');
 			String t =(String) u.elementAt(keyCol_1);
 			hmap.put(t, line);
 		}
@@ -760,7 +770,7 @@ public class ContainsSearch {
         int knt2 = 0;
         for (int i=0; i<v2.size(); i++) {
 			String line = (String) v2.elementAt(i);
-			Vector u = StringUtils.parseData(line, '\t');
+			Vector u = parseData(line, '\t');
 			String t = (String) u.elementAt(keyCol_2);
 			if (hmap.containsKey(t)) {
 				w.add(t + "\t" + (String) hmap.get(t));
@@ -781,7 +791,7 @@ public class ContainsSearch {
 		Vector w = new Vector();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, delim);
+			Vector u = parseData(line, delim);
 			String value = (String) u.elementAt(columnIndex);
 			w.add(value);
 		}
@@ -818,51 +828,21 @@ public class ContainsSearch {
 		return t;
 	 }
 
-    public static Vector tokenize(String term, boolean applyStem) {
-		term = term.toLowerCase();
-		term = removeSpecialCharacters(term);
-		Vector words = new Vector();
-		StringTokenizer st = new StringTokenizer(term);
-		while (st.hasMoreTokens()) {
-			String token = st.nextToken();
-			if (!isFiller(token)) {
-				if (applyStem) {
-					token = stemTerm(token);
-				}
-				words.add(token);
-			}
-		}
-		return words;
-	}
-
 	public static String stemTerm(String term) {
 		return stemmer.stem(term);
 	}
 
-/*
-    public static Vector tokenize(String term) {
-		term = term.toLowerCase();
-		term = removeSpecialCharacters(term);
-		Vector words = new Vector();
-		StringTokenizer st = new StringTokenizer(term);
-		while (st.hasMoreTokens()) {
-			String token = st.nextToken();
-			words.add(token);
-		}
-		return words;
-	}
-*/
 
     public static Vector tokenizeTerm(String t) {
 		t = removeSpecialCharacters(t);
-		//Vector tokens = AxiomExtractor.tokenize(t, false);
+		//Vector tokens = tokenize(t, false);
 		Vector tokens = tokenize(t, false);
 
         Vector w = new Vector();
 		for (int i=0; i<tokens.size(); i++) {
 			String token = (String) tokens.elementAt(i);
 			token = token.toLowerCase();
-			String wd = AxiomExtractor.stemTerm(token);
+			String wd = stemTerm(token);
 			if (!w.contains(wd)) {
 				w.add(wd);
 			}
@@ -870,7 +850,7 @@ public class ContainsSearch {
 			while (it.hasNext()) {
 				String s = (String) it.next();
 				if (!tokens.contains(s)) {
-					s = AxiomExtractor.stemTerm(s);
+					s = stemTerm(s);
 					//////////////////////////////////
 					//s = removeSpecialCharacters(s);
 					if (!w.contains(s)) {
@@ -882,7 +862,7 @@ public class ContainsSearch {
 				Vector syns = (Vector) SYNONYM_MAP.get(wd);
 				for (int i2=0; i2<syns.size(); i2++) {
 					String syn = (String) syns.elementAt(i2);
-					syn = AxiomExtractor.stemTerm(syn);
+					syn = stemTerm(syn);
 					if (!w.contains(syn)) {
 						w.add(syn);
 					}
@@ -903,7 +883,7 @@ public class ContainsSearch {
 		Vector v = new Vector();
 		for (int i=0; i<w.size(); i++) {
 			String token = (String) w.elementAt(i);
-			Vector u = StringUtils.parseData(token, '/');
+			Vector u = parseData(token, '/');
 			//Utils.dumpVector(token, u);
 			if (v.size() == 0) {
 				for (int j=0; j<u.size(); j++) {
@@ -961,7 +941,6 @@ public class ContainsSearch {
         code2TokenizedTermMap = createCode2TokenizedTermMap(code2TermMap);
 	}
 
-//C198008
     public HashMap createCode2TokenizedTermMap(HashMap code2TermMap) {
 		HashMap hmap = new HashMap();
 		HashSet term_set = new HashSet();
@@ -989,7 +968,7 @@ public class ContainsSearch {
 		HashMap hmap = new HashMap();
 		for (int i=1; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, '\t');
+			Vector u = parseData(line, '\t');
 			String key = (String) u.elementAt(0);
 			Vector w = new Vector();
 			if (hmap.containsKey(key)) {
@@ -1006,24 +985,11 @@ public class ContainsSearch {
         return hmap;
 	}
 
-    public static Vector tokenize(String term) {
-		term = term.toLowerCase();
-		term = removeSpecialCharacters(term);
-		Vector words = new Vector();
-		StringTokenizer st = new StringTokenizer(term);
-		while (st.hasMoreTokens()) {
-			String token = st.nextToken();
-			if (!isFiller(token)) {
-				token = stemTerm(token);
-				words.add(token);
-			}
-		}
-		return words;
-	}
-
 	public Vector search(String term) {
 		Vector w = new Vector();
 		Vector v1 = tokenize(term);
+		Utils.dumpVector(term, v1);
+
 		Iterator it = code2TokenizedTermMap.keySet().iterator();
 		while (it.hasNext()) {
             String key = (String) it.next();
@@ -1050,7 +1016,7 @@ public class ContainsSearch {
 	}
 
 	public boolean contains(String code, String dis) {
-		Vector v1 = AxiomExtractor.tokenize(dis);
+		Vector v1 = tokenize(dis);
 		Utils.dumpVector(dis, v1);
 		if (!code2TokenizedTermMap.containsKey(code)) {
 			System.out.println("Key not found in code2TokenizedTermMap " + code);
@@ -1126,7 +1092,7 @@ public class ContainsSearch {
         for (int i=1; i<v.size(); i++) {
 			knt++;
 			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, '\t');
+			Vector u = parseData(line, '\t');
 			String code = (String) u.elementAt(codeCol);
 			String dis = (String) u.elementAt(vbtCol);
 			Vector dis_vec = reconstructTerms(dis);
@@ -1188,8 +1154,16 @@ public class ContainsSearch {
 		return def;
 	}
 
+/*
+Row	NCIt code	NCIt DEFINITION	NCCN Regimen Name	NCCN Disease Name
+2	C188903	A regimen consisting of polatuzumab vedotin, bendamustine and rituximab that may be used in the treatment of diffuse large B-cell lymphoma (DLBCL).	Bendamustine/Polatuzumab vedotin-piiq + RiTUXimab	Diffuse Large B-Cell Lymphoma
+*/
 	public static Vector run(String filename, int dis_col, int def_col) {
-		Vector debug_vec = new Vector();
+		System.out.println("filename: " + filename);
+		System.out.println("dis_col: " + dis_col);
+		System.out.println("def_col: " + def_col);
+
+		//Vector debug_vec = new Vector();
 		Vector missing_word_vec = new Vector();
         Vector w = new Vector();
         Vector v = Utils.readFile(filename);
@@ -1202,7 +1176,7 @@ public class ContainsSearch {
 			String line = (String) v.elementAt(i);
 			System.out.println("(" + i + ") " + line);
 
-			Vector u = StringUtils.parseData(line, '\t');
+			Vector u = parseData(line, '\t');
 			String dis = (String) u.elementAt(dis_col);
 			String def = (String) u.elementAt(def_col);
 
@@ -1218,12 +1192,13 @@ public class ContainsSearch {
 			}
 
 			//Vector dis_vec = reconstructTerms(dis);
-			Vector dis_vec = AxiomExtractor.tokenize(dis, false);
+			Vector dis_vec = tokenize(dis, false);
 			dis_vec = removeSpecialCharacters(dis_vec);
 
-			Vector def_vec = AxiomExtractor.tokenize(def, false);
+			Vector def_vec = tokenize(def, false);
 			def_vec = addSynonyms(def_vec);
 			def_vec = removeSpecialCharacters(def_vec);
+
 
 			boolean contains = true;
 			for (int i3=0; i3<dis_vec.size(); i3++) {
@@ -1231,9 +1206,9 @@ public class ContainsSearch {
 				if (!def_vec.contains(word)) {
 					contains = false;
 					knt3++;
-					debug_vec.add("\n(" + knt3 + ") " + line);
-					debug_vec.add("\tDisease Name: " + dis);
-					debug_vec.add("\tword not found: " + word);
+					//debug_vec.add("\n(" + knt3 + ") " + line);
+					//debug_vec.add("\tDisease Name: " + dis);
+					//debug_vec.add("\tword not found: " + word);
 					if (!missing_word_vec.contains(word)) {
 						missing_word_vec.add(word);
 					}
@@ -1253,12 +1228,13 @@ public class ContainsSearch {
         System.out.println("Total: " + knt1);
         System.out.println("Contains: " + knt2);
         System.out.println("No match: " + knt3);
-        Utils.saveToFile("reason_" + filename, debug_vec);
+        //Utils.saveToFile("reason_" + filename, debug_vec);
 
         missing_word_vec = new SortUtils().quickSort(missing_word_vec);
         Utils.saveToFile("missing_word_" + filename, missing_word_vec);
         return w;
 	}
+
 
 	public static String removeBrackets(String t) {
 		int n1 = t.lastIndexOf("(");
@@ -1266,13 +1242,161 @@ public class ContainsSearch {
 			return t.substring(0, n1-1);
 		}
 		return t;
+
+	}
+
+    public static Vector tokenize(String term, boolean applyStem) {
+		term = term.toLowerCase();
+		term = removeSpecialCharacters(term);
+		Vector words = new Vector();
+		Vector w = parseData(term, ' ');
+        for (int i=0; i<w.size(); i++) {
+			String token = (String) w.elementAt(i);
+			if (token.length() > 0) {
+				if (!isFiller(token)) {
+					if (applyStem) {
+						token = stemTerm(token);
+					}
+					words.add(token);
+				}
+			}
+		}
+		return words;
+	}
+
+    public static Vector tokenize(String term) {
+		term = term.toLowerCase();
+		Vector words = parseData(term, ' ');
+		return words;
+	}
+
+	public static Vector runAnalysis(String line, String dis,  String def) {
+		Vector w = new Vector();
+		dis = removeBrackets(dis);
+		dis = dis.replace("/", " ");
+
+		Vector dis_vec = parseData(dis, ' ');
+		dis_vec = removeSpecialCharacters(dis_vec);
+		Utils.dumpVector(dis, dis_vec);
+
+        def = def.replace("/", " ");
+		String def0 = def.toLowerCase();
+		def = addSynonymousPhrases(def0);
+		Vector def_vec = tokenize(def, false);
+		def_vec = addSynonyms(def_vec);
+		Utils.dumpVector(def, def_vec);
+
+		for (int i3=0; i3<dis_vec.size(); i3++) {
+			String word = (String) dis_vec.elementAt(i3);
+			if (!def_vec.contains(word)) {
+				w.add(word);
+			}
+		}
+        return w;
+	}
+
+
+	public static void runAnalysis(String matchfile, String nomatchfile, int dis_col, int def_col) {
+		Vector v = Utils.readFile(matchfile);
+		Vector w = new Vector();
+		HashMap lineMap = new HashMap();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Integer int_obj = Integer.valueOf(i);
+			lineMap.put(int_obj, line);
+		}
+
+		w.add((String) v.elementAt(0));
+ 		for (int i=1; i<v.size(); i++) {
+			Integer int_obj = Integer.valueOf(i);
+            String line = (String) lineMap.get(int_obj);
+
+			String line1 = line;
+			if (line1.indexOf("(*)") == -1) {
+
+				w.add(line);
+
+//////////////////////////////////////////////////////////////////////////////////////
+				Vector w1 = new Vector();
+				Vector u = parseData(line1, '\t');
+				String dis = (String) u.elementAt(dis_col);
+				String def = (String) u.elementAt(def_col);
+				w1.add("\tDisease Name: " + dis);
+				w1.add("\tDefinition: " + def);
+				Vector missing_words = runAnalysis(line, dis,  def);
+				w1.add("\tMissing words: ");
+				for (int j=0; j<missing_words.size(); j++) {
+					String wd = (String) missing_words.elementAt(j);
+					w1.add("\t\t" + wd);
+				}
+				w.addAll(w1);
+//////////////////////////////////////////////////////////////////////////////////////
+			}
+		}
+        Utils.saveToFile("nomatch_" + matchfile, w);
+	}
+
+
+	public String construct_get_contains(String named_graph, String target) {
+        String prefixes = owlSPARQLUtils.getPrefixes();
+        StringBuffer buf = new StringBuffer();
+        buf.append(prefixes);
+        buf.append("select distinct ?x1_label ?x1_code ?z_target ").append("\n");
+        buf.append("from <" + named_graph + ">").append("\n");
+        buf.append("where  { ").append("\n");
+        buf.append("            ?x a owl:Class .").append("\n");
+        buf.append("            ?x :NHC0 ?x_code .").append("\n");
+        buf.append("            ?x rdfs:label ?x_label .").append("\n");
+        buf.append("            ?z_axiom a owl:Axiom  .").append("\n");
+        buf.append("            ?z_axiom owl:annotatedSource ?x .").append("\n");
+        buf.append("            ?z_axiom owl:annotatedProperty ?p .").append("\n");
+        buf.append("            ?p rdfs:label ?p_label .").append("\n");
+        buf.append("            ?p rdfs:label \"FULL_SYN\"^^xsd:string .").append("\n");
+        buf.append("            ?z_axiom owl:annotatedTarget ?z_target .").append("\n");
+        buf.append("            FILTER (contains(lcase(str(?z_target)), \"" + target + "\"))").append("\n");
+        buf.append("}").append("\n");
+        buf.append("").append("\n");
+        buf.append("").append("\n");
+        return buf.toString();
+	}
+
+	public Vector getContains(String named_graph, String target) {
+        String query = construct_get_contains(named_graph, target);
+        Vector v = owlSPARQLUtils.executeQuery(query);
+        if (v == null) return null;
+        if (v.size() == 0) return v;
+        //v = new ParserUtils().getResponseValues(v);
+        return new SortUtils().quickSort(v);
 	}
 
 	public static void main(String[] args) {
+		long ms = System.currentTimeMillis();
+		/*
 		ContainsSearch cs = new ContainsSearch();
 		String filename = args[0];
-		//public static Vector run(String filename, int dis_col, int def_col) {
-		Vector w = cs.run(filename, 1, 2);
+		//int dis_col, int def_col
+		String dis_col_str = args[1];
+		String def_col_str = args[2];
+		int dis_col = Integer.parseInt(dis_col_str);
+		int def_col = Integer.parseInt(def_col_str);
+		Vector w = cs.run(filename, dis_col, def_col);
 		Utils.saveToFile("result_" + filename, w);
+
+		String nomatchfile = "nomatch_" + filename;
+		runAnalysis("result_" + filename, nomatchfile, dis_col, def_col);
+		*/
+
+		String serviceUrl = ConfigurationController.serviceUrl;
+		String namedGraph = ConfigurationController.namedGraph;
+		String username = ConfigurationController.username;
+		String password = ConfigurationController.password;
+	    ContainsSearch cs = new ContainsSearch(serviceUrl, namedGraph, username, password);
+
+	    String target = args[0];
+	    Vector v = cs.getContains(namedGraph, target);
+	    Utils.dumpVector(target, v);
+	    System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+
+
 	}
 }
