@@ -540,6 +540,14 @@ public class MatchResultFilter {
 		return outputfile;
 	}
 
+	public static void flatternMatchResults(String xlsfile) {
+		String datafile = ExcelDiffUtils.exportXLSFile(xlsfile);
+		String outputfile = "flattened_" + datafile;
+		boolean generateXLS = true;
+	    outputfile = flatten(datafile, outputfile, generateXLS);
+	    System.out.println(outputfile + " generated.");
+	}
+
     public static void main(String[] args) {
 		String resultfile = args[0];
 	    String outputfile = run(resultfile);

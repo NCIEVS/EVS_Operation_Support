@@ -79,6 +79,19 @@ public class ExcelExporter {
 
 	}
 
+	public static String exportXLSFile(String excelFilePath) {
+		int n = excelFilePath.lastIndexOf(".");
+		String textfile = excelFilePath.substring(0, n) + ".txt";
+		try {
+			Vector w = ExcelReadWriteUtils.readXLSFile(excelFilePath);
+			Utils.saveToFile(textfile , w);
+			System.out.println(textfile + " generated.");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return textfile;
+	}
+
     public static Vector getSheetNames(String excelfile) {
 		try {
 			return ExcelReader.getSheetNames(excelfile);
