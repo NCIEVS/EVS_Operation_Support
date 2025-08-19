@@ -591,7 +591,7 @@ public class ContainsSearchByTerm {
 		int col = colIndex;
 		long ms = System.currentTimeMillis();
 		Vector no_matches = new Vector();
-		Vector matches = new Vector();
+		//Vector matches = new Vector();
         Vector v = Utils.readFile(datafile);
         Vector w = new Vector();
         String header = (String) v.elementAt(0);
@@ -599,7 +599,7 @@ public class ContainsSearchByTerm {
 
         w.add(header + "\tMatched NCIt Code(s)\tNCI PT(s)\tNCI SY(s)");
         no_matches.add(header);
-        matches.add(header + "\tMatched NCIt Code(s)\tNCI PT(s)\tNCI SY(s)");
+        //matches.add(header + "\tMatched NCIt Code(s)\tNCI PT(s)\tNCI SY(s)");
 		for (int i=1; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			//System.out.println("(" + i + ") " + line);
@@ -619,6 +619,7 @@ public class ContainsSearchByTerm {
 					Vector codes = new Vector();
 					for (int j=0; j<codes_0.size(); j++) {
 						String code = (String) codes_0.elementAt(j);
+						/*
 						if (branch.size() > 0) {
 							if (branch.contains(code) && !is_retired(code)) {
 								codes.add(code);
@@ -628,12 +629,22 @@ public class ContainsSearchByTerm {
 								codes.add(code);
 							}
 						}
+						*/
+						if (!is_retired(code)) {
+							codes.add(code);
+						}
 					}
 					if (codes.size() > 0) {
-						String matchData = getMatchedData(codes);
-						w.add(line + "\t" + matchData);
-						matches.add(line + "\t" + matchData);
-						matched = true;
+						for (int k=0; k<codes.size(); k++) {
+							String cd = (String) codes.elementAt(k);
+							Vector w1 = new Vector();
+							w1.add(cd);
+						    String matchData = getMatchedData(w1);
+						    w.add(line + "\t" + matchData);
+						    //matches.add(line + "\t" + matchData);
+						}
+						//matched = true;
+
 					} else {
 						no_matches.add(line);
 						w.add(line + "\tNo match");
@@ -647,7 +658,7 @@ public class ContainsSearchByTerm {
 		}
 		Utils.saveToFile(outputfile, w);
 		Utils.saveToFile("no_matches_" + outputfile, no_matches);
-		Utils.saveToFile("matches_" + outputfile, matches);
+		//Utils.saveToFile("matches_" + outputfile, matches);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 		System.out.println(outputfile + " generated.");
 		return outputfile;
@@ -701,14 +712,16 @@ public class ContainsSearchByTerm {
 		Utils.saveToFile(filename, v);
 	}
 
+	public static String run(String datafile) {
+		return run(datafile, 0, true);
+	}
+
 	public static String run(String datafile, int col, boolean generateXLS) {
 		long ms = System.currentTimeMillis();
 		int n = datafile.lastIndexOf(".");
 		String outputfile = "contains_" + datafile.substring(0, n) + ".txt";
 		String resultfile = ContainsSearchByTerm.run(datafile, outputfile, col);
 		ContainsSearchByTerm.encodeFile(resultfile);
-		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
-		System.out.println(resultfile + " generated.");
 
         if (generateXLS) {
 			String textfile = resultfile;
@@ -723,6 +736,8 @@ public class ContainsSearchByTerm {
 				ex.printStackTrace();
 			}
 		}
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		System.out.println(resultfile + " generated.");
 		return resultfile;
 	}
 
@@ -738,6 +753,7 @@ public class ContainsSearchByTerm {
 		}
 		String resultfile = ContainsSearchByTerm.run(datafile, outputfile, col);
 		encodeFile(resultfile);
+
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
