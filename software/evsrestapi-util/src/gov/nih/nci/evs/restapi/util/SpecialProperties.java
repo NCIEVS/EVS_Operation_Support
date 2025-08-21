@@ -1,5 +1,7 @@
 package gov.nih.nci.evs.restapi.util;
+import gov.nih.nci.evs.restapi.config.*;
 import gov.nih.nci.evs.restapi.bean.*;
+
 
 import java.io.*;
 import java.text.*;
@@ -9,8 +11,31 @@ import java.nio.file.*;
 import java.nio.charset.Charset;
 
 public class SpecialProperties {
+	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
+    static HashMap synonymMap = null;
+    static {
+		synonymMap = AxiomParser.loadSynonyms(AXIOM_FILE);
+	}
+
 	SpecialProperties() {
 
+	}
+
+	public static Vector getSpecialProperties(String subsetCode, String memberCode, String sourceName) {
+		Vector w = new Vector();
+		List parentAxioms = getSynonyms(subsetCode);
+		List axioms = getSynonyms(memberCode);
+		String codeListName = getCodeListName(subsetCode, parentAxioms, sourceName);
+		w.add(codeListName);
+		String cdiscSubmissionValue = getCDISCSubmissionValue(subsetCode, parentAxioms, memberCode, axioms, sourceName);
+		w.add(cdiscSubmissionValue);
+		return w;
+	}
+
+	public static List getSynonyms(String code) {
+		Vector v = (Vector) synonymMap.get(code);
+		if (v == null) return null;
+		return vector2List(v);
 	}
 
 	public static List vector2List(Vector v) {
@@ -119,8 +144,6 @@ public class SpecialProperties {
 	    List<String> cdisc_pts = getSynonymsWithQualifiers(axioms,
 	       termSource, termType, sourceCode, null);
 
-	    //Utils.dumpVector("cdisc_pts of " + code, list2Vector(cdisc_pts));
-
 	    if (cdisc_pts == null || cdisc_pts.size() == 0) {
 			System.out.println("\nINFO (2): getCDISCSubmissionValue No " + termSource + " PT is found for (codelistCode " + codelistCode + ", code " + code + ")");
 			return null;
@@ -186,6 +209,16 @@ public class SpecialProperties {
 			System.out.println("\nINFO: getCodeListName Multiple " + termSource + " SYs are found in " + parentCode);
 			return cdisc_sys.get(0);
 		}
+	}
+
+	public static void main(String[] args) {
+		long ms = System.currentTimeMillis();
+		String codeListCode = args[0];
+		String memberCode = args[1];
+		String sourceName = args[2];
+		Vector w = getSpecialProperties(codeListCode, memberCode, sourceName);
+		Utils.dumpVector(codeListCode + "|" + memberCode + "|" + sourceName, w);
+        System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 }
