@@ -82,6 +82,12 @@ public class ExactMatchByTerm {
     static String SYNONYM_EXT = null;
     static String termfile = null;
 
+    public String named_graph = null;
+    String serviceUrl = null;
+    String username = null;
+    String password = null;
+    public OWLSPARQLUtils owlSPARQLUtils = null;
+
 	static {
 		AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE_NAME;
 		PROPERTY_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.propertyfile;
@@ -131,6 +137,17 @@ public class ExactMatchByTerm {
 
         branch = new HashSet();
         Vector codes = null;
+	}
+
+	public ExactMatchByTerm(String serviceUrl, String named_graph, String username, String password) {
+		this.serviceUrl = serviceUrl;
+		this.named_graph = named_graph;
+		this.username = username;
+		this.password = password;
+
+		owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
+		owlSPARQLUtils.set_named_graph(named_graph);
+
 	}
 
 	public static Vector extractBranchCodes(String root) {
@@ -808,4 +825,50 @@ public class ExactMatchByTerm {
 		}
         Utils.saveToFile("results_" + datafile, w);
 	}
+
+	public String construct_get_exact_matches(String named_graph, String target) {
+        String prefixes = owlSPARQLUtils.getPrefixes();
+        StringBuffer buf = new StringBuffer();
+        buf.append(prefixes);
+        buf.append("select distinct ?x_label ?x_code ?z_target ").append("\n");
+        buf.append("from <" + named_graph + ">").append("\n");
+        buf.append("where  { ").append("\n");
+        buf.append("            ?x a owl:Class .").append("\n");
+        buf.append("            ?x :NHC0 ?x_code .").append("\n");
+        buf.append("            ?x rdfs:label ?x_label .").append("\n");
+        buf.append("            ?z_axiom a owl:Axiom  .").append("\n");
+        buf.append("            ?z_axiom owl:annotatedSource ?x .").append("\n");
+        buf.append("            ?z_axiom owl:annotatedProperty ?p .").append("\n");
+        buf.append("            ?p rdfs:label ?p_label .").append("\n");
+        buf.append("            ?p rdfs:label \"FULL_SYN\"^^xsd:string .").append("\n");
+        buf.append("            ?z_axiom owl:annotatedTarget ?z_target .").append("\n");
+        buf.append("            FILTER (lcase(str(?z_target))=\"" + target + "\"" + "^^xsd:string)").append("\n");
+        buf.append("}").append("\n");
+        buf.append("").append("\n");
+        buf.append("").append("\n");
+        return buf.toString();
+	}
+
+	public Vector getExactMatches(String named_graph, String target) {
+        String query = construct_get_exact_matches(named_graph, target);
+        Vector v = owlSPARQLUtils.executeQuery(query);
+        if (v == null) return null;
+        if (v.size() == 0) return v;
+        return new SortUtils().quickSort(v);
+	}
+
+	public static void main(String[] args) {
+		long ms = System.currentTimeMillis();
+		String serviceUrl = ConfigurationController.serviceUrl;
+		String namedGraph = ConfigurationController.namedGraph;
+		String username = ConfigurationController.username;
+		String password = ConfigurationController.password;
+	    ExactMatchByTerm test = new ExactMatchByTerm(serviceUrl, namedGraph, username, password);
+
+	    String target = args[0];
+	    Vector v = test.getExactMatches(namedGraph, target);
+	    Utils.dumpVector(target, v);
+	    System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
 }

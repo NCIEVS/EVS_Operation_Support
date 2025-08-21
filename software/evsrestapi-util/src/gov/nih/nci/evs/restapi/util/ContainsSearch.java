@@ -1341,7 +1341,7 @@ Row	NCIt code	NCIt DEFINITION	NCCN Regimen Name	NCCN Disease Name
         String prefixes = owlSPARQLUtils.getPrefixes();
         StringBuffer buf = new StringBuffer();
         buf.append(prefixes);
-        buf.append("select distinct ?x1_label ?x1_code ?z_target ").append("\n");
+        buf.append("select distinct ?x_label ?x_code ?z_target ").append("\n");
         buf.append("from <" + named_graph + ">").append("\n");
         buf.append("where  { ").append("\n");
         buf.append("            ?x a owl:Class .").append("\n");
