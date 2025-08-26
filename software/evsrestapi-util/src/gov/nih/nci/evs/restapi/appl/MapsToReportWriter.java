@@ -1,4 +1,5 @@
 package gov.nih.nci.evs.restapi.appl;
+import gov.nih.nci.evs.restapi.config.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.common.*;
 import gov.nih.nci.evs.restapi.util.*;
@@ -483,12 +484,13 @@ Mapped ICDO3.1 Morphology PT Terminology (C168658)
 		label0 = label0.replaceAll(" ", "_");
 		char delim = '|';
 		//String headerColor = ExcelWriter.RED;
-		String excelfile = label0 + "_(" + version + ")_" + StringUtils.getToday() + ".xlsx";
-		new ExcelWriter().writeToXSSF(datafile_vec, excelfile, delim, sheetLabel_vec, null);
+		String excelfile = label0 + "_(" + version + ")_" + StringUtils.getToday() + ".xls";
+		//new ExcelWriter().writeToXSSF(datafile_vec, excelfile, delim, sheetLabel_vec, null);
+		new ExcelWriter().writeToHSSF(datafile_vec, excelfile, delim, sheetLabel_vec, null);
 		System.out.println(excelfile + " generated.");
 	}
 
-/*
+
     public static void main(String[] args) {
 		String serviceUrl = ConfigurationController.serviceUrl;
 		String namedGraph = ConfigurationController.namedGraph;
@@ -503,7 +505,7 @@ Mapped ICDO3.1 Morphology PT Terminology (C168658)
 		mapsToReportWriter.run(terminology_name, terminology_version);
         System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
     }
-*/
+
 }
 
 
