@@ -672,6 +672,27 @@ public class ExcelReadWriteUtils {
 		return excelFileName;
 	}
 
+
+    public static String xlsx2xls(String xlsxfile) {
+        System.out.println("xlsxfile: " + xlsxfile);
+        int n = xlsxfile.lastIndexOf(".");
+        String sheetName = xlsxfile.substring(0, n);
+        String textfile = sheetName + ".txt";
+        int sheet_num = 0;
+		Vector w = ExcelReader.toDelimited(xlsxfile, sheet_num, '\t');
+		Utils.saveToFile(textfile, w);
+		String xlsfile = null;
+		try {
+	        xlsfile = ExcelReadWriteUtils.text2XLS(textfile, '\t', sheetName);
+			//short firstRowColor = IndexedColors.LIGHT_GREEN.getIndex();
+			//ExcelFormatter.reformat(xlsfile, firstRowColor);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	    return xlsfile;
+    }
+
+
 	public static void main(String[] args) throws IOException {
         try {
         	String xlsfile = args[0];

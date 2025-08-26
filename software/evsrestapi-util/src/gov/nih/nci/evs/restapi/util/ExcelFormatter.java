@@ -450,7 +450,8 @@ v.	H is a width of 35
         	Vector v = Utils.readFile(textfile);
 			String line = (String) v.elementAt(0);
 			Vector u = StringUtils.parseData(line, '\t');
-        	int numCol = u.size();
+        	//int numCol = u.size();
+        	int numCol = u.size() + 10;
          	int[] widths = new int[numCol];
         	for (int k=0; k<numCol; k++) {
 				widths[k] = 0;
