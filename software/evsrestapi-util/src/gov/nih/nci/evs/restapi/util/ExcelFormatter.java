@@ -93,16 +93,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  *
  */
 public class ExcelFormatter {
-
-/*
-c.	Set the column widths (there are specific parameters to follow for each column)
-i.	A-B are width of 8
-ii.	C is a width of 12
-iii.	D-F is a width of 35
-iv.	G is a width of 64
-v.	H is a width of 35
-*/
-
 	public static void hightlightFirstRow(Sheet sheet) {
 		HSSFRow row;
 		HSSFCell cell;
@@ -126,28 +116,7 @@ v.	H is a width of 35
 		}
 	}
 
-/*
-	public static String reformat(String xlsfile, String outputfile) {
-		Vector<Integer> widths = new Vector();
-		widths.add(Integer.valueOf(8 * 256));
-		widths.add(Integer.valueOf(8 * 256));
-		widths.add(Integer.valueOf(12 * 256));
-		widths.add(Integer.valueOf(35 * 256));
-		widths.add(Integer.valueOf(35 * 256));
-		widths.add(Integer.valueOf(35 * 256));
-		widths.add(Integer.valueOf(64 * 256));
-		widths.add(Integer.valueOf(35 * 256));
-		return reformat(xlsfile, outputfile, widths);
-	}
-*/
-
-	public static String reformat(String xlsfile, String outputfile, Vector<Integer> widths) {
-		 short firstRowColor = IndexedColors.YELLOW.getIndex();
-		return reformat(xlsfile, outputfile, widths, firstRowColor);
-	}
-
-
-	public static String reformat(String xlsfile, String outputfile, Vector<Integer> widths, short firstRowColor) {
+	public static String reformat(String xlsfile, String outputfile, short firstRowColor) {
 		if (outputfile == null) {
 			outputfile = "modified_" + xlsfile;
 			System.out.println(xlsfile);
@@ -155,155 +124,149 @@ v.	H is a width of 35
 
 		boolean status = false;
 		FileOutputStream fileOut = null;
+		int numberSheets = 0;
 		try {
 			InputStream inp = new FileInputStream(xlsfile);
 			Workbook wb = WorkbookFactory.create(inp);
-			Sheet sheet = wb.getSheetAt(0);
-			HSSFRow row = null;
-			HSSFCell cell = null;
 
-            for (int k=0; k<widths.size(); k++) {
-				Integer int_obj = (Integer) widths.elementAt(k);
-				int m = int_obj.intValue();
-				sheet.setColumnWidth(k, m);
-			}
-			/*
-			sheet.setColumnWidth(0, 8 * 256);   //A
-			sheet.setColumnWidth(1, 8 * 256);   //B
-			sheet.setColumnWidth(2, 12 * 256);  //C
-			sheet.setColumnWidth(3, 35 * 256);  //D
-			sheet.setColumnWidth(4, 35 * 256);  //E
-			sheet.setColumnWidth(5, 35 * 256);  //F
-			sheet.setColumnWidth(6, 64 * 256);  //G
-			sheet.setColumnWidth(7, 35 * 256);  //H
-			*/
+			numberSheets = wb.getNumberOfSheets();
 
-            int n = xlsfile.lastIndexOf(".");
-			//String sheetName = xlsfile.substring(0,n);
-			Font font= wb.createFont();
-			font.setFontName("Arial");
-			font.setBold(false);
-			font.setItalic(false);
+			for (int lcv=0; lcv<numberSheets; lcv++) {
+				Sheet sheet = wb.getSheetAt(lcv);
+				Vector<Integer> widths = getColWidthEstimates(xlsfile, lcv);
+				HSSFRow row = null;
+				HSSFCell cell = null;
 
-			Iterator rows = sheet.rowIterator();
-			int row_num = 0;
-			while (rows.hasNext())
-			{
-				StringBuffer buf = new StringBuffer();
-				row = (HSSFRow) rows.next();
-				row.setHeight((short)-1);
-				if (row_num == 0) {
-					row.setHeight((short)950);
+				for (int k=0; k<widths.size(); k++) {
+					Integer int_obj = (Integer) widths.elementAt(k);
+					int m = int_obj.intValue();
+					sheet.setColumnWidth(k, m);
 				}
-				cell = row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-				boolean costlistRow = false;
-				String costlistCode = getCellData(cell);
+				int n = xlsfile.lastIndexOf(".");
+				//String sheetName = xlsfile.substring(0,n);
+				Font font= wb.createFont();
+				font.setFontName("Arial");
+				font.setBold(false);
+				font.setItalic(false);
 
-				if (costlistCode == null || costlistCode.compareTo("null") == 0 || costlistCode.compareTo("") == 0) {
-					costlistRow = true;
-				}
-
-				for(int i=0; i<row.getLastCellNum(); i++) {
-                    cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
- 				    CellStyle cellStyle = cell.getCellStyle();
-					cellStyle.setWrapText(true);   //Wrapping text
+				Iterator rows = sheet.rowIterator();
+				int row_num = 0;
+				while (rows.hasNext())
+				{
+					StringBuffer buf = new StringBuffer();
+					row = (HSSFRow) rows.next();
+					row.setHeight((short)-1);
 					if (row_num == 0) {
-						cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+						row.setHeight((short)950);
+					}
+					cell = row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+					boolean costlistRow = false;
+					String costlistCode = getCellData(cell);
 
-					} else {
-						cellStyle.setVerticalAlignment(VerticalAlignment.TOP);
+					if (costlistCode == null || costlistCode.compareTo("null") == 0 || costlistCode.compareTo("") == 0) {
+						costlistRow = true;
 					}
 
-					if (costlistRow) {
-						cellStyle.setFillBackgroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
-						cellStyle.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
-						cellStyle.setFont(font);
-				    }
-					cellStyle.setBorderTop(BorderStyle.THIN);
-					cellStyle.setBorderBottom(BorderStyle.THIN);
-					cellStyle.setBorderLeft(BorderStyle.THIN);
-					cellStyle.setBorderRight(BorderStyle.THIN);
-					cell.setCellStyle(cellStyle);
-				}
-				row_num++;
-			}
+					for(int i=0; i<row.getLastCellNum(); i++) {
+						cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+						CellStyle cellStyle = cell.getCellStyle();
+						cellStyle.setWrapText(true);   //Wrapping text
+						if (row_num == 0) {
+							cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
-			setAutoFilter(sheet, 'H');
-			//hightlightFirstRow(sheet);
+						} else {
+							cellStyle.setVerticalAlignment(VerticalAlignment.TOP);
+						}
 
-			//sheet = wb.getSheetAt(2);
-			sheet = wb.getSheetAt(0);
-			row = null;
-			cell = null;
-
-
-            for (int k=0; k<widths.size(); k++) {
-				Integer int_obj = (Integer) widths.elementAt(k);
-				int m = int_obj.intValue();
-				sheet.setColumnWidth(k, m);
-			}
-            n = xlsfile.lastIndexOf(".");
-			//String sheetName = xlsfile.substring(0,n);
-			font= wb.createFont();
-			font.setFontName("Arial");
-			font.setBold(false);
-			font.setItalic(false);
-
-			rows = sheet.rowIterator();
-			row_num = 0;
-			while (rows.hasNext())
-			{
-				StringBuffer buf = new StringBuffer();
-				row = (HSSFRow) rows.next();
-				row.setHeight((short)-1);
-				if (row_num == 0) {
-					row.setHeight((short)950);
-				}
-				cell = row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-				boolean costlistRow = false;
-				String costlistCode = getCellData(cell);
-
-				if (costlistCode == null || costlistCode.compareTo("null") == 0 || costlistCode.compareTo("") == 0) {
-					costlistRow = true;
+						if (costlistRow) {
+							cellStyle.setFillBackgroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
+							cellStyle.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
+							cellStyle.setFont(font);
+						}
+						cellStyle.setBorderTop(BorderStyle.THIN);
+						cellStyle.setBorderBottom(BorderStyle.THIN);
+						cellStyle.setBorderLeft(BorderStyle.THIN);
+						cellStyle.setBorderRight(BorderStyle.THIN);
+						cell.setCellStyle(cellStyle);
+					}
+					row_num++;
 				}
 
-				for(int i=0; i<row.getLastCellNum(); i++) {
-                    cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
- 				    CellStyle cellStyle = cell.getCellStyle();
-					cellStyle.setWrapText(true);   //Wrapping text
+				setAutoFilter(sheet, 'H');
+				//hightlightFirstRow(sheet);
+
+				//sheet = wb.getSheetAt(2);
+				sheet = wb.getSheetAt(0);
+				row = null;
+				cell = null;
+
+
+				for (int k=0; k<widths.size(); k++) {
+					Integer int_obj = (Integer) widths.elementAt(k);
+					int m = int_obj.intValue();
+					sheet.setColumnWidth(k, m);
+				}
+				n = xlsfile.lastIndexOf(".");
+				//String sheetName = xlsfile.substring(0,n);
+				font= wb.createFont();
+				font.setFontName("Arial");
+				font.setBold(false);
+				font.setItalic(false);
+
+				rows = sheet.rowIterator();
+				row_num = 0;
+				while (rows.hasNext())
+				{
+					StringBuffer buf = new StringBuffer();
+					row = (HSSFRow) rows.next();
+					row.setHeight((short)-1);
 					if (row_num == 0) {
-						cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-						//cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
-						//cellStyle.setFillBackgroundColor(IndexedColors.YELLOW.getIndex());
-						//cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-						//row.setRowStyle(cellStyle);
+						row.setHeight((short)950);
+					}
+					cell = row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+					boolean costlistRow = false;
+					String costlistCode = getCellData(cell);
 
-					} else {
-						cellStyle.setVerticalAlignment(VerticalAlignment.TOP);
+					if (costlistCode == null || costlistCode.compareTo("null") == 0 || costlistCode.compareTo("") == 0) {
+						costlistRow = true;
 					}
 
-					if (costlistRow) {
-						cellStyle.setFillBackgroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
-						cellStyle.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
-						cellStyle.setFont(font);
-				    }
-					cellStyle.setBorderTop(BorderStyle.THIN);
-					cellStyle.setBorderBottom(BorderStyle.THIN);
-					cellStyle.setBorderLeft(BorderStyle.THIN);
-					cellStyle.setBorderRight(BorderStyle.THIN);
-					cellStyle.setVerticalAlignment(VerticalAlignment.TOP);
-					cell.setCellStyle(cellStyle);
+					for(int i=0; i<row.getLastCellNum(); i++) {
+						cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+						CellStyle cellStyle = cell.getCellStyle();
+						cellStyle.setWrapText(true);   //Wrapping text
+						if (row_num == 0) {
+							cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+							//cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+							//cellStyle.setFillBackgroundColor(IndexedColors.YELLOW.getIndex());
+							//cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+							//row.setRowStyle(cellStyle);
+
+						} else {
+							cellStyle.setVerticalAlignment(VerticalAlignment.TOP);
+						}
+
+						if (costlistRow) {
+							cellStyle.setFillBackgroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
+							cellStyle.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
+							cellStyle.setFont(font);
+						}
+						cellStyle.setBorderTop(BorderStyle.THIN);
+						cellStyle.setBorderBottom(BorderStyle.THIN);
+						cellStyle.setBorderLeft(BorderStyle.THIN);
+						cellStyle.setBorderRight(BorderStyle.THIN);
+						cellStyle.setVerticalAlignment(VerticalAlignment.TOP);
+						cell.setCellStyle(cellStyle);
+					}
+					row_num++;
 				}
-				row_num++;
+
+				setAutoFilter(sheet, 'J');
 			}
 
-			setAutoFilter(sheet, 'J');
-			//hightlightFirstRow(sheet);
-            //outputfile = "modified_" + xlsfile;
 			fileOut = new FileOutputStream(outputfile);
 			wb.write(fileOut);
 			status = true;
-			//System.out.println(xlsfile + " is modified and saved as " + outputfile);
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -315,9 +278,9 @@ v.	H is a width of 35
 				ex.printStackTrace();
 			}
 		}
-		//hightlightFirstRow(outputfile, 1);
-		//hightlightFirstRow(outputfile, 2);
-		hightlightFirstRow(outputfile, 0, firstRowColor);
+		for (int lcv=0; lcv<numberSheets; lcv++) {
+			hightlightFirstRow(outputfile, lcv, firstRowColor);
+		}
 		return outputfile;
 	}
 
@@ -488,8 +451,7 @@ v.	H is a width of 35
 
 	public static void reformat(String xlsfile, short firstRowColor) {
 		FileUtils.copyfile(xlsfile, "bak_" + xlsfile);
-		Vector<Integer> widths = getColWidthEstimates(xlsfile, 0);
-		reformat(xlsfile, xlsfile, widths, firstRowColor);
+		reformat(xlsfile, xlsfile, firstRowColor);
 	}
 
 	public static void main(String[] args) {
