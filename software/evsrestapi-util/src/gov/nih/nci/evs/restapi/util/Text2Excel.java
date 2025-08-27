@@ -7,6 +7,9 @@ import java.util.*;
 import java.nio.file.*;
 import java.nio.charset.Charset;
 
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
 /**
  * <!-- LICENSE_TEXT_START -->
  * Copyright 2022 Guidehouse. This software was developed in conjunction
@@ -80,6 +83,30 @@ public class Text2Excel {
         return v;
 	}
 
+    public static Vector getSheetNames(String excelfile) {
+		Vector sheetLabel_vec = new Vector();
+	    Workbook workbook = ExcelReader.openWorkbook(excelfile);
+	    int numberOfSheets = workbook.getNumberOfSheets();
+	    System.out.println("numberOfSheets: " + numberOfSheets);
+	    for (int i=0; i<numberOfSheets; i++) {
+		    Sheet sheet = workbook.getSheetAt(i);
+		    String sheetName = sheet.getSheetName();
+		    System.out.println("sheetName: " + sheetName);
+		    sheetLabel_vec.add(sheetName);
+		}
+		return sheetLabel_vec;
+	}
+
+    public static void generateExcel(Vector datafile_vec, String excelfile, char delim, Vector sheetLabel_vec) {
+		ExcelWriter writer = new ExcelWriter();
+		if (excelfile.endsWith(".xls")) {
+			writer.writeToHSSF(datafile_vec, excelfile, delim, sheetLabel_vec);
+		} else {
+			writer.writeToXSSF(datafile_vec, excelfile, delim, sheetLabel_vec);
+		}
+		System.out.println(excelfile + " generated.");
+	}
+
     public static void generateExcel(String dir, String excelfile, char delim) {
 		Vector files = listFilesInDirectory(dir);
 		String currentPath = null;
@@ -100,7 +127,7 @@ public class Text2Excel {
 		}
 		Utils.dumpVector("datafile_vec", datafile_vec);
 		Utils.dumpVector("sheetLabel_vec", sheetLabel_vec);
-		new ExcelWriter().writeToXSSF(datafile_vec, excelfile, delim, sheetLabel_vec, null);
+		generateExcel(datafile_vec, excelfile, delim, sheetLabel_vec);
 		System.out.println(excelfile + " generated.");
 	}
 
