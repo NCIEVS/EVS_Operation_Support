@@ -148,7 +148,7 @@ public class SPARQLQueryGenerator {
 		w.add("\tVector v = owlSPARQLUtils.executeQuery(query);");
 		w.add("\tif (v == null) return null;");
 		w.add("\tif (v.size() == 0) return v;");
-		w.add("\tv = new ParserUtils().getResponseValues(v);");
+		//w.add("\tv = new ParserUtils().getResponseValues(v);");
 		w.add("\treturn new SortUtils().quickSort(v);");
 		w.add("}");
 		return w;

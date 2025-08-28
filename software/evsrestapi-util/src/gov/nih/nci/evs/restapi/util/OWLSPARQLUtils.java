@@ -4483,36 +4483,6 @@ bnode_07130346_a093_4c67_ad70_efd4d5bc5796_242618|Thorax|C12799|Maps_To|P375|Tho
  	    return w;
 	}
 
-	public String generate_get_distinct_property_values(String named_graph, String property_name) {
-		String prefixes = getPrefixes();
-		StringBuffer buf = new StringBuffer();
-		buf.append(prefixes);
-		buf.append("SELECT distinct ?z").append("\n");
-		buf.append("{").append("\n");
-
-		if (named_graph != null) {
-			buf.append("    graph <" + named_graph + ">").append("\n");
-		}
-		buf.append("{").append("\n");
-		buf.append("?x a owl:Class .").append("\n");
-		buf.append("?x rdfs:label ?x_label . ").append("\n");
-		buf.append("?x :NHC0 ?x_code .").append("\n");
-		buf.append("?x ?y ?z .").append("\n");
-		buf.append("?y rdfs:label ?y_label .").append("\n");
-		buf.append("?y rdfs:label \"" + property_name + "\"^^xsd:string  ").append("\n");
-		buf.append("}").append("\n");
-		buf.append("}").append("\n");
-		return buf.toString();
-	}
-
-	public Vector getDistinctPropertyValues(String named_graph, String property_name) {
-	    String query = generate_get_distinct_property_values(named_graph, property_name);
-	    Vector v = executeQuery(query);
-	    // v = new ParserUtils().getResponseValues(v);
-	    v = new SortUtils().quickSort(v);
-	    return v;
-	}
-
 	public String construct_get_concepts_with_properties(String named_graph, Vector prop_codes) {
 		String prefixes = getPrefixes();
 		StringBuffer buf = new StringBuffer();
@@ -6330,5 +6300,31 @@ bnode_07130346_a093_4c67_ad70_efd4d5bc5796_242618|Thorax|C12799|Maps_To|P375|Tho
 		v = new ParserUtils().getResponseValues(v);
 		return (String) v.elementAt(0);
 	}
+
+	public String construct_get_distinct_property_values(String named_graph, String prop_label) {
+		String prefixes = getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		buf.append("select distinct ?p_value ").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
+		buf.append("where  { ").append("\n");
+		buf.append("            	?x a owl:Class .").append("\n");
+		buf.append("            	?x ?p ?p_value .").append("\n");
+		buf.append("            	?p rdfs:label ?p_label .").append("\n");
+		buf.append("            	?p rdfs:label \"" + prop_label + "\"^^xsd:string .").append("\n");
+		buf.append("}").append("\n");
+		buf.append("").append("\n");
+		return buf.toString();
+	}
+
+
+	public Vector getDistinctPropertyValues(String named_graph, String prop_label) {
+		String query = construct_get_distinct_property_values(named_graph, prop_label);
+		Vector v = executeQuery(query);
+		if (v == null) return null;
+		if (v.size() == 0) return v;
+		return new SortUtils().quickSort(v);
+	}
+
 }
 
