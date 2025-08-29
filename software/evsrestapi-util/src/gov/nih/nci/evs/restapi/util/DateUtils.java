@@ -179,14 +179,14 @@ public class DateUtils {
 
     public static String getNCIThesaurusGraphName(int year, int month) {
 		 String version = getNCItMonthlyVersion(year, month);
-		 return NCI_THESAURUS_URI + version + ".owl";
+		 return NCI_THESAURUS_URI + "_" + version + ".owl";
 	}
 
     public static String getNCIThesaurusGraphName() {
 		int currentYear = getCurrentYear();
 		int currentMonth = getCurrentMonth();
 		String version = getNCItMonthlyVersion(currentYear, currentMonth);
-		return NCI_THESAURUS_URI + version + ".owl";
+		return NCI_THESAURUS_URI + "_" + version + ".owl";
 	}
 
 	public static int getCurrentMonth() {
@@ -290,7 +290,7 @@ public class DateUtils {
 
     public static String getNCIThesaurusGraphName(int year, int month, int week) {
 		 String version = getNCItVersion(year, month, week);
-		 return NCI_THESAURUS_URI + version + ".owl";
+		 return NCI_THESAURUS_URI + "_" + version + ".owl";
 	}
 
 
