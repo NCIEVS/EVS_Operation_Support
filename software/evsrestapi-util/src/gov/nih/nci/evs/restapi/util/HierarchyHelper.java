@@ -921,29 +921,37 @@ public class HierarchyHelper implements Serializable {
 		return buf.toString();
 	}
 
+	public String getParentConceptData(String code) {
+		Vector v1 = getSuperclassCodes(code);
+		if (v1 == null) {
+			return "";
+		}
+		Vector parents= new Vector();
+		for (int k=0; k<v1.size(); k++) {
+			String super_code = (String) v1.elementAt(k);
+			String super_label = getLabel(super_code);
+			String sup = super_label + " (" + super_code + ")";
+			parents.add(sup);
+		}
+		String str = vector2DelimitedString(parents, '$');
+		return str;
+	}
+
 	public String appendParentConcepts(String line) {
 		Vector u = StringUtils.parseData(line, '\t');
 		if (u.contains("No match")) return line;
-        String t0 = (String) u.elementAt(0);
         String codestr = (String) u.elementAt(1);
-        String super_display_names = "";
         Vector w1 = new Vector();
         Vector w2 = new Vector();
         Vector codes = StringUtils.parseData(codestr, '|');
+        Vector parents = new Vector();
         for (int i=0; i<codes.size(); i++) {
 			String code = (String) codes.elementAt(i);
-			Vector v1 = getSuperclassCodes(code);
-			Vector parents = new Vector();
-			for (int k=0; k<v1.size(); k++) {
-				String super_code = (String) v1.elementAt(k);
-				String super_label = getLabel(super_code);
-				String sup = super_label + " (" + super_code + ")";
-				parents.add(sup);
-			}
-			w1.add(vector2DelimitedString(parents, '$'));
+			String parentData = getParentConceptData(code);
+			parents.add(parentData);
 		}
-		String retstr = vector2DelimitedString(w1, '|');
-		return line + "\t" + retstr;
+		String str = vector2DelimitedString(parents, '|');
+		return line + "\t" + str;
 	}
 
 	public static String generateUserTree(String filename) {
