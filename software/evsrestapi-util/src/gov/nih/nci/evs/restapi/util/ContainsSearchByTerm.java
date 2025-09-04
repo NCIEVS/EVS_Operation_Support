@@ -63,6 +63,8 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 
 public class ContainsSearchByTerm {
 	static String AXIOM_FILE_NAME = "axiom_ThesaurusInferred_forTS.txt";
+	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
+    static HierarchyHelper hh = null;
 	static String AXIOM_FILE = null;
 	static HashMap term2CodesMap = null;
 	static HashMap NCIPTMap = null;
@@ -85,6 +87,11 @@ public class ContainsSearchByTerm {
 
 
 	static {
+		if (new File(PARENT_CHILD_FILE).exists()) {
+			Vector parent_child_vec = Utils.readFile(PARENT_CHILD_FILE);
+			hh = new HierarchyHelper(parent_child_vec);
+		}
+
 		AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE_NAME;
 		System.out.println(AXIOM_FILE);
 		File file = new File(AXIOM_FILE);
@@ -740,6 +747,90 @@ public class ContainsSearchByTerm {
 		System.out.println(resultfile + " generated.");
 		return resultfile;
 	}
+
+	public static String getParentConceptData(String code) {
+		Vector v1 = hh.getSuperclassCodes(code);
+		if (v1 == null) {
+			return "";
+		}
+		Vector parents= new Vector();
+		for (int k=0; k<v1.size(); k++) {
+			String super_code = (String) v1.elementAt(k);
+			String super_label = hh.getLabel(super_code);
+			String sup = super_label + " (" + super_code + ")";
+			parents.add(sup);
+		}
+		String str = hh.vector2DelimitedString(parents, '$');
+		return str;
+	}
+
+	public static String appendParentConcepts(String line) {
+		Vector u = StringUtils.parseData(line, '\t');
+		if (u.contains("No match")) return line;
+        String codestr = (String) u.elementAt(1);
+        Vector w1 = new Vector();
+        Vector w2 = new Vector();
+        Vector codes = StringUtils.parseData(codestr, '|');
+        Vector parents = new Vector();
+        for (int i=0; i<codes.size(); i++) {
+			String code = (String) codes.elementAt(i);
+			String parentData = getParentConceptData(code);
+			parents.add(parentData);
+		}
+		String str = hh.vector2DelimitedString(parents, '|');
+		return line + "\t" + str;
+	}
+
+	public static void run(String datafile, int colIndex, String branch_root, boolean generateXLS) {
+		long ms = System.currentTimeMillis();
+		Vector codes = null;
+		if (branch_root != null) {
+			String root = branch_root;
+			codes = hh.get_transitive_closure_v3(root);
+			Utils.saveToFile(root + ".txt", codes);
+		}
+
+		String outputfile = run(datafile, colIndex, generateXLS);
+		Vector v = Utils.readFile(outputfile);
+		if (codes != null) {
+			Vector w = Utils.readFile(outputfile);
+			v = new Vector();
+			v.add((String) w.elementAt(0));
+			for (int i=1; i<w.size(); i++) {
+				String line = (String) w.elementAt(i);
+				Vector u = StringUtils.parseData(line, '\t');
+				String code = (String) u.elementAt(1);
+				if (codes.contains(code) || code.compareTo("No match") == 0) {
+					v.add(line);
+				}
+			}
+		}
+		Utils.saveToFile("V1_" + outputfile, v);
+		Vector w = Utils.readFile("V1_" + outputfile);
+		v = new Vector();
+		v.add((String) w.elementAt(0));
+		for (int i=1; i<w.size(); i++) {
+			String line = (String) w.elementAt(i);
+			line = appendParentConcepts(line);
+			v.add(line);
+		}
+		String textfile = "V2_" + outputfile;
+		Utils.saveToFile(textfile, v);
+
+        if (generateXLS) {
+			int n = textfile.lastIndexOf(".");
+			String sheetName = textfile.substring(0, n);
+			String xlsfile = null;
+			char delim = '\t';
+			try {
+				xlsfile = ExcelReadWriteUtils.writeXLSFile(textfile, delim, sheetName);
+				ExcelFormatter.reformat(xlsfile, IndexedColors.LIGHT_GREEN.getIndex());
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+    }
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
