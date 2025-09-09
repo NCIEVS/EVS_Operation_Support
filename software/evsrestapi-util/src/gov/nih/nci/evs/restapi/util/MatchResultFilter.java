@@ -72,10 +72,13 @@ public class MatchResultFilter {
     static HashSet retiredConcepts = new HashSet();
     static String CONCEPT_STATUS_FILE = "P310.txt";
     static String branchfile = null;
+    static HierarchyHelper hh = null;
 
 	static {
 		AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE_NAME;
-        NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
+		String HIER_FILE = ConfigurationController.reportGenerationDirectory + File.separator + HIER_FILE_NAME;
+		Vector v = Utils.readFile(HIER_FILE);
+		hh = new HierarchyHelper(v);
 
 		System.out.println(AXIOM_FILE);
 		File file = new File(AXIOM_FILE);
@@ -107,9 +110,7 @@ public class MatchResultFilter {
 			file = new File(branchfile);
 			if (!file.exists()) {
 				System.out.println(branchfile + " does not exists.");
-				String HIER_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile;
-				Vector v = Utils.readFile(HIER_FILE);
-				HierarchyHelper hh = new HierarchyHelper(v);
+
 				int n = branchfile.indexOf(".");
 				String root = branchfile.substring(0, n);//"C62634";
 				codes = extractBranchCodes(root);
@@ -136,6 +137,39 @@ public class MatchResultFilter {
 			}
 		}
 		return hset;
+	}
+
+	public static String getParentConceptData(String code) {
+		Vector v1 = hh.getSuperclassCodes(code);
+		if (v1 == null) {
+			return "";
+		}
+		Vector parents= new Vector();
+		for (int k=0; k<v1.size(); k++) {
+			String super_code = (String) v1.elementAt(k);
+			String super_label = hh.getLabel(super_code);
+			String sup = super_label + " (" + super_code + ")";
+			parents.add(sup);
+		}
+		String str = hh.vector2DelimitedString(parents, '$');
+		return str;
+	}
+
+	public static String appendParentConcepts(String line) {
+		Vector u = StringUtils.parseData(line, '\t');
+		if (u.contains("No match")) return line;
+        String codestr = (String) u.elementAt(1);
+        Vector w1 = new Vector();
+        Vector w2 = new Vector();
+        Vector codes = StringUtils.parseData(codestr, '|');
+        Vector parents = new Vector();
+        for (int i=0; i<codes.size(); i++) {
+			String code = (String) codes.elementAt(i);
+			String parentData = getParentConceptData(code);
+			parents.add(parentData);
+		}
+		String str = hh.vector2DelimitedString(parents, '|');
+		return line + "\t" + str;
 	}
 
 	public static boolean is_retired(String code) {
@@ -379,6 +413,11 @@ public class MatchResultFilter {
 	}
 
 	public static String run(String datafile, String outputfile, boolean generateXLS) {
+		return run(datafile, branch, outputfile, generateXLS);
+	}
+
+
+	public static String run(String datafile, HashSet branch, String outputfile, boolean generateXLS) {
 		long ms = System.currentTimeMillis();
 		Vector no_matches = new Vector();
 		Vector matches = new Vector();
