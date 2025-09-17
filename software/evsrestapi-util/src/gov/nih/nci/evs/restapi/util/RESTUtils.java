@@ -220,7 +220,7 @@ public class RESTUtils {
         JSONUtils jsonUtils = new JSONUtils();
 		Vector w = jsonUtils.parseJSON(json);
         w = jsonUtils.getResponseValues(w);
-        Utils.dumpVector("w", w);
+        //Utils.dumpVector("w", w);
 
 	}
 

@@ -341,7 +341,7 @@ public class HTTPUtils {
 			String json = util.executeQuery(url, username, password, "application/json");
 			if (json != null) {
 				v = new JSONUtils().parseJSON(json);
-				v = new ParserUtils().getResponseValues(v);
+				v = getResponseValues(v);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -360,7 +360,105 @@ public class HTTPUtils {
 		return new RESTUtils(username, password, readTimeout, connectTimeout).runSPARQL(query, restURL);
 	}
 
+	public static Vector getResponseVariables(Vector v) {
+		if (v == null) return null;
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = parseData(line, '|');
+			String var = (String) u.elementAt(0);
+			if (!w.contains(var)) {
+				w.add(var);
+			}
+		}
+		return w;
+	}
 
+	public static String getVariableName(String line) {
+		Vector u = parseData(line, '|');
+		return (String) u.elementAt(0);
+	}
+
+    public static String getValue(String t) {
+		if (t == null) return null;
+		Vector v = parseData(t, '|');
+		if (v.size() == 0) return null;
+		return (String) v.elementAt(v.size()-1);
+	}
+
+	public static Vector getResponseValues(Vector v) {
+		if (v == null || v.size() == 0) return null;
+		Vector w = new Vector();
+		Vector vars = getResponseVariables(v);
+		String firstVar = (String) vars.elementAt(0);
+		String[] values = new String[vars.size()];
+		for (int i=0; i<vars.size(); i++) {
+			values[i] = null;
+		}
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			String var = getVariableName(line);
+			if (var.compareTo(firstVar) == 0 && values[0] != null) {
+				StringBuffer buf = new StringBuffer();
+				for (int j=0; j<vars.size(); j++) {
+					String t = values[j];
+					if (t == null) {
+						t = "null";
+					}
+					buf.append(t);
+					if (j < vars.size()-1) {
+						buf.append("|");
+					}
+				}
+				String s = buf.toString();
+				w.add(s);
+
+				for (int k=0; k<vars.size(); k++) {
+					values[k] = null;
+			    }
+		    }
+		    String value = getValue(line);
+			for (int k=0; k<vars.size(); k++) {
+				if (var.compareTo((String) vars.elementAt(k)) == 0) {
+					values[k] = value;
+				}
+			}
+
+		}
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<vars.size(); i++) {
+			String t = values[i];
+			if (t == null) {
+				t = "null";
+			}
+			buf.append(t);
+			if (i < vars.size()-1) {
+				buf.append("|");
+			}
+		}
+		String s = buf.toString();
+		w.add(s);
+		return w;
+	}
+
+    public static Vector parseData(String line, char delimiter) {
+		if(line == null) return null;
+		Vector w = new Vector();
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<line.length(); i++) {
+			char c = line.charAt(i);
+			if (c == delimiter) {
+				w.add(buf.toString());
+				buf = new StringBuffer();
+			} else {
+				buf.append(c);
+			}
+		}
+		w.add(buf.toString());
+		return w;
+	}
+
+	/*
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		String restURL = args[0];
@@ -369,7 +467,7 @@ public class HTTPUtils {
 		String password = null;
 		String query = loadQuery(queryfile);
 		Vector v = runQuery(restURL, username, password, query);
-		Utils.dumpVector("v", v);
+		//Utils.dumpVector("v", v);
 
 		String json = new HTTPUtils(restURL).runSPARQL(query, restURL);
 		System.out.println(json);
@@ -377,9 +475,10 @@ public class HTTPUtils {
 
 		Vector w = jsonUtils.parseJSON(json);
         w = jsonUtils.getResponseValues(w);
-        Utils.dumpVector("w", w);
+        //Utils.dumpVector("w", w);
 
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
+	*/
 }
 
