@@ -70,6 +70,7 @@ public class OWLScanner {
     static String NAMESPACE = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
     static String NAMESPACE_TARGET = "<!-- " + NAMESPACE;
     static String OWL_CLS_TARGET = NAMESPACE_TARGET + "C";
+    static String OWL_PROPERTY_TARGET = NAMESPACE_TARGET + "P";
     static String OWL_ANNOTATION_PROPERTY_TARGET = NAMESPACE_TARGET + "A";
 
 	static String open_tag = "<owl:Axiom>";
@@ -3459,6 +3460,36 @@ C4910|<NHC0>C4910</NHC0>
 			}
 		}
 		w = new SortUtils().quickSort(w);
+		return w;
+	}
+
+	public Vector getOWLAnnotationPropertyDataByCode(String code) {
+		Vector w = new Vector();
+		String target = NAMESPACE_TARGET + code + " -->";
+		boolean istart = false;
+		for (int i=0; i<owl_vec.size(); i++) {
+			String line = (String) owl_vec.elementAt(i);
+			if (line.indexOf(target) != -1) {
+				istart = true;
+			} else if (istart && line.indexOf(OWL_PROPERTY_TARGET) != -1) {
+                istart = false;
+			}
+			if (istart) {
+				w.add(line);
+			}
+		}
+		return w;
+	}
+
+	public static Vector getOWLAnnotationPropertyDataByCodes(String owlfile, Vector codes) {
+		Vector w = new Vector();
+		OWLScanner scanner = new OWLScanner(owlfile);
+		for (int i=0; i<codes.size(); i++) {
+			String code = (String) codes.elementAt(i);
+			Vector v = scanner.getOWLAnnotationPropertyDataByCode(code);
+			w.addAll(v);
+			w.add("\n");
+		}
 		return w;
 	}
 
