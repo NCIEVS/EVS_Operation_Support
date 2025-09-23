@@ -3493,6 +3493,89 @@ C4910|<NHC0>C4910</NHC0>
 		return w;
 	}
 
+
+    public static String getClassId(String line) {
+         line = line.trim();
+         int n = line.lastIndexOf("#");
+         String t = line.substring(n+1, line.length());
+         n = t.lastIndexOf(" ");
+         t = t.substring(0, n);
+         return t;
+	}
+
+    public static String getPropertyValue(String line) {
+         line = line.trim();
+         int n = line.lastIndexOf("<");
+         String t = line.substring(0, n);
+         n = t.lastIndexOf(">");
+         t = t.substring(n+1, t.length());
+         return t;
+	}
+
+	public static Vector getPropertyData(String owlfile, String OWL_CLS_TARGET, Vector property_vec) {
+		Vector owl_vec = Utils.readFile(owlfile);
+		HashMap hmap0 = new HashMap();
+		HashMap hmap = new HashMap();
+		String classId = null;
+		for (int i=0; i<owl_vec.size(); i++) {
+			String line = (String) owl_vec.elementAt(i);
+			if (line.indexOf(OWL_CLS_TARGET) != -1) {
+				if (classId != null) {
+					hmap0.put(classId, hmap);
+				}
+				classId = getClassId(line);
+				hmap = new HashMap();
+			} else {
+				line = line.trim();
+				for (int k=0; k<property_vec.size(); k++) {
+					String prop = (String) property_vec.elementAt(k);
+					String s = "<" + prop;
+					if (line.startsWith(s)) {
+						String value = getPropertyValue(line);
+						hmap.put(prop, value);
+					}
+				}
+			}
+		}
+		if (hmap != null) {
+			hmap0.put(classId, hmap);
+		}
+		return flattenHashMapData(hmap0, property_vec);
+	}
+
+    public static Vector flattenHashMapData(HashMap hmap0, Vector keys) {
+		Vector w = new Vector();
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<keys.size(); i++) {
+			String key = (String) keys.elementAt(i);
+			buf.append(key);
+			if (i<keys.size()-1) {
+				buf.append("|");
+			}
+		}
+		String line = buf.toString();
+		w.add("Code|" + line);
+
+		Iterator it = hmap0.keySet().iterator();
+		while (it.hasNext()) {
+			String code = (String) it.next();
+			HashMap hmap = (HashMap) hmap0.get(code);
+			buf = new StringBuffer();
+			for (int i=0; i<keys.size(); i++) {
+				String key = (String) keys.elementAt(i);
+				String value = (String) hmap.get(key);
+				buf.append(value);
+				if (i<keys.size()-1) {
+					buf.append("|");
+				}
+			}
+			line = buf.toString();
+			w.add(code + "|" + line);
+		}
+		return w;
+	}
+
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
         String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
