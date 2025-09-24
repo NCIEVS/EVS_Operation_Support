@@ -710,4 +710,24 @@ public class Utils {
 		}
 		return w;
 	}
+
+    public static HashMap vector2MultiValuedHashMap(Vector v, char delim, int keyCol, int valueCol) {
+		HashMap hmap = new HashMap();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			String key = (String) u.elementAt(keyCol);
+			String value = (String) u.elementAt(valueCol);
+			Vector w = new Vector();
+			if (hmap.containsKey(key)) {
+				w = (Vector) hmap.get(key);
+			}
+			if (!w.contains(value)) {
+				w.add(value);
+			}
+			hmap.put(key, w);
+		}
+		return hmap;
+	}
+
 }
