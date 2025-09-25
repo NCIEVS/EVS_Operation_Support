@@ -66,6 +66,7 @@ public class ReflectionUtils {
 		}
 
 		out.println("import java.lang.Class;");
+		out.println("import java.util.*;");
 		out.println("import java.lang.reflect.*;");
 		out.println("");
 		out.println("class " + className + " {");

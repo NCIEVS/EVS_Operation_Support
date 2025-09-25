@@ -730,4 +730,11 @@ public class Utils {
 		return hmap;
 	}
 
+    public static String[] vector2Array(Vector v) {
+		String[] a = new String[v.size()];
+		for (int i=0; i<v.size(); i++) {
+			a[i] = (String) v.elementAt(i);
+		}
+		return a;
+	}
 }
