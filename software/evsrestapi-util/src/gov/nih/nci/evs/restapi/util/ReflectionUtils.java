@@ -42,7 +42,6 @@ public class ReflectionUtils {
 		}
 	}
 
-
     public static void generateReflectionRunner(PrintWriter out, String parentClassName, String methodSignature) {
 		int n = methodSignature.indexOf("(");
 		String methodName = methodSignature.substring(0, n);
@@ -66,8 +65,9 @@ public class ReflectionUtils {
 		}
 
 		out.println("import java.lang.Class;");
-		out.println("import java.util.*;");
 		out.println("import java.lang.reflect.*;");
+		out.println("import gov.nih.nci.evs.restapi.util.*;");
+
 		out.println("");
 		out.println("class " + className + " {");
 		out.println("");
@@ -91,6 +91,7 @@ public class ReflectionUtils {
 			buf.append(", ").append(type + ".class");
 		}
 		String s = buf.toString();
+
 		out.println("			Method method = clazz.getMethod(\"" + methodName + "\"" + s + ");");
 		out.println("			" + parentClassName + " instance = new " + parentClassName + "();");
 		if (param_vec.size() == 0) {
@@ -100,6 +101,9 @@ public class ReflectionUtils {
 			for (int k=0; k<param_vec.size(); k++) {
 				String type = (String) type_vec.elementAt(k);
 				String param = (String) param_vec.elementAt(k);
+				if (type.compareTo("String[]") == 0) {
+					param = "(Object) Utils.vector2Array(StringUtils.parseData(" + param + ", '|'))";
+				}
 				buf.append(param);
 				if (k<param_vec.size()-1) {
 					buf.append(", ");
