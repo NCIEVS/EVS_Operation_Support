@@ -1,5 +1,4 @@
 package gov.nih.nci.evs.restapi.util;
-import gov.nih.nci.evs.restapi.util.*;
 import gov.nih.nci.evs.restapi.config.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import java.io.*;
@@ -23,8 +22,10 @@ public class ReflectionUtils {
     public static void generateReflectionRunner(String parentClassName, String methodSignature) {
 		int n = methodSignature.indexOf("(");
 		String outputfile = methodSignature.substring(0, n) + ".java";
+
 		String firstChar = outputfile.substring(0, 1);
 		outputfile = firstChar.toUpperCase() + outputfile.substring(1, outputfile.length());
+
 		PrintWriter pw = null;
     	try{
     	    pw = new PrintWriter(outputfile);
@@ -53,14 +54,16 @@ public class ReflectionUtils {
 		Vector param_vec = new Vector();
 		if (t.length() > 0) {
 			u = StringUtils.parseData(t, ',');
-			for (int i=0; i<u.size(); i++) {
-				String s = (String) u.elementAt(i);
-				s = s.trim();
-				Vector u2 = StringUtils.parseData(s, ' ');
-				String type = (String) u2.elementAt(0);
-				String param = (String) u2.elementAt(1);
-				type_vec.add(type);
-				param_vec.add(param);
+			if (u.size() > 0) {
+				for (int i=0; i<u.size(); i++) {
+					String s = (String) u.elementAt(i);
+					s = s.trim();
+					Vector u2 = StringUtils.parseData(s, ' ');
+					String type = (String) u2.elementAt(0);
+					String param = (String) u2.elementAt(1);
+					type_vec.add(type);
+					param_vec.add(param);
+				}
 			}
 		}
 
