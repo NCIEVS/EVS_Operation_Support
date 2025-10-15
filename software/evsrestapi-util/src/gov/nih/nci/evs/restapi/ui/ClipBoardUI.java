@@ -1,5 +1,6 @@
 package gov.nih.nci.evs.restapi.ui;
 import gov.nih.nci.evs.restapi.util.*;
+import gov.nih.nci.evs.restapi.config.*;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -218,7 +219,6 @@ public class ClipBoardUI {
         return defaultToolkit.getSystemClipboard();
     }
 
-/*
     public static void main(String args[]) {
         ClipBoardUI ui = null;//new ClipBoardUI();
         String outputDir = ConfigurationController.nccn_output_dir;
@@ -226,5 +226,4 @@ public class ClipBoardUI {
         ui = new ClipBoardUI(outputDir, prefix);
         ui.initialize();
 	}
-*/
 }
