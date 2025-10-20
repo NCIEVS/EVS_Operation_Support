@@ -179,12 +179,37 @@ public class ExcelExporter {
 
     public static String run(String excelfile, int sheet_num) {
 		try {
-			return export(excelfile, sheet_num);
+			if (excelfile.endsWith("xls")) {
+				int n = excelfile.lastIndexOf(".");
+				String textfile = excelfile.substring(0, n) + ".txt";
+				Vector data = ExcelUtils.excel2Text(excelfile, sheet_num);
+				Utils.saveToFile(textfile, data);
+                return textfile;
+			} else {
+				return export(excelfile, sheet_num);
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		return null;
     }
+
+
+/*
+	public static void main(String[] args) {
+		String excelfile = args[0];
+		String sheetNumStr = args[1];
+	    int sheet_number = Integer.parseInt(sheetNumStr);
+		System.out.println("excelfile: " + excelfile);
+		Vector data = excel2Text(excelfile, sheet_number);
+        //generateTemplate(excelfile, 0);
+        //write("template_" + excelfile, "v2_" + excelfile, 0, data, '\t');
+        //String target_file = clone(excelfile);
+
+	}
+
+
+*/
 
     public static void exportExcelSheets(String excelfile, String outputDir) {
         Vector w = getSheetNames(excelfile);
