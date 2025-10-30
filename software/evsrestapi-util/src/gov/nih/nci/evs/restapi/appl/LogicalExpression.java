@@ -1,7 +1,5 @@
-package gov.nih.nci.evs.restapi.util;
-import gov.nih.nci.evs.restapi.bean.*;
-import gov.nih.nci.evs.restapi.common.*;
-import gov.nih.nci.evs.restapi.config.*;
+package gov.nih.nci.evs.restapi.appl;
+import gov.nih.nci.evs.restapi.util.*;
 import java.io.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -77,7 +75,7 @@ public class LogicalExpression {
     String version = null;
     String username = null;
     String password = null;
-    OWLSPARQLUtils owlSPARQLUtils = null;
+    BasicSPARQLUtils basicSPARQLUtils = null;
     static HashMap transitionMatrix = null;
     static Vector absorbingStates = null;
     static int MAX_LENGTH = 10;
@@ -90,49 +88,100 @@ public class LogicalExpression {
 		pathMap = createPathMap();
 		path2RoleGroupMap = createPath2RoleGroupMap();
 	}
-/*
-	public HashMap getRangeHashMap() {
-		return this.rangeHashMap;
-	}
-*/
-    public LogicalExpression() {
-		this.serviceUrl = ConfigurationController.serviceUrl;
-    	this.named_graph = ConfigurationController.namedGraph;
-    	this.username = ConfigurationController.username;
-    	this.password = ConfigurationController.password;
-        this.owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
-        this.owlSPARQLUtils.set_named_graph(named_graph);
-        rangeHashMap = getRangeHashMap(named_graph);
-    }
 
     public LogicalExpression(String serviceUrl, String named_graph, String username, String password) {
 		this.serviceUrl = serviceUrl;
     	this.named_graph = named_graph;
     	this.username = username;
     	this.password = password;
-        this.owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
-        this.owlSPARQLUtils.set_named_graph(named_graph);
+        this.basicSPARQLUtils = new BasicSPARQLUtils(serviceUrl, named_graph, username, password);
         rangeHashMap = getRangeHashMap(named_graph);
     }
 
-    public OWLSPARQLUtils getOWLSPARQLUtils() {
-		return this.owlSPARQLUtils;
+	public String construct_get_label_by_code(String named_graph, String code) {
+		String prefixes = basicSPARQLUtils.getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		buf.append("select ?x_label").append("\n");
+		buf.append("{").append("\n");
+		if (named_graph != null) {
+			buf.append("    graph <" + named_graph + ">").append("\n");
+		}
+		buf.append("    {").append("\n");
+		buf.append("	    ?x a owl:Class . ").append("\n");
+		buf.append("	    ?x :NHC0 \"" + code + "\"^^<http://www.w3.org/2001/XMLSchema#string> .").append("\n");
+		buf.append("	    ?x rdfs:label ?x_label    ").append("\n");
+		buf.append("    }").append("\n");
+		buf.append("}").append("\n");
+		return buf.toString();
 	}
 
 	public String getLabel(String code) {
-		Vector v = owlSPARQLUtils.getLabelByCode(code);
-		if (v != null) {
-			return (String) v.elementAt(0);
-		}
-		return null;
+		Vector v = getLabelByCode(code);
+		return (String) v.elementAt(0);
 	}
 
-	public Vector getSuperclassesByCode(String code) {
-		return owlSPARQLUtils.getSuperclassesByCode(named_graph, code);
+
+	public Vector getLabelByCode(String code) {
+		String query = construct_get_label_by_code(this.named_graph, code);
+		System.out.println(query);
+
+        Vector v = executeQuery(query);
+        if (v == null) return null;
+        if (v.size() == 0) return v;
+        return new SortUtils().quickSort(v);
 	}
+
+	public Vector getLabelByCode(String named_graph, String code) {
+        Vector v = executeQuery(construct_get_label_by_code(named_graph, code));
+        if (v == null) return null;
+        if (v.size() == 0) return v;
+        return new SortUtils().quickSort(v);
+	}
+
+	public Vector getSuperclassesByCode(String named_graph, String code) {
+        String query = construct_get_superclasses_by_code(named_graph, code);
+        Vector v = executeQuery(query);
+        if (v == null) return null;
+        if (v.size() == 0) return v;
+        return new SortUtils().quickSort(v);
+	}
+
+	public String construct_get_superclasses_by_code(String named_graph, String code) {
+        String prefixes = basicSPARQLUtils.getPrefixes();
+        StringBuffer buf = new StringBuffer();
+        buf.append(prefixes);
+        buf.append("select distinct ?y_label ?y_code").append("\n");
+        buf.append("{").append("\n");
+		if (named_graph != null) {
+			buf.append("    graph <" + named_graph + ">").append("\n");
+		}
+		buf.append("    {").append("\n");
+        buf.append("            {").append("\n");
+        buf.append("                ?x :NHC0 ?x_code .").append("\n");
+        buf.append("                ?x rdfs:label ?x_label .").append("\n");
+        buf.append("                ?y :NHC0 ?y_code .").append("\n");
+        buf.append("                ?y rdfs:label ?y_label .").append("\n");
+        buf.append("                ?x :NHC0 \"" + code + "\"^^xsd:string .").append("\n");
+        buf.append("                ?x rdfs:subClassOf ?y . ").append("\n");
+        buf.append("            } union {").append("\n");
+        buf.append("                ?x :NHC0 ?x_code .").append("\n");
+        buf.append("                ?x rdfs:label ?x_label .").append("\n");
+        buf.append("                ?y :NHC0 ?y_code .").append("\n");
+        buf.append("                ?y rdfs:label ?y_label .").append("\n");
+        buf.append("                ?x :NHC0 \"" + code + "\"^^xsd:string .").append("\n");
+        buf.append("                ?x rdfs:subClassOf ?rs . ").append("\n");
+        buf.append("                ?rs a owl:Restriction .  ").append("\n");
+        buf.append("            ?rs owl:onProperty ?p .").append("\n");
+        buf.append("                ?rs owl:someValuesFrom ?y .  ").append("\n");
+        buf.append("            }").append("\n");
+        buf.append("    }").append("\n");
+        buf.append("}").append("\n");
+        return buf.toString();
+    }
 
 	public String construct_get_domain(String named_graph) {
-        String prefixes = owlSPARQLUtils.getPrefixes();
+        String prefixes = basicSPARQLUtils.getPrefixes();
         StringBuffer buf = new StringBuffer();
         buf.append(prefixes);
         buf.append("select distinct ?r_code ?r_label ?r_domain_code ?r_domain_label").append("\n");
@@ -165,14 +214,14 @@ public class LogicalExpression {
 	public Vector getDomain(String named_graph) {
         String query = construct_get_domain(named_graph);
         System.out.println(query);
-        Vector v = owlSPARQLUtils.executeQuery(query);
+        Vector v = basicSPARQLUtils.executeQuery(query);
         if (v == null) return null;
         if (v.size() == 0) return v;
         return new SortUtils().quickSort(v);
 	}
 
 	public String construct_get_range(String named_graph) {
-        String prefixes = owlSPARQLUtils.getPrefixes();
+        String prefixes = basicSPARQLUtils.getPrefixes();
         StringBuffer buf = new StringBuffer();
         buf.append(prefixes);
         buf.append("select distinct ?r_code ?r_label ?r_range_code ?r_range_label").append("\n");
@@ -219,7 +268,7 @@ public class LogicalExpression {
 	public Vector getRange(String named_graph) {
         String query = construct_get_range(named_graph);
         System.out.println(query);
-        Vector v = owlSPARQLUtils.executeQuery(query);
+        Vector v = basicSPARQLUtils.executeQuery(query);
         if (v == null) return null;
         if (v.size() == 0) return v;
         //v = new ParserUtils().getResponseValues(v);
@@ -265,7 +314,7 @@ public class LogicalExpression {
 		int i_count = 0;
 		int u_count = 0;
 		int c_count = 0;
-        String prefixes = owlSPARQLUtils.getPrefixes();
+        String prefixes = basicSPARQLUtils.getPrefixes();
         StringBuffer buf = new StringBuffer();
         buf.append(prefixes);
         String selectStmt = path2SelectStmt(path);
@@ -359,7 +408,7 @@ public class LogicalExpression {
 	}
 
 	public Vector executeQuery(String query) {
-        Vector v = owlSPARQLUtils.executeQuery(query);
+        Vector v = basicSPARQLUtils.executeQuery(query);
         if (v == null) return null;
         if (v.size() == 0) return v;
         //v = new ParserUtils().getResponseValues(v);
@@ -430,18 +479,18 @@ public class LogicalExpression {
 		String label = getLabel(code);
 		System.out.println(label + " (" + code + ")");
 		HashMap path2HashMap = new HashMap();
-        LogicalExpression test = new LogicalExpression();
+        //LogicalExpression test = new LogicalExpression();
         Vector paths = new Vector();
         paths.add("E|I|O|C");
         paths.add("E|I|O|R");
         paths.add("E|I|O|U|O|R");
         paths.add("E|I|O|U|O|I|O|R"); //role groups
-        HashMap hmap = test.getLogicalExpressionData(named_graph, code, paths);
+        HashMap hmap = getLogicalExpressionData(named_graph, code, paths);
         Iterator it = hmap.keySet().iterator();
         while (it.hasNext()) {
 			String path = (String) it.next();
 			Vector v = (Vector) hmap.get(path);
-			HashMap hmap2 = test.sortRestrictions(path, v);
+			HashMap hmap2 = sortRestrictions(path, v);
 			if (hmap2.keySet().size() > 0) {
 				path2HashMap.put(path, hmap2);
 			}
@@ -495,12 +544,12 @@ public class LogicalExpression {
 		return new SortUtils().quickSort(ranges);
 	}
 
-	public static void getDomainAndRangeData(String named_graph) {
-        LogicalExpression test = new LogicalExpression();
-        HashMap domainHashMap = test.getDomainHashMap(named_graph);
+	public void getDomainAndRangeData(String named_graph) {
+        //LogicalExpression test = new LogicalExpression();
+        HashMap domainHashMap = getDomainHashMap(named_graph);
         Utils.dumpHashMap("domainHashMap", domainHashMap);
 
-        HashMap rangeHashMap = test.getRangeHashMap(named_graph);
+        HashMap rangeHashMap = getRangeHashMap(named_graph);
         Utils.dumpHashMap("rangeHashMap", rangeHashMap);
 	}
 
@@ -621,7 +670,7 @@ public class LogicalExpression {
 	}
 
 	public String construct_get_superclass(String named_graph, String code) {
-		String prefixes = owlSPARQLUtils.getPrefixes();
+		String prefixes = basicSPARQLUtils.getPrefixes();
 		StringBuffer buf = new StringBuffer();
 		buf.append(prefixes);
 		buf.append("select distinct ?x_code ?x_label ?y").append("\n");
@@ -645,7 +694,7 @@ public class LogicalExpression {
 		Vector v = executeQuery(query);
 		if (v == null) return null;
 		if (v.size() == 0) return v;
-		v = new ParserUtils().getResponseValues(v);
+		//v = new ParserUtils().getResponseValues(v);
 		return v;
 	}
 
@@ -664,11 +713,9 @@ public class LogicalExpression {
 		return w;
 	}
 
-	public static String run(String code) {
+	public String run(String code) {
 		long ms = System.currentTimeMillis();
-		String named_graph = ConfigurationController.namedGraph;
-		LogicalExpression le = new LogicalExpression();
-		HashMap hmap = le.run(named_graph, code);
+		HashMap hmap = run(named_graph, code);
 		Vector ranges = getAllRanges(hmap);
 		Utils.dumpVector("ranges", ranges);
 
@@ -703,11 +750,11 @@ public class LogicalExpression {
 		}
 	    Utils.dumpVector("Simple roles", simpleRoleVec);
 
-	    System.out.println("Logical definition of " + le.getLabel(code) + " (" + code + ")");
-        Vector parents = le.getParents(named_graph, code);
+	    System.out.println("Logical definition of " + getLabel(code) + " (" + code + ")");
+        Vector parents = getParents(named_graph, code);
 
         Vector w0 = new Vector();
-        w0.add("Logical definition of " + le.getLabel(code) + " (" + code + ")");
+        w0.add("Logical definition of " + getLabel(code) + " (" + code + ")");
 
 	    System.out.println("\nParent(s)");
 	    w0.add("\nParent(s)");
@@ -766,8 +813,13 @@ public class LogicalExpression {
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
-		String code = args[0];
-		String outputfile = run(code);
-		System.out.println(outputfile + " generated.");
+		String serviceUrl = args[0];
+		String named_graph = args[1];
+		String username = args[2];
+		String password = args[3];
+		String code = args[4];
+		LogicalExpression logicalexpression = new LogicalExpression(serviceUrl, named_graph, username, password);
+		logicalexpression.run(code);
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
