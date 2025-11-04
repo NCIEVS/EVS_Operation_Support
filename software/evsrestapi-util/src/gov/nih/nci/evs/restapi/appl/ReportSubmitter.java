@@ -117,7 +117,7 @@ public class ReportSubmitter {
 	 }
 
 	 public static void generateReport(String report) {
-		 if (report.compareTo("Maps To ICD0") == 0) {
+		 if (report.compareTo("Maps To ICDO") == 0) {
 			long ms = System.currentTimeMillis();
 			MapsToReportWriter mapsToReportWriter = new MapsToReportWriter(serviceUrl, namedGraph, username, password);
 
@@ -218,7 +218,7 @@ public class ReportSubmitter {
 			System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 			System.out.println("Reports " + report + " generated.");
 		} else {
-			System.out.println("Report " + report + " is not sspported.");
+			System.out.println("Report " + report + " is not supported.");
 		}
 
 
