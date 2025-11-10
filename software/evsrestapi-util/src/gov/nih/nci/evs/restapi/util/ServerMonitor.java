@@ -1,13 +1,23 @@
 package gov.nih.nci.evs.restapi.util;
+
+//import gov.nih.nci.evs.restapi.appl.*;
 import gov.nih.nci.evs.restapi.bean.*;
+import gov.nih.nci.evs.restapi.common.*;
+import gov.nih.nci.evs.restapi.config.*;
+
 import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.*;
-import java.sql.*;
-import java.text.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.Map;
-import org.apache.commons.lang.*;
+import java.util.regex.*;
+import org.json.*;
 
 /**
  * <!-- LICENSE_TEXT_START -->
@@ -59,52 +69,114 @@ import org.apache.commons.lang.*;
  *     Initial implementation kim.ong@nih.gov
  *
  */
- public class ServerMonitor {
-	 String serviceUrl = null;
+public class ServerMonitor {
+    public static String SERVER_STATUS = "server_status.txt";
 
-	 public ServerMonitor(String serviceUrl) {
-		 this.serviceUrl = serviceUrl;
-	 }
+	public static void query(String version) throws Exception {
+		query("NCI_Thesaurus", version);
+	}
 
-	 public static void runQuery(String serviceUrl, String queryfile) {
-		 new MetathesaurusDataUtils(serviceUrl).runQuery(queryfile);
-	 }
+	public static void query(String codingScheme, String version) throws Exception {
+		if (version == null) {
+			version = DateUtils.getNCItMonthlyVersion();
+		}
+		Vector v = Utils.readFile(SERVER_STATUS);
+		Vector w = new Vector();
+        String serviceUrl = null;
+		for (int i=0; i<v.size(); i++) {
+			String t = (String) v.elementAt(i);
+			if (t.startsWith("(")) {
+				int m = t.indexOf(")");
+				serviceUrl = t.substring(m+2, t.length());
+			} else {
+				if (t.startsWith(codingScheme + "|" + version)) {
+					w.add(serviceUrl);
+					w.add("\t" + t);
+				}
+			}
+		}
+		if (w.size() > 0) {
+			System.out.println(version + " available at");
+			for (int i=0; i<w.size(); i++) {
+				String t = (String) w.elementAt(i);
+				System.out.println(t);
+			}
+		} else {
+			System.out.println(version + " not available.");
+		}
+	}
 
-     public static boolean isStardogServerAvailable(String serviceUrl) {
-		 try {
-			 HashMap hmap = new OWLSPARQLUtils(serviceUrl).getGraphName2VersionHashMap();
-			 gov.nih.nci.evs.restapi.util.StringUtils.dumpHashMap("GraphName2VersionHashMap: ", hmap);
-         	 return true;
-		 } catch(Exception ex) {
-			 ex.printStackTrace();
-			 return false;
-		 }
-	 }
+	public static void run() {
+        long ms = System.currentTimeMillis();
+        String outputfile = SERVER_STATUS;
+		PrintWriter pw = null;
 
-     public static boolean isMySQLServerAvailable(String serviceUrl) {
-		 try {
-			 HashMap hmap = new MetathesaurusDataUtils(serviceUrl).createSAB2HierarchyRootHashMap();
-			 gov.nih.nci.evs.restapi.util.StringUtils.dumpHashMap("SAB2HierarchyRootHashMap: ", hmap);
-         	 return true;
-		 } catch(Exception ex) {
-			 ex.printStackTrace();
-			 return false;
-		 }
-	 }
+		HashMap hmap = new HashMap();
+		Vector w = new Vector();
 
-	 public static void run(String serviceUrl) {
-		 System.out.println(serviceUrl);
-         boolean isServerAvailable = isStardogServerAvailable(serviceUrl);
-         System.out.println("isServerAvailable: " + isServerAvailable);
-         if (isServerAvailable) {
-			 boolean isMySQLServerAvailable = isMySQLServerAvailable(serviceUrl);
-			 System.out.println("isMySQLServerAvailable: " + isMySQLServerAvailable);
-		 }
-	 }
+		try {
+			pw = new PrintWriter(outputfile, "UTF-8");
+			String username = ConfigurationController.username;
+			String password = ConfigurationController.password;
+			String namedGraph = ConfigurationController.namedGraph;
+			String serviceUrls = ConfigurationController.serviceUrls;
+			Vector serviceUrl_vec = StringUtils.parseData(serviceUrls, '|');
+			String codingScheme = "NCI_Thesaurus";
+			pw.println("Default namedGraph: " + namedGraph);
+			for (int i=0; i<serviceUrl_vec.size(); i++) {
+				String serviceUrl = (String) serviceUrl_vec.elementAt(i);
+				System.out.println("serviceUrl: " + serviceUrl);
+				int j = i+1;
+				pw.println("(" + j + ") " + serviceUrl);
+				try {
+					MetadataUtils test = new MetadataUtils(serviceUrl, username, password);
+					String version = test.getLatestVersion(codingScheme);
+					pw.println(codingScheme);
+					pw.println("latest version: " + version);
+					test.dumpNameVersion2NamedGraphMap(pw);
+					HashMap nameVersion2NamedGraphMap = test.getNameVersion2NamedGraphMap();
+					if (nameVersion2NamedGraphMap != null) {
+						hmap.put(serviceUrl, nameVersion2NamedGraphMap);
+					}
 
- 	 public static void main(String[] args) {
-         String serviceUrl = args[0];
-         run(serviceUrl);
-	 }
- }
+				} catch (Exception ex) {
+					pw.println("Instantiation of MetadataUtils failed.");
+				}
+			}
+
+		} catch (Exception ex) {
+
+		} finally {
+			try {
+				pw.close();
+				pw.println("Output file " + outputfile + " generated.");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			System.out.println(key);
+			HashMap nameVersion2NamedGraphMap = (HashMap) hmap.get(key);
+			Iterator it2 = nameVersion2NamedGraphMap.keySet().iterator();
+			while (it2.hasNext()) {
+				String key2 = (String) it2.next();
+				Vector vec = (Vector) nameVersion2NamedGraphMap.get(key2);
+				for (int i=0; i<vec.size(); i++) {
+					String value = (String) vec.elementAt(i);
+					System.out.println(key2 + " --> " + value);
+					w.add(key + "|" + key2 + "|" + value);
+				}
+			}
+		}
+		Utils.saveToFile("server_status_" + StringUtils.getToday() + ".txt", w);
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
+	public static void main(String[] args) {
+		run();
+	}
+}
 
