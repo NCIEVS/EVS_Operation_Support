@@ -613,6 +613,8 @@ public class OWLSPARQLUtils {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 	public String construct_get_superclasses_by_code(String named_graph, String code) {
+		return construct_get_superclasses(named_graph, code);
+		/*
         String prefixes = getPrefixes();
         StringBuffer buf = new StringBuffer();
         buf.append(prefixes);
@@ -643,6 +645,7 @@ public class OWLSPARQLUtils {
         buf.append("    }").append("\n");
         buf.append("}").append("\n");
         return buf.toString();
+        */
     }
 
 	public Vector getSuperclassesByCode(String named_graph, String code) {
@@ -655,6 +658,8 @@ public class OWLSPARQLUtils {
 	}
 
 	public String construct_get_subclasses_by_code(String named_graph, String code) {
+		return construct_get_subclasses(named_graph, code);
+		/*
         String prefixes = getPrefixes();
         StringBuffer buf = new StringBuffer();
         buf.append(prefixes);
@@ -685,6 +690,7 @@ public class OWLSPARQLUtils {
         buf.append("    }").append("\n");
         buf.append("}").append("\n");
         return buf.toString();
+        */
     }
 
 	public Vector getSubclassesByCode(String named_graph, String code) {
