@@ -178,6 +178,33 @@ public class ConfigurationController {
 		}
 	}
 
+	public static void updateResourceFile(String key, String value) {
+		try{
+			String propertyFile = "resources/Test.properties";
+			File file = new File(propertyFile);
+			if (!file.exists()) {
+				System.out.println("WARNING: property file " + propertyFile + " does not exists.");
+			} else {
+				Vector v = Utils.readFile(propertyFile);
+				Vector w = new Vector();
+				for (int i=0; i<v.size(); i++) {
+					String line = (String) v.elementAt(i);
+					Vector u = StringUtils.parseData(line, '=');
+					String t1 = (String) u.elementAt(0);
+					if (t1.compareTo(key) == 0) {
+						w.add(key + "=" + value);
+					} else {
+						w.add(line);
+					}
+				}
+				Utils.saveToFile(propertyFile, w);
+				System.out.println("Updated property file " + propertyFile + ".");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 }
 
 

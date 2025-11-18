@@ -63,6 +63,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 public class ExactMatchByTerm {
 	static String AXIOM_FILE_NAME = "axiom_ThesaurusInferred_forTS.txt";
 	static String HIER_FILE_NAME = "parent_child.txt";
+	static String SUBSET_FILE = null;
 	static String AXIOM_FILE = null;
 	static String NCIT_OWL = null;
 	static String PROPERTY_FILE = null;
@@ -92,6 +93,7 @@ public class ExactMatchByTerm {
 		AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE_NAME;
 		PROPERTY_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.propertyfile;
         NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
+        SUBSET_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.subsetfile;
 
 		System.out.println(AXIOM_FILE);
 		File file = new File(AXIOM_FILE);
@@ -856,6 +858,78 @@ public class ExactMatchByTerm {
         if (v.size() == 0) return v;
         return new SortUtils().quickSort(v);
 	}
+
+
+	public static Vector getSubset(String root) {
+		Vector v = Utils.readFile(SUBSET_FILE);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String subsetCode = (String) u.elementAt(2);
+			if (subsetCode.compareTo(root) == 0) {
+				w.add((String) u.elementAt(0));
+			}
+		}
+		return w;
+	}
+
+	public static Vector generateRestrictedAxiomFile(Vector codes) {
+		HashSet hset = Utils.vector2HashSet(codes);
+		Vector v = Utils.readFile(AXIOM_FILE);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(1);
+			if (hset.contains(code)) {
+				w.add(line);
+			}
+		}
+		return w;
+	}
+
+	public static void updateResourceFile(String key, String value) {
+		try{
+			String propertyFile = "resources/Test.properties";
+			File file = new File(propertyFile);
+			if (!file.exists()) {
+				System.out.println("WARNING: property file " + propertyFile + " does not exists.");
+			} else {
+				Vector v = Utils.readFile(propertyFile);
+				Vector w = new Vector();
+				for (int i=0; i<v.size(); i++) {
+					String line = (String) v.elementAt(i);
+					Vector u = StringUtils.parseData(line, '=');
+					String t1 = (String) u.elementAt(0);
+					if (t1.compareTo(key) == 0) {
+						w.add(key + "=" + value);
+					} else {
+						w.add(line);
+					}
+				}
+				Utils.saveToFile(propertyFile, w);
+				System.out.println("Updated property file " + propertyFile + ".");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public static void mapToSubset(String root, String datafile) {
+		long ms = System.currentTimeMillis();
+		Vector v = getSubset(root);
+		Utils.saveToFile(root + ".txt", v);
+		Vector w = generateRestrictedAxiomFile(v);
+		String axiomfile = "axiom_ThesaurusInferred_forTS_" + StringUtils.getToday() + ".txt";
+		Utils.saveToFile(axiomfile, w);
+		updateResourceFile("termfile", axiomfile);
+		Utils.saveToFile("axiom_ThesaurusInferred_forTS.txt", w);
+		String outputfile = "results_" + datafile;
+		ExactMatchByTerm.run(datafile, outputfile, 0, true);
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
