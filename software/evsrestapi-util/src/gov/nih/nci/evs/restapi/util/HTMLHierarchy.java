@@ -240,6 +240,60 @@ public class HTMLHierarchy {
 		return outputfile;
 	}
 
+
+    public static HashMap createSourcePTMap(String axiomfile, String source) {
+		HashMap hmap = new HashMap();
+		Vector v = Utils.readFile(axiomfile);
+		int lcv = 0;
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			if (u.contains("P383$PT") && u.contains("P384$" + source) ) {
+				lcv++;
+				if (lcv < 100) {
+					//System.out.println((String) u.elementAt(1) + " --> " + (String) u.elementAt(3));
+				}
+				hmap.put((String) u.elementAt(1), (String) u.elementAt(3));
+			}
+		}
+		System.out.println(hmap.keySet().size());
+		return hmap;
+	}
+
+	public static void generateHierarchyFiles(Vector parent_child_vec, String axiomfile, String root) {
+		HierarchyHelper hh = new HierarchyHelper(parent_child_vec);
+		Vector lines = hh.get_transitive_closure_v4(root);
+		Utils.saveToFile(root + "_codes.txt", lines);
+
+		Vector w = new Vector();
+		if (axiomfile == null) {
+			for (int i=0; i<lines.size(); i++) {
+				String line = (String) lines.elementAt(i);
+				w.add(line);
+			}
+		} else {
+			HashMap NCIPTMap = createSourcePTMap(axiomfile, "NCI");
+			for (int i=0; i<lines.size(); i++) {
+				String line = (String) lines.elementAt(i);
+				Vector u = StringUtils.parseData(line, '|');
+				String s0 = (String) u.elementAt(0);
+				String s1 = (String) u.elementAt(1);
+				String s2 = (String) u.elementAt(2);
+				String s3 = (String) u.elementAt(3);
+				String t0 = (String) NCIPTMap.get(s1);
+				String t2 = (String) NCIPTMap.get(s3);
+				w.add(t0 + "|" + s1 + "|" + t2 + "|" + s3);
+			}
+		}
+		w = new SortUtils().quickSort(w);
+        Utils.saveToFile(root + ".txt", w);
+        String title = root + " Hierarchy";
+        run(w, title, root);
+        hh = new HierarchyHelper(w);
+        hh.printTree(root);
+	}
+
+
     public static void main(String[] args) {
 		String datafile = args[0];
 		String title = args[1];
