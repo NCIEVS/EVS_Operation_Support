@@ -63,6 +63,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 public class ExactMatchByTerm {
 	static String AXIOM_FILE_NAME = "axiom_ThesaurusInferred_forTS.txt";
 	static String HIER_FILE_NAME = "parent_child.txt";
+	static String PARENT_CHILD_FILE = null;
 	static String SUBSET_FILE = null;
 	static String AXIOM_FILE = null;
 	static String NCIT_OWL = null;
@@ -94,6 +95,7 @@ public class ExactMatchByTerm {
 		PROPERTY_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.propertyfile;
         NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
         SUBSET_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.subsetfile;
+        PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
 
 		System.out.println(AXIOM_FILE);
 		File file = new File(AXIOM_FILE);
@@ -916,8 +918,41 @@ public class ExactMatchByTerm {
 		}
 	}
 
+	public static Vector trimAxiomFile(Vector req_spec) {
+		Vector v = Utils.readFile(AXIOM_FILE);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			if (u.contains("P384$NCI") && u.contains("P383$PT")) {
+				w.add(line);
+			} else if (u.contains("P384$NCI") && u.contains("P383$SY")) {
+				w.add(line);
+			} else {
+				boolean include = true;
+				for (int j=0; j<req_spec.size(); j++) {
+					String req = (String) req_spec.elementAt(j);
+					if (!u.contains(req)) {
+						include = false;
+						break;
+					}
+				}
+				if (include) {
+					w.add(line);
+				}
+			}
+		}
+		return w;
+	}
+
 	public static void mapToSubset(String root, String datafile) {
 		Vector codes = getSubset(root);
+		mapToCodes(codes, datafile);
+	}
+
+	public static void mapToBranch(String root, String datafile) {
+		HierarchyHelper hh = new HierarchyHelper(Utils.readFile(PARENT_CHILD_FILE));
+		Vector codes = hh.get_transitive_closure_v4(root);
 		mapToCodes(codes, datafile);
 	}
 
