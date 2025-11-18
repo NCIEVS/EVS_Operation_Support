@@ -917,14 +917,18 @@ public class ExactMatchByTerm {
 	}
 
 	public static void mapToSubset(String root, String datafile) {
+		Vector codes = getSubset(root);
+		mapToCodes(codes, datafile);
+	}
+
+	public static void mapToCodes(Vector codes, String datafile) {
 		long ms = System.currentTimeMillis();
-		Vector v = getSubset(root);
-		Utils.saveToFile(root + ".txt", v);
-		Vector w = generateRestrictedAxiomFile(v);
+
+		Vector w = generateRestrictedAxiomFile(codes);
 		String axiomfile = "axiom_ThesaurusInferred_forTS_" + StringUtils.getToday() + ".txt";
 		Utils.saveToFile(axiomfile, w);
 		updateResourceFile("termfile", axiomfile);
-		Utils.saveToFile("axiom_ThesaurusInferred_forTS.txt", w);
+
 		String outputfile = "results_" + datafile;
 		ExactMatchByTerm.run(datafile, outputfile, 0, true);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
