@@ -116,7 +116,6 @@ public class ExactMatch {
 		initialize();
 	}
 
-
     public void initialize() {
 		sourceCode2LineMap = createSourceCode2LineMap();
 		term2CodesMap = createTerm2CodesMap();
@@ -887,24 +886,46 @@ public class ExactMatch {
 	}
 
 	public static void mapToSubset(String root, String datafile) {
+		mapToSubset(root, datafile, 0);
+	}
+
+	public static void mapToSubset(String root, String datafile, int colNum) {
 		Vector codes = getSubset(root);
-		mapToCodes(codes, datafile);
+		mapToCodes(codes, datafile, colNum);
 	}
 
 	public static void mapToBranch(String root, String datafile) {
+		mapToBranch(root, datafile, 0);
+	}
+
+	public static void mapToBranch(String root, String datafile, int colNum) {
 		HierarchyHelper hh = new HierarchyHelper(Utils.readFile(PARENT_CHILD_FILE));
 		Vector codes = hh.get_transitive_closure_v4(root);
-		mapToCodes(codes, datafile);
+		mapToCodes(codes, datafile, colNum);
 	}
 
 	public static void mapToCodes(Vector codes, String datafile) {
+	    mapToCodes(codes, datafile, 0);
+    }
+
+	public static void mapToCodes(Vector codes, String datafile, int colNum) {
 		long ms = System.currentTimeMillis();
 		Vector w = generateRestrictedAxiomFile(codes);
 		String axiomfile = "axiom_ThesaurusInferred_forTS_" + StringUtils.getToday() + ".txt";
 		Utils.saveToFile(axiomfile, w);
 		String outputfile = "results_" + datafile;
-		new ExactMatch(axiomfile).run(datafile, outputfile, 0, true);
+		new ExactMatch(axiomfile).run(datafile, outputfile, colNum, true);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
+	public static void run(String datafile, int colNum) {
+		long ms = System.currentTimeMillis();
+		String outputfile = "results_" + datafile;
+		new ExactMatch().run(datafile, outputfile, colNum, true);
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
+	public static void run(String datafile) {
+		run(datafile, 0);
+	}
 }
