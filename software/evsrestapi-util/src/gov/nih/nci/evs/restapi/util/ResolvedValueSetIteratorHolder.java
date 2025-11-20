@@ -790,7 +790,8 @@ public class ResolvedValueSetIteratorHolder {
          StringBuffer buf = new StringBuffer();
          buf.append("<a href=\"");
          buf.append(URL);
-		 buf.append("&code=" + code);
+		 //buf.append("&code=" + code);
+		 buf.append(code);
 		 buf.append("\"");
 		 buf.append(">");
 		 buf.append(code);
