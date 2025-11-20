@@ -430,7 +430,7 @@ public class PolyHierarchy {
 		int type = ISA_ONLY;
 		Vector parent_child_vector = generateHierarchyData(root, maxLevel, type);
 		parent_child_vector.remove(0);
-		String parent_child_file = root + "_tree" + ".txt";
+		String parent_child_file = root + "_treedata" + ".txt";
 		Utils.saveToFile(parent_child_file, parent_child_vector);
         generateDynamicHTMLTree(parent_child_file, replace_vec, by_vec);
 	}
