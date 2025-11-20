@@ -456,6 +456,7 @@ public class PolyHierarchy {
     public static void generateDynamicHTMLTree(String parent_child_file, Vector replace_vec, Vector by_vec) {
 		int n = parent_child_file.lastIndexOf(".");
 		String htmlfile = parent_child_file.substring(0, n) + ".html";
+		htmlfile = htmlfile.replace("treedata", "htmltree");
 		ASCII2HTMLTreeConverter.generateDynamicHTMLTree(parent_child_file, htmlfile);
 		if (replace_vec != null && replace_vec.size() > 0) {
 			substitute(htmlfile, replace_vec, by_vec);
