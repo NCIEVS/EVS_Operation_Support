@@ -86,6 +86,13 @@ public class Constants {
 
     public static String ASSOCIATION_NAME = "inverse_is_a";
 
+	public static final int TYPE_SUPERCONCEPT_INDEX = 0;
+	public static final int TYPE_SUBCONCEPT_INDEX = 1;
+	public static final int TYPE_ROLE_INDEX = 2;
+	public static final int TYPE_INVERSE_ROLE_INDEX = 3;
+	public static final int TYPE_ASSOCIATION_INDEX = 4;
+	public static final int TYPE_INVERSE_ASSOCIATION_INDEX = 5;
+
     public static final String TYPE_ROLE = "type_role";
     public static final String TYPE_ASSOCIATION = "type_association";
     public static final String TYPE_SUPERCONCEPT = "type_superconcept";
