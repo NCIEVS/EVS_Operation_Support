@@ -1084,16 +1084,19 @@ public class GraphDrawerByOWL {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    public static void globalReplacement(String filename, String replace, String by, String outputfile) {
+		Vector w = new Vector();
+		Vector v = Utils.readFile(filename);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.replace(replace, by);
+			w.add(line);
+		}
+		Utils.saveToFile(outputfile, w);
+	}
 
-	public static void main(String[] args) {
-		long ms = System.currentTimeMillis();
-
-        String code = args[0];
-        String idx_str = args[1];
-        int idx = Integer.parseInt(idx_str);
-
+	public static void run(String code, int idx) {
 		GraphDrawerByOWL gd = new GraphDrawerByOWL();
-
 		PrintWriter pw = null;
 
 		String type = "";
@@ -1111,7 +1114,7 @@ public class GraphDrawerByOWL {
 			type = "type_inverse_association";
 		}
 
-		String outputfile = code + "_" + idx_str + "_graph.html";
+		String outputfile = code + "_" + idx + "_graph.html";
 		try {
 			pw = new PrintWriter(outputfile, "UTF-8");
         	gd.view_graph(pw, code, type);
@@ -1126,6 +1129,21 @@ public class GraphDrawerByOWL {
 				ex.printStackTrace();
 			}
 		}
+	}
+
+	public static void main(String[] args) {
+		long ms = System.currentTimeMillis();
+
+        String code = args[0];
+        String idx_str = args[1];
+        int idx = Integer.parseInt(idx_str);
+
+		GraphDrawerByOWL gd = new GraphDrawerByOWL();
+		gd.run(code, idx);
+		String outputfile = code + "_" + idx_str + "_graph.html";
+		globalReplacement(outputfile, "/sparql/", "sparql/", outputfile);
+
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
+
