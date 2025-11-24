@@ -73,6 +73,12 @@ public class HierarchyViewer {
 		frame.show();
 	}
 
+	public static void run(String[] args) {
+		String datafile = args[0];
+		JFrame frame = new TreeFrame(datafile);
+		frame.show();
+	}
+
 	public static void main(String[] args) {
 		String datafile = args[0];
 		JFrame frame = new TreeFrame(datafile);
@@ -97,14 +103,14 @@ class TreeFrame extends JFrame implements ActionListener {
 
 	public TreeFrame(String datafile) {
         String title = "NCI Thesaurus";
-        int n = datafile.indexOf("parent_child.txt");
-        if (n > 0) {
-			title = datafile.substring(0, n-1);
-            title = title.trim();
-		}
 
 		Vector parent_child_vec = Utils.readFile(datafile);
 		hh = new HierarchyHelper(parent_child_vec);
+		Vector roots = hh.getRoots();
+		if (roots.size() == 1) {
+			String root = (String) roots.elementAt(0);
+			title = hh.getLabel(root);
+		}
 		setTitle(title + " Hierarchy");
 		setSize(2400, 1200);
 		addWindowListener(new WindowAdapter() {
@@ -113,31 +119,14 @@ class TreeFrame extends JFrame implements ActionListener {
 		  }
 		});
 
-
-
-		TreeNode root = createTree(title);
+		TreeNode root = createTree(title + " Hierarchy");
 		model = new DefaultTreeModel(root);
 		tree = new JTree(model);
 
-		//tree.setEditable(true);
 		tree.setEditable(false);
-
 		Container contentPane = getContentPane();
 		JScrollPane scrollPane = new JScrollPane(tree);
         contentPane.add(scrollPane, "Center");
-		/*
-		JPanel panel = new JPanel();
-		addSiblingButton = new JButton("Add Sibling");
-		addSiblingButton.addActionListener(this);
-		panel.add(addSiblingButton);
-		addChildButton = new JButton("Add Child");
-		addChildButton.addActionListener(this);
-		panel.add(addChildButton);
-		deleteButton = new JButton("Delete");
-		deleteButton.addActionListener(this);
-		panel.add(deleteButton);
-		contentPane.add(panel, "South");
-		*/
 	}
 
 	public Vector sortByLabel(Vector codes) {

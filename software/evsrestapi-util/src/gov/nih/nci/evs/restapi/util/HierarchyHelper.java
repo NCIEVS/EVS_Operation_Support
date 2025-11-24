@@ -250,7 +250,7 @@ public class HierarchyHelper implements Serializable {
 		HashMap label_hmap = new HashMap();
 		for (int i=0; i<label_vec.size(); i++) {
 			String t = (String) label_vec.elementAt(i);
-			Vector u = StringUtils.parseData(t);
+			Vector u = StringUtils.parseData(t, '|');
 			String code = (String) u.elementAt(0);
 			String name = (String) u.elementAt(1);
 			label_hmap.put(code, name);
@@ -341,7 +341,7 @@ public class HierarchyHelper implements Serializable {
 		HashMap parent2childcodesMap = new HashMap();
         for (int i=0; i<w.size(); i++) {
 			String t = (String) w.elementAt(i);
-			Vector u = StringUtils.parseData(t);
+			Vector u = StringUtils.parseData(t, '|');
 			String parent_code = null;
 			String child_code = null;
 			if (format == FORMAT_PARENT_CHILD) {
@@ -380,7 +380,7 @@ public class HierarchyHelper implements Serializable {
 		HashMap label_hmap = new HashMap();
         for (int i=0; i<w.size(); i++) {
 			String t = (String) w.elementAt(i);
-			Vector u = StringUtils.parseData(t);
+			Vector u = StringUtils.parseData(t, '|');
 			if (u.size() == 2) {
 				String code = (String) u.elementAt(0);
 				String label = (String) u.elementAt(1);
@@ -1093,14 +1093,14 @@ public class HierarchyHelper implements Serializable {
 		Vector v = Utils.readFile("tvs_rel.txt");
 		HierarchyHelper test = new HierarchyHelper(v, 1);
 		Vector roots = test.getRoots();
-		StringUtils.dumpVector("roots", roots);
+		Utils.dumpVector("roots", roots);
 		Vector leaves = test.getLeaves();
-		StringUtils.dumpVector("leaves", leaves);
+		Utils.dumpVector("leaves", leaves);
 
 		for (int i=0; i<roots.size(); i++) {
 			String root = (String) roots.elementAt(i);
 			Vector w = test.getTransitiveClosure(root);
-			StringUtils.dumpVector("\n" + root, w);
+			Utils.dumpVector("\n" + root, w);
 		}
 		test.printTree();
 	}
