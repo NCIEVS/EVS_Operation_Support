@@ -244,6 +244,54 @@ FULL_SYN=P90|P384$NCI|P383$PT
 		return queryHashMap;
 	}
 
+	public static void runTest(String serviceUrl,
+	                           String namedGraph,
+	                           String username,
+	                           String password,
+	                           String subsetCode,
+	                           String filename
+	                           ) {
+        BasicQueryUtils basicQueryUtils = new BasicQueryUtils(serviceUrl, namedGraph, username, password);
+		Vector v = Utils.readFile(filename);
+        HashMap queryHashMap = SPARQLBuilder.createQueryHashMap(namedGraph, subsetCode, v);
+		String outputfile = "results_sparql_" + filename;
+		PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(outputfile);
+			queryHashMap = SPARQLBuilder.createQueryHashMap(namedGraph, subsetCode, v);
+			Iterator it = queryHashMap.keySet().iterator();
+			int j = 0;
+			while (it.hasNext()) {
+				String queryName = (String) it.next();
+				if (!queryName.startsWith("#")) {
+					j++;
+					System.out.println("\n(" + j + ") " + queryName);
+					String query = (String) queryHashMap.get(queryName);
+					pw.println(queryName);
+					pw.println(query);
+					Vector w = basicQueryUtils.executeQuery(query);
+					if (w != null) {
+						for (int k=0; k<w.size(); k++) {
+							String t = (String) w.elementAt(k);
+							pw.println(t);
+						}
+						pw.println("\n");
+					}
+				}
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			if (pw != null) {
+				try {
+					pw.close();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
+	}
 
 	public static void run(
 		String named_graph,
