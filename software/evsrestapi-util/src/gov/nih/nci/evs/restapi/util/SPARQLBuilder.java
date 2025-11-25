@@ -245,20 +245,44 @@ FULL_SYN=P90|P384$NCI|P383$PT
 	}
 
 
+	public static void run(
+		String named_graph,
+		String subsetCode,
+		String filename) {
+		Vector v = Utils.readFile(filename);
+
+		String outputfile = "sparql_" + filename;
+		PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(outputfile);
+
+			HashMap queryHashMap = createQueryHashMap(named_graph, subsetCode, v);
+			Iterator it = queryHashMap.keySet().iterator();
+			int j = 0;
+			while (it.hasNext()) {
+				String queryName = (String) it.next();
+				j++;
+				System.out.println("\n(" + j + ") " + queryName);
+				String query = (String) queryHashMap.get(queryName);
+				pw.print(query);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			if (pw != null) {
+				try {
+					pw.close();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
+	}
+
 	public static void main(String[] args) {
 		String named_graph = args[0];
 		String subsetCode = args[1];
 		String filename = args[2];
-		Vector v = Utils.readFile(filename);
-		HashMap queryHashMap = createQueryHashMap(named_graph, subsetCode, v);
-		Iterator it = queryHashMap.keySet().iterator();
-		int j = 0;
-		while (it.hasNext()) {
-			String queryName = (String) it.next();
-            j++;
-            System.out.println("\n(" + j + ") " + queryName);
-            String query = (String) queryHashMap.get(queryName);
-            System.out.println(query);
-		}
+		run(named_graph, subsetCode, filename);
 	}
 }

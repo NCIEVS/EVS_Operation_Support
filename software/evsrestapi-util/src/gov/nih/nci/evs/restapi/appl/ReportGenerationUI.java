@@ -376,7 +376,7 @@ public class ReportGenerationUI {
 		JLabel reportLabel = new JLabel("Select Report: ", JLabel.LEFT);
 		//String[] reports = new String[]{"Maps To ICD0", "EVS Statistics", "GDC Diff", "FDA Count", "PrimitiveConcepts"};
 
-		String[] reports = new String[]{"Maps To ICD0", "EVS Statistics", "GDC Diff", "FDA Count", "PrimitiveConcepts",
+		String[] reports = new String[]{"Maps To ICDO", "EVS Statistics", "GDC Diff", "FDA Count", "PrimitiveConcepts",
 		"3D Pie Chart", "Linguistic Analysis", "Pediatric Subset Reports", "Is-A Hierarchy QA"};
 
 		reportComboBox = new JComboBox(reports);

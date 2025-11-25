@@ -57,8 +57,8 @@ import javax.servlet.http.*;
  *
  */
 public class RestrictionPageGenerator extends HttpServlet {
-	String HYPERLINK = "https://nciterms65.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&type=terminology&key=null&b=1&n=0&vse=null&code=";
-
+	//String HYPERLINK = "https://nciterms65.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&type=terminology&key=null&b=1&n=0&vse=null&code=";
+    String HYPERLINK = "https://evsexplore-qa.semantics.cancer.gov/evsexplore/concept/ncit/";
 	public RestrictionPageGenerator() {
 
 	}

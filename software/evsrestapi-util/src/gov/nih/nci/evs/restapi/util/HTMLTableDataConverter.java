@@ -111,17 +111,6 @@ public class HTMLTableDataConverter {
 				StringBuffer buf = new StringBuffer();
 				for (int j=0; j<u.size(); j++) {
 				    String s = (String) u.elementAt(j);
-
-				    /*
-				    boolean bool = isCode(s);
-				    if (bool) {
-						s = HyperlinkHelper.toHyperlink(s);
-					}
-					buf = buf.append(s);
-					if (j < u.size()-1) {
-						buf.append("" + delimiter);
-					}
-					*/
 					if (s.indexOf("|") != -1) {
 						StringBuffer buf2 = new StringBuffer();
 						Vector u2 = StringUtils.parseData(s, '|');
