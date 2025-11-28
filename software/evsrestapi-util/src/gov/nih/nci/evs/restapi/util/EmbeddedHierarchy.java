@@ -66,14 +66,14 @@ import java.util.regex.*;
  *
  */
 public class EmbeddedHierarchy {
-	static final String ROOT_NODE = "Root node";
-	static final String ROOT_NODE_CODE = "<Root>";
+	public static final String ROOT_NODE = "Root node";
+	public static final String ROOT_NODE_CODE = "<Root>";
 
-	static final String UNUSED_SUBSET_CONCEPT_CODE = "C103175";
-	static final String TERMINOLOGY_SUBSET_CODE = "C54443";
+	public static final String UNUSED_SUBSET_CONCEPT_CODE = "C103175";
+	public static final String TERMINOLOGY_SUBSET_CODE = "C54443";
 
-	static final String parent_child_file = "parent_child.txt";
-	static final String vs_header_concept_file = "P372.txt";
+	public static final String parent_child_file = "parent_child.txt";
+	public static final String vs_header_concept_file = "P372.txt";
 
 	int multiple_count = 0;
 
