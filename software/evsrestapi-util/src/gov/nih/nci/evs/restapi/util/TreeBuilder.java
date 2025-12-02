@@ -1,6 +1,7 @@
 package gov.nih.nci.evs.restapi.util;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.common.*;
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -68,6 +69,9 @@ import org.json.*;
  *
  */
 public class TreeBuilder {
+
+	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
+
     private JSONUtils jsonUtils = null;
 	private Vector<ServerInfo> serverInfo_vec = null;
 
@@ -77,23 +81,18 @@ public class TreeBuilder {
 	private String username = null;
 	private String password = null;
 
-	public TreeBuilder() {
+	static HierarchyHelper hh = null;
 
+    static {
+		Vector parent_child_vec = Utils.readFile(PARENT_CHILD_FILE);
+		hh = new HierarchyHelper(parent_child_vec);
 	}
 
-	public TreeBuilder(OWLSPARQLUtils owlSPARQLUtils) {
-        jsonUtils = new JSONUtils();
-        sparqlUtils = owlSPARQLUtils;
-	}
-
-	public TreeBuilder(String serviceUrl, String username, String password) {
+	public TreeBuilder(String serviceUrl, String named_graph, String username, String password) {
         jsonUtils = new JSONUtils();
         sparqlUtils = new OWLSPARQLUtils(serviceUrl, username, password);
-	}
-
-	public TreeBuilder(String serviceUrl) {
-        jsonUtils = new JSONUtils();
-        sparqlUtils = new OWLSPARQLUtils(serviceUrl, null, null);
+        this.named_graph = named_graph;
+        sparqlUtils.set_named_graph(named_graph);
 	}
 
 	public void set_named_graph(String named_graph) {
@@ -167,43 +166,40 @@ public class TreeBuilder {
 	}
 
     public Vector getSubclassCodes(String code) {
-		Vector v = sparqlUtils.getSubclassesByCode(named_graph, code);
-        Vector w = new Vector();
-        int n = v.size() / 2;
-        for (int i=0; i<n; i++) {
-			String t0 = (String) v.elementAt(2*i);
-			Vector u = parseData(t0, '|');
-			String label = (String) u.elementAt(2);
-			String t1 = (String) v.elementAt(2*i+1);
-			u = parseData(t1, '|');
-			String cd = (String) u.elementAt(2);
+		Vector w = new Vector();
+		Vector v = hh.getSubclassCodes(code);
+		if (w == null) return w;
+        for (int i=0; i<v.size(); i++) {
+			String cd = (String) v.elementAt(i);
+			String label = hh.getLabel(cd);
 			w.add(cd + "|" + label);
 		}
-        return w;
+		return w;
 	}
 
     public Vector getSuperclassCodes(String code) {
-		Vector v = sparqlUtils.getSuperclassesByCode(named_graph, code);
-        Vector w = new Vector();
-        int n = v.size() / 2;
-        for (int i=0; i<n; i++) {
-			String t0 = (String) v.elementAt(2*i);
-			Vector u = parseData(t0, '|');
-			String label = (String) u.elementAt(2);
-			String t1 = (String) v.elementAt(2*i+1);
-			u = parseData(t1, '|');
-			String cd = (String) u.elementAt(2);
+		Vector w = new Vector();
+		Vector v = hh.getSuperclassCodes(code);
+		if (w == null) return w;
+        for (int i=0; i<v.size(); i++) {
+			String cd = (String) v.elementAt(i);
+			String label = hh.getLabel(cd);
 			w.add(cd + "|" + label);
 		}
-        return w;
+		return w;
 	}
 
     public String getLabel(String code) {
         Vector v = sparqlUtils.getLabelByCode(named_graph, code);
         //x_label|literal|Heart Failure
+        Utils.dumpVector(code, v);
+
         String t = (String) v.elementAt(0);
         Vector w = parseData(t, '|');
-        return (String) w.elementAt(2);
+
+         Utils.dumpVector(code, w);
+
+        return (String) w.elementAt(0);
     }
 
 //////////////////////////////////////////////////////////////////////
@@ -286,8 +282,6 @@ public class TreeBuilder {
 		}
 		return root_ti;
 	}
-//////////////////////////////////////////////////////////////////////
-
 
 	public Vector generateTreeData(String code) {
 		return generateTreeData(code, Constants.TRAVERSE_DOWN);
@@ -344,36 +338,63 @@ public class TreeBuilder {
 
 	public void traverse(PrintWriter pw, String code, int direction) {
 		Stack stack = new Stack();
-		String label = getLabel(code);
-		stack.push("0|"+ code + "|" + label);
-        while (!stack.isEmpty()) {
-			String s = (String) stack.pop();
-			Vector u = parseData(s, '|');
-			String level_str = (String) u.elementAt(0);
-			int level = Integer.parseInt(level_str);
-			String curr_code = (String) u.elementAt(1);
-			label = (String) u.elementAt(2);
-			String indent = "";
-			for (int i=0; i<level; i++) {
-				indent = indent + "\t";
-			}
-			pw.println(indent + label + " (" + curr_code + ")");
+		Vector v = new Vector();
+        Vector w = null;
+		String label = hh.getLabel(code);
+		if (direction == Constants.TRAVERSE_UP) {
+			w = getSuperclassCodes(code);
+		} else {
+			w = getSubclassCodes(code);
+		}
+		String level_str = "1";
+		int level = Integer.parseInt(level_str);
 
-            Vector w = null;
-            if (direction == Constants.TRAVERSE_UP) {
-            	w = getSuperclassCodes(curr_code);
-		    } else {
-				w = getSubclassCodes(curr_code);
-			}
-            if (w != null) {
-				level = level + 1;
-				for (int j=0; j<w.size(); j++) {
-					String next_code = (String) w.elementAt(j);
-					String t = "" + level + "|" + next_code;
-					stack.push(t);
-				}
+		if (w != null) {
+			for (int j=0; j<w.size(); j++) {
+				String t1 = (String) w.elementAt(j);
+				Vector u1 = StringUtils.parseData(t1, '|');
+				String next_code = (String) u1.elementAt(0);
+				String next_label = (String) u1.elementAt(1);
+				String t = label + "|" + code + "|" + next_label + "|" + next_code + "|" + level;
+				stack.push(t);
 		    }
 		}
+        while (!stack.isEmpty()) {
+			String s = (String) stack.pop();
+			//pw.println(s);
+			v.add(s);
+			Vector u = parseData(s, '|');
+			String parent_label = (String) u.elementAt(0);
+			String parent_code = (String) u.elementAt(1);
+			String child_label = (String) u.elementAt(2);
+			String child_code = (String) u.elementAt(3);
+
+			level = level + 1;
+			try {
+				if (direction == Constants.TRAVERSE_UP) {
+					w = getSuperclassCodes(child_code);
+				} else {
+					w = getSubclassCodes(child_code);
+				}
+				if (w != null) {
+					level_str = (String) u.elementAt(4);
+					level = Integer.parseInt(level_str);
+
+					for (int j=0; j<w.size(); j++) {
+						String t1 = (String) w.elementAt(j);
+						Vector u1 = StringUtils.parseData(t1, '|');
+						String next_code = (String) u1.elementAt(0);
+						String next_label = (String) u1.elementAt(1);
+						String t = child_label + "|" + child_code + "|" + next_label + "|" + next_code + "|" + level;
+						stack.push(t);
+					}
+				}
+			} catch (Exception ex) {
+
+			}
+		}
+		v = new SortUtils().quickSort(v);
+		dumpVector(pw, "", v);
 	}
 
     public void dumpVector(String label, Vector v) {
@@ -381,22 +402,19 @@ public class TreeBuilder {
 		dumpVector(pw, label, v);
 	}
 
-
     public void dumpVector(PrintWriter pw, String label, Vector v) {
 		if (pw == null) {
 			pw = new PrintWriter(System.out);
 		}
-		pw.println("\n" + label);
-		int j = 0;
+		if (label.length() > 0) {
+			pw.println(label);
+		}
 		for (int i=0; i<v.size(); i++) {
 			String t = (String) v.elementAt(i);
-			j = i+1;
-			pw.println("(" + j + ") " + t);
-		}
-		if (v.size() == 0) {
-			pw.println("\tNone.");
+			pw.println(t);
 		}
 	}
+
 
     public static Links loadTreeData(String filename) {
 		List a = new ArrayList();
@@ -438,32 +456,14 @@ public class TreeBuilder {
 	}
 
 
-    public static void main(String[] args) {
-		String serviceUrl = "http://ncidb-d174-v.nci.nih.gov/sparql1?query=";
-		String username = null;
-		String password = null;
-		String named_graph = "http://NCIt";
-		String code = "C86567"; //Lifting
-		String outputfile = "tree.txt";
-
-        if (args.length == 6) {
-			serviceUrl = args[0];
-			username = args[1];
-			password = args[2];
-			named_graph = args[3];
-			code = args[4];
-			outputfile = args[5];
-		}
-		/*
-        String directory = "queries";
-        */
+    public String run(String code) {
+		String outputfile = code + "_tree.txt";
         int direction = Constants.TRAVERSE_DOWN;
-        TreeBuilder treeBuilder = new TreeBuilder(serviceUrl);
 
         PrintWriter pw = null;
         try {
  			pw = new PrintWriter(outputfile, "UTF-8");
-            treeBuilder.traverse(pw, code, direction);
+            traverse(pw, code, direction);
  		} catch (Exception ex) {
 
  		} finally {
@@ -474,5 +474,35 @@ public class TreeBuilder {
  				ex.printStackTrace();
  			}
 		}
+		return outputfile;
+
+	}
+
+    public static int findLevel(String line) {
+		int level = 0;
+		for (int i=0; i<line.length(); i++) {
+			char c = line.charAt(i);
+			if (c != '\t') {
+				level = i;
+				break;
+			}
+		}
+		return level;
+	}
+
+    public void drawTrees(String filename) {
+        PolyHierarchy.generateDynamicHTMLTree(filename);
+	}
+
+
+    public static void main(String[] args) {
+		String serviceUrl = ConfigurationController.serviceUrl;
+		String username = ConfigurationController.username;
+		String password = ConfigurationController.password;
+		String named_graph = ConfigurationController.namedGraph;
+		String code = args[0];
+		TreeBuilder treeBuilder = new TreeBuilder(serviceUrl, named_graph, username, password);
+		String treedatafile = treeBuilder.run(code);
+		treeBuilder.drawTrees(treedatafile);
 	}
 }

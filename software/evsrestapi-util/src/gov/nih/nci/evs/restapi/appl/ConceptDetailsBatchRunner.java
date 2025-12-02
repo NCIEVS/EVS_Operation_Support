@@ -194,7 +194,6 @@ public class ConceptDetailsBatchRunner {
 		this.ncit_version = mdu.getLatestVersion(NCI_THESAURUS);
 		this.owlSPARQLUtils = new gov.nih.nci.evs.restapi.util.OWLSPARQLUtils(serviceUrl, username, password);
 		this.owlSPARQLUtils.set_named_graph(named_graph);
-        this.treeBuilder = new TreeBuilder(this.owlSPARQLUtils);
         this.exportUtils = new ExportUtils(this.owlSPARQLUtils);
         System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
 	}

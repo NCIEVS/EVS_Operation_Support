@@ -192,6 +192,7 @@ public class ExportUtils {
 		        );
 	}
 
+/*
     public Paths buildPaths(String named_graph, String code, int direction) {
         TreeBuilder treeBuilder = new TreeBuilder(owlSPARQLUtils);
 		Vector u = treeBuilder.generateTreeData(code, direction);
@@ -206,5 +207,5 @@ public class ExportUtils {
 		Paths paths = pathFinder.findPaths();
 		return paths;
 	}
-
+*/
 }
