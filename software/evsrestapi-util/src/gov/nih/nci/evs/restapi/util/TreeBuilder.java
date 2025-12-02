@@ -190,16 +190,7 @@ public class TreeBuilder {
 	}
 
     public String getLabel(String code) {
-        Vector v = sparqlUtils.getLabelByCode(named_graph, code);
-        //x_label|literal|Heart Failure
-        Utils.dumpVector(code, v);
-
-        String t = (String) v.elementAt(0);
-        Vector w = parseData(t, '|');
-
-         Utils.dumpVector(code, w);
-
-        return (String) w.elementAt(0);
+		return hh.getLabel(code);
     }
 
 //////////////////////////////////////////////////////////////////////
