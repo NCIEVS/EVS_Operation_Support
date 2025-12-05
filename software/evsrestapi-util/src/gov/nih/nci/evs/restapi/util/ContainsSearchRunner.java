@@ -158,14 +158,7 @@ public class ContainsSearchRunner {
 
 	public static String run(String filename, int dis_col, int def_col) {
 		ContainsSearch cs = new ContainsSearch();
-		Vector w = cs.run(filename, dis_col, def_col);
-		String outputfile = "result_" + filename;
-		Utils.saveToFile(outputfile, w);
-
-        char delim = '\t';
-        String xlsfile = text2Excel(outputfile, delim);
- 		short firstRowColor = IndexedColors.LIGHT_GREEN.getIndex();
-		ExcelFormatter.reformat(xlsfile, firstRowColor);
+		String outputfile = cs.run(filename, dis_col, def_col);
 		return outputfile;
 	}
 

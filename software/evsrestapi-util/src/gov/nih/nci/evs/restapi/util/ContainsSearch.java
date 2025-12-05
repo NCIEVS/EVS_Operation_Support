@@ -7,6 +7,7 @@ import java.util.*;
 import java.nio.file.*;
 import java.nio.charset.Charset;
 import opennlp.tools.stemmer.PorterStemmer;
+import org.apache.poi.ss.usermodel.IndexedColors;
 
 /**
  * <!-- LICENSE_TEXT_START -->
@@ -170,80 +171,82 @@ public class ContainsSearch {
 		SYNONYM_MAP2 = new HashMap();
 		SYNONYMOUS_PHRASE_MAP = new HashMap();
 
-		for (int i=0; i<SYNONYM_VEC.size(); i++) {
-			String wd_pair = (String) SYNONYM_VEC.elementAt(i);
-			wd_pair = wd_pair.toLowerCase();
-			Vector u = parseData(wd_pair, '|');
-			wd1 = (String) u.elementAt(0);
-			wd2 = (String) u.elementAt(1);
+		if (SYNONYM_VEC.size() > 0) {
 
-			wd1 = wd1.trim();
-			wd2 = wd2.trim();
-
-			if (wd1.indexOf(" ") != -1 || wd2.indexOf(" ") != -1) {
-				w = new Vector();
-				if (SYNONYMOUS_PHRASE_MAP.containsKey(wd1)) {
-					w = (Vector) SYNONYMOUS_PHRASE_MAP.get(wd1);
-				}
-				if (!w.contains(wd2)) {
-					w.add(wd2);
-				}
-				SYNONYMOUS_PHRASE_MAP.put(wd1, w);
-
-				w = new Vector();
-				if (SYNONYMOUS_PHRASE_MAP.containsKey(wd2)) {
-					w = (Vector) SYNONYMOUS_PHRASE_MAP.get(wd2);
-				}
-				if (!w.contains(wd1)) {
-					w.add(wd1);
-				}
-				SYNONYMOUS_PHRASE_MAP.put(wd2, w);
-
-			} else {
-
-				wd1 = stemTerm(wd1);
-				wd2 = stemTerm(wd2);
-				w = new Vector();
-				if (SYNONYM_MAP.containsKey(wd1)) {
-					w = (Vector) SYNONYM_MAP.get(wd1);
-				}
-				if (!w.contains(wd2)) {
-					w.add(wd2);
-				}
-				SYNONYM_MAP.put(wd1, w);
-
-				w = new Vector();
-				if (SYNONYM_MAP.containsKey(wd2)) {
-					w = (Vector) SYNONYM_MAP.get(wd2);
-				}
-				if (!w.contains(wd1)) {
-					w.add(wd1);
-				}
-				SYNONYM_MAP.put(wd2, w);
-
-				///////////////////////////////////////////////////////////
+			for (int i=0; i<SYNONYM_VEC.size(); i++) {
+				String wd_pair = (String) SYNONYM_VEC.elementAt(i);
+				wd_pair = wd_pair.toLowerCase();
+				Vector u = parseData(wd_pair, '|');
 				wd1 = (String) u.elementAt(0);
 				wd2 = (String) u.elementAt(1);
-				w = new Vector();
-				if (SYNONYM_MAP2.containsKey(wd1)) {
-					w = (Vector) SYNONYM_MAP2.get(wd1);
-				}
-				if (!w.contains(wd2)) {
-					w.add(wd2);
-				}
-				SYNONYM_MAP2.put(wd1, w);
 
-				w = new Vector();
-				if (SYNONYM_MAP2.containsKey(wd2)) {
-					w = (Vector) SYNONYM_MAP2.get(wd2);
+				wd1 = wd1.trim();
+				wd2 = wd2.trim();
+
+				if (wd1.indexOf(" ") != -1 || wd2.indexOf(" ") != -1) {
+					w = new Vector();
+					if (SYNONYMOUS_PHRASE_MAP.containsKey(wd1)) {
+						w = (Vector) SYNONYMOUS_PHRASE_MAP.get(wd1);
+					}
+					if (!w.contains(wd2)) {
+						w.add(wd2);
+					}
+					SYNONYMOUS_PHRASE_MAP.put(wd1, w);
+
+					w = new Vector();
+					if (SYNONYMOUS_PHRASE_MAP.containsKey(wd2)) {
+						w = (Vector) SYNONYMOUS_PHRASE_MAP.get(wd2);
+					}
+					if (!w.contains(wd1)) {
+						w.add(wd1);
+					}
+					SYNONYMOUS_PHRASE_MAP.put(wd2, w);
+
+				} else {
+
+					wd1 = stemTerm(wd1);
+					wd2 = stemTerm(wd2);
+					w = new Vector();
+					if (SYNONYM_MAP.containsKey(wd1)) {
+						w = (Vector) SYNONYM_MAP.get(wd1);
+					}
+					if (!w.contains(wd2)) {
+						w.add(wd2);
+					}
+					SYNONYM_MAP.put(wd1, w);
+
+					w = new Vector();
+					if (SYNONYM_MAP.containsKey(wd2)) {
+						w = (Vector) SYNONYM_MAP.get(wd2);
+					}
+					if (!w.contains(wd1)) {
+						w.add(wd1);
+					}
+					SYNONYM_MAP.put(wd2, w);
+
+					///////////////////////////////////////////////////////////
+					wd1 = (String) u.elementAt(0);
+					wd2 = (String) u.elementAt(1);
+					w = new Vector();
+					if (SYNONYM_MAP2.containsKey(wd1)) {
+						w = (Vector) SYNONYM_MAP2.get(wd1);
+					}
+					if (!w.contains(wd2)) {
+						w.add(wd2);
+					}
+					SYNONYM_MAP2.put(wd1, w);
+
+					w = new Vector();
+					if (SYNONYM_MAP2.containsKey(wd2)) {
+						w = (Vector) SYNONYM_MAP2.get(wd2);
+					}
+					if (!w.contains(wd1)) {
+						w.add(wd1);
+					}
+					SYNONYM_MAP2.put(wd2, w);
 				}
-				if (!w.contains(wd1)) {
-					w.add(wd1);
-				}
-				SYNONYM_MAP2.put(wd2, w);
 			}
 		}
-		//dumpMultiValuedHashMap("SYNONYM_MAP", SYNONYM_MAP);
 		System.out.println("Initialization of ContainsSearch completed.");
 	}
 
@@ -262,6 +265,7 @@ public class ContainsSearch {
 		boolean exists = checkIfFileExists(SYNONYM_FILE);
 		if (!exists) {
 			System.out.println("WARNING: file " + SYNONYM_FILE + " does not exists.");
+			SYNONYM_VEC = new Vector();
 		}
         SYNONYM_VEC = Utils.readFile(SYNONYM_FILE);
 	}
@@ -1080,6 +1084,32 @@ public class ContainsSearch {
 		dumpVector(dis_term, res_vec);
 	}
 
+/*
+	public static String run(String filename, int dis_col, int def_col) {
+		ContainsSearch cs = new ContainsSearch();
+		Vector w = cs.run(filename, dis_col, def_col);
+		String outputfile = "result_" + filename;
+		Utils.saveToFile(outputfile, w);
+
+        char delim = '\t';
+        String xlsfile = text2Excel(outputfile, delim);
+ 		short firstRowColor = IndexedColors.LIGHT_GREEN.getIndex();
+		ExcelFormatter.reformat(xlsfile, firstRowColor);
+		return outputfile;
+	}
+*/
+	public static String text2Excel(String textfile, char delim) {
+		int n = textfile.lastIndexOf(".");
+		String sheetName = textfile.substring(0, n);//label + " " + StringUtils.getToday("yyyy-MM-dd");
+		String xlsfile = null;
+		try {
+			xlsfile = ExcelReadWriteUtils.writeXLSFile(textfile, delim, sheetName);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return xlsfile;
+	}
+
 	public String run(String termfile, String datafile, int codeCol, int vbtCol) {
         createCode2TokenizedTermMap(termfile);
         Vector w = new Vector();
@@ -1119,7 +1149,12 @@ public class ContainsSearch {
         Utils.saveToFile("nomatch_" + datafile, nomatches);
         System.out.println("Number of records: " + knt);
         System.out.println("Number of nomatches: " + nomatches.size());
-        return outputfile;
+
+        char delim = '\t';
+        String xlsfile = text2Excel(outputfile, delim);
+ 		short firstRowColor = IndexedColors.LIGHT_GREEN.getIndex();
+		ExcelFormatter.reformat(xlsfile, firstRowColor);
+		return outputfile;
 	}
 
     public static Vector addSynonyms(Vector v) {
@@ -1158,7 +1193,7 @@ public class ContainsSearch {
 Row	NCIt code	NCIt DEFINITION	NCCN Regimen Name	NCCN Disease Name
 2	C188903	A regimen consisting of polatuzumab vedotin, bendamustine and rituximab that may be used in the treatment of diffuse large B-cell lymphoma (DLBCL).	Bendamustine/Polatuzumab vedotin-piiq + RiTUXimab	Diffuse Large B-Cell Lymphoma
 */
-	public static Vector run(String filename, int dis_col, int def_col) {
+	public static String run(String filename, int dis_col, int def_col) {
 		System.out.println("filename: " + filename);
 		System.out.println("dis_col: " + dis_col);
 		System.out.println("def_col: " + def_col);
@@ -1199,7 +1234,6 @@ Row	NCIt code	NCIt DEFINITION	NCCN Regimen Name	NCCN Disease Name
 			def_vec = addSynonyms(def_vec);
 			def_vec = removeSpecialCharacters(def_vec);
 
-
 			boolean contains = true;
 			for (int i3=0; i3<dis_vec.size(); i3++) {
 				String word = (String) dis_vec.elementAt(i3);
@@ -1228,11 +1262,18 @@ Row	NCIt code	NCIt DEFINITION	NCCN Regimen Name	NCCN Disease Name
         System.out.println("Total: " + knt1);
         System.out.println("Contains: " + knt2);
         System.out.println("No match: " + knt3);
-        //Utils.saveToFile("reason_" + filename, debug_vec);
 
         missing_word_vec = new SortUtils().quickSort(missing_word_vec);
         Utils.saveToFile("missing_word_" + filename, missing_word_vec);
-        return w;
+
+		String outputfile = "result_" + filename;
+		Utils.saveToFile(outputfile, w);
+
+        char delim = '\t';
+        String xlsfile = text2Excel(outputfile, delim);
+ 		short firstRowColor = IndexedColors.LIGHT_GREEN.getIndex();
+		ExcelFormatter.reformat(xlsfile, firstRowColor);
+        return outputfile;
 	}
 
 
@@ -1383,7 +1424,7 @@ Row	NCIt code	NCIt DEFINITION	NCCN Regimen Name	NCCN Disease Name
 	    System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
-	public static void main(String[] args) {
+	public static void main1(String[] args) {
 		long ms = System.currentTimeMillis();
 		String serviceUrl = ConfigurationController.serviceUrl;
 		String namedGraph = ConfigurationController.namedGraph;
@@ -1393,4 +1434,14 @@ Row	NCIt code	NCIt DEFINITION	NCCN Regimen Name	NCCN Disease Name
 	    String outputfile = args[1];
 	    run(serviceUrl, namedGraph, username, password, target, outputfile);
 	}
+
+	public static void main(String[] args) {
+		////Disease Name	Indication(s)	NCIt Code	NCI PT	note
+		String datafile = args[0];
+		String disColStr = args[1];
+		int dis_col = Integer.parseInt(disColStr);
+		String defColStr = args[2];
+		int def_col = Integer.parseInt(defColStr);
+		run(datafile, dis_col, def_col);
+    }
 }
