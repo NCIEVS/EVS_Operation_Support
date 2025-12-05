@@ -1362,41 +1362,35 @@ Row	NCIt code	NCIt DEFINITION	NCCN Regimen Name	NCCN Disease Name
 
 	public Vector getContains(String named_graph, String target) {
         String query = construct_get_contains(named_graph, target);
+        System.out.println(query);
+
         Vector v = owlSPARQLUtils.executeQuery(query);
         if (v == null) return null;
         if (v.size() == 0) return v;
-        //v = new ParserUtils().getResponseValues(v);
         return new SortUtils().quickSort(v);
+	}
+
+	public static void run(String serviceUrl,
+	                       String namedGraph,
+	                       String username,
+	                       String password,
+	                       String target,
+	                       String outputfile) {
+		long ms = System.currentTimeMillis();
+	    ContainsSearch cs = new ContainsSearch(serviceUrl, namedGraph, username, password);
+	    Vector v = cs.getContains(namedGraph, target);
+	    Utils.saveToFile(outputfile, v);
+	    System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
-		/*
-		ContainsSearch cs = new ContainsSearch();
-		String filename = args[0];
-		//int dis_col, int def_col
-		String dis_col_str = args[1];
-		String def_col_str = args[2];
-		int dis_col = Integer.parseInt(dis_col_str);
-		int def_col = Integer.parseInt(def_col_str);
-		Vector w = cs.run(filename, dis_col, def_col);
-		Utils.saveToFile("result_" + filename, w);
-
-		String nomatchfile = "nomatch_" + filename;
-		runAnalysis("result_" + filename, nomatchfile, dis_col, def_col);
-		*/
-
 		String serviceUrl = ConfigurationController.serviceUrl;
 		String namedGraph = ConfigurationController.namedGraph;
 		String username = ConfigurationController.username;
 		String password = ConfigurationController.password;
-	    ContainsSearch cs = new ContainsSearch(serviceUrl, namedGraph, username, password);
-
 	    String target = args[0];
-	    Vector v = cs.getContains(namedGraph, target);
-	    Utils.dumpVector(target, v);
-	    System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
-
-
+	    String outputfile = args[1];
+	    run(serviceUrl, namedGraph, username, password, target, outputfile);
 	}
 }
