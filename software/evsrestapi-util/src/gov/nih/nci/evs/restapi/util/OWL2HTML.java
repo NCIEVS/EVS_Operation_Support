@@ -143,7 +143,7 @@ public class OWL2HTML {
       out.println("		<meta name=\"description\" content=\"A Tree from HTML Lists\">");
       out.println("		<meta http-equiv=\"pragma\" content=\"nocache\">");
       out.println("		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
-      int n = textfile.lastIndexOf(",");
+      int n = textfile.lastIndexOf(".");
       String title = (String) textfile.substring(0, n);
       out.println("		<title>" + title + "</title>");
       out.println("		<script>");
