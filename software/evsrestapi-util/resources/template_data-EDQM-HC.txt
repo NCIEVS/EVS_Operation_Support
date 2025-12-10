@@ -1,0 +1,17 @@
+name:EDQM Characteristics Prototype|type:Association|rootConceptCode:C150103|association:Concept_In_Subset|level:1|sortColumn:2
+label:NCIt Subset Code|display:code|propertyType:Associated Concept Code|property:NHC0|source:|group:|subsource:
+label:NCIt Subset Name|display:property|propertyType:Associated Concept Property|property:P108|source:|group:|subsource:
+label:NCIt Concept Code|display:code|propertyType:code|property:NHC0|source:|group:|subsource:
+label:NCIt Preferred Term|display:property|propertyType:FULL_SYN|property:P90|source:NCI|group:PT|subsource:
+label:EDQM-HC Preferred Term|display:property|propertyType:FULL_SYN|property:P90|source:EDQM-HC|group:PT|subsource:
+label:EDQM-HC Source Code|display:property|propertyType:FULL_SYN|property:P90|source:EDQM-HC|group:PT|subsource:
+label:Has_Pharmaceutical_Administration_Method PT|display:property|propertyType:Has_Pharmaceutical_Administration_Method|property:P108|source:|group:|subsource:
+label:Has_Pharmaceutical_Administration_Method Source Code|display:property|propertyType:Has_Pharmaceutical_Administration_Method|property:P385|source:EDQM-HC|group:|subsource:
+label:Has_Pharmaceutical_Intended_Site PT|display:property|propertyType:Has_Pharmaceutical_Intended_Site|property:P108|source:|group:|subsource:P385
+label:Has_Pharmaceutical_Intended_Site Source Code|display:property|propertyType:Has_Pharmaceutical_Intended_Site|property:P385|source:EDQM-HC|group:|subsource:
+label:Has_Pharmaceutical_Transformation PT|display:property|propertyType:Has_Pharmaceutical_Transformation|property:P108|source:|group:|subsource:
+label:Has_Pharmaceutical_Transformation Source Code|display:property|propertyType:Has_Pharmaceutical_Transformation|property:P385|source:EDQM-HC|group:|subsource:
+label:Has_Pharmaceutical_Release_Characteristics PT|display:property|propertyType:Has_Pharmaceutical_Release_Characteristics|property:P108|source:|group:|subsource:
+label:Has_Pharmaceutical_Release_Characteristics Source Code|display:property|propertyType:Has_Pharmaceutical_Release_Characteristics|property:P385|source:EDQM-HC|group:|subsource:
+label:Has_Pharmaceutical_State_Of_Matter PT|display:property|propertyType:Has_Pharmaceutical_State_Of_Matter|property:P108|source:|group:|subsource:
+label:Has_Pharmaceutical_State_Of_Matter Source Code|display:property|propertyType:Has_Pharmaceutical_State_Of_Matter|property:P385|source:EDQM-HC|group:|subsource:
