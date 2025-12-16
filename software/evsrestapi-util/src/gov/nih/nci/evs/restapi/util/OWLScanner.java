@@ -65,6 +65,9 @@ import java.util.*;
  *
  */
 public class OWLScanner {
+
+    static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
+
     String owlfile = null;
     Vector owl_vec = null;
     static String NAMESPACE = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
@@ -1690,6 +1693,14 @@ C4910|<NHC0>C4910</NHC0>
 				}
 			}
 			if (istart) {
+				//<owl:Class
+				if (t.indexOf("<owl:Class") != -1) {
+					t = "   " + t;
+				}
+				else if (t.indexOf("<!--") != -1) {
+					t = t.replace("   <!--", "<!--");
+					t = "\n" + t + "\n";
+				}
 				v.add(t);
 		    }
 		}
@@ -3575,15 +3586,60 @@ C4910|<NHC0>C4910</NHC0>
 		return w;
 	}
 
+	public static void extractBranchTemplate() {
+        Vector v = Utils.readFile(NCIT_OWL);
+        Vector w = new Vector();
+        boolean switchOff = false;
+        for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (line.indexOf("    // Classes") != -1) {
+				w.add(line);
+				i++;
+				line = (String) v.elementAt(i);
+				w.add(line);
+				i++;
+				line = (String) v.elementAt(i);
+				w.add(line);
+				i++;
+				line = (String) v.elementAt(i);
+				w.add(line);
+				w.add("\n<INSERT CLASS DATA HERE.>\n");
+				switchOff = true;
+			} else if (!switchOff) {
+				w.add(line);
+			} else {
+                if (line.indexOf("    // Annotations") != -1) {
+					w.add((String) v.elementAt(i-3));
+					w.add((String) v.elementAt(i-2));
+					w.add((String) v.elementAt(i-1));
+					w.add((String) v.elementAt(i));
+					switchOff = false;
+				}
+			}
+		}
+		Utils.saveToFile("branch_base.owl", w);
+	}
 
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
+		/*
         String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
         String owlfile = ConfigurationController.owlfile;
         owlfile = reportGenerationDirectory + File.separator + owlfile;
 		OWLScanner scanner = new OWLScanner(owlfile);
 		Vector w = scanner.extractEquivalenceClasses();
 		Utils.saveToFile("equivalence_classses.txt", w);
+		*/
+		//extractBranchTemplate();
+        String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
+        String owlfile = ConfigurationController.owlfile;
+        owlfile = reportGenerationDirectory + File.separator + owlfile;
+		OWLScanner scanner = new OWLScanner(owlfile);
+		Vector codes = new Vector();
+		codes.add("C12345");
+		codes.add("C12545");
+		Vector w = scanner.getOWLClassDataByCode(scanner.get_owl_vec(), codes);
+		Utils.saveToFile("classdata.txt", w);
         System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
