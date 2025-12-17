@@ -3586,6 +3586,7 @@ C4910|<NHC0>C4910</NHC0>
 		return w;
 	}
 
+    static String INSERT_CONTENT_HERE = "INSERT CONTENT HERE";
 	public static void extractBranchTemplate() {
         Vector v = Utils.readFile(NCIT_OWL);
         Vector w = new Vector();
@@ -3603,7 +3604,7 @@ C4910|<NHC0>C4910</NHC0>
 				i++;
 				line = (String) v.elementAt(i);
 				w.add(line);
-				w.add("\n<INSERT CLASS DATA HERE.>\n");
+				w.add("\n<" + INSERT_CONTENT_HERE + ">\n");
 				switchOff = true;
 			} else if (!switchOff) {
 				w.add(line);

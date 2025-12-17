@@ -737,4 +737,32 @@ public class Utils {
 		}
 		return a;
 	}
+
+	public static String insert(String file1, String file2, String locMarker) {
+		Vector v1 = Utils.readFile(file1);
+		Vector v2 = Utils.readFile(file2);
+		Vector w = new Vector();
+
+		for (int i=0; i<v1.size(); i++) {
+			String line = (String) v1.elementAt(i);
+			if (line.indexOf(locMarker) != -1) {
+				for (int j=0; j<v2.size(); j++) {
+					String line2 = (String) v2.elementAt(j);
+					w.add(line2);
+				}
+			} else {
+				w.add(line);
+			}
+		}
+		int n = file2.lastIndexOf(".");
+		String outputfile = file2.substring(0, n) + ".owl";
+		Utils.saveToFile(outputfile, w);
+		return outputfile;
+	}
+
+	static String INSERT_CONTENT_HERE = "INSERT CONTENT HERE";
+	public static String insert(String file1, String file2) {
+		return insert(file1, file2, INSERT_CONTENT_HERE);
+	}
+
 }
