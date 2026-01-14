@@ -550,7 +550,7 @@ public class ExcelReadWriteUtils {
 
 	public static String text2XLSX(String textfile, char delim, String sheetName) throws IOException {
 		int n = textfile.lastIndexOf(".");
-		String excelFileName = textfile.substring(0, n) + ".xls";
+		String excelFileName = textfile.substring(0, n) + ".xlsx";
 		XSSFWorkbook wb = new XSSFWorkbook();
 		XSSFSheet sheet = wb.createSheet(sheetName) ;
 		XSSFCreationHelper helper = wb.getCreationHelper();
