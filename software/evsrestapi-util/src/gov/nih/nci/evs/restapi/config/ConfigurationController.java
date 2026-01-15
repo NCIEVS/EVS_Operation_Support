@@ -126,6 +126,7 @@ public class ConfigurationController {
 	public final static String synonymExt = properties.getProperty("synonymExt");
 	public final static String userDownloadDir = properties.getProperty("userDownloadDir");
 	public final static String nccn_output_dir = properties.getProperty("nccn_output_dir");
+	public final static String apikey = properties.getProperty("apikey");
 
 	/**
 	 * To be implemented by each descendant testcase.
