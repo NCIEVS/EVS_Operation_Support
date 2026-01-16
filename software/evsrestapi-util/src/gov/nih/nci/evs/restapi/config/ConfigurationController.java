@@ -127,6 +127,7 @@ public class ConfigurationController {
 	public final static String userDownloadDir = properties.getProperty("userDownloadDir");
 	public final static String nccn_output_dir = properties.getProperty("nccn_output_dir");
 	public final static String apikey = properties.getProperty("apikey");
+	public final static String url = properties.getProperty("url");
 	public final static String hashmapdata = properties.getProperty("hashmapdata");
 
 	/**
