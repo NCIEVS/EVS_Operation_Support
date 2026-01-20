@@ -129,6 +129,7 @@ public class ConfigurationController {
 	public final static String apikey = properties.getProperty("apikey");
 	public final static String url = properties.getProperty("url");
 	public final static String hashmapdata = properties.getProperty("hashmapdata");
+	public final static String json = properties.getProperty("json");
 
 	/**
 	 * To be implemented by each descendant testcase.
