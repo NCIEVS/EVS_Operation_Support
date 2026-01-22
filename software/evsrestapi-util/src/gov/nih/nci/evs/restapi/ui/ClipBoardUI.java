@@ -219,11 +219,15 @@ public class ClipBoardUI {
         return defaultToolkit.getSystemClipboard();
     }
 
+    public static void run(String outputDir, String prefix) {
+        ClipBoardUI ui = new ClipBoardUI(outputDir, prefix);
+        ui.initialize();
+	}
+
     public static void main(String args[]) {
-        ClipBoardUI ui = null;//new ClipBoardUI();
         String outputDir = ConfigurationController.nccn_output_dir;
         String prefix = "F";
-        ui = new ClipBoardUI(outputDir, prefix);
+        ClipBoardUI ui = new ClipBoardUI(outputDir, prefix);
         ui.initialize();
 	}
 }
