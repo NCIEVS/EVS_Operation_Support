@@ -900,7 +900,7 @@ public class ExactMatch {
 
 	public static void mapToBranch(String root, String datafile, int colNum) {
 		HierarchyHelper hh = new HierarchyHelper(Utils.readFile(PARENT_CHILD_FILE));
-		Vector codes = hh.get_transitive_closure_v4(root);
+		Vector codes = hh.get_transitive_closure_v3(root);
 		mapToCodes(codes, datafile, colNum);
 	}
 
