@@ -2,6 +2,7 @@ package gov.nih.nci.evs.restapi.appl;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.model.*;
 import gov.nih.nci.evs.restapi.util.*;
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -70,14 +71,19 @@ import java.util.regex.*;
  */
 public class NCItQA {
     //ThesaurusInferred_forTS
-    public static String NCIT_OWL = "ThesaurusInferred_forTS.owl";
-    public static String SEMANTIC_TYPE_URL = "https://metamap.nlm.nih.gov/Docs/SemanticTypes_2018AB.txt";
-    public static String UMLS_SEMANTIC_TYPE_URL = "https://www.nlm.nih.gov/research/umls/META3_current_semantic_types.html";
+    //public static String NCIT_OWL = "ThesaurusInferred_forTS.owl";
+    static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
+	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
+	static String RESTRICTION_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.rolefile; //"roles.txt";
+	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
+	static String PROPERTY_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.propertyfile;
+    //public static String SEMANTIC_TYPE_URL = "https://metamap.nlm.nih.gov/Docs/SemanticTypes_2018AB.txt";
+    //public static String UMLS_SEMANTIC_TYPE_URL = "https://www.nlm.nih.gov/research/umls/META3_current_semantic_types.html";
 
-    public static String PROPERTY_FILE = "properties.txt";
-    public static String ROLE_FILE = "roles.txt";
-    public static String SEMANTIC_TYPE_FILE = "semantictypes.txt";
-    public static String FULLSYN_FILE = "FULLSYN.txt";
+    //public static String PROPERTY_FILE = "properties.txt";
+    public static String ROLE_FILE = RESTRICTION_FILE;//"roles.txt";
+    //public static String SEMANTIC_TYPE_FILE = "semantictypes.txt";
+    public static String FULLSYN_FILE = generateFULLSYN_FILE();//"FULLSYN.txt";
 
     public static String OBJECT_PROPERTY_FILE = "objectProperties.txt";
     public static String DEPRECATED_FILE = "deprecated.txt";
@@ -86,8 +92,6 @@ public class NCItQA {
     public static String SEMANTIC_TYPE_PROP_CODE = "P106";
     public static String PREFERRED_NAME_PROP_CODE = "P108";
     public static String CONCEPT_STATUS_PROP_CODE = "P310";
-
-
 
     public Vector semantic_types = null;
     Vector objectProperties = null;
@@ -101,7 +105,7 @@ public class NCItQA {
     HashMap code2LabelMap = null;//getCode2LabelMap
     HashMap roleCode2LabelMap = null;
 
-    public static String AXIOM_FILE = "axioms.txt";
+    //public static String AXIOM_FILE = "axioms.txt";
 
     public HashMap concept_status_map = null;
     public String owlfile = null;
@@ -112,20 +116,121 @@ public class NCItQA {
     Vector annotationProperties = null;
     public boolean saveOption = false;
 
+/*
     public NCItQA() {
 
 	}
+*/
 
 	public NCItQA(String owlfile) {
 		this.owlfile = owlfile;
 		//initialize();
 	}
 
+/*
+Recombinant Amphiregulin|C1000|P90|CRDGF|P383$AB|P384$NCI
+Recombinant Amphiregulin|C1000|P90|KAF|P383$AB|P384$NCI
+*/
+	public static String generateFULLSYN_FILE() {
+		Vector v = Utils.readFile(AXIOM_FILE);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String propCode = (String) u.elementAt(2);
+			if (propCode.compareTo("P90") == 0) {
+				w.add(line);
+			}
+		}
+		String fullsynfile = "FULLSYN.txt";
+		Utils.saveToFile(fullsynfile, w);
+		return fullsynfile;
+	}
+
 	public void setSaveOption(boolean saveOption) {
 		this.saveOption = saveOption;
 	}
 
+/*
+Recombinant Amphiregulin|C1000|P90|AMPHIREGULIN|P383$PT|P384$FDA|P385$7MGE0HPM2H|P386$UNII
+Recombinant Amphiregulin|C1000|P90|AR|P383$AB|P384$NCI
+Recombinant Amphiregulin|C1000|P90|CRDGF|P383$AB|P384$NCI
+Recombinant Amphiregulin|C1000|P90|KAF|P383$AB|P384$NCI
+Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
+*/
+
+    public List getSynonyms(Vector axiom_data) {
+		if (axiom_data == null) return null;
+		List syn_list = new ArrayList();
+		HashMap hmap = new HashMap();
+		for (int i=0; i<axiom_data.size(); i++) {
+			String t = (String) axiom_data.elementAt(i);
+			gov.nih.nci.evs.restapi.bean.Synonym syn = AxiomParser.line2Synonym(t);// {
+			syn_list.add(syn);
+		}
+		/*
+			/*
+			Vector u = StringUtils.parseData(t, '|');
+			String axiom_id = (String) u.elementAt(0); //bnode_21e4bb1f_2fc9_480b_bbdb_0d116398d610_2156686
+			String label = (String) u.elementAt(1);
+			String code = (String) u.elementAt(2);
+			String propertyName = (String) u.elementAt(3); // FULL_SYN
+			//String propertyCode = (String) u.elementAt(4); // P90
+			String term_name = (String) u.elementAt(4); //P90
+			String qualifier_name = (String) u.elementAt(5);
+			//String qualifier_code = (String) u.elementAt(7);
+			String qualifier_value = (String) u.elementAt(6);
+
+			String key = axiom_id + "$" + code;
+
+            Synonym syn = (Synonym) hmap.get(key);
+            if (syn == null) {
+				syn = new Synonym(
+							code,
+							label,
+							term_name,
+							null, //termGroup,
+							null, //termSource,
+							null, //sourceCode,
+							null, //subSourceName,
+		                    null); //subSourceCode
+			}
+			if (qualifier_name.compareTo("Term Type") == 0 ||
+			           qualifier_name.compareTo("tem-type") == 0 ||
+			           qualifier_name.compareTo("P383") == 0) {
+				syn.setTermGroup(qualifier_value);
+			} else if (qualifier_name.compareTo("Term Source") == 0 ||
+			           qualifier_name.compareTo("tem-source") == 0 ||
+			           qualifier_name.compareTo("P384") == 0) {
+				syn.setTermSource(qualifier_value);
+			} else if (qualifier_name.compareTo("Source Code") == 0 ||
+			           qualifier_name.compareTo("source-code") == 0 ||
+			           qualifier_name.compareTo("P385") == 0) {
+				syn.setSourceCode(qualifier_value);
+			} else if (qualifier_name.compareTo("Subsource Name") == 0 ||
+			           qualifier_name.compareTo("subsource-name") == 0 ||
+			           qualifier_name.compareTo("P386") == 0) {
+				syn.setSubSourceName(qualifier_value);
+			} else if (qualifier_name.compareTo("Subsource Code") == 0 ||
+			           qualifier_name.compareTo("subsource-name") == 0) {
+				syn.setSubSourceCode(qualifier_value);
+			}
+			hmap.put(key, syn);
+		}
+		List syn_list = new ArrayList();
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			Synonym syn = (Synonym) hmap.get(key);
+			syn_list.add(syn);
+		}
+		*/
+		return syn_list;
+	}
+
+
 	public void initialize() {
+		/*
 		if (owlfile == null) {
 			if (FileUtils.fileExists(NCIT_OWL)) {
 				System.out.println(NCIT_OWL + " exists.");
@@ -139,10 +244,13 @@ public class NCItQA {
 	    }
 
 		owlScanner = new OWLScanner(NCIT_OWL);
+		*/
+		owlScanner = new OWLScanner(owlfile);
 		if (FileUtils.fileExists(FULLSYN_FILE)) {
 			System.out.println(FULLSYN_FILE + " exists.");
 			Vector w = Utils.readFile(FULLSYN_FILE);
-            full_syn_list = new AxiomUtils().getSynonyms(w);
+            //full_syn_list = new AxiomUtils().getSynonyms(w);
+            full_syn_list = getSynonyms(w);
 		} else {
 		    full_syn_list = extractFULLSyns();
 		}
@@ -233,7 +341,8 @@ public class NCItQA {
 		System.out.println("version: " + version);
 		String t = this.owlfile;
 		int n = t.lastIndexOf(".");
-		String outputfile = t.substring(0, n) + "_" + version + "_" + StringUtils.getToday() + "_QA.txt";
+		//String outputfile = t.substring(0, n) + "_" + version + "_" + StringUtils.getToday() + "_QA.txt";
+		String outputfile = ConfigurationController.owlfile + "_" + version + "_" + StringUtils.getToday() + "_QA.txt";
 		return outputfile;
 	}
 
@@ -526,6 +635,12 @@ public class NCItQA {
 					sourceCode = "null";
 				}
 				key = key + "|" + sourceCode;
+				String sourceSourceName = syn.getSubSourceName();
+				if (sourceSourceName == null) {
+					sourceSourceName = "null";
+				}
+				key = key + "|" + sourceSourceName;
+
 				Vector v = new Vector();
 				if (hmap.containsKey(key)) {
 
