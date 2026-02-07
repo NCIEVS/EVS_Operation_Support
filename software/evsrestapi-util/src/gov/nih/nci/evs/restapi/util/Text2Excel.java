@@ -131,6 +131,18 @@ public class Text2Excel {
 		System.out.println(excelfile + " generated.");
 	}
 
+    public static void generateExcel(String textfile, char delim) {
+		int n = textfile.lastIndexOf(".");
+		String sheetLabel = textfile.substring(0, n);
+		String excelfile = textfile.substring(0, n) + ".xlsx";
+		Vector datafile_vec = new Vector();
+		Vector sheetLabel_vec = new Vector();
+		sheetLabel_vec.add(sheetLabel);
+		datafile_vec.add(textfile);
+		generateExcel(datafile_vec, excelfile, delim, sheetLabel_vec);
+		System.out.println(excelfile + " generated.");
+	}
+
 	public static void main(String[] args) {
 		String dir = args[0];
 		System.out.println("working dir: " + dir);
