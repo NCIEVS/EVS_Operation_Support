@@ -765,4 +765,89 @@ public class Utils {
 		return insert(file1, file2, INSERT_CONTENT_HERE);
 	}
 
+    public static String vector2DelimitedString(Vector v) {
+		if (v == null) return "";
+		v = new SortUtils().quickSort(v);
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<v.size(); i++) {
+			String value = (String) v.elementAt(i);
+			buf.append(value).append("|");
+		}
+		String t = buf.toString();
+		if (t.endsWith("|")) {
+			t = t.substring(0, t.length()-1);
+		}
+		String decoded = HTMLDecoder.decode(t);
+		return decoded.trim();
+	}
+
+	public static HashMap createMultivaluedHashMap(String filename, char delim, int keyCol, int valueCol, boolean skipFirstLine) {
+		HashMap hmap = new HashMap();
+        int istart = 0;
+        if (skipFirstLine) {
+			istart = 1;
+		}
+		Vector v = Utils.readFile(filename);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.trim();
+			if (line.length() > 0) {
+				Vector u = StringUtils.parseData(line, delim);
+				String key = (String) u.elementAt(keyCol);
+				String value = (String) u.elementAt(valueCol);
+				Vector w = new Vector();
+				if (hmap.containsKey(key)) {
+					w = (Vector) hmap.get(key);
+				}
+				if (!w.contains(value)) {
+					w.add(value);
+				}
+				hmap.put(key, w);
+			}
+		}
+		return hmap;
+	}
+
+	public static Vector compareMultivaluedHashMaps(String title, String keyLabel, String valueLabel, HashMap hmap1, HashMap hmap2) {
+		boolean reportUnchanged = false;
+		return compareMultivaluedHashMaps(title, keyLabel, valueLabel, hmap1, hmap2, reportUnchanged);
+	}
+
+	public static Vector compareMultivaluedHashMaps(String title, String keyLabel, String valueLabel, HashMap hmap1, HashMap hmap2, boolean reportUnchanged) {
+		Vector w = new Vector();
+		w.add(title + "\t\t\t");
+		w.add(keyLabel + "\t" + "Action\tPrevious Value\tCurrent Value");
+		Iterator it = hmap1.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			Vector w1 = (Vector) hmap1.get(key);
+			String s1 = vector2DelimitedString(w1);
+			if (hmap2.containsKey(key)) {
+				Vector w2 = (Vector) hmap2.get(key);
+				String s2 = vector2DelimitedString(w2);
+				if (s1.compareTo(s2) != 0) {
+					w.add(key + "\t" + "Modify" + "\t" + s1 + "\t" + s2);
+				} else {
+					if (reportUnchanged) {
+					    w.add(key + "\t" + "Unchanged" + "\t" + s1 + "\t" + s2);
+					}
+				}
+
+			} else {
+				w.add(key + "\t" + "Delete" + "\t" + s1 + "\t" + "");
+			}
+		}
+
+		it = hmap2.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			Vector w2 = (Vector) hmap2.get(key);
+			String s2 = vector2DelimitedString(w2);
+			if (!hmap1.containsKey(key)) {
+				w.add(key + "\t" + "Add" + "\t" + s2 + "\t" + "");
+			}
+		}
+		return w;
+	}
+
 }

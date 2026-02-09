@@ -17,8 +17,14 @@ public class HTMLDecoder {
 		Utils.saveToFile(filename, w);
 	}
 
-	public static String decode(String input) {
+	public static String replace(String input) {
 		input = input.replace("&apos;", "'");
+		input = input.replace("&lt;", "<");
+		input = input.replace("&gt;", ">");
+        return input;
+	}
+
+	public static String decode(String input) {
 
         StringWriter writer = null;
         int len = input.length();
@@ -92,10 +98,13 @@ public class HTMLDecoder {
             i = st;
         }
 
+
+
         if (writer != null) {
             writer.append(input.substring(st, len));
             return writer.toString();
         }
+
         return input;
     }
 
