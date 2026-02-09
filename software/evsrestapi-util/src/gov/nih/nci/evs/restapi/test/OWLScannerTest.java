@@ -138,7 +138,7 @@ public class OWLScannerTest {
 		OWLScanner scanner = new OWLScanner(owlfile);
 		if (args.length > 1) {
 			String namespace = args[1];
-			OWLScanner.set_NAMESPACE(namespace);
+			scanner.set_NAMESPACE(namespace);
 		}
 		Vector w = scanner.extractRDFSLabels(scanner.get_owl_vec());
 		Utils.saveToFile(outputfile, w);

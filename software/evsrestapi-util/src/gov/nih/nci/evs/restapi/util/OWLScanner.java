@@ -70,11 +70,11 @@ public class OWLScanner {
 
     String owlfile = null;
     Vector owl_vec = null;
-    static String NAMESPACE = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
-    static String NAMESPACE_TARGET = "<!-- " + NAMESPACE;
-    static String OWL_CLS_TARGET = NAMESPACE_TARGET + "C";
-    static String OWL_PROPERTY_TARGET = NAMESPACE_TARGET + "P";
-    static String OWL_ANNOTATION_PROPERTY_TARGET = NAMESPACE_TARGET + "A";
+    String NAMESPACE = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
+    String NAMESPACE_TARGET = "<!-- " + NAMESPACE;
+    String OWL_CLS_TARGET = NAMESPACE_TARGET + "C";
+    String OWL_PROPERTY_TARGET = NAMESPACE_TARGET + "P";
+    String OWL_ANNOTATION_PROPERTY_TARGET = NAMESPACE_TARGET + "A";
 
 	static String open_tag = "<owl:Axiom>";
 	static String close_tag = "</owl:Axiom>";
@@ -96,8 +96,13 @@ public class OWLScanner {
 
     }
 
-    public static void set_NAMESPACE(String namespace) {
+    public void set_NAMESPACE(String namespace) {
 		NAMESPACE = namespace;
+		//NAMESPACE = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
+		NAMESPACE_TARGET = "<!-- " + NAMESPACE;
+		OWL_CLS_TARGET = NAMESPACE_TARGET + "C";
+		OWL_PROPERTY_TARGET = NAMESPACE_TARGET + "P";
+		OWL_ANNOTATION_PROPERTY_TARGET = NAMESPACE_TARGET + "A";
 		NAMESPACE_TARGET = "<!-- " + NAMESPACE;
 	}
 
@@ -1089,6 +1094,7 @@ C4910|<NHC0>C4910</NHC0>
 	}
 
     public Vector extractSuperclasses(Vector class_vec) {
+		System.out.println("extractSuperclasses " + class_vec.size());
         Vector w = new Vector();
         boolean istart = false;
         boolean istart0 = false;
@@ -1556,7 +1562,7 @@ C4910|<NHC0>C4910</NHC0>
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public static String extractClassId(String line) {
+    public String extractClassId(String line) {
         String t = line;
         String classId = null;
 		if (t.indexOf(NAMESPACE_TARGET) != -1 && t.endsWith("-->")) {
@@ -3198,6 +3204,9 @@ C4910|<NHC0>C4910</NHC0>
 
 	public HashMap getPropertyMap(Vector owl_vec) {
 		Vector v = extractAllProperties(owl_vec);
+		System.out.println("v: " + v.size());
+		Utils.saveToFile("properties.txt", v);
+
         HashMap hmap = new HashMap();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
