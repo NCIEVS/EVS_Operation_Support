@@ -889,6 +889,24 @@ public class HierarchyHelper implements Serializable {
 		}
 	}
 
+    public void printTree(Vector parent_child_vec, String outputfile) {
+		HierarchyHelper hh = new HierarchyHelper(parent_child_vec);
+		PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(outputfile, "UTF-8");
+			hh.printTree(pw);
+		} catch (Exception ex) {
+
+		} finally {
+			try {
+				pw.close();
+				System.out.println("Output file " + outputfile + " generated.");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
 	public Vector appendParentConceptdData(String filename) {
 		Vector v = Utils.readFile(filename);
 		Vector w = new Vector();
