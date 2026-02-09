@@ -3630,6 +3630,17 @@ C4910|<NHC0>C4910</NHC0>
 		Utils.saveToFile("branch_base.owl", w);
 	}
 
+	public static Vector extractHierarchicalRelationships(String owlfile, String namespace) {
+		Vector output_vec = new Vector();
+		OWLScanner scanner = new OWLScanner(owlfile);
+		String NAMESPACE = namespace; //"http://ncicb.nci.nih.gov/xml/owl/EVS/ctcae6.owl#";
+		scanner.set_NAMESPACE(NAMESPACE);
+		Vector owl_vec = scanner.get_owl_vec();
+		Vector parent_child_vec = scanner.extractHierarchicalRelationships(owl_vec);
+		parent_child_vec = new SortUtils().quickSort(parent_child_vec);
+		return parent_child_vec;
+	}
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		/*

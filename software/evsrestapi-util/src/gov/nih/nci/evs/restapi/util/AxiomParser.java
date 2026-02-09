@@ -405,6 +405,66 @@ public class AxiomParser {
 			subSourceCode);
 	}
 
+    public static Definition line2Definition(String line) {
+		line = line.trim();
+		if (line.length() == 0) return null;
+		Vector u = StringUtils.parseData(line, '|');
+		String code = (String) u.elementAt(1);
+		String label = (String) u.elementAt(0);
+		String description = (String) u.elementAt(3);
+		String attribution = "";
+		String source = "";
+
+		for (int i=4; i<u.size(); i++) {
+			String t = (String) u.elementAt(i);
+			Vector u2 = StringUtils.parseData(t, '$');
+			String s1 = (String) u2.elementAt(0);
+			String s2 = (String) u2.elementAt(1);
+			if (s1.compareTo("P381") == 0) {
+				attribution = s2;
+			} else if (s1.compareTo("P378") == 0) {
+				source = s2;
+			}
+		}
+		return new Definition(
+			code,
+			label,
+			description,
+			attribution,
+			source);
+	}
+
+    public static AltDefinition line2AltDefinition(String line) {
+		line = line.trim();
+		if (line.length() == 0) return null;
+		Vector u = StringUtils.parseData(line, '|');
+		String code = (String) u.elementAt(1);
+		String label = (String) u.elementAt(0);
+		String prop_code = (String) u.elementAt(2);
+
+		String description = (String) u.elementAt(3);
+		String attribution = "";
+		String source = "";
+
+		for (int i=4; i<u.size(); i++) {
+			String t = (String) u.elementAt(i);
+			Vector u2 = StringUtils.parseData(t, '$');
+			String s1 = (String) u2.elementAt(0);
+			String s2 = (String) u2.elementAt(1);
+			if (s1.compareTo("P381") == 0) {
+				attribution = s2;
+			} else if (s1.compareTo("P378") == 0) {
+				source = s2;
+			}
+		}
+		return new AltDefinition(
+			code,
+			label,
+			description,
+			attribution,
+			source);
+	}
+
     public static HashMap loadSynonyms(String filename) {
 		HashMap hmap = new HashMap();
 		Vector v = Utils.readFile(filename);
