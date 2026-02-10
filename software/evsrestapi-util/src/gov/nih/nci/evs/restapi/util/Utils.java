@@ -807,6 +807,43 @@ public class Utils {
 		return hmap;
 	}
 
+
+	public static HashMap createMultivaluedHashMap(Vector v, char delim, int keyCol, Vector<Integer> valueCols, boolean skipFirstLine) {
+		HashMap hmap = new HashMap();
+        int istart = 0;
+        if (skipFirstLine) {
+			istart = 1;
+		}
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.trim();
+			if (line.length() > 0) {
+				Vector u = StringUtils.parseData(line, delim);
+				String key = (String) u.elementAt(keyCol);
+				StringBuffer buf = new StringBuffer();
+				for (int j=0; j<valueCols.size(); j++) {
+					Integer int_obj = (Integer) valueCols.elementAt(j);
+					int k = int_obj.intValue();
+					buf.append((String) u.elementAt(k)).append(delim);
+				}
+				String value = buf.toString();
+				if (value.endsWith("" + delim)) {
+					value = value.substring(0, value.length()-1);
+				}
+				Vector w = new Vector();
+				if (hmap.containsKey(key)) {
+					w = (Vector) hmap.get(key);
+				}
+				if (!w.contains(value)) {
+					w.add(value);
+				}
+				hmap.put(key, w);
+			}
+		}
+		return hmap;
+	}
+
+
 	public static HashMap createMultivaluedHashMap(String filename, char delim, int keyCol, int valueCol, boolean skipFirstLine) {
 		HashMap hmap = new HashMap();
         int istart = 0;
