@@ -781,6 +781,32 @@ public class Utils {
 		return decoded.trim();
 	}
 
+	public static HashMap createMultivaluedHashMap(Vector v, char delim, int keyCol, int valueCol, boolean skipFirstLine) {
+		HashMap hmap = new HashMap();
+        int istart = 0;
+        if (skipFirstLine) {
+			istart = 1;
+		}
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.trim();
+			if (line.length() > 0) {
+				Vector u = StringUtils.parseData(line, delim);
+				String key = (String) u.elementAt(keyCol);
+				String value = (String) u.elementAt(valueCol);
+				Vector w = new Vector();
+				if (hmap.containsKey(key)) {
+					w = (Vector) hmap.get(key);
+				}
+				if (!w.contains(value)) {
+					w.add(value);
+				}
+				hmap.put(key, w);
+			}
+		}
+		return hmap;
+	}
+
 	public static HashMap createMultivaluedHashMap(String filename, char delim, int keyCol, int valueCol, boolean skipFirstLine) {
 		HashMap hmap = new HashMap();
         int istart = 0;
