@@ -465,6 +465,49 @@ public class AxiomParser {
 			source);
 	}
 
+    public static MapToEntry line2MapToEntry(String line) {
+		line = line.trim();
+		if (line.length() == 0) return null;
+		Vector u = StringUtils.parseData(line, '|');
+		String code = (String) u.elementAt(1);
+		String label = (String) u.elementAt(0);
+		String prop_code = (String) u.elementAt(2);
+
+		String targetTerm = (String) u.elementAt(3);
+		String targetCode = "";
+		String targetTermType = "";
+		String targetTerminology = "";
+		String targetTerminologyVersion = "";
+		String relationshipToTarget = "";
+
+		for (int i=4; i<u.size(); i++) {
+			String t = (String) u.elementAt(i);
+			Vector u2 = StringUtils.parseData(t, '$');
+			String s1 = (String) u2.elementAt(0);
+			String s2 = (String) u2.elementAt(1);
+			if (s1.compareTo("P393") == 0) {
+				relationshipToTarget = s2;
+			} else if (s1.compareTo("P394") == 0) {
+				targetTermType = s2;
+			} else if (s1.compareTo("P395") == 0) {
+				targetCode = s2;
+			} else if (s1.compareTo("P396") == 0) {
+				targetTerminology = s2;
+			} else if (s1.compareTo("P397") == 0) {
+				targetTerminologyVersion = s2;
+			}
+		}
+		return new MapToEntry(
+		 code,
+		 label,
+		 relationshipToTarget,
+		 targetCode,
+		 targetTerm,
+		 targetTermType,
+		 targetTerminology,
+		 targetTerminologyVersion);
+	}
+
     public static HashMap loadSynonyms(String filename) {
 		HashMap hmap = new HashMap();
 		Vector v = Utils.readFile(filename);
