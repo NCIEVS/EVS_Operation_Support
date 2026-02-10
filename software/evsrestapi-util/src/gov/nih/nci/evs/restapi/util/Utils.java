@@ -807,6 +807,12 @@ public class Utils {
 		return hmap;
 	}
 
+	public static HashMap createMultiValuedHashMap(Vector v, char delim, int keyCol, int valueCol) {
+		Vector<Integer> keyCols = new Vector();
+		keyCols.add(Integer.valueOf(keyCol));
+		boolean skipFirstLine = false;
+		return createMultiValuedHashMap(v, delim, keyCols, valueCol, skipFirstLine);
+	}
 
 	public static HashMap createMultiValuedHashMap(Vector v, char delim, Vector<Integer> keyCols, int valueCol, boolean skipFirstLine) {
 		HashMap hmap = new HashMap();
