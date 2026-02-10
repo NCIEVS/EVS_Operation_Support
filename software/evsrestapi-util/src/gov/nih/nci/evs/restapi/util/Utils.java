@@ -781,7 +781,7 @@ public class Utils {
 		return decoded.trim();
 	}
 
-	public static HashMap createMultivaluedHashMap(Vector v, char delim, int keyCol, int valueCol, boolean skipFirstLine) {
+	public static HashMap createMultiValuedHashMap(Vector v, char delim, int keyCol, int valueCol, boolean skipFirstLine) {
 		HashMap hmap = new HashMap();
         int istart = 0;
         if (skipFirstLine) {
@@ -808,7 +808,7 @@ public class Utils {
 	}
 
 
-	public static HashMap createMultivaluedHashMap(Vector v, char delim, int keyCol, Vector<Integer> valueCols, boolean skipFirstLine) {
+	public static HashMap createMultiValuedHashMap(Vector v, char delim, Vector<Integer> keyCols, int valueCol, boolean skipFirstLine) {
 		HashMap hmap = new HashMap();
         int istart = 0;
         if (skipFirstLine) {
@@ -819,16 +819,16 @@ public class Utils {
 			line = line.trim();
 			if (line.length() > 0) {
 				Vector u = StringUtils.parseData(line, delim);
-				String key = (String) u.elementAt(keyCol);
+				String value = (String) u.elementAt(valueCol);
 				StringBuffer buf = new StringBuffer();
-				for (int j=0; j<valueCols.size(); j++) {
-					Integer int_obj = (Integer) valueCols.elementAt(j);
+				for (int j=0; j<keyCols.size(); j++) {
+					Integer int_obj = (Integer) keyCols.elementAt(j);
 					int k = int_obj.intValue();
-					buf.append((String) u.elementAt(k)).append(delim);
+					buf.append((String) u.elementAt(k)).append("" + delim);
 				}
-				String value = buf.toString();
-				if (value.endsWith("" + delim)) {
-					value = value.substring(0, value.length()-1);
+				String key = buf.toString();
+				if (key.endsWith("" + delim)) {
+					key = key.substring(0, key.length()-1);
 				}
 				Vector w = new Vector();
 				if (hmap.containsKey(key)) {
@@ -843,8 +843,7 @@ public class Utils {
 		return hmap;
 	}
 
-
-	public static HashMap createMultivaluedHashMap(String filename, char delim, int keyCol, int valueCol, boolean skipFirstLine) {
+	public static HashMap createMultiValuedHashMap(String filename, char delim, int keyCol, int valueCol, boolean skipFirstLine) {
 		HashMap hmap = new HashMap();
         int istart = 0;
         if (skipFirstLine) {
