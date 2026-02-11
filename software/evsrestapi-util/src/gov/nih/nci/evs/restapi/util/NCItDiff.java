@@ -103,6 +103,9 @@ public class NCItDiff {
 		HashMap hmap1 = createHashCode2StringMap(Utils.readFile(outputfile1));
         HashMap hmap2 = createHashCode2StringMap(Utils.readFile(outputfile2));
 
+        Vector w = new Vector();
+        w.add("Edit Action\tType\tPrevious Value\tCurrent Value");
+
         Vector diff_vec = new Vector();
         Iterator it1 = hmap1.keySet().iterator();
         while (it1.hasNext()) {
@@ -131,7 +134,8 @@ public class NCItDiff {
 				}
 			}
 		}
-		return diff_vec;
+		w.addAll(diff_vec);
+		return w;
 	}
 
     static int TYPE_ID = 0;
