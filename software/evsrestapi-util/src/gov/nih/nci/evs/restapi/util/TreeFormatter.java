@@ -70,9 +70,11 @@ public class TreeFormatter {
 
 	public static String toDelimited(String line) {
 		line = remoteTabs(line);
-		int n = line.indexOf("(");
+		int n = line.lastIndexOf("(");
 		String label = line.substring(0, n-1);
 		String code = line.substring(n+1, line.length()-1);
+		System.out.println(label);
+		System.out.println(code);
 		String t = label + "|" + code;
 		return t;
 	}
