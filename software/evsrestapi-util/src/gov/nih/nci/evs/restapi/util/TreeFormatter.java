@@ -73,8 +73,6 @@ public class TreeFormatter {
 		int n = line.lastIndexOf("(");
 		String label = line.substring(0, n-1);
 		String code = line.substring(n+1, line.length()-1);
-		System.out.println(label);
-		System.out.println(code);
 		String t = label + "|" + code;
 		return t;
 	}
@@ -120,6 +118,7 @@ public class TreeFormatter {
 
 	public static void main(String[] args) {
 		String asciitree = args[0];
+		//gov.nih.nci.evs.evsrest.appl.main.flattenASCIITree(asciitree);
 		flattenASCIITree(asciitree);
 	}
 
