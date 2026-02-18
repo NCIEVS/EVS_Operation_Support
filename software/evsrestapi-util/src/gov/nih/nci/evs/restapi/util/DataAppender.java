@@ -1,5 +1,4 @@
 package gov.nih.nci.evs.restapi.util;
-import gov.nih.nci.evs.restapi.config.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,12 +9,13 @@ import java.nio.file.*;
 import java.text.*;
 import java.util.*;
 
+import gov.nih.nci.evs.restapi.config.*;
 
 public class DataAppender {
     static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
 
 	public static HashMap createMultiValuedHashMap(Vector v) {
-		return Utils.createMultiValuedHashMap(v, '|', 0, 2);
+		return Utils.createMultiValuedHashMap(v, '\t', 0, 2);
 	}
 
 	public static Vector extractColumnData(String filename, String cols, char delim) {
@@ -30,11 +30,63 @@ public class DataAppender {
 		return DataExtractor.extractColumnData(filename, propCode_vec, delim);
 	}
 
-    public static void run(String datafile, char delim, int keycol, Vector propCode_vec, String outputfile, String heading) {
-		Vector v = Utils.readFile(datafile);
+	public static HashMap createCode2LabelMap(String parent_child_file) {
+		Vector v = Utils.readFile(parent_child_file);
+		HashMap hmap = new HashMap();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String s0 = (String) u.elementAt(0);
+			String s1 = (String) u.elementAt(1);
+			hmap.put(s1, s0);
+			if (u.size() > 2) {
+				String s2 = (String) u.elementAt(2);
+				String s3 = (String) u.elementAt(3);
+				hmap.put(s3, s2);
+			}
+		}
+		return hmap;
+	}
+
+	public static Vector sortBy(Vector v, char delim, int col, boolean skipHeading) {
+		Vector w = new Vector();
+		int istart = 0;
+		if (skipHeading) {
+			istart = 1;
+			w.add((String) v.elementAt(0));
+		}
+		HashMap hmap = new HashMap();
+		Vector keys = new Vector();
+		for (int i=istart; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			String key = (String) u.elementAt(col);
+			if (!keys.contains(key)) {
+				keys.add(key);
+			}
+			Vector lines = new Vector();
+			if (hmap.containsKey(key)) {
+				lines = (Vector) hmap.get(key);
+			}
+			lines.add(line);
+			hmap.put(key, lines);
+		}
+		keys = new SortUtils().quickSort(keys);
+		for (int i=0; i<keys.size(); i++) {
+			String key = (String) keys.elementAt(i);
+			Vector lines = (Vector) hmap.get(key);
+			for (int j=0; j<lines.size(); j++) {
+				String line = (String) lines.elementAt(j);
+				w.add(line);
+			}
+		}
+		return w;
+	}
+
+    public static void append(HashMap code2LabelMap, Vector propCode_vec, String outputfile, String heading) {
         Vector w0 = new Vector();
-        HashSet hset = new HashSet();
         w0.add(heading);
+        HashMap propCode2DataMap = new HashMap();
         Vector w = new Vector();
 		for (int i=0; i<propCode_vec.size(); i++) {
 			String propCode = (String) propCode_vec.elementAt(i);
@@ -49,38 +101,39 @@ public class DataAppender {
 			String propfile = propCode + ".txt";
 			Utils.saveToFile(propfile, v0);
 			HashMap hmap = createMultiValuedHashMap(v0);
-			w = new Vector();
-			for (int j=0; j<v.size(); j++) {
-				String line = (String) v.elementAt(j);
-				Vector u2 = StringUtils.parseData(line, delim);
-				String code = (String) u2.elementAt(keycol);
-				String appended_data = "";
-				if (!hset.contains(code)) {
-					Vector v1 = (Vector) hmap.get(code);
-					String t = "";
-					if (v1 != null) {
-						t = Utils.vector2DelimitedString(v1);
-						appended_data = appended_data + "\t" + t;
-					}
-					line = line.replace("|", "\t");
-					w.add(line + "\t" + appended_data);
-					hset.add(code);
+			propCode2DataMap.put(propCode, hmap);
+		}
+
+		w = new Vector();
+		Iterator it = code2LabelMap.keySet().iterator();
+		while (it.hasNext()) {
+			String code = (String) it.next();
+			String label = (String) code2LabelMap.get(code);
+			String line = code + "\t" + label;
+			String appended_data = "";
+			Iterator it2 = propCode2DataMap.keySet().iterator();
+			while (it2.hasNext()) {
+				String propCode = (String) it2.next();
+				HashMap hmap = (HashMap) propCode2DataMap.get(propCode);
+				Vector v1 = (Vector) hmap.get(code);
+				String t = "";
+				if (v1 != null) {
+					t = Utils.vector2DelimitedString(v1);
+					appended_data = appended_data + "\t" + t;
+				} else {
+					appended_data = appended_data + "\t";
 				}
 			}
+			w.add(line + "\t" + appended_data);
 		}
-		w = new SortUtils().quickSort(w);
 		w0.addAll(w);
 		Utils.saveToFile(outputfile, w0);
 	}
 
 	public static void main(String[] args) {
 		String datafile = args[0];
-		Vector w = extractColumnData(datafile, "0|1", '|');
-		String modified_datafile = "modified_" + datafile;
-		Utils.saveToFile(modified_datafile, w);
-
+		HashMap code2LabelMap = createCode2LabelMap(datafile);
 		char delim = '|';
-		int keycol = 1;
 		String propCodes = args[1];
 		Vector w1 = StringUtils.parseData(propCodes, '|');
 		Vector propCode_vec = new Vector();
@@ -88,10 +141,14 @@ public class DataAppender {
 			String s = (String) w1.elementAt(i);
 			propCode_vec.add(s);
 		}
-		String outputfile = "rsults_" + datafile;
-		String heading = "Label\tCode\tSemantic Type(s)";
-		run(modified_datafile, delim, keycol, propCode_vec, outputfile, heading);
 
+		String outputfile = "prop_values_" + datafile;
+		System.out.println("outputfile: " + outputfile);
+		String heading = "Code\tLabel\tSemantic Type(s)";
+		append(code2LabelMap, propCode_vec, outputfile, heading);
+        Vector w = Utils.readFile(outputfile);
+        boolean skipHeading = true;
+        w = sortBy(w, '\t', 1, skipHeading);
+        Utils.saveToFile(outputfile, w);
 	}
-
 }
