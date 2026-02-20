@@ -465,6 +465,46 @@ public class AxiomParser {
 			source);
 	}
 
+    public static GoAnnotation line2GoAnnotation(String line) {
+		line = line.trim();
+		if (line.length() == 0) return null;
+		Vector u = StringUtils.parseData(line, '|');
+		String code = (String) u.elementAt(1);
+		String label = (String) u.elementAt(0);
+		String prop_code = (String) u.elementAt(2);
+		String annotation = (String) u.elementAt(3);
+		String goEvi = "";
+		String goId = "";
+		String goSource = "";
+		String sourceDate = "";
+
+		for (int i=4; i<u.size(); i++) {
+			String t = (String) u.elementAt(i);
+			Vector u2 = StringUtils.parseData(t, '$');
+			String s1 = (String) u2.elementAt(0);
+			String s2 = (String) u2.elementAt(1);
+			if (s1.compareTo("P389") == 0) {
+				goEvi = s2;
+			} else if (s1.compareTo("P387") == 0) {
+				goId = s2;
+			} else if (s1.compareTo("P390") == 0) {
+				goSource = s2;
+			} else if (s1.compareTo("P391") == 0) {
+				sourceDate = s2;
+			}
+		}
+
+		return new GoAnnotation(
+			code,
+			label,
+			annotation,
+			goEvi,
+			goId,
+			goSource,
+			sourceDate
+		);
+	}
+
     public static MapToEntry line2MapToEntry(String line) {
 		line = line.trim();
 		if (line.length() == 0) return null;
