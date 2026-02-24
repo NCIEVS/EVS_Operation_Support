@@ -105,7 +105,8 @@ public class LvgApiUtils {
 			LexItem tempIn = LexItem.TargetToSource(temp);
 			Vector<LexItem> out2 = ToInflection.Mutate(tempIn,
 				lvg.GetConnection(), lvg.GetInflectionTrie(),
-				OutputFilter.LVG_OR_ALL, false, false);
+				//OutputFilter.LVG_OR_ALL, false, false);
+				OutputFilter.PRESERVED_CASE, false, false); //2025
 			outs.addAll(out2);
 		}
 		return outs;
