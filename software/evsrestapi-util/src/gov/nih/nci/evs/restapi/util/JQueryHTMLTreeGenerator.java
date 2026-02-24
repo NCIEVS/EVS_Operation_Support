@@ -2,6 +2,7 @@ package gov.nih.nci.evs.restapi.util;
 import gov.nih.nci.evs.restapi.appl.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.common.*;
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,7 +65,9 @@ public class JQueryHTMLTreeGenerator {
 	HierarchyHelper hh = null;
 	Vector parent_child_vec = null;
 	String TREE_VARIABLE_NAME = "demoList";
-	String HYPERLINK = "https://nciterms.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&type=terminology&key=null&b=1&n=0&vse=null&code=";
+	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
+
+	String HYPERLINK = "https://evsexplore-qa.semantics.cancer.gov/evsexplore/concept/ncit/";
 
 	String fontColor = "red";
 	HashSet nodeSet = null;
@@ -287,48 +290,46 @@ public class JQueryHTMLTreeGenerator {
 		return w;
 	}
 
+	public static Vector getNodes(Vector parent_child_vec) {
+		Vector v = new Vector();
+		for (int i=0; i<parent_child_vec.size(); i++) {
+			String line = (String) parent_child_vec.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(1);
+			if (!v.contains(code)) {
+				v.add(code);
+			}
+			code = (String) u.elementAt(3);
+			if (!v.contains(code)) {
+				v.add(code);
+			}
+		}
+		return v;
+	}
 
-	public static void main(String[] args) {
-		/*
-		String filename = args[0];
-		System.out.println(filename);
-		Vector parent_child_vec = Utils.readFile(filename);
-		parent_child_vec = filterRoots(parent_child_vec);
-
-		JQueryHTMLTreeGenerator generator = new JQueryHTMLTreeGenerator(parent_child_vec);
-
-		String hyperlinkUrl = "https://nciterms65.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&type=terminology&key=null&b=1&n=0&vse=null&code=";
-        generator.setHYPERLINK(hyperlinkUrl);
-
-	    String outputfile = "disease_tree.html";
-	    String title = "Test HTML Tree";
-		generator.generate(outputfile, title);
-		*/
+	public static void run(String root) {
         long ms = System.currentTimeMillis();
-        String parent_child_file = args[0];
-        Vector parent_child_vec = Utils.readFile(parent_child_file);
-        String root = args[1];
+        Vector parent_child_vec = Utils.readFile(PARENT_CHILD_FILE);
         Vector codes = new Vector();
         codes.add(root);
         TransitiveClosureRunner runner = new TransitiveClosureRunner(parent_child_vec);
         Vector v = runner.run(codes);
         String outputfile = "parent_child_" + root + ".txt";
         Utils.saveToFile(outputfile, v);
-
-		parent_child_vec = filterRoots(v);
 		JQueryHTMLTreeGenerator generator = new JQueryHTMLTreeGenerator(parent_child_vec);
-		String hyperlinkUrl = "https://nciterms65.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&type=terminology&key=null&b=1&n=0&vse=null&code=";
-        //generator.setHYPERLINK(hyperlinkUrl);
-        generator.setHYPERLINK(null);
-
 	    outputfile = root + "_tree.html";
 	    String label = runner.getHierarchyHelper().getLabel(root);
 	    String title = label + " (" + root + ")" + " Hierarchy";
-	    Vector mth_nodes = Utils.readFile("main_types.txt");
+	    Vector mth_nodes = getNodes(v);
 	    HashSet nodeSet = Utils.vector2HashSet(mth_nodes);
 	    generator.setNodeSet(nodeSet);
 		generator.generate(outputfile, title);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
+	public static void main(String[] args) {
+		String root = args[0];
+		run(root);
 	}
 
 }
