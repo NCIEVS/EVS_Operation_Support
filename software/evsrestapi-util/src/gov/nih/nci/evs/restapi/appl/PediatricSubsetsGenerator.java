@@ -118,13 +118,9 @@ public class PediatricSubsetsGenerator {
         Vector u = null;
 
         v = null;
-        File f = new File(P310_DATAFILE);
-        if (!f.exists()) {
-			v = getProperty(named_graph, "P310");
-			Utils.saveToFile(P310_DATAFILE, v);
-		} else {
-			v = Utils.readFile(P310_DATAFILE);
-		}
+		v = getProperty(named_graph, "P310");
+		Utils.saveToFile(P310_DATAFILE, v);
+
 		retired_concepts = new HashSet();
 		for (int i=0; i<v.size(); i++) {
 			line = (String) v.elementAt(i);
@@ -138,32 +134,17 @@ public class PediatricSubsetsGenerator {
 		}
 		System.out.println("Retired concepts: " + retired_concepts.size());
 
-        f = new File(P363_DATAFILE);
-        if (!f.exists()) {
-			v = getProperty(named_graph, "P363");
-			Utils.saveToFile(P363_DATAFILE, v);
-			System.out.println(P363_DATAFILE + " generated.");
-		} else {
-			System.out.println(P363_DATAFILE + " exists.");
-		}
+		v = getProperty(named_graph, "P363");
+		Utils.saveToFile(P363_DATAFILE, v);
+		System.out.println(P363_DATAFILE + " generated.");
 
-        f = new File(P310_DATAFILE);
-        if (!f.exists()) {
-			v = getProperty(named_graph, "P310");
-			Utils.saveToFile(P310_DATAFILE, v);
-			System.out.println(P310_DATAFILE + " generated.");
-		} else {
-			System.out.println(P310_DATAFILE + " exists.");
-		}
+		v = getProperty(named_graph, "P310");
+		Utils.saveToFile(P310_DATAFILE, v);
+		System.out.println(P310_DATAFILE + " generated.");
 
-        f = new File(P97_DATAFILE);
-        if (!f.exists()) {
-			v = getP97(named_graph);
-			Utils.saveToFile(P97_DATAFILE, v);
-			System.out.println(P97_DATAFILE + " generated.");
-		} else {
-			System.out.println(P97_DATAFILE + " exists.");
-		}
+		v = getP97(named_graph);
+		Utils.saveToFile(P97_DATAFILE, v);
+		System.out.println(P97_DATAFILE + " generated.");
 
         statusMap = createStatusMap();
         System.out.println("statusMap: " + statusMap.keySet().size());
@@ -180,15 +161,10 @@ public class PediatricSubsetsGenerator {
             role_data.add((String) u.elementAt(1) + "|" + "R108" + "|" + (String) u.elementAt(4));
 		}
         code2LabelMap = createCode2LabelMap(role_source_data);
+		v = getProperty(named_graph, "P108");
+		Utils.saveToFile(P108_DATAFILE, v);
+		System.out.println(P108_DATAFILE + " generated.");
 
-        f = new File(P108_DATAFILE);
-        if (!f.exists()) {
- 			v = getProperty(named_graph, "P108");
- 			Utils.saveToFile(P108_DATAFILE, v);
- 			System.out.println(P108_DATAFILE + " generated.");
- 		} else {
- 			System.out.println(P108_DATAFILE + " exists.");
- 		}
         preferredTermMap = createPreferredTermMap();
 	}
 
