@@ -6,6 +6,7 @@ import java.text.*;
 import java.util.*;
 import java.util.regex.*;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringSubstitutor;
 
 import java.nio.file.*;
 import java.nio.charset.Charset;
@@ -929,4 +930,19 @@ public class StringUtils {
 		}
 		return w;
 	}
+
+    public static String substitute(String templateString, Map<String, String> valuesMap) {
+        StringSubstitutor sub = new StringSubstitutor(valuesMap);
+        String resolvedString = sub.replace(templateString);
+        return resolvedString;
+	}
+
+	public static void dumpValuesMap(Map<String, String> valuesMap) {
+		Iterator it = valuesMap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			System.out.println(key + " --> " + (String) valuesMap.get(key));
+		}
+	}
+
 }
