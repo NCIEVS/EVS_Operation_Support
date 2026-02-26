@@ -645,7 +645,7 @@ short black_index = ref.getIndex();
 			int i = Integer.parseInt(code.substring(1, code.length()-1));
 			return true;
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			//ex.printStackTrace();
 		}
 		return false;
 	}
