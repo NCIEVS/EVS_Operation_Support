@@ -1,7 +1,7 @@
 package gov.nih.nci.evs.restapi.util;
-import gov.nih.nci.evs.restapi.appl.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.common.*;
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -69,6 +69,11 @@ import org.json.*;
  *
  */
 public class ValueSetResolver {
+
+	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
+	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
+	static String ASSOCIATION_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.subsetfile;
+
 	private String owlfile = null;
 	private Vector parent_child_vec = null;
 	private Vector association_vec = null;
@@ -118,19 +123,13 @@ ALL Vitals Table|C178124|P90|Vitals Table|P383$PT|P384$PCDC|P386$ALL
 
     public void initialize() {
 		long ms = System.currentTimeMillis();
-		System.out.println("extractHierarchicalRelationships ...");
-		OWLScanner scanner = new OWLScanner(owlfile);
-
-		parent_child_vec = scanner.extractHierarchicalRelationships();
-		Utils.saveToFile("hier_" + owlfile, parent_child_vec);
-		System.out.println("extractAssociations ...");
-		association_vec = scanner.extractAssociations(scanner.get_owl_vec(), "A8");
-		Utils.saveToFile("A8_" + owlfile, association_vec);
+		Vector parent_child_vec = Utils.readFile(PARENT_CHILD_FILE);
 		parent_child_hmap = create_parent_child_hmap();
 		subset_hmap = create_subset_hmap();
 		code2LabelMap = createCode2LabelMap(parent_child_vec);
 
 		if (sourcePTQualifiers != null) {
+			OWLScanner scanner = new OWLScanner(owlfile);
 			System.out.println("extractAxiomData ...");
 			fullsyn_vec = scanner.extractAxiomData("P90");
 			System.out.println("fullsyn_vec: " + fullsyn_vec.size());
@@ -192,6 +191,7 @@ ALL Vitals Table|C178124|P90|Vitals Table|P383$PT|P384$PCDC|P386$ALL
 	}
 
 	public HashMap create_subset_hmap() {
+		Vector association_vec = Utils.readFile(ASSOCIATION_FILE);
 		HashMap hmap = new HashMap();
 		for (int i=0; i<association_vec.size(); i++) {
 			String line = (String) association_vec.elementAt(i);
@@ -211,6 +211,7 @@ ALL Vitals Table|C178124|P90|Vitals Table|P383$PT|P384$PCDC|P386$ALL
 		return hmap;
 	}
 	public HashMap create_parent_child_hmap() {
+		Vector parent_child_vec = Utils.readFile(PARENT_CHILD_FILE);
 		HashMap hmap = new HashMap();
 		for (int i=0; i<parent_child_vec.size(); i++) {
 			String line = (String) parent_child_vec.elementAt(i);
@@ -248,7 +249,6 @@ ALL Vitals Table|C178124|P90|Vitals Table|P383$PT|P384$PCDC|P386$ALL
 						for (int i=0; i<memberCodes.size(); i++) {
 							String memberCode = (String) memberCodes.elementAt(i);
 							String memberLabel = (String) code2LabelMap.get(memberCode);
-							//String data = label + "|" + code + "|" + memberLabel + "|" + memberCode;
 							String data = code + "\t" + label + "\t" + memberCode + "\t" + memberLabel;
 							if (!v.contains(data)) {
 								v.add(data);
@@ -277,11 +277,11 @@ ALL Vitals Table|C178124|P90|Vitals Table|P383$PT|P384$PCDC|P386$ALL
 	}
 
 	public static void main(String[] args) {
-		String owlfile = args[0];
-		String subsetCode = args[1];
+		String owlfile = NCIT_OWL;
+		String subsetCode = args[0];
 		System.out.println("subsetCode: " + subsetCode);
 		ValueSetResolver resolver = new ValueSetResolver(owlfile);
-		resolver.setSourcePTQualifiers("P384$PCDC|P386$ALL");
+		//resolver.setSourcePTQualifiers("P384$PCDC|P386$ALL");
         String outputfile = subsetCode + "_members.txt";
 		Vector w = resolver.resolve(subsetCode);
 		Utils.saveToFile(outputfile, w);
