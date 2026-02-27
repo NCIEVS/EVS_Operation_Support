@@ -1,8 +1,9 @@
 package gov.nih.nci.evs.restapi.util;
+
 import java.util.*;
 import java.util.Queue;
 
-class FIFOQueue {
+public class FIFOQueue {
     private List<String> data;
     private int p_start;
 
