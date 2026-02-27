@@ -125,7 +125,12 @@ public class MetadataUtils {
 		this.sparql_endpoint = this.serviceUrl;
 		this.owlSPARQLUtils = new OWLSPARQLUtils(sparql_endpoint, username, password);
 		owlSPARQLUtils.set_named_graph(this.namedGraph);
-		this.nameVersion2NamedGraphMap = owlSPARQLUtils.getNameVersion2NamedGraphMap();
+
+		try {
+			this.nameVersion2NamedGraphMap = owlSPARQLUtils.getNameVersion2NamedGraphMap();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 		//this.nameGraph2PredicateHashMap = createNameGraph2PredicateHashMap();
 		//this.basePrefixUIDHashMap = createBasePrefixUIDHashMap();
     }

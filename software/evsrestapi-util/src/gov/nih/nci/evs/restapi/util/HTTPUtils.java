@@ -336,7 +336,6 @@ public class HTTPUtils {
 			if (query != null) {
 			   s = s + "?query=" + query;
 		    }
-			//String s = restURL + "?query=" + query;
 			URL url = new URL(s);
 			String json = util.executeQuery(url, username, password, "application/json");
 			if (json != null) {
@@ -344,7 +343,8 @@ public class HTTPUtils {
 				v = getResponseValues(v);
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			//ex.printStackTrace();
+			System.out.println("ERROR: runQuery " + query);
 		}
 		return new SortUtils().quickSort(v);
 	}
