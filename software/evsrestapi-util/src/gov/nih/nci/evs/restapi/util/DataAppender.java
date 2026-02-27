@@ -18,6 +18,24 @@ public class DataAppender {
 		return Utils.createMultiValuedHashMap(v, '\t', 0, 2);
 	}
 
+	public static String vector2DelimitedString(Vector v) {
+		char delim = '$';
+		return vector2DelimitedString(v, delim);
+	}
+
+	public static String vector2DelimitedString(Vector v, char delim) {
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<v.size(); i++) {
+			String t = (String) v.elementAt(i);
+			buf.append(t).append("" + delim);
+		}
+		String s = buf.toString();
+		if (s.length() > 0) {
+			s = s.substring(0, s.length()-1);
+		}
+		return s;
+	}
+
 	public static Vector extractColumnData(String filename, String cols, char delim) {
 		Vector<String> col_vec = StringUtils.parseData(cols, '|');
 		Vector<Integer> propCode_vec = new Vector();
@@ -83,6 +101,27 @@ public class DataAppender {
 		return w;
 	}
 
+    public static void appendData(String filename, int codeCol, String propCode, String outputfile) {
+		HashMap valueMap = getMultiValuedDataHashMap(propCode);
+		Vector v = Utils.readFile(filename);
+		Vector w = new Vector();
+		w.add((String) v.elementAt(0) + "\t" + propCode);
+		for (int i=1; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '\t');
+			String code = (String) u.elementAt(codeCol);
+			Vector values = (Vector) valueMap.get(code);
+			String t = "";
+			if (values != null) {
+				t = vector2DelimitedString(values);
+			}
+			w.add(line + "\t" + t);
+		}
+		int n = filename.lastIndexOf(".");
+		//String outputfile = filename.substring(0, n) + "_" + StringUtils.getToday() + ".txt";
+		Utils.saveToFile(outputfile, w);
+	}
+
     public static void append(HashMap code2LabelMap, Vector propCode_vec, String outputfile, String heading) {
         Vector w0 = new Vector();
         w0.add(heading);
@@ -129,6 +168,23 @@ public class DataAppender {
 		w0.addAll(w);
 		Utils.saveToFile(outputfile, w0);
 	}
+
+
+    public static HashMap getMultiValuedDataHashMap(String propCode) {
+        HashMap propCode2DataMap = new HashMap();
+        Vector w = new Vector();
+		Vector dataVec = new Vector();
+		dataVec.add(propCode);
+		DataRetrieval test = new DataRetrieval(NCIT_OWL, dataVec);
+		Vector v0 = new Vector();
+		for (int j=0; j<dataVec.size(); j++) {
+			String data_req = (String) dataVec.elementAt(j);
+			v0.addAll(test.getData(data_req));
+		}
+		HashMap hmap = createMultiValuedHashMap(v0);
+        return hmap;
+	}
+
 
 	public static void main(String[] args) {
 		String datafile = args[0];
