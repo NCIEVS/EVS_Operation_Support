@@ -795,33 +795,61 @@ public class StringUtils {
 		 }
 	 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	 public static HashMap createMultiValuedHashMap(Vector v, int key_column_1, int key_column_2, int value_column_1, int value_column_2) {
+         Vector<Integer> keyCols = new Vector();
+         keyCols.add(Integer.valueOf(key_column_1));
+         keyCols.add(Integer.valueOf(key_column_2));
+
+         Vector<Integer> valueCols = new Vector();
+         valueCols.add(Integer.valueOf(value_column_1));
+         valueCols.add(Integer.valueOf(value_column_2));
+ 		 return createMultiValuedHashMap(v, '|', keyCols, valueCols, false);
+	 }
+
+	 public static HashMap createMultiValuedHashMap(Vector v, Vector<Integer> keyCols, Vector<Integer> valueCols) {
+		 char delim = '\t';
+		 boolean skipHeading = true;
+		 return createMultiValuedHashMap(v, delim, keyCols, valueCols, skipHeading);
+	 }
+
+	 public static HashMap createMultiValuedHashMap(Vector v, char delim, Vector<Integer> keyCols, Vector<Integer> valueCols, boolean skipHeading) {
 		 HashMap hmap = new HashMap();
 		 SortUtils sortUtils = new SortUtils();
-		 for (int i=0; i<v.size(); i++) {
+		 int istart = 0;
+		 if (skipHeading) {
+			 istart = 1;
+		 }
+		 for (int i=istart; i<v.size(); i++) {
 			 String line = (String) v.elementAt(i);
-			 Vector u = StringUtils.parseData(line, '|');
-			 String key = (String) u.elementAt(key_column_1);
-			 if (key_column_2 != -1) {
-			 	String key2 = (String) u.elementAt(key_column_2);
-			 	key = key + "|" + key2;
+			 Vector u = StringUtils.parseData(line, delim);
+			 StringBuffer buf1 = new StringBuffer();
+			 StringBuffer buf2 = new StringBuffer();
+			 for (int j=0; j<u.size(); j++) {
+				 if (keyCols.contains(Integer.valueOf(j))) {
+					 buf1.append((String) u.elementAt(j)).append("|");
+				 } else if (valueCols.contains(Integer.valueOf(j))) {
+					 buf2.append((String) u.elementAt(j)).append("|");
+				 }
+			 }
+			 String t1 = buf1.toString();
+			 if (t1.endsWith("|")) {
+				 t1 = t1.substring(0, t1.length()-1);
+			 }
+			 String t2 = buf2.toString();
+			 if (t2.endsWith("|")) {
+				 t2 = t2.substring(0, t2.length()-1);
 			 }
 
-			 String value1 = (String) u.elementAt(value_column_1);
-			 String value = value1;
-			 if (value_column_2 != -1) {
-			 	String value2 = (String) u.elementAt(value_column_2);
-			 	value = value + "|" + value2;
-			 }
 			 Vector w = new Vector();
-			 if (hmap.containsKey(key)) {
-				 w = (Vector) hmap.get(key);
+			 if (hmap.containsKey(t1)) {
+				 w = (Vector) hmap.get(t1);
 			 }
-			 if (!w.contains(value)) {
-				 w.add(value);
+			 if (!w.contains(t2)) {
+				 w.add(t2);
 				 w = sortUtils.quickSort(w);
 			 }
-			 hmap.put(key, w);
+			 hmap.put(t1, w);
 		 }
 		 return hmap;
 	 }
