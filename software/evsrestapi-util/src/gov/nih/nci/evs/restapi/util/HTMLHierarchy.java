@@ -217,7 +217,8 @@ public class HTMLHierarchy {
     public static String run(Vector parent_child_vec, String title, String root) {
         long ms = System.currentTimeMillis();
 		PrintWriter pw = null;
-		String outputfile = title.toLowerCase();
+		//String outputfile = title.toLowerCase();
+		String outputfile = title;
 		outputfile = outputfile.replace(" ", "_");
 		outputfile = outputfile + ".html";
 
