@@ -314,6 +314,129 @@ public class NCItDiff {
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms0));
 	}
 
+
+//// HIERARCHY ////////////////////////////////////////////////////////////////////////////////////////////////
+	public static HashSet getCodes(Vector parent_child_vec) {
+		HashSet hset = new HashSet();
+		for (int i=0; i<parent_child_vec.size(); i++) {
+			String line = (String) parent_child_vec.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(1);
+			if (!hset.contains(code)) {
+				hset.add(code);
+			}
+			code = (String) u.elementAt(3);
+			if (!hset.contains(code)) {
+				hset.add(code);
+			}
+		}
+		return hset;
+	}
+
+	public static HashSet getRelations(Vector parent_child_vec) {
+		HashSet hset = new HashSet();
+		for (int i=0; i<parent_child_vec.size(); i++) {
+			String line = (String) parent_child_vec.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code1 = (String) u.elementAt(1);
+			String code2 = (String) u.elementAt(3);
+			String rel = code1 + "|" + code2;
+			if (!hset.contains(rel)) {
+				hset.add(rel);
+			}
+		}
+		return hset;
+	}
+
+	public static HashMap getCode2LabelMap(Vector parent_child_vec) {
+		HashMap hmap = new HashMap();
+		for (int i=0; i<parent_child_vec.size(); i++) {
+			String line = (String) parent_child_vec.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(1);
+			String label = (String) u.elementAt(0);
+			hmap.put(code, label);
+		}
+		return hmap;
+	}
+
+    //hset1L old; hset2: new
+	public static Vector hashSetDiff(HashSet hset1, HashSet hset2) {
+		Vector w = new Vector();
+		Iterator it1 = hset1.iterator();
+		while (it1.hasNext()) {
+			String key = (String) it1.next();
+			if (!hset2.contains(key)) {
+				w.add("Delete\t" + key);
+			}
+		}
+		Iterator it2 = hset2.iterator();
+		while (it2.hasNext()) {
+			String key = (String) it2.next();
+			if (!hset1.contains(key)) {
+				w.add("Add\t" + key);
+			}
+		}
+		return w;
+	}
+
+	public static Vector hashMapDiff(HashMap hmap1, HashMap hmap2) {
+		Vector w = new Vector();
+		Iterator it1 = hmap1.keySet().iterator();
+		while (it1.hasNext()) {
+			String key = (String) it1.next();
+			if (!hmap2.containsKey(key)) {
+				w.add("Delete\t" + key);
+			}
+		}
+		Iterator it2 = hmap2.keySet().iterator();
+		while (it2.hasNext()) {
+			String key = (String) it2.next();
+			if (!hmap1.containsKey(key)) {
+				w.add("Add\t" + key);
+			} else {
+				String value1 = (String) hmap1.get(key);
+				String value2 = (String) hmap2.get(key);
+				if (value1.compareTo(value2) != 0) {
+					w.add("Modify\t" + value1 + "\t" + value2);
+				}
+			}
+		}
+		return w;
+	}
+
+	public static void hierDiff(String hierfile1, String hierfile2, String outputDir) {
+		File f = new File(outputDir);
+		if (!f.exists()) {
+			f.mkdir();
+		}
+
+		Vector parent_child_vec_1 = Utils.readFile(hierfile1);
+		Vector parent_child_vec_2 = Utils.readFile(hierfile2);
+		HashSet code_vec_1 = getCodes(parent_child_vec_1);
+		HashSet code_vec_2 = getCodes(parent_child_vec_2);
+		Vector w = hashSetDiff(code_vec_1, code_vec_2);
+		Utils.saveToFile(outputDir + File.separator + "concepts.txt", w);
+
+		HashMap code2LabelMap_1 = getCode2LabelMap(parent_child_vec_1);
+		HashMap code2LabelMap_2 = getCode2LabelMap(parent_child_vec_2);
+		w = hashMapDiff(code2LabelMap_1, code2LabelMap_2);
+		Utils.saveToFile(outputDir + File.separator + "labels.txt", w);
+
+		HashSet rel_vec_1 = getRelations(parent_child_vec_1);
+		HashSet rel_vec_2 = getRelations(parent_child_vec_2);
+		w = hashSetDiff(rel_vec_1, rel_vec_2);
+		Utils.saveToFile(outputDir + File.separator + "relationships.txt", w);
+
+		String excelfile = outputDir + ".xlsx";
+		System.out.println("excelfile: " + excelfile);
+		char delim = '\t';
+		System.out.println("Calling generateExcel...");
+		Text2Excel.generateExcel(outputDir, excelfile, delim);
+	}
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 	public static void main(String[] args) {
 		run();
 	}
