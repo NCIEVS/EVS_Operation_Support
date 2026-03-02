@@ -1,4 +1,5 @@
 package gov.nih.nci.evs.restapi.util;
+import gov.nih.nci.evs.restapi.config.*;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.XStream;
@@ -225,7 +226,6 @@ public class SPARQLSearchUtils extends OWLSPARQLUtils {
         kwd_freq_hmap = new HashMap();
         rareKeywords = new HashSet();
 		filler_set = toHashSet(fillers);
-
 		if (checkIfFileExists(NAME_DATA)) {
 			name_data = Utils.readFile(NAME_DATA);
 		} else {
@@ -1016,14 +1016,48 @@ public Vector getPropertyValues(String named_graph, String propertyName) {
         buf.append("}").append("\n");
 
 
-	return buf.toString();
-}
+	    return buf.toString();
+    }
 
-	public Vector getSearchByNameData(String named_graph) {
+	public Vector getSearchByNameData0(String named_graph) {
 		String query = construct_search_by_name_data(named_graph);
 		Vector w = executeQuery(query);
 		if (w != null && w.size() > 0) {
 			w = new ParserUtils().getResponseValues(w);
+		}
+		return w;
+	}
+
+	//    public static Synonym line2Synonym(String line) {
+	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
+/*
+		line = line.trim();
+		if (line.length() == 0) return null;
+		Vector u = StringUtils.parseData(line, '|');
+		String code = (String) u.elementAt(1);
+		String label = (String) u.elementAt(0);
+		String termName = (String) u.elementAt(3);
+		String termGroup = null;
+		String termSource = null;
+		String sourceCode = null;
+		String subSourceName = null;
+		String subSourceCode = null;
+		for (int i=4; i<u.size(); i++) {
+*/
+
+	public Vector getSearchByNameData(String named_graph) {
+		Vector v = Utils.readFile(AXIOM_FILE);
+		//Recombinant Amphiregulin|C1000|P90|KAF|P383$AB|P384$NCI
+		//		buf.append("select distinct ?x_label ?x_code ?a_target ?q1_value ?q2_value ").append("\n");
+        Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+	        Vector u = StringUtils.parseData(line, '|');
+	        String propcode = (String) u.elementAt(2);
+	        if (propcode.compareTo("P90") == 0) {
+				Synonym syn = AxiomParser.line2Synonym(line);
+				w.add(syn.getLabel() + "|" + syn.getCode() + "|" + syn.getTermName() + "|" + syn.getTermSource() + "|" + syn.getTermGroup());
+			}
 		}
 		return w;
 	}
@@ -1489,15 +1523,21 @@ public Vector getPropertyValues(String named_graph, String propertyName) {
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
-		String serviceUrl = args[0];
-		String namedGraph = args[1];
-		String username = args[2];
-		String password = args[3];
-		String verbatimfile = args[4];
+		String serviceUrl = ConfigurationController.serviceUrl;
+		String named_graph = ConfigurationController.namedGraph;
+		String username = ConfigurationController.username;
+		String password = ConfigurationController.password;
+		System.out.println("serviceUrl: " + serviceUrl);
+		System.out.println("named_graph: " + named_graph);
+
+		String verbatimfile = args[0];
+		/*
 		String codingScheme = "NCI_Thesaurus";
 		MetadataUtils test = new MetadataUtils(serviceUrl, username, password);
 		String version = test.getLatestVersion(codingScheme);
 		String named_graph = test.getNamedGraph(codingScheme);
+		*/
+
 		SPARQLSearchUtils searchUtils = new SPARQLSearchUtils(serviceUrl, named_graph, username, password);
         Vector verbatims = Utils.readFile(verbatimfile);
         Vector w = new Vector();
@@ -1509,11 +1549,16 @@ public Vector getPropertyValues(String named_graph, String propertyName) {
 			boolean matched = true;
 			k++;
 			String verbatim = (String) verbatims.elementAt(i);
-			Vector u = StringUtils.parseData(verbatim);
+			Vector u = StringUtils.parseData(verbatim, '\t');
 			String term = (String) u.elementAt(0);
-			String code = (String) u.elementAt(1);
+			String code = "NA";//
+			if (u.size() > 1) {
+				code = (String) u.elementAt(1);
+				System.out.println("(" + k + ") " + term + " (" + code + ")");
+			} else {
+				System.out.println("(" + k + ") " + term);
+			}
 
-			System.out.println("(" + k + ") " + term + " (" + code + ")");
 			Vector v = searchUtils.mapTo(term);
 			if (v != null && v.size() > 0) {
 				Vector v2 = new Vector();
