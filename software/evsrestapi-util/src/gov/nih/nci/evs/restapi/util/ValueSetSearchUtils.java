@@ -1,4 +1,5 @@
 package gov.nih.nci.evs.restapi.util;
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -254,7 +255,6 @@ public class ValueSetSearchUtils {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			String propertyName = (String) u.elementAt(5);
-
 			if (forVS) {
 				if (byName) {
 					if (nameList.contains(propertyName)) {
@@ -294,10 +294,12 @@ public class ValueSetSearchUtils {
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
-		String serviceUrl = args[0];
-		String namedGraph = args[1];
-		String username = args[2];
-		String password = args[3];
+		String serviceUrl = ConfigurationController.serviceUrl;
+		String namedGraph = ConfigurationController.namedGraph;
+		String username = ConfigurationController.username;
+		String password = ConfigurationController.password;
+		System.out.println("serviceUrl: " + serviceUrl);
+		System.out.println("namedGraph: " + namedGraph);
 
 		String term = "blue";
 		String code = "C48333";
@@ -308,12 +310,13 @@ public class ValueSetSearchUtils {
 			String algorithm = ALGORITHMS[i];
 			Vector w = utils.search(namedGraph, term, algorithm, subset_code);
 			Utils.dumpVector(algorithm + ", name - " + term, w);
-
+/*
 			boolean byName = true;
 			Vector w1 = utils.parseVSData(w, true, false);
 			Utils.dumpVector("value set, " + algorithm + ", name - " + term, w1);
 			Vector w2 = utils.parseVSData(w, false, false);
 			Utils.dumpVector("value set, " + algorithm + ", property - " + term, w2);
+*/
 		}
 
 		Vector w = utils.searchByCode(namedGraph, code);
