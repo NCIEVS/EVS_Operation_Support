@@ -86,7 +86,7 @@ public class ValueSetUtils {
 
 	private String sparql_endpoint = null;
 
-	public static String PARENT_CHILD_FILE = "parent_child.txt";
+	//public static String PARENT_CHILD_FILE = "parent_child.txt";
 	public static String CONCEPT_IN_SUBSET_FILE = "concept_in_subset.txt";
 	public static String VS_HEADER_CONCEPT_FILE = "vs_header_concepts.txt";
 	public static String ANNOTATION_PROPERTY_FILE = "annotation_properties.txt";
@@ -109,10 +109,17 @@ public class ValueSetUtils {
     static Vector subset_vec = null;
     static Vector parent_child_vec = null;
     static String parent_child_file = "parent_child.txt";
-    static String a8File = "A8.txt";
+    static String subsetfile = "A8.txt";
+
+	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
+	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
+	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
+	static String SUBSET_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.subsetfile;
+
 
     static {
 		long ms = System.currentTimeMillis();
+		/*
 		File file1 = new File(parent_child_file);
 		File file2 = new File(a8File);
 		if (!file1.exists() || !file2.exists()) {
@@ -130,6 +137,10 @@ public class ValueSetUtils {
 			subset_vec = Utils.readFile(a8File);
 			parent_child_vec = Utils.readFile(parent_child_file);
 		}
+		*/
+		parent_child_vec = Utils.readFile(PARENT_CHILD_FILE);
+		subset_vec = Utils.readFile(SUBSET_FILE);
+
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
@@ -208,8 +219,6 @@ public class ValueSetUtils {
     public void initialize() {
 		long ms_0 = System.currentTimeMillis();
         long ms = System.currentTimeMillis();
-
-System.out.println("Step 1: " + ANNOTATION_PROPERTY_FILE);
         boolean annotation_property_file_exists = checkIfFileExists(ANNOTATION_PROPERTY_FILE);
         annotation_property_vec = null;
         if (!annotation_property_file_exists) {
@@ -222,8 +231,6 @@ System.out.println("Step 1: " + ANNOTATION_PROPERTY_FILE);
 			annotation_property_vec = Utils.readFile(ANNOTATION_PROPERTY_FILE);
 		}
 		System.out.println("Total processing " + ANNOTATION_PROPERTY_FILE + " run time (ms): " + (System.currentTimeMillis() - ms));
-
-System.out.println("Step 2: " + PARENT_CHILD_FILE);
         ms = System.currentTimeMillis();
         boolean parent_child_file_exists = checkIfFileExists(PARENT_CHILD_FILE);
         parent_child_vec = null;
@@ -237,8 +244,6 @@ System.out.println("Step 2: " + PARENT_CHILD_FILE);
 			parent_child_vec = Utils.readFile(PARENT_CHILD_FILE);
 		}
 		System.out.println("Total processing " + PARENT_CHILD_FILE + " run time (ms): " + (System.currentTimeMillis() - ms));
-
-System.out.println("Step 3: " + VS_HEADER_CONCEPT_FILE);
         ms = System.currentTimeMillis();
         boolean vs_header_concept_file_exists = checkIfFileExists(VS_HEADER_CONCEPT_FILE);
         vs_header_concept_vec = null;
@@ -252,8 +257,6 @@ System.out.println("Step 3: " + VS_HEADER_CONCEPT_FILE);
 			vs_header_concept_vec = Utils.readFile(VS_HEADER_CONCEPT_FILE);
 		}
 		System.out.println("Total processing " + VS_HEADER_CONCEPT_FILE + " run time (ms): " + (System.currentTimeMillis() - ms));
-
-System.out.println("Step 4: " + EMBEDDED_VALUE_SET_HIERARCHY_FILE);
         ms = System.currentTimeMillis();
         embedded_value_set_hierarchy_vec = null;
         boolean embedded_value_set_hierarchy_file_exists = checkIfFileExists(EMBEDDED_VALUE_SET_HIERARCHY_FILE);
@@ -266,8 +269,6 @@ System.out.println("Step 4: " + EMBEDDED_VALUE_SET_HIERARCHY_FILE);
 			embedded_value_set_hierarchy_vec = Utils.readFile(EMBEDDED_VALUE_SET_HIERARCHY_FILE);
 		}
 		System.out.println("Total processing " + EMBEDDED_VALUE_SET_HIERARCHY_FILE + " run time (ms): " + (System.currentTimeMillis() - ms));
-
-System.out.println("Step 5: generating AssertedValueSetTree ...");
         assertedValueSetTree = generateAssertedValueSetTree(embedded_value_set_hierarchy_vec);
 		System.out.println("Total processing run time (ms): " + (System.currentTimeMillis() - ms_0));
 	}
