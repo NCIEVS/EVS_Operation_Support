@@ -130,6 +130,7 @@ public class ConfigurationController {
 	public final static String url = properties.getProperty("url");
 	public final static String hashmapdata = properties.getProperty("hashmapdata");
 	public final static String json = properties.getProperty("json");
+	public final static String mail_smtp_server = properties.getProperty("mail_smtp_server");
 
 	/**
 	 * To be implemented by each descendant testcase.
