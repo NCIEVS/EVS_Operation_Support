@@ -1,7 +1,7 @@
 package gov.nih.nci.evs.restapi.util;
 import gov.nih.nci.evs.restapi.bean.*;
 import java.io.*;
-import java.net.URI;
+import java.net.*;
 import java.text.*;
 import java.util.*;
 import java.util.regex.*;
@@ -973,4 +973,21 @@ public class StringUtils {
 		}
 	}
 
+    public static boolean validateUrl(String url_str) {
+		try {
+			URL url = new URL(url_str);
+			HttpURLConnection.setFollowRedirects(false);
+			HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+			int responseCode = huc.getResponseCode();
+			System.out.println("responseCode: " + responseCode);
+			if (responseCode != HttpURLConnection.HTTP_OK) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch (Exception ex) {
+			//ex.printStackTrace();
+		}
+        return false;
+	}
 }
