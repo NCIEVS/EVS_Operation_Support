@@ -16,6 +16,10 @@ public class RelationshipTableGenerator {
     String password = null;
 
     Vector supportedPropertyQualifiers = null;
+    HashMap propertyCode2NameMap = null;
+    HashMap propertyName2CodeMap = null;
+
+    static String DATAFILE = "datafile.txt";
 
     public RelationshipTableGenerator(String serviceUrl, String named_graph, String username, String password) {
 		this.serviceUrl = serviceUrl;
@@ -28,10 +32,50 @@ public class RelationshipTableGenerator {
 
 	    this.version = owlSPARQLUtils.get_version();
 	    System.out.println(this.version);
+	    initialize();
+
+	    System.out.println("datafile " + DATAFILE + " generated.");
+	}
+
+	public String getDataFileName() {
+		return DATAFILE;
+	}
+
+	public HashMap getPropertyCode2NameMap() {
+		return propertyCode2NameMap;
+	}
+
+	public HashMap getPropertyName2CodeMap() {
+		return propertyName2CodeMap;
+	}
+
+	public void initialize() {
+		generate();
+        propertyCode2NameMap = new HashMap();
+        propertyName2CodeMap = new HashMap();
+
+        Vector v = Utils.readFile(DATAFILE);
+        for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			if (u.size() > 1) {
+				propertyCode2NameMap.put((String) u.elementAt(1), (String) u.elementAt(0));
+				propertyName2CodeMap.put((String) u.elementAt(0), (String) u.elementAt(1));
+			}
+		}
 	}
 
 	public void generateHTML(String filename) {
 		Vector v = Utils.readFile(filename);
+		HTMLTable.generate(v);
+	}
+
+	public void generate() {
+		generate(DATAFILE);
+	}
+
+	public void generateHTML() {
+		Vector v = Utils.readFile(DATAFILE);
 		HTMLTable.generate(v);
 	}
 
