@@ -133,6 +133,13 @@ public class ConfigurationController {
 	public final static String mail_smtp_server = properties.getProperty("mail_smtp_server");
 	public final static String configfile = properties.getProperty("configfile");
 
+	public final static String CONCEPT_DETAIL_LINK = properties.getProperty("conceptDetailLink");
+	public final static String TERM_SEARCH_URL = properties.getProperty("termSearchUrl");
+	public final static String DOCUMENT_SEARCH_URL = properties.getProperty("documentSearchUrl");
+
+	public final static String AUTOCOMPLETE_MATCH_OBJECTS = properties.getProperty("autoCompleteMatchObjects");
+	public final static String AUTOCOMPLETE_MATCH_OBJECT_VARIABLE = properties.getProperty("autoCompleteMatchObjectVariable");
+
 	/**
 	 * To be implemented by each descendant testcase.
 	 *
