@@ -125,6 +125,19 @@ public class OWL2HTML {
 		return w;
 	}
 
+	public static String getIndentation(String line) {
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<line.length(); i++) {
+			char c = line.charAt(i);
+			if (c == ' ') {
+				buf.append("&nbsp;");
+			} else {
+				break;
+			}
+		}
+		return buf.toString();
+	}
+
     public static String hyperlinkNCItCodes(String line) {
 		Vector codes = gov.nih.nci.evs.restapi.util.StringUtils.scanNCItCodes(line);
 		if (codes.size() == 0) return line;
@@ -134,6 +147,19 @@ public class OWL2HTML {
 		}
 		return line;
 	}
+
+//<A8 rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#(C193249)"/>
+
+
+    public static String toToolTip(String code, String label) {
+		if (code == null || code.length() == 0) return null;
+		if (label == null || label.length() == 0) return null;
+		StringBuffer buf = new StringBuffer();
+		buf.append("<div class=\"tooltip\">").append(code).append("<span class=\"tooltiptext\">").append(label).append("</span>").append("</div>");
+        String t = buf.toString();
+        return t;
+	}
+
 
 	public static void run(PrintWriter out, String textfile) {
 		out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
@@ -162,7 +188,7 @@ public class OWL2HTML {
 		out.println("");
 		out.println(".tooltip .tooltiptext {");
 		out.println("  visibility: hidden;");
-		out.println("  width: 120px;");
+		out.println("  width: 360px;");
 		out.println("  background-color: #555;");
 		out.println("  color: #fff;");
 		out.println("  text-align: center;");
@@ -201,10 +227,35 @@ public class OWL2HTML {
 		Vector v = Utils.readFile(textfile);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
+			String indent = getIndentation(line);
 			line = line.trim();
-			if (line.startsWith("</")) {
+
+			//<owl:onProperty rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#R176"/>
+            if (line.startsWith("<owl:onProperty") && line.indexOf("rdf:resource=") != -1) {
+				int n1 = line.indexOf("#R");
+				int n2 = line.lastIndexOf("\"");
+				String tag = line.substring(n1+1, n2);
+				String propLabel = getPropertyLabel(tag);
+				String by = toToolTip(tag, propLabel);
 				line = encode(line);
-				out.println(line + "<p></p>");
+				line = hyperlinkNCItCodes(line);
+				line = line.replace(tag, by);
+                out.println(indent + line + "<p></p>");
+
+            } else if (line.startsWith("<A") && line.indexOf("rdf:resource=") != -1) {
+				int n1 = line.indexOf(" ");
+				String tag = line.substring(1, n1);
+				//System.out.println(tag);
+				String propLabel = getPropertyLabel(tag);
+				//System.out.println(propLabel);
+				String by = toToolTip(tag, propLabel);
+				line = encode(line);
+				line = hyperlinkNCItCodes(line);
+				line = line.replace(tag, by);
+                out.println(indent + line + "<p></p>");
+			} else if (line.startsWith("</")) {
+				line = encode(line);
+				out.println(indent + line + "<p></p>");
 			} else {
 				String tag = null;
 				String value = null;
@@ -219,11 +270,11 @@ public class OWL2HTML {
 
 				if (tag != null && tag.length() > 0 && propLabel != null && propLabel.length() > 0) {
 					line = toToolTipText(tag, propLabel, value);
-					out.println(line + "<p></p>");
+					out.println(indent + line + "<p></p>");
 				} else {
 					line = encode(line);
 					line = hyperlinkNCItCodes(line);
-					out.println(line + "<p></p>");
+					out.println(indent + line + "<p></p>");
 				}
 			}
 		}
