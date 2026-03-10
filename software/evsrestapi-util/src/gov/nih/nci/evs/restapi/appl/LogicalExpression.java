@@ -106,7 +106,7 @@ public class LogicalExpression {
 		StringBuffer buf = new StringBuffer();
 		buf.append(prefixes);
 		buf.append("select distinct ?r_code ?r_label ?r_domain_code ?r_domain_label").append("\n");
-		buf.append("from <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus_26.02d.owl>").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
 		buf.append("where  { ").append("\n");
 		buf.append("            ?r a owl:ObjectProperty .").append("\n");
 		buf.append("            ?r rdfs:label ?r_label .").append("\n");
@@ -143,7 +143,7 @@ public class LogicalExpression {
 		StringBuffer buf = new StringBuffer();
 		buf.append(prefixes);
 		buf.append("select distinct ?r_code ?r_label ?r_range_code ?r_range_label").append("\n");
-		buf.append("from <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus_26.02d.owl>").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
 		buf.append("where  { ").append("\n");
 		buf.append("            ?r a owl:ObjectProperty .").append("\n");
 		buf.append("            ?r rdfs:label ?r_label .").append("\n");
