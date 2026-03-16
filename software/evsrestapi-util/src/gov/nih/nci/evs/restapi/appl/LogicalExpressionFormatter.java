@@ -304,49 +304,6 @@ public class LogicalExpressionFormatter {
 		return buf.toString();
 	}
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-    public boolean checkRoleGroupRangeConsistency(Vector role_group_vec) {
-		if (role_group_vec == null || role_group_vec.size() == 0) return false;
-		String line = (String) role_group_vec.elementAt(0);
-		if (line.indexOf("\t") != -1) {
-			line = line.trim();
-			if (line.length() > 0) {
-				Vector u = StringUtils.parseData(line, '\t');
-				String roleName = (String) u.elementAt(0);
-				String range = (String) roleName2RangeNameMap.get(roleName);
-				for (int i=1; i<role_group_vec.size(); i++) {
-					line = (String) role_group_vec.elementAt(i);
-					if (line.length() > 0) {
-						Vector u2 = StringUtils.parseData(line, '\t');
-						roleName = (String) u2.elementAt(0);
-						String roleRange = (String) roleName2RangeNameMap.get(roleName);
-						if (roleRange.compareTo(range) != 0) return false;
-					}
-				}
-			}
-			return true;
-		} else {
-			line = line.trim();
-			if (line.length() > 0) {
-				Vector u = StringUtils.parseData(line, '|');
-				String roleName = (String) u.elementAt(u.size()-4);
-				String range = (String) roleName2RangeNameMap.get(roleName);
-				for (int i=1; i<role_group_vec.size(); i++) {
-					line = (String) role_group_vec.elementAt(i);
-					if (line.length() > 0) {
-						Vector u2 = StringUtils.parseData(line, '|');
-						roleName = (String) u2.elementAt(u2.size()-4);
-						String roleRange = (String) roleName2RangeNameMap.get(roleName);
-						if (roleRange.compareTo(range) != 0) return false;
-					}
-				}
-			}
-			return true;
-		}
-	}
-*/
-
     public void dumpRoleGroupRangeData(Vector role_group_vec) {
 		for (int i=0; i<role_group_vec.size(); i++) {
 			String line = (String) role_group_vec.elementAt(i);
@@ -359,18 +316,7 @@ public class LogicalExpressionFormatter {
 
     public String generateRoleGroupExpression(Vector role_group_vec) {
 		if (role_group_vec == null || role_group_vec.size() == 0) return "";
-		//boolean bool = checkRoleGroupRangeConsistency(role_group_vec);
-		//System.out.println("checkRoleGroupRangeConsistency returns: " + bool);
-/*
-
-		if (!bool) {
-			System.out.println("WARNING: Inconsistent role range found in role group data");
-			System.out.println("dumpRoleGroupRangeData ...");
-			dumpRoleGroupRangeData(role_group_vec);
-			return null;
-		}
-*/
-	role_group_vec = retrieveRestrictions(role_group_vec);
+		role_group_vec = retrieveRestrictions(role_group_vec);
 //Utils.dumpVector("generateRoleGroupExpression role_group_vec", role_group_vec);
 
 		StringBuffer buf2 = new StringBuffer();
@@ -384,23 +330,6 @@ public class LogicalExpressionFormatter {
 		}
 		return buf2.toString();
 	}
-
-/*
-    public String getRoleGroupRange(Vector role_group_vec) {
-		if (role_group_vec == null || role_group_vec.size() == 0) return null;
-		boolean bool = checkRoleGroupRangeConsistency(role_group_vec);
-		System.out.println("getRoleGroupRange returns: " + bool);
-
-		if (bool) {
-			String line = (String) role_group_vec.elementAt(0);
-			Vector u = StringUtils.parseData(line, '|');
-			String roleCode = (String) u.elementAt(u.size()-4);
-			String roleRange = (String) roleName2RangeNameMap.get(roleCode);
-			return roleRange;
-		}
-		return null;
-	}
-*/
 
 	public static Vector retrieveRestrictions(Vector result_vec) {
 		Vector w = new Vector();

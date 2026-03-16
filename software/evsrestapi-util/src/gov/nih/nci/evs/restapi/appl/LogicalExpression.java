@@ -384,11 +384,26 @@ public class LogicalExpression {
 	public HashMap sortRestrictions(String path, Vector v) {
 		HashMap hmap = new HashMap();
 		if (v == null) return hmap;
+		if (path.endsWith("|C")) {
+			return hmap;
+		}
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
+
 			Vector u = StringUtils.parseData(line, '|');
+
+			String roleCode = (String) u.elementAt(u.size()-3);
+			String rangeName = (String) roleCode2RangeNameMap.get(roleCode);
+
+			System.out.println(line + "\t(Range: " + rangeName + ")");
+			//C6481|Inflammatory Myofibroblastic Tumor|b0|b1|b2|b4|Disease_May_Have_Cytogenetic_Abnormality|R114|C36590|t(2;17)(p23;q23)
+			//getRoleCode2RangeNameMap
+
+
 			if (path.endsWith("U|O|R") || path.endsWith("I|O|R")) {
 				String key = (String) u.elementAt(u.size()-5);
+				System.out.println(key);
+
 				String value = (String) u.elementAt(u.size()-4) + "|" +
 							   (String) u.elementAt(u.size()-3) + "|" +
 							   (String) u.elementAt(u.size()-2) + "|" +
@@ -402,6 +417,7 @@ public class LogicalExpression {
 			} else if (path.endsWith("U|O|I|O|R")) {
 				String key = (String) u.elementAt(u.size()-6) + "|" +
 				             (String) u.elementAt(u.size()-5);
+				System.out.println(key);
 				String value = (String) u.elementAt(u.size()-4) + "|" +
 							   (String) u.elementAt(u.size()-3) + "|" +
 							   (String) u.elementAt(u.size()-2) + "|" +
