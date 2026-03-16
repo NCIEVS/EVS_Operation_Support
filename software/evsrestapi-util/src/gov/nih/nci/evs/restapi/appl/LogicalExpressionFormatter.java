@@ -74,11 +74,8 @@ public class LogicalExpressionFormatter {
 	HashMap roleName2RangeNameMap = null;
 	HashMap roleCode2RangeNameMap = null;
 	Vector PATHS = null;
-
 	static HashMap roleDataMap = null;
-
 	static HashMap range2ExpressionMap = null;
-
 	static String RANGE_RESSULT = "range_results.txt";
 
 	public LogicalExpressionFormatter() {
@@ -158,7 +155,6 @@ public class LogicalExpressionFormatter {
         Vector parents = (Vector) hmap.get("E|I|O|C");
         Vector parent_vec = new Vector();
         Vector w = new Vector();
-        //Utils.dumpVector("E|I|O|C", parents);
 
         if (parents != null && parents.size() > 0) {
 			buf.append("Parent").append("\n");
@@ -182,7 +178,6 @@ public class LogicalExpressionFormatter {
         HashMap range2RolesHashMap = new HashMap();
         String path = "E|I|O|R";
         Vector restrictions = (Vector) hmap.get("E|I|O|R");
-        //Utils.dumpVector("restrictions (E|I|O|R)", restrictions);
 	    Vector v = retrieveRestrictions(restrictions);
 //	(1) C6481|Inflammatory Myofibroblastic Tumor|b0|b1|Disease_Has_Abnormal_Cell|R105|C36957|Neoplastic Spindle-Shaped Myofibroblast
 		for (int i=0; i<v.size(); i++) {
@@ -328,7 +323,7 @@ public class LogicalExpressionFormatter {
 		boolean bool = checkRoleGroupRangeConsistency(role_group_vec);
 		if (!bool) {
 			System.out.println("Inconsistent role range found in role group data");
-			dumpRoleGroupRangeData(role_group_vec);
+			//dumpRoleGroupRangeData(role_group_vec);
 			return null;
 		}
 		StringBuffer buf2 = new StringBuffer();
@@ -358,6 +353,7 @@ public class LogicalExpressionFormatter {
 
 	public static Vector retrieveRestrictions(Vector result_vec) {
 		Vector w = new Vector();
+		if (result_vec == null || result_vec.size() == 0) return w;
 		for (int i=0; i<result_vec.size(); i++) {
 			String line = (String) result_vec.elementAt(i);
 			line = line.trim();

@@ -370,6 +370,37 @@ public class DateUtils {
         return dayOfMonth;
 	}
 
+	public Vector getReleaseSchedule(int year, int month) throws Exception {
+        Vector w = new Vector();
+		String weekDay = "Monday";
+		Vector weekday_vec = DateUtils.getWeekdayOfAMonth(year, month, weekDay);
+		for (int j=0; j<weekday_vec.size(); j++) {
+			Integer int_obj = (Integer) weekday_vec.elementAt(j);
+			String version = DateUtils.getNCItVersion(year, month, j);
+			String graphName = DateUtils.getNCIThesaurusGraphName(year, month, j);
+			w.add("" + year + "|" + DateUtils.getMonthString(month) + "|" + version + "|" + graphName + "|" + DateUtils.getNCItReleaseDate(year, month, j));
+		}
+        return w;
+	}
+
+	public Vector getCurrentMonthReleaseSchedule() throws Exception {
+		int year = DateUtils.getCurrentYear();
+		int month = DateUtils.getCurrentMonth();
+		return getReleaseSchedule(year, month);
+	}
+
+	public Vector getPreviousMonthReleaseSchedule() throws Exception {
+		int year = DateUtils.getCurrentYear();
+		int month = DateUtils.getCurrentMonth();
+		if (month == 1) {
+			year = year - 1;
+			month = 12;
+		} else {
+			month = month - 1;
+		}
+		return getReleaseSchedule(year, month);
+	}
+
 	public static void main(String[] args) throws Exception {
 		int currentYear = getCurrentYear();
 		int currentMonth = getCurrentMonth();

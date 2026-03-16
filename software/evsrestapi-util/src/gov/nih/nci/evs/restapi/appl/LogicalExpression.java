@@ -83,8 +83,19 @@ public class LogicalExpression {
     static int MAX_LENGTH = 10;
     HashMap rangeHashMap = null;
 
+    HashMap roleCode2RangeNameMap = null;
+    HashMap roleName2RangeNameMap = null;
+
 	public HashMap getRangeHashMap() {
 		return this.rangeHashMap;
+	}
+
+	public HashMap getRoleCode2RangeNameMap() {
+		return roleCode2RangeNameMap;
+	}
+
+	public HashMap getRoleName2RangeNameMap() {
+		return roleName2RangeNameMap;
 	}
 
     public LogicalExpression(String serviceUrl, String named_graph, String username, String password) {
@@ -178,7 +189,7 @@ public class LogicalExpression {
 						w.add(range);
 					}
 				}
-				Utils.dumpVector("range", w);
+				//Utils.dumpVector("range", w);
 				return new SortUtils().quickSort(w);
 			}
 		} catch (Exception ex) {
@@ -190,6 +201,8 @@ public class LogicalExpression {
 
 	public HashMap getRangeHashMap(String named_graph) {
 		HashMap hmap = new HashMap();
+        roleCode2RangeNameMap = new HashMap();
+        roleName2RangeNameMap = new HashMap();
 		Vector v = null;
 		try {
 			v = getRange(named_graph);
@@ -198,6 +211,8 @@ public class LogicalExpression {
 					String line = (String) v.elementAt(i);
 					Vector u = StringUtils.parseData(line, '|');
 					hmap.put((String) u.elementAt(0), (String) u.elementAt(3));
+					roleCode2RangeNameMap.put((String) u.elementAt(0), (String) u.elementAt(3));
+					roleName2RangeNameMap.put((String) u.elementAt(1), (String) u.elementAt(3));
 				}
 			}
 		} catch (Exception ex) {
@@ -359,14 +374,11 @@ public class LogicalExpression {
 			String line = (String) stack.pop();
 			Vector path = StringUtils.parseData(line, '|');
 			String query = path2Query(named_graph, code, path);
-
-			System.out.println(query);
-
 			Vector v = executeQuery(query);
 			if (v != null && v.size() > 0) {
 				hmap.put(line, v);
 			}
-			Utils.dumpVector(line, v);
+			//Utils.dumpVector(line, v);
 		}
 		return hmap;
     }
@@ -431,7 +443,7 @@ public class LogicalExpression {
 				while (it2.hasNext()) {
 					String key = (String) it2.next();
 					Vector values = (Vector) hmap2.get(key);
-					Utils.dumpVector(key, values);
+					//Utils.dumpVector(key, values);
 				}
 			}
 		}

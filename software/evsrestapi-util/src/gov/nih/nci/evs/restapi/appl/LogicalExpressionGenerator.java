@@ -3,6 +3,7 @@ import gov.nih.nci.evs.restapi.util.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.config.*;
 
+
 import java.io.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -73,6 +74,11 @@ public class LogicalExpressionGenerator {
 	static HashMap rangeHashMap = null;
 	static LogicalExpression le = null;
 	static HashMap code2LabelMap = null;
+	static HashMap roleName2RangeNameMap = null;
+	static HashMap roleCode2RangeNameMap = null;
+	static Vector PATHS = null;
+	HashMap range2ExpressionMap = null;
+	static LogicalExpressionFormatter formatter = new LogicalExpressionFormatter();
 
 	static {
 		String serviceUrl = ConfigurationController.serviceUrl;
@@ -82,225 +88,47 @@ public class LogicalExpressionGenerator {
 
 		System.out.println(serviceUrl);
 		System.out.println(named_graph);
-		code2LabelMap = loadOrGenerateLabelHashMap(named_graph);
-		le = new LogicalExpression(serviceUrl, named_graph, username, password);
-        rangeHashMap = le.getRangeHashMap(named_graph);
+
+		try {
+			code2LabelMap = loadOrGenerateLabelHashMap(named_graph);
+			le = new LogicalExpression(serviceUrl, named_graph, username, password);
+			rangeHashMap = le.getRangeHashMap(named_graph);
+			roleName2RangeNameMap = le.getRoleName2RangeNameMap();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+        PATHS = new Vector();
+        PATHS.add("E|I|O|C");
+        PATHS.add("E|I|O|R");
+        PATHS.add("E|I|O|U|O|R");
+        PATHS.add("E|I|O|U|O|I|O|R");
+
+        formatter.setRangeMaps(roleName2RangeNameMap, roleCode2RangeNameMap);
+        formatter.setpaths(PATHS);
 	}
 
     public LogicalExpressionGenerator() {
+		range2ExpressionMap = new HashMap();
+	}
 
+    public void dumpLogicalExpressionDataMap(HashMap hmap) {
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			System.out.println(key);
+		}
+	}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public HashMap getLogicalExpressionData(String named_graph, String code) {
+        HashMap hmap = le.getLogicalExpressionData(named_graph, code, PATHS);
+        return hmap;
 	}
 
     public String getLogicalExpression(String named_graph, String code) {
-		HashMap range2IdsMap = new HashMap();
-        Vector paths = new Vector();
-        paths.add("E|I|O|C");
-        paths.add("E|I|O|R");
-        paths.add("E|I|O|U|O|R");
-        paths.add("E|I|O|U|O|I|O|R");
-        HashMap hmap = le.getLogicalExpressionData(named_graph, code, paths);
-
-        StringBuffer buf = new StringBuffer();
-        Vector parents = (Vector) hmap.get("E|I|O|C");
-        Vector parent_vec = new Vector();
-        if (parents != null && parents.size() > 0) {
-			buf.append("Parent").append("\n");
-			for (int i=0; i<parents.size(); i++) {
-				String line = (String) parents.elementAt(i);
-				Vector u = StringUtils.parseData(line, '|');
-				try {
-					parent_vec.add("\t" + (String) u.elementAt(u.size()-1) + " (" + (String) u.elementAt(u.size()-2) + ")");
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-		}
-		parent_vec = new SortUtils().quickSort(parent_vec);
-		for (int i=0; i<parent_vec.size(); i++) {
-			String line = (String) parent_vec.elementAt(i);
-			buf.append(line).append("\n");
-		}
-
-        HashMap role_hmap = new HashMap();
-        String path = "E|I|O|R";
-        Vector restrictions = (Vector) hmap.get("E|I|O|R");
-
-        Vector simple_role_groups = (Vector) hmap.get("E|I|O|U|O|R");
-        HashMap simple_role_group_hmap = le.sortRestrictions(path, simple_role_groups);
-        Vector multiple_role_groups = (Vector) hmap.get("E|I|O|U|O|I|O|R");
-
-        HashMap role_group_hmap = new HashMap();
-
-        if (multiple_role_groups != null) {
-			role_group_hmap = le.sortRestrictions(path, multiple_role_groups);
-			if (role_group_hmap.keySet().size() > 0) {
-				Iterator it = role_group_hmap.keySet().iterator();
-				while (it.hasNext()) {
-					String key = (String) it.next();
-					Vector w = (Vector) role_group_hmap.get(key);
-					for (int j=0; j<w.size(); j++) {
-						String line = (String) restrictions.elementAt(j);
-						Vector u = StringUtils.parseData(line, '|');
-						String label = (String) u.elementAt(u.size()-1);
-						String role_code = (String) u.elementAt(u.size()-2);
-						String role = (String) u.elementAt(u.size()-3);
-						String roleName = (String) u.elementAt(u.size()-4);
-						String range = (String) rangeHashMap.get(role);
-						Vector id_vec = new Vector();
-						if (range2IdsMap.containsKey(range)) {
-							id_vec = (Vector) range2IdsMap.get(range);
-						}
-						id_vec.add(key);
-						range2IdsMap.put(range, id_vec);
-					}
-				}
-			}
-		}
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-		Vector key_vec = le.getRangeLabels(named_graph);
-		for (int lcv=0; lcv<key_vec.size(); lcv++) {
-			String key = (String) key_vec.elementAt(lcv);
-			Vector id_vec = (Vector) range2IdsMap.get(key);
-
-			int role_group_knt = 0;
-			Vector role_group_vec = new Vector();
-
-			Vector restriction_vec = new Vector();
-			Vector simple_role_group_vec = new Vector();
-			int simple_role_group_knt = 0;
-
-            if (restrictions != null) {
-				for (int i=0; i<restrictions.size(); i++) {
-					String line = (String) restrictions.elementAt(i);
-					Vector u1 = StringUtils.parseData(line, '|');
-					String target_1_label = (String) u1.elementAt(u1.size()-1);
-					String target_1_code = (String) u1.elementAt(u1.size()-2);
-					String role_1_code = (String) u1.elementAt(u1.size()-3);
-					String role_1_label = (String) u1.elementAt(u1.size()-4);
-					String range = (String) rangeHashMap.get(role_1_code);
-					if (range.compareTo(key) == 0) {
-						restriction_vec.add("\t" + role_1_label +"\t" + (String) u1.elementAt(u1.size()-1) + " (" + (String) u1.elementAt(u1.size()-2) + ")");
-					}
-				}
-			} else {
-				System.out.println("restrictions == null");
-			}
-
-			Iterator it_simple_role_group_hmap = simple_role_group_hmap.keySet().iterator();
-			while (it_simple_role_group_hmap.hasNext()) {
-				String key2 = (String) it_simple_role_group_hmap.next();
-				Vector w = (Vector) simple_role_group_hmap.get(key2);
-
-				for (int k=0; k<w.size(); k++) {
-					String line = (String) w.elementAt(k);
-					Vector u1 = StringUtils.parseData(line, '|');
-					String target_1_label = (String) u1.elementAt(u1.size()-1);
-					String target_1_code = (String) u1.elementAt(u1.size()-2);
-					String role_1_code = (String) u1.elementAt(u1.size()-3);
-					String role_1_label = (String) u1.elementAt(u1.size()-4);
-					String range = (String) rangeHashMap.get(role_1_code);
-					if (range.compareTo(key) == 0) {
-						simple_role_group_vec.add("\t" + role_1_label +"\t" + (String) u1.elementAt(u1.size()-1) + " (" + (String) u1.elementAt(u1.size()-2) + ")");
-					}
-					simple_role_group_knt++;
-				}
-			}
-
-            if (id_vec != null && id_vec.size() > 0) {
-				for (int i=0; i<id_vec.size(); i++) {
-					String id = (String) id_vec.elementAt(i);
-
-					if (role_group_hmap.containsKey(id)) {
-						Vector values = (Vector) role_group_hmap.get(id);
-						String line = (String) values.elementAt(0);
-						Vector u1 = StringUtils.parseData(line, '|');
-						String target_1_label = (String) u1.elementAt(u1.size()-1);
-						String target_1_code = (String) u1.elementAt(u1.size()-2);
-						String role_1_code = (String) u1.elementAt(u1.size()-3);
-						String role_1_label = (String) u1.elementAt(u1.size()-4);
-						String range_1 = (String) rangeHashMap.get(role_1_code);
-
-						line = (String) values.elementAt(1);
-						Vector u2 = StringUtils.parseData(line, '|');
-						String target_2_label = (String) u2.elementAt(u2.size()-1);
-						String target_2_code = (String) u2.elementAt(u2.size()-2);
-						String role_2_code = (String) u2.elementAt(u2.size()-3);
-						String role_2_label = (String) u2.elementAt(u2.size()-4);
-						String range_2 = (String) rangeHashMap.get(role_2_code);
-
-						if (range_1.compareTo(key) == 0 && range_2.compareTo(key) == 0) {
-							role_group_vec.add("\t" + role_1_label +"\t" + (String) u1.elementAt(u1.size()-1) + " (" + (String) u1.elementAt(u1.size()-2) + ")");
-							role_group_vec.add("\t" + role_2_label +"\t" + (String) u2.elementAt(u2.size()-1) + " (" + (String) u2.elementAt(u2.size()-2) + ")");
-							role_group_knt++;
-						}
-					}
-				}
-			}
-
-			if (restriction_vec.size() > 0 || simple_role_group_knt > 0 || role_group_knt > 0) {
-                StringBuffer buf2 = new StringBuffer();
-				restriction_vec = new SortUtils().quickSort(restriction_vec);
-				for (int k=0; k<restriction_vec.size(); k++) {
-					buf2.append("\n");
-					String line = (String) restriction_vec.elementAt(k);
-					buf2.append(line);
-				}
-
-				if (simple_role_group_knt > 0) {
-					it_simple_role_group_hmap = simple_role_group_hmap.keySet().iterator();
-					Vector w0 = new Vector();
-					while (it_simple_role_group_hmap.hasNext()) {
-						String key2 = (String) it_simple_role_group_hmap.next();
-						Vector w = (Vector) simple_role_group_hmap.get(key2);
-						for (int j=0; j<w.size(); j++) {
-							String line = (String) w.elementAt(j);
-							Vector u = StringUtils.parseData(line, '|');
-							String label = (String) u.elementAt(u.size()-1);
-							String role_code = (String) u.elementAt(u.size()-2);
-							String role = (String) u.elementAt(u.size()-3);
-							String roleName = (String) u.elementAt(u.size()-4);
-							String range = (String) rangeHashMap.get(role);
-							if (range.compareTo(key)== 0) {
-								w0.add("\t" + roleName +"\t" + label + " (" + role_code + ")");
-							}
-						}
-					}
-					if (w0.size() > 0) {
-						buf2.append("\n\t").append("Role Group(s)").append("\n");
-						for (int k=0; k<w0.size(); k++) {
-							buf2.append((String) w0.elementAt(k)).append("\n");
-							if (k<w0.size() - 1) {
-								buf2.append("\t").append("or").append("\n");
-							}
-						}
-					}
-				}
-
-				if (role_group_knt > 0) {
-					buf2.append("\n\n");
-					if (role_group_knt > 0) {
-						buf2.append("\n\t").append("Role Group(s)").append("\n");
-						for (int k=0; k<role_group_vec.size()/2; k++) {
-							buf2.append((String) role_group_vec.elementAt(k)).append("\n");
-							buf2.append((String) role_group_vec.elementAt(k+1)).append("\n");
-							if (k<role_group_vec.size()/2 - 1) {
-								buf2.append("\n\t").append("or").append("\n");
-							}
-						}
-					}
-				}
-				if (buf2.length() > 0) {
-					buf.append("\n").append(key);
-				}
-				buf.append(buf2);
-				if (buf2.length() > 0) {
-					buf.append("\n");
-				}
-			}
-		}
-		return buf.toString();
+        HashMap hmap = getLogicalExpressionData(named_graph, code);
+        String expression = formatter.getLogicalExpression(hmap);
+        return expression;
 	}
 
 	public static String construct_get_label(String prefixes, String named_graph) {
@@ -401,27 +229,31 @@ public class LogicalExpressionGenerator {
 			System.out.println("(" + j + ") Logical expression of " + label + " (" + code + ")");
 			w.add("\n(" + j + ") Logical expression of " + label + " (" + code + ")");
 			String expression = getLogicalExpression(named_graph, code);
+			System.out.println("\n(" + j + ") Logical expression of " + label + " (" + code + ")");
 			w.add(expression);
+			System.out.println(expression);
 		}
 		return w;
 	}
-
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		String filename = args[0];
         Vector codes = Utils.readFile(filename);
         System.out.println("codes: " + codes.size());
-
 		String firstLn = (String) codes.elementAt(0);
 		if (firstLn.indexOf("\t") != -1) {
 			codes = extract_column_data(filename, 5, '\t');
+		} else if (firstLn.indexOf("|") != -1) {
+			codes = extract_column_data(filename, 0, '|');
 		}
-
 		codes = removeDuplicats(codes, false);
         LogicalExpressionGenerator test = new LogicalExpressionGenerator();
         Vector w = test.run(codes);
-        Utils.saveToFile("logical_expression_" + filename, w);
+        int n = filename.lastIndexOf(".");
+        String name = filename.substring(0, n);
+        Utils.saveToFile("logical_expression_" + name + "_" + StringUtils.getToday() + ".txt", w);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
+
