@@ -69,7 +69,6 @@ import org.json.*;
  *
  */
 
-
 public class RoleGroupQuery {
     JSONUtils jsonUtils = null;
     HTTPUtils httpUtils = null;
@@ -151,11 +150,25 @@ public class RoleGroupQuery {
 		Vector w = new Vector();
 		int knt = 0;
 		long ms0 = System.currentTimeMillis();
+		LogicalExpressionGenerator generator = new LogicalExpressionGenerator();
+
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			String code = (String) u.elementAt(1);
-			Vector w1 = getRolegroup(named_graph, code);
+
+			HashMap dataMap = generator.getLogicalExpressionData(named_graph, code);
+			String key1 = "E|I|O|U|O|R";
+			String key2 = "E|I|O|U|O|I|O|R";
+			Vector w1 = new Vector();
+			Vector values_1 = (Vector) dataMap.get(key1);
+			if (values_1 != null && values_1.size() > 0) {
+				w1.addAll(values_1);
+			}
+			Vector values_2 = (Vector) dataMap.get(key2);
+			if (values_2 != null && values_2.size() > 0) {
+				w1.addAll(values_2);
+			}
 			if (w1 != null && w1.size() > 0) {
 				w.addAll(w1);
 				knt++;
@@ -170,12 +183,47 @@ public class RoleGroupQuery {
 	}
 
     public Vector findConceptsWithEquivalentclass() {
-		//OWLSPARQLUtils owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
-		//owlSPARQLUtils.set_named_graph(named_graph);
 		Vector v = owlSPARQLUtils.getEquivalentClass(named_graph);
 		Utils.saveToFile("equivalentClass_" + StringUtils.getToday() + ".txt", v);
 		return v;
     }
+
+
+	public static Vector run(Vector codes) {
+		String named_graph =  ConfigurationController.namedGraph;
+		LogicalExpressionGenerator generator = new LogicalExpressionGenerator();
+		HashMap code2LabelMap = new LogicalExpressionGenerator().getCode2LabelMap();
+
+		Vector w = new Vector();
+		for (int i=0; i<codes.size(); i++) {
+			int j = i+1;
+			String code = (String) codes.elementAt(i);
+			String label = (String) code2LabelMap.get(code);
+			System.out.println("(" + j + ") Logical expression of " + label + " (" + code + ")");
+			w.add("\n(" + j + ") Logical expression of " + label + " (" + code + ")");
+			String expression = generator.getLogicalExpression(named_graph, code);
+			System.out.println("\n(" + j + ") Logical expression of " + label + " (" + code + ")");
+			w.add(expression);
+			System.out.println(expression);
+		}
+		return w;
+	}
+
+
+    public static void getLogicalExpression(String filename) {
+		Vector v = Utils.readFile(filename);
+		Vector codes = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(0);
+			if (!codes.contains(code)) {
+				codes.add(code);
+			}
+		}
+		Vector w = run(codes);
+		Utils.saveToFile("expression_" + filename, w);
+	}
 
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
@@ -189,9 +237,18 @@ public class RoleGroupQuery {
 		Vector w = test.getRolegroup(named_graph, code);
 		Utils.saveToFile("results_rolegroup_query.txt", w);
 		*/
-		Vector w = test.getConceptsWithRolegroup(named_graph);
-		Utils.saveToFile("rolegroups.txt", w);
 
+		/*
+		Vector w = test.getConceptsWithRolegroup(named_graph);
+		String filename = "concepts_with_rolegroups.txt";
+		Utils.saveToFile(filename, w);
+		*/
+
+		String filename = "concepts_with_rolegroups.txt";
+		if (args.length > 0) {
+			filename = args[0];
+		}
+        test.getLogicalExpression(filename);
     }
 
 }

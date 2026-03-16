@@ -149,6 +149,38 @@ public class LogicalExpressionFormatter {
 		return roleDataMap;
 	}
 
+	public HashMap generateRange2RoleGroupExpressionMap(Vector role_group_vec) {
+		if (role_group_vec == null || role_group_vec.size() == 0) return null;
+		HashMap hmap = new HashMap();
+		Vector w = new Vector();
+		for (int i=0; i<role_group_vec.size(); i++) {
+			String line = (String) role_group_vec.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String roleCode = (String) u.elementAt(u.size()-4);
+			String roleRange = (String) roleName2RangeNameMap.get(roleCode);
+			w = new Vector();
+		    if (hmap.containsKey(roleRange)) {
+				w = (Vector) hmap.get(roleRange);
+			}
+			w.add(line);
+			hmap.put(roleRange, w);
+		}
+		HashMap expressionMap = new HashMap();
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String range = (String) it.next();
+			w = (Vector) hmap.get(range);
+			//Utils.dumpVector(range, w);
+			String roleExpression = generateRoleGroupExpression(w);
+			expressionMap.put(range, roleExpression);
+		}
+		return expressionMap;
+	}
+
+	public static void dumpMultiValuedHashMap(HashMap hmap) {
+		Utils.dumpMultiValuedHashMap("LogicalExpression Data", hmap);
+	}
+
     public String getLogicalExpression(HashMap hmap) {
 // Parents:
         StringBuffer buf = new StringBuffer();
@@ -196,33 +228,38 @@ public class LogicalExpressionFormatter {
 // Simple Restriction group:
         Vector simple_role_groups = (Vector) hmap.get("E|I|O|U|O|R");
         //Utils.dumpVector("simple_role_groups (E|I|O|U|O|R)", simple_role_groups);
-        String range = getRoleGroupRange(simple_role_groups);
-        if (range != null) {
-			v = retrieveRestrictions(simple_role_groups);
-			String roleExpression = generateRoleGroupExpression(v);
-			w = new Vector();
-			if (range2RolesHashMap.containsKey(range)) {
-				w = (Vector) range2RolesHashMap.get(range);
+        HashMap range2RoleGroupExpressionMap = generateRange2RoleGroupExpressionMap(simple_role_groups);
+        if (range2RoleGroupExpressionMap != null) {
+            Iterator it = range2RoleGroupExpressionMap.keySet().iterator();
+            while (it.hasNext()) {
+				String range = (String) it.next();
+				String roleExpression = (String) range2RoleGroupExpressionMap.get(range);
+				w = new Vector();
+				if (range2RolesHashMap.containsKey(range)) {
+					w = (Vector) range2RolesHashMap.get(range);
+				}
+				w.add(roleExpression + "|RG");
+			    range2RolesHashMap.put(range, w);
 			}
-			w.add(roleExpression + "|RG");
-			range2RolesHashMap.put(range, w);
 		}
 
 // multiple_role_groups:
         Vector multiple_role_groups = (Vector) hmap.get("E|I|O|U|O|I|O|R");
         //Utils.dumpVector("multiple_role_groups (E|I|O|U|O|I|O|R)", multiple_role_groups);
-        range = getRoleGroupRange(multiple_role_groups);
-        if (range != null) {
-			v = retrieveRestrictions(multiple_role_groups);
-			String roleExpression = generateRoleGroupExpression(v);
-			w = new Vector();
-			if (range2RolesHashMap.containsKey(range)) {
-				w = (Vector) range2RolesHashMap.get(range);
+        range2RoleGroupExpressionMap = generateRange2RoleGroupExpressionMap(multiple_role_groups);
+        if (range2RoleGroupExpressionMap != null) {
+            Iterator it = range2RoleGroupExpressionMap.keySet().iterator();
+            while (it.hasNext()) {
+				String range = (String) it.next();
+				String roleExpression = (String) range2RoleGroupExpressionMap.get(range);
+				w = new Vector();
+				if (range2RolesHashMap.containsKey(range)) {
+					w = (Vector) range2RolesHashMap.get(range);
+				}
+				w.add(roleExpression + "|RG");
+			    range2RolesHashMap.put(range, w);
 			}
-			w.add(roleExpression + "|RG");
-			range2RolesHashMap.put(range, w);
 		}
-
 		String parentStr = buf.toString();
 		return parentStr + "\n" + range2RolesHashMap2Expression(range2RolesHashMap);
 	}
@@ -249,7 +286,7 @@ public class LogicalExpressionFormatter {
 						//buf.append("\t" + value).append("\n");
 					}
 				}
-				sorted_values = new SortUtils().quickSort(sorted_values);
+				//sorted_values = new SortUtils().quickSort(sorted_values);
 				for (int j=0; j<sorted_values.size(); j++) {
 					String value = (String) sorted_values.elementAt(j);
 					buf.append("\t" + value).append("\n");
@@ -268,6 +305,7 @@ public class LogicalExpressionFormatter {
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
     public boolean checkRoleGroupRangeConsistency(Vector role_group_vec) {
 		if (role_group_vec == null || role_group_vec.size() == 0) return false;
 		String line = (String) role_group_vec.elementAt(0);
@@ -307,6 +345,7 @@ public class LogicalExpressionFormatter {
 			return true;
 		}
 	}
+*/
 
     public void dumpRoleGroupRangeData(Vector role_group_vec) {
 		for (int i=0; i<role_group_vec.size(); i++) {
@@ -320,12 +359,20 @@ public class LogicalExpressionFormatter {
 
     public String generateRoleGroupExpression(Vector role_group_vec) {
 		if (role_group_vec == null || role_group_vec.size() == 0) return "";
-		boolean bool = checkRoleGroupRangeConsistency(role_group_vec);
+		//boolean bool = checkRoleGroupRangeConsistency(role_group_vec);
+		//System.out.println("checkRoleGroupRangeConsistency returns: " + bool);
+/*
+
 		if (!bool) {
-			System.out.println("Inconsistent role range found in role group data");
-			//dumpRoleGroupRangeData(role_group_vec);
+			System.out.println("WARNING: Inconsistent role range found in role group data");
+			System.out.println("dumpRoleGroupRangeData ...");
+			dumpRoleGroupRangeData(role_group_vec);
 			return null;
 		}
+*/
+	role_group_vec = retrieveRestrictions(role_group_vec);
+//Utils.dumpVector("generateRoleGroupExpression role_group_vec", role_group_vec);
+
 		StringBuffer buf2 = new StringBuffer();
 		buf2.append("\n\t").append("Role Group(s)").append("\n");
 		for (int k=0; k<role_group_vec.size()/2; k++) {
@@ -338,9 +385,12 @@ public class LogicalExpressionFormatter {
 		return buf2.toString();
 	}
 
+/*
     public String getRoleGroupRange(Vector role_group_vec) {
 		if (role_group_vec == null || role_group_vec.size() == 0) return null;
 		boolean bool = checkRoleGroupRangeConsistency(role_group_vec);
+		System.out.println("getRoleGroupRange returns: " + bool);
+
 		if (bool) {
 			String line = (String) role_group_vec.elementAt(0);
 			Vector u = StringUtils.parseData(line, '|');
@@ -350,6 +400,7 @@ public class LogicalExpressionFormatter {
 		}
 		return null;
 	}
+*/
 
 	public static Vector retrieveRestrictions(Vector result_vec) {
 		Vector w = new Vector();
