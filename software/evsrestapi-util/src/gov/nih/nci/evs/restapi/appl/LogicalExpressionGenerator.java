@@ -119,6 +119,10 @@ public class LogicalExpressionGenerator {
 		}
 	}
 
+	public static HashMap getCode2LabelMap() {
+		return code2LabelMap;
+	}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public HashMap getLogicalExpressionData(String named_graph, String code) {
         HashMap hmap = le.getLogicalExpressionData(named_graph, code, PATHS);
