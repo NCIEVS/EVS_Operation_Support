@@ -80,9 +80,8 @@ public class LogicalExpression {
     OWLSPARQLUtils owlSPARQLUtils = null;
     static HashMap transitionMatrix = null;
     static Vector absorbingStates = null;
-    static int MAX_LENGTH = 10;
-    HashMap rangeHashMap = null;
 
+    HashMap rangeHashMap = null;
     HashMap roleCode2RangeNameMap = null;
     HashMap roleName2RangeNameMap = null;
 
@@ -91,11 +90,11 @@ public class LogicalExpression {
 	}
 
 	public HashMap getRoleCode2RangeNameMap() {
-		return roleCode2RangeNameMap;
+		return this.roleCode2RangeNameMap;
 	}
 
 	public HashMap getRoleName2RangeNameMap() {
-		return roleName2RangeNameMap;
+		return this.roleName2RangeNameMap;
 	}
 
     public LogicalExpression(String serviceUrl, String named_graph, String username, String password) {
@@ -105,7 +104,7 @@ public class LogicalExpression {
     	this.password = password;
         this.owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
         this.owlSPARQLUtils.set_named_graph(named_graph);
-        rangeHashMap = getRangeHashMap(named_graph);
+        constructRangeHashMap(named_graph);
     }
 
     public OWLSPARQLUtils getOWLSPARQLUtils() {
@@ -199,8 +198,8 @@ public class LogicalExpression {
 		return null;
 	}
 
-	public HashMap getRangeHashMap(String named_graph) {
-		HashMap hmap = new HashMap();
+	public void constructRangeHashMap(String named_graph) {
+		rangeHashMap = new HashMap();
         roleCode2RangeNameMap = new HashMap();
         roleName2RangeNameMap = new HashMap();
 		Vector v = null;
@@ -210,7 +209,7 @@ public class LogicalExpression {
 				for (int i=0; i<v.size(); i++) {
 					String line = (String) v.elementAt(i);
 					Vector u = StringUtils.parseData(line, '|');
-					hmap.put((String) u.elementAt(0), (String) u.elementAt(3));
+					rangeHashMap.put((String) u.elementAt(0), (String) u.elementAt(3));
 					roleCode2RangeNameMap.put((String) u.elementAt(0), (String) u.elementAt(3));
 					roleName2RangeNameMap.put((String) u.elementAt(1), (String) u.elementAt(3));
 				}
@@ -218,7 +217,6 @@ public class LogicalExpression {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		return hmap;
 	}
 
     public String path2SelectStmt(Vector path) {

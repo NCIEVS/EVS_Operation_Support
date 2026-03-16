@@ -71,28 +71,25 @@ import org.json.*;
 
 
 public class LogicalExpressionGenerator {
-	static HashMap rangeHashMap = null;
-	static LogicalExpression le = null;
-	static HashMap code2LabelMap = null;
-	static HashMap roleName2RangeNameMap = null;
-	static HashMap roleCode2RangeNameMap = null;
-	static Vector PATHS = null;
+	HashMap rangeHashMap = null;
+	LogicalExpression le = null;
+	HashMap code2LabelMap = null;
+	HashMap roleName2RangeNameMap = null;
+	HashMap roleCode2RangeNameMap = null;
+	Vector PATHS = null;
 	HashMap range2ExpressionMap = null;
-	static LogicalExpressionFormatter formatter = new LogicalExpressionFormatter();
+	LogicalExpressionFormatter formatter = null;
 
-	static {
+	private void initialize() {
 		String serviceUrl = ConfigurationController.serviceUrl;
 		String named_graph = ConfigurationController.namedGraph;
 		String username = ConfigurationController.username;
 		String password = ConfigurationController.password;
 
-		System.out.println(serviceUrl);
-		System.out.println(named_graph);
-
 		try {
 			code2LabelMap = generateLabelHashMap(named_graph);//loadOrGenerateLabelHashMap(named_graph);
 			le = new LogicalExpression(serviceUrl, named_graph, username, password);
-			rangeHashMap = le.getRangeHashMap(named_graph);
+			roleCode2RangeNameMap = le.getRoleCode2RangeNameMap();
 			roleName2RangeNameMap = le.getRoleName2RangeNameMap();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -103,11 +100,13 @@ public class LogicalExpressionGenerator {
         PATHS.add("E|I|O|U|O|R");
         PATHS.add("E|I|O|U|O|I|O|R");
 
+        formatter = new LogicalExpressionFormatter();
         formatter.setRangeMaps(roleName2RangeNameMap, roleCode2RangeNameMap);
         formatter.setpaths(PATHS);
 	}
 
     public LogicalExpressionGenerator() {
+		initialize();
 		range2ExpressionMap = new HashMap();
 	}
 
@@ -119,7 +118,7 @@ public class LogicalExpressionGenerator {
 		}
 	}
 
-	public static HashMap getCode2LabelMap() {
+	public HashMap getCode2LabelMap() {
 		return code2LabelMap;
 	}
 
@@ -169,7 +168,7 @@ public class LogicalExpressionGenerator {
 		return createHashmap(v,1, 0, '|');
 	}
 
-    public static HashMap loadOrGenerateLabelHashMap(String named_graph) {
+    public HashMap loadOrGenerateLabelHashMap(String named_graph) {
 		String filename = "labels.txt";
 		File file = new File(filename);
 		HashMap hmap = null;
