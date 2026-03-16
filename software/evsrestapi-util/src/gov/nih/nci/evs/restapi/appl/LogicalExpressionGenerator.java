@@ -90,7 +90,7 @@ public class LogicalExpressionGenerator {
 		System.out.println(named_graph);
 
 		try {
-			code2LabelMap = loadOrGenerateLabelHashMap(named_graph);
+			code2LabelMap = generateLabelHashMap(named_graph);//loadOrGenerateLabelHashMap(named_graph);
 			le = new LogicalExpression(serviceUrl, named_graph, username, password);
 			rangeHashMap = le.getRangeHashMap(named_graph);
 			roleName2RangeNameMap = le.getRoleName2RangeNameMap();
@@ -145,6 +145,24 @@ public class LogicalExpressionGenerator {
         buf.append("order by ?x_label").append("\n");
         buf.append("").append("\n");
         return buf.toString();
+	}
+
+    public static HashMap generateLabelHashMap(String named_graph) {
+		String filename = "labels.txt";
+		HashMap hmap = null;
+		Vector v = null;
+
+		String serviceUrl = ConfigurationController.serviceUrl;
+		String namedGraph = ConfigurationController.namedGraph;
+		String username = ConfigurationController.username;
+		String password = ConfigurationController.password;
+		OWLSPARQLUtils owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
+		owlSPARQLUtils.set_named_graph(namedGraph);
+		String query = construct_get_label(owlSPARQLUtils.getPrefixes(), namedGraph);
+		v = owlSPARQLUtils.executeQuery(query);
+		if (v == null) return null;
+		Utils.saveToFile(filename, v);
+		return createHashmap(v,1, 0, '|');
 	}
 
     public static HashMap loadOrGenerateLabelHashMap(String named_graph) {
