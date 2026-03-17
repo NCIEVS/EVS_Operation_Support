@@ -78,6 +78,8 @@ public class RoleGroupQuery {
     String restURL = null;
     String named_graph_id = ":NHC0";
     String BASE_URI = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl";
+    String CONCEPTS_WITH_ROLE_GROUPS_FILE = "concepts_with_rolegroups.txt";
+    String CODES_WITH_ROLE_GROUPS_FILE = "codes_with_rolegroups.txt";
 
     ParserUtils parser = new ParserUtils();
     HashMap nameVersion2NamedGraphMap = null;
@@ -188,12 +190,66 @@ public class RoleGroupQuery {
 		return v;
     }
 
+	public static Vector getCodes(String filename) {
+		Vector v = Utils.readFile(filename);
+		Vector codes = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(0);
+			if (!codes.contains(code)) {
+				codes.add(code);
+			}
+		}
+		return codes;
+	}
+
+    public void debug(String filename) {
+		String named_graph =  ConfigurationController.namedGraph;
+		LogicalExpressionGenerator generator = new LogicalExpressionGenerator();
+
+		Vector codes = getCodes(filename);
+		HashMap dataMap = getLogicalExpressionData(codes);
+		Iterator it = dataMap.keySet().iterator();
+		while (it.hasNext()) {
+			String code = (String) it.next();
+			HashMap hmap = (HashMap) dataMap.get(code);
+			Utils.dumpMultiValuedHashMap(code, hmap);
+
+			System.out.println("Range of roles in role group:");
+			String path = "E|I|O|U|O|I|O|R";
+			Vector v = (Vector) hmap.get(path);
+			if (v != null && v.size() > 0) {
+				for (int i=0; i<v.size(); i++) {
+					String line = (String) v.elementAt(i);
+					Vector u = StringUtils.parseData(line, '|');
+					String roleName = (String) u.elementAt(u.size()-4);
+					String roleRange = (String) generator.getRangeNameByRoleName(roleName);
+					System.out.println(line + " (" + roleName + " range: " + roleRange + ")");
+				}
+			}
+		}
+
+
+
+	}
+
+    public HashMap getLogicalExpressionData(Vector codes) {
+		LogicalExpressionGenerator generator = new LogicalExpressionGenerator();
+		HashMap dataMap = new HashMap();
+		String named_graph =  ConfigurationController.namedGraph;
+		for (int i=0; i<codes.size(); i++) {
+			String code = (String) codes.elementAt(i);
+        	HashMap hmap = generator.getLogicalExpressionData(named_graph, code);
+        	dataMap.put(code, hmap);
+		}
+        return dataMap;
+	}
 
 	public static Vector run(Vector codes) {
 		String named_graph =  ConfigurationController.namedGraph;
 		LogicalExpressionGenerator generator = new LogicalExpressionGenerator();
 		HashMap code2LabelMap = new LogicalExpressionGenerator().getCode2LabelMap();
-
 		Vector w = new Vector();
 		for (int i=0; i<codes.size(); i++) {
 			int j = i+1;
@@ -210,17 +266,9 @@ public class RoleGroupQuery {
 	}
 
 
+
     public static void getLogicalExpression(String filename) {
-		Vector v = Utils.readFile(filename);
-		Vector codes = new Vector();
-		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String code = (String) u.elementAt(0);
-			if (!codes.contains(code)) {
-				codes.add(code);
-			}
-		}
+		Vector codes = getCodes(filename);
 		Vector w = run(codes);
 		Utils.saveToFile("expression_" + filename, w);
 	}
@@ -244,11 +292,15 @@ public class RoleGroupQuery {
 		Utils.saveToFile(filename, w);
 		*/
 
-		String filename = "concepts_with_rolegroups.txt";
+        /*
+		String filename = args[0];//"concepts_with_rolegroups.txt";
 		if (args.length > 0) {
 			filename = args[0];
 		}
         test.getLogicalExpression(filename);
+        */
+        String filename = args[0];
+        test.debug(filename);
     }
 
 }

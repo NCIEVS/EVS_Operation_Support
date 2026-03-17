@@ -310,7 +310,7 @@ public class LogicalExpressionFormatter {
 			Vector u = StringUtils.parseData(line, '|');
 			String roleName = (String) u.elementAt(u.size()-4);
 			String roleRange = (String) roleName2RangeNameMap.get(roleName);
-			System.out.println(line + "(range: + " + roleRange + ")");
+			System.out.println(line + " (" + roleName + " range: " + roleRange + ")");
 		}
 	}
 

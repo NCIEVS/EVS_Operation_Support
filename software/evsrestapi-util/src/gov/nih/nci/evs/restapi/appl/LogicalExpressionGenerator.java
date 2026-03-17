@@ -122,10 +122,20 @@ public class LogicalExpressionGenerator {
 		return code2LabelMap;
 	}
 
+
+    public String getRangeNameByRoleCode(String roleCode) {
+		return (String) roleCode2RangeNameMap.get(roleCode);
+	}
+
+    public String getRangeNameByRoleName(String roleName) {
+		return (String) roleName2RangeNameMap.get(roleName);
+	}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public HashMap getLogicalExpressionData(String named_graph, String code) {
         HashMap hmap = le.getLogicalExpressionData(named_graph, code, PATHS);
-        dumpLogicalExpressionDataMap(hmap);
+        //dumpLogicalExpressionDataMap(hmap);
         return hmap;
 	}
 
