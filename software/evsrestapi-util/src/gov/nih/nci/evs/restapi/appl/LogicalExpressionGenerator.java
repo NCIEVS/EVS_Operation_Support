@@ -110,6 +110,14 @@ public class LogicalExpressionGenerator {
 		range2ExpressionMap = new HashMap();
 	}
 
+	public String getLabel(String code) {
+		return (String) code2LabelMap.get(code);
+	}
+
+    public HashMap getQueries(String named_graph, String code) {
+		return le.getQueries(named_graph, code, PATHS);
+	}
+
     public void dumpLogicalExpressionDataMap(HashMap hmap) {
 		Iterator it = hmap.keySet().iterator();
 		while (it.hasNext()) {

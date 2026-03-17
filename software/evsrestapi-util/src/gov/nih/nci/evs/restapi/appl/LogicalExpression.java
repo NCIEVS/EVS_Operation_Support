@@ -360,6 +360,24 @@ public class LogicalExpression {
 		return absorbingStates.contains(t);
 	}
 
+
+    public HashMap getQueries(String named_graph, String code, Vector paths) {
+		HashMap hmap = new HashMap();
+        Stack stack = new Stack();
+        for (int i=0; i<paths.size(); i++) {
+			stack.push((String) paths.elementAt(i));
+		}
+
+        while (!stack.isEmpty()) {
+			String line = (String) stack.pop();
+			Vector path = StringUtils.parseData(line, '|');
+			String query = path2Query(named_graph, code, path);
+			hmap.put(line, query);
+		}
+		return hmap;
+    }
+
+
     public HashMap getLogicalExpressionData(String named_graph, String code, Vector paths) {
 		HashMap hmap = new HashMap();
         Stack stack = new Stack();

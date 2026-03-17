@@ -1,4 +1,4 @@
-package gov.nih.nci.evs.restapi.appl;
+import gov.nih.nci.evs.restapi.appl.*;
 import gov.nih.nci.evs.restapi.util.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.common.*;
@@ -88,6 +88,15 @@ public class RoleGroupQuery {
     String username = null;
     String password = null;
     OWLSPARQLUtils owlSPARQLUtils = null;
+
+	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
+	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
+	static String RESTRICTION_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.rolefile; //"roles.txt";
+	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
+	static Vector ROLE_DATA = null;
+	static {
+		ROLE_DATA = Utils.readFile(RESTRICTION_FILE);
+	}
 
     public RoleGroupQuery(String serviceUrl, String named_graph, String username, String password) {
 		this.serviceUrl = serviceUrl;
@@ -211,6 +220,7 @@ public class RoleGroupQuery {
 		Vector codes = getCodes(filename);
 		HashMap dataMap = getLogicalExpressionData(codes);
 		Iterator it = dataMap.keySet().iterator();
+		int j = 0;
 		while (it.hasNext()) {
 			String code = (String) it.next();
 			HashMap hmap = (HashMap) dataMap.get(code);
@@ -219,19 +229,27 @@ public class RoleGroupQuery {
 			System.out.println("Range of roles in role group:");
 			String path = "E|I|O|U|O|I|O|R";
 			Vector v = (Vector) hmap.get(path);
+			String label = null;
 			if (v != null && v.size() > 0) {
 				for (int i=0; i<v.size(); i++) {
 					String line = (String) v.elementAt(i);
 					Vector u = StringUtils.parseData(line, '|');
+					label = (String) u.elementAt(1);
 					String roleName = (String) u.elementAt(u.size()-4);
 					String roleRange = (String) generator.getRangeNameByRoleName(roleName);
 					System.out.println(line + " (" + roleName + " range: " + roleRange + ")");
 				}
 			}
+
+			String expression = generator.getLogicalExpression(named_graph, code);
+			j++;
+			System.out.println("\n(" + j + ") Logical expression of " + label + " (" + code + ")");
+			System.out.println(expression);
+
+			HashMap queryMap = generator.getQueries(named_graph, code);
+			String query = (String) queryMap.get(path);
+			System.out.println(query);
 		}
-
-
-
 	}
 
     public HashMap getLogicalExpressionData(Vector codes) {
@@ -273,6 +291,49 @@ public class RoleGroupQuery {
 		Utils.saveToFile("expression_" + filename, w);
 	}
 
+
+	public String construct_get_roles(String named_graph, String code) {
+        String prefixes = owlSPARQLUtils.getPrefixes();
+        StringBuffer buf = new StringBuffer();
+        buf.append(prefixes);
+        buf.append("select distinct ?x_code ?x_label ?p_code ?p_label ?y_code ?y_label").append("\n");
+        buf.append("{").append("\n");
+		if (named_graph != null) {
+			buf.append("graph <" + named_graph + ">").append("\n");
+		}
+        buf.append("	{").append("\n");
+        buf.append("            ?x a owl:Class .").append("\n");
+        buf.append("            ?x :NHC0 ?x_code .").append("\n");
+        if (code != null) {
+            buf.append("            ?x :NHC0 \"" + code + "\"^^xsd:string . ").append("\n");
+	    }
+        buf.append("            ?x rdfs:label ?x_label .").append("\n");
+        buf.append("            ?x (rdfs:subClassOf|owl:equivalentClass|owl:unionOf/rdf:rest*/rdf:first|owl:intersectionOf/rdf:rest*/rdf:first)* ?rs .").append("\n");
+        buf.append("            ?rs a owl:Restriction .").append("\n");
+        buf.append("            ?rs owl:onProperty ?p .").append("\n");
+        buf.append("            ?p :NHC0 ?p_code .").append("\n");
+        buf.append("            ?p rdfs:label ?p_label .").append("\n");
+        buf.append("            ?rs owl:someValuesFrom ?y .").append("\n");
+        buf.append("            ?y :NHC0 ?y_code .").append("\n");
+        buf.append("            ?y rdfs:label ?y_label .").append("\n");
+        buf.append("	}").append("\n");
+        buf.append("}").append("\n");
+        return buf.toString();
+	}
+
+    public static Vector getRolesByOWL(String code) {
+		Vector v = new Vector();
+		for (int i=0; i<ROLE_DATA.size(); i++) {
+			String line = (String) ROLE_DATA.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String src_code = (String) u.elementAt(1);
+			if (src_code.compareTo(code) == 0) {
+				v.add(line);
+			}
+		}
+		return v;
+	}
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		String serviceUrl = ConfigurationController.serviceUrl;
@@ -299,8 +360,17 @@ public class RoleGroupQuery {
 		}
         test.getLogicalExpression(filename);
         */
+
+        /*
         String filename = args[0];
         test.debug(filename);
+
+        String query = test.construct_get_roles(named_graph, "C9110");
+        System.out.println(query);
+        */
+        String code = "C9110";
+        Vector v = getRolesByOWL(code);
+        Utils.dumpVector(code, v);
     }
 
 }
