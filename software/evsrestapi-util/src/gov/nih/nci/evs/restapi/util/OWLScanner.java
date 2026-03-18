@@ -3653,11 +3653,19 @@ C4910|<NHC0>C4910</NHC0>
 		return t;
 	}
 
+	public static String getTagValue(String line) {
+		int n1 = line.indexOf(">");
+		int n2 = line.lastIndexOf("<");
+		String t = line.substring(n1+1, n2);
+		return t;
+	}
+
 	public static Vector extractRoleDomainAndRange(String owlfile) {
 		Vector output_vec = new Vector();
 		OWLScanner scanner = new OWLScanner(owlfile);
 		Vector owl_vec = scanner.get_owl_vec();
 		String roleCode = null;
+		String roleLabel = null;
 		String domainCode = null;
 		String rangeCode = null;
 		boolean start = false;
@@ -3674,10 +3682,14 @@ C4910|<NHC0>C4910</NHC0>
 						domainCode = extractCode2(line);
 					} else if (line.indexOf("<rdfs:range ") != -1) {
 						rangeCode = extractCode2(line);
-						output_vec.add(roleCode + "|" + domainCode + "|" + rangeCode);
+						output_vec.add(roleCode + "|" + roleLabel + "|" + domainCode + "|" + rangeCode);
 						roleCode = null;
 						domainCode = null;
 						rangeCode = null;
+						//<rdfs:label>Role_Has_Domain</rdfs:label>
+					} else if (line.indexOf("<rdfs:label>") != -1) {
+						int n = "</rdfs:label>".length();
+						roleLabel = getTagValue(line);
 					}
 				}
 			}
