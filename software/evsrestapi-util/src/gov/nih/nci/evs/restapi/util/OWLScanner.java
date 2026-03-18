@@ -3682,15 +3682,21 @@ C4910|<NHC0>C4910</NHC0>
 						domainCode = extractCode2(line);
 					} else if (line.indexOf("<rdfs:range ") != -1) {
 						rangeCode = extractCode2(line);
-						output_vec.add(roleCode + "|" + roleLabel + "|" + domainCode + "|" + rangeCode);
-						roleCode = null;
-						domainCode = null;
-						rangeCode = null;
-						//<rdfs:label>Role_Has_Domain</rdfs:label>
 					} else if (line.indexOf("<rdfs:label>") != -1) {
-						int n = "</rdfs:label>".length();
-						roleLabel = getTagValue(line);
+						if (roleCode != null) {
+							roleLabel = getTagValue(line);
+							System.out.println(roleCode + " --> " + roleLabel);
+							output_vec.add(roleCode + "|" + roleLabel + "|" + domainCode + "|" + rangeCode);
+							roleCode = null;
+							roleLabel = null;
+							domainCode = null;
+							rangeCode = null;
+						}
 					}
+				}
+
+				if (line.indexOf("*******") != -1) {
+					break;
 				}
 			}
 		}
