@@ -3685,7 +3685,6 @@ C4910|<NHC0>C4910</NHC0>
 					} else if (line.indexOf("<rdfs:label>") != -1) {
 						if (roleCode != null) {
 							roleLabel = getTagValue(line);
-							System.out.println(roleCode + " --> " + roleLabel);
 							output_vec.add(roleCode + "|" + roleLabel + "|" + domainCode + "|" + rangeCode);
 							roleCode = null;
 							roleLabel = null;
