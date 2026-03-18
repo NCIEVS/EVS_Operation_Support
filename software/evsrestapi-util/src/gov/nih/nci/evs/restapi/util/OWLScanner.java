@@ -3641,6 +3641,51 @@ C4910|<NHC0>C4910</NHC0>
 		return parent_child_vec;
 	}
 
+	public static String extractCode1(String line) {
+		int n = line.lastIndexOf("#");
+		String t = line.substring(n+1, line.length()-2);
+		return t;
+	}
+
+	public static String extractCode2(String line) {
+		int n = line.lastIndexOf("#");
+		String t = line.substring(n+1, line.length()-3);
+		return t;
+	}
+
+	public static Vector extractRoleDomainAndRange(String owlfile) {
+		Vector output_vec = new Vector();
+		OWLScanner scanner = new OWLScanner(owlfile);
+		Vector owl_vec = scanner.get_owl_vec();
+		String roleCode = null;
+		String domainCode = null;
+		String rangeCode = null;
+		boolean start = false;
+		for (int i=0; i<owl_vec.size(); i++) {
+			String line = (String) owl_vec.elementAt(i);
+			if (line.indexOf("Object Properties") != -1) {
+				start = true;
+			}
+			if (start) {
+				if (line.indexOf("<owl:ObjectProperty ") != -1) {
+					roleCode = extractCode1(line);
+				} else {
+					if (line.indexOf("<rdfs:domain ") != -1) {
+						domainCode = extractCode2(line);
+					} else if (line.indexOf("<rdfs:range ") != -1) {
+						rangeCode = extractCode2(line);
+						output_vec.add(roleCode + "|" + domainCode + "|" + rangeCode);
+						roleCode = null;
+						domainCode = null;
+						rangeCode = null;
+					}
+				}
+			}
+		}
+		output_vec = new SortUtils().quickSort(output_vec);
+		return output_vec;
+	}
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		/*
