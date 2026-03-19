@@ -163,6 +163,7 @@ public class OWL2LogicalExpression {
 		boolean cont = true;
 		String roleCode = null;
 		String roleTargetCode = null;
+		boolean role_group_started = false;
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			if (line.indexOf("</owl:equivalentClass>") != -1) break;
@@ -172,8 +173,10 @@ public class OWL2LogicalExpression {
 				path = path + "C|";
 			} else if (line.indexOf("<owl:intersectionOf ") != -1) {
 				path = path + "I|";
-				if (path.endsWith("U|C|I|")) {
+				//E|C|I|C|U|C|I
+				if (path.endsWith("U|C|I|") && !role_group_started) {
 					role_vec.add("Role Group starts");
+					role_group_started = true;
 				}
 			} else if (line.indexOf("<owl:unionOf ") != -1) {
 				path = path + "U|";
@@ -194,7 +197,7 @@ public class OWL2LogicalExpression {
 				path = path.substring(0, n);
 			} else if (line.indexOf("</owl:intersectionOf>") != -1) {
 				if (path.indexOf("|U|C|I|") != -1) {
-					role_vec.add("Role Group ends");
+					role_vec.add("or");
 				}
 				int n = path.lastIndexOf("I");
 				path = path.substring(0, n);
@@ -208,6 +211,66 @@ public class OWL2LogicalExpression {
 		}
 		return role_vec;
 	}
+
+/*
+Raw Logical Expression Data:
+        (1) P|C3720
+        (2) Role Group starts
+        (3) E|C|I|C|U|C|I|R|R114$C27711
+        (4) E|C|I|C|U|C|I|R|R89$C36706
+        (5) Role Group ends
+        (6) Role Group starts
+        (7) E|C|I|C|U|C|I|R|R114$C36435
+        (8) E|C|I|C|U|C|I|R|R89$C36707
+        (9) Role Group ends
+        (10) Role Group starts
+        (11) E|C|I|C|U|C|I|R|R114$C36436
+        (12) E|C|I|C|U|C|I|R|R89$C36708
+        (13) Role Group ends
+        (14) Role Group starts
+        (15) E|C|I|C|U|C|I|R|R114$C36437
+        (16) E|C|I|C|U|C|I|R|R89$C36711
+        (17) Role Group ends
+        (18) Role Group starts
+        (19) E|C|I|C|U|C|I|R|R114$C36590
+        (20) E|C|I|C|U|C|I|R|R89$C37216
+        (21) Role Group ends
+        (22) Role Group starts
+        (23) E|C|I|C|U|C|I|R|R114$C36591
+        (24) E|C|I|C|U|C|I|R|R89$C38348
+        (25) Role Group ends
+        (26) Role Group starts
+        (27) E|C|I|C|U|C|I|R|R114$C45439
+        (28) E|C|I|C|U|C|I|R|R89$C45442
+        (29) Role Group ends
+        (30) Role Group starts
+        (31) E|C|I|C|U|C|I|R|R114$C45440
+        (32) E|C|I|C|U|C|I|R|R89$C45443
+        (33) Role Group ends
+        (34) Role Group starts
+        (35) E|C|I|C|U|C|I|R|R114$C45441
+        (36) E|C|I|C|U|C|I|R|R89$C45444
+        (37) Role Group ends
+        (38) E|C|I|R|R104$C39687
+        (39) E|C|I|R|R105$C39679
+        (40) E|C|I|R|R106$C37208
+        (41) E|C|I|R|R106$C81946
+        (42) E|C|I|R|R113$C37024
+        (43) E|C|I|R|R113$C37026
+        (44) E|C|I|R|R113$C39680
+        (45) E|C|I|R|R115$C36156
+        (46) E|C|I|R|R115$C39695
+        (47) E|C|I|R|R115$C50764
+        (48) E|C|I|R|R176$C101046
+        (49) E|C|I|R|R176$C101059
+        (50) E|C|I|R|R176$C101075
+        (51) E|C|I|R|R176$C101083
+        (52) E|C|I|R|R176$C101085
+        (53) E|C|I|R|R176$C38184
+        (54) E|C|I|R|R176$C99361
+        (55) E|C|I|R|R176$C99869
+        (56) E|C|I|R|R176$C99873
+*/
 
     public Vector appendRoleRange(String codefile) {
 		long ms = System.currentTimeMillis();
@@ -242,28 +305,61 @@ public class OWL2LogicalExpression {
         return w0;
     }
 
+/*
+Modified Logical Expression Data:
+	(1) P|C3720
+	(2) Role Group starts
+	(3) E|C|I|C|U|C|I|R|R114$C27711
+	(4) E|C|I|C|U|C|I|R|R89$C36706
+	(5) or
+	(6) E|C|I|C|U|C|I|R|R114$C36435
+	(7) E|C|I|C|U|C|I|R|R89$C36707
+	(8) or
+	(9) E|C|I|C|U|C|I|R|R114$C36436
+	(10) E|C|I|C|U|C|I|R|R89$C36708
+	(11) or
+	(12) E|C|I|C|U|C|I|R|R114$C36437
+	(13) E|C|I|C|U|C|I|R|R89$C36711
+	(14) or
+	(15) E|C|I|C|U|C|I|R|R114$C36590
+	(16) E|C|I|C|U|C|I|R|R89$C37216
+	(17) or
+	(18) E|C|I|C|U|C|I|R|R114$C36591
+	(19) E|C|I|C|U|C|I|R|R89$C38348
+	(20) or
+	(21) E|C|I|C|U|C|I|R|R114$C45439
+	(22) E|C|I|C|U|C|I|R|R89$C45442
+	(23) or
+	(24) E|C|I|C|U|C|I|R|R114$C45440
+	(25) E|C|I|C|U|C|I|R|R89$C45443
+	(26) or
+	(27) E|C|I|C|U|C|I|R|R114$C45441
+	(28) E|C|I|C|U|C|I|R|R89$C45444
+	(29) Role Group ends
+	(30) E|C|I|R|R104$C39687
+	(31) E|C|I|R|R105$C39679
+	(32) E|C|I|R|R106$C37208
+	(33) E|C|I|R|R106$C81946
+	(34) E|C|I|R|R113$C37024
+	(35) E|C|I|R|R113$C37026
+	(36) E|C|I|R|R113$C39680
+	(37) E|C|I|R|R115$C36156
+	(38) E|C|I|R|R115$C39695
+	(39) E|C|I|R|R115$C50764
+	(40) E|C|I|R|R176$C101046
+	(41) E|C|I|R|R176$C101059
+	(42) E|C|I|R|R176$C101075
+	(43) E|C|I|R|R176$C101083
+	(44) E|C|I|R|R176$C101085
+	(45) E|C|I|R|R176$C38184
+	(46) E|C|I|R|R176$C99361
+	(47) E|C|I|R|R176$C99869
+	(48) E|C|I|R|R176$C99873
+	*/
+
+
+
     public static HashMap sortLogicalExpressionData(Vector v) {
-		/*
-C27781.owl:
-        (1) P|C3194
-        (2) Role Group starts
-        (3) E|C|I|C|U|C|I|R|R114$C36317
-        (4) E|C|I|C|U|C|I|R|R89$C37238
-        (5) Role Group ends
-        (6) Role Group starts
-        (7) E|C|I|C|U|C|I|R|R114$C36374
-        (8) E|C|I|C|U|C|I|R|R89$C45472
-        (9) Role Group ends
-        (10) E|C|I|C|U|R|R176$C99200
-        (11) E|C|I|C|U|R|R176$C99279
-        (12) E|C|I|R|R105$C36975
-        (13) E|C|I|R|R105$C48916
-        (14) E|C|I|R|R108$C35899
-        (15) E|C|I|R|R108$C35998
-        (16) E|C|I|R|R108$C41457
-        (17) E|C|I|R|R108$C48917
-        (18) E|C|I|R|R176$C92539
-        */
         HashMap hmap = new HashMap();
         hmap.put("Parent", new Vector());
         hmap.put("Role Group", new Vector());
@@ -277,7 +373,7 @@ C27781.owl:
 			String line = (String) v.elementAt(i);
 			if (line.indexOf("Role Group starts") != -1) {
 				start = true;
-
+				rg_buf = new StringBuffer();
 			} else if (line.indexOf("Role Group ends") != -1) {
 				String s = rg_buf.toString();
 				if (s.length() > 0) {
@@ -293,24 +389,30 @@ C27781.owl:
 				rg_buf = new StringBuffer();
 			}
 			if (start) {
-				if (line.indexOf("Role Group starts") == -1) {
+				if (line.compareTo("or") == 0) {
+					//do nothing
+				} else if (line.compareTo("Role Group starts") == 0) {
+					//do nothing
+				} else if (line.indexOf("|U|C|I|R|") != -1) {
 					int n = line.lastIndexOf("R");
 					String role = line.substring(n, line.length());
 					rg_buf.append(role).append("|");
 				}
-			} else if (line.startsWith("P|")) {
-				Vector u = StringUtils.parseData(line, '|');
-				String role = (String) u.elementAt(1);
-				w = (Vector) hmap.get("Parent");
-				w.add(role);
-				hmap.put("Parent", w);
-			} else if (!line.startsWith("P|") && line.indexOf("|U|C|I|R|") == -1) {
-				if (line.indexOf("Role Group ends") == -1) {
+			} else {
+				if (line.startsWith("P|")) {
 					Vector u = StringUtils.parseData(line, '|');
-					String role = (String) u.elementAt(u.size()-1);
-					w = (Vector) hmap.get("Role");
+					String role = (String) u.elementAt(1);
+					w = (Vector) hmap.get("Parent");
 					w.add(role);
-					hmap.put("Role", w);
+					hmap.put("Parent", w);
+				} else if (!line.startsWith("P|") && line.indexOf("|U|C|I|R|") == -1) {
+					if (line.indexOf("Role Group ends") == -1) {
+						Vector u = StringUtils.parseData(line, '|');
+						String role = (String) u.elementAt(u.size()-1);
+						w = (Vector) hmap.get("Role");
+						w.add(role);
+						hmap.put("Role", w);
+					}
 				}
 			}
 		}
@@ -539,18 +641,46 @@ C27781.owl:
 		return run(class_data_vec, false);
 	}
 
+	public static Vector modifyLogicalExpressionData(Vector v) {
+		boolean role_group_exists = false;
+		if (v.contains("Role Group starts")) {
+			role_group_exists = true;
+		}
+		if (!role_group_exists) return v;
+		for (int i=0; i<v.size(); i++) {
+			int j = v.size()-1-i;
+			String line = (String) v.elementAt(j);
+			if (line.compareTo("or") == 0) {
+				v.setElementAt("Role Group ends", j);
+				break;
+			}
+		}
+		return v;
+	}
+
     public static String run(Vector class_data_vec, boolean debug) {
 		String expression = null;
 		OWL2LogicalExpression test = new OWL2LogicalExpression();
         Vector logicalExpressionData = test.getLogicalExpressionData(class_data_vec);
+        if (debug) {
+			Utils.dumpVector("Raw Logical Expression Data", logicalExpressionData);
+		}
+		logicalExpressionData = test.modifyLogicalExpressionData(logicalExpressionData);
+        if (debug) {
+			Utils.dumpVector("Modified Logical Expression Data", logicalExpressionData);
+		}
         HashMap hmap = test.sortLogicalExpressionData(logicalExpressionData);
-        if (debug) Utils.dumpMultiValuedHashMap("Logical Expression Data", hmap);
+        if (debug) {
+			Utils.dumpMultiValuedHashMap("Sorted Logical Expression Data", hmap);
+		}
         boolean bool = test.validateRoleGroups(hmap);
         if (!bool){
         	System.out.println("WARNING: validateRoleGroups returns: " + bool);
 		} else {
 			hmap = test.formatLogicalExpression(hmap);
-			if (debug) Utils.dumpMultiValuedHashMap("formatted LogicalExpressionData", hmap);
+			if (debug) {
+				Utils.dumpMultiValuedHashMap("formatted LogicalExpressionData", hmap);
+			}
 			expression = test.getLogicalExpression(hmap);
  		}
 		return expression;
@@ -565,7 +695,10 @@ C27781.owl:
 		long ms = System.currentTimeMillis();
 		OWL2LogicalExpression test = new OWL2LogicalExpression();
 		String owlfile = args[0];
-		String expression = test.run(owlfile);
+		//String expression = test.run(owlfile);
+
+		String expression = run(Utils.readFile(owlfile), true);
+
 		int n = owlfile.indexOf(".");
 		String code = owlfile.substring(0, n);
 		String label = test.getLabel(code);
