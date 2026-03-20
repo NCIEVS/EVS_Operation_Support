@@ -115,7 +115,7 @@ public class LogicalExpressionGenerator {
 	}
 
     public HashMap getQueries(String named_graph, String code) {
-		return le.getQueries(named_graph, code, PATHS);
+		return le.getQueries(named_graph, code);
 	}
 
     public void dumpLogicalExpressionDataMap(HashMap hmap) {
@@ -142,8 +142,7 @@ public class LogicalExpressionGenerator {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public HashMap getLogicalExpressionData(String named_graph, String code) {
-        HashMap hmap = le.getLogicalExpressionData(named_graph, code, PATHS);
-        //dumpLogicalExpressionDataMap(hmap);
+        HashMap hmap = le.getLogicalExpressionData(named_graph, code);
         return hmap;
 	}
 
