@@ -100,9 +100,9 @@ public class LogicalExpressionGenerator {
         PATHS.add("E|I|O|U|O|R");
         PATHS.add("E|I|O|U|O|I|O|R");
 
-        formatter = new LogicalExpressionFormatter();
-        formatter.setRangeMaps(roleName2RangeNameMap, roleCode2RangeNameMap);
-        formatter.setpaths(PATHS);
+        formatter = new LogicalExpressionFormatter(roleCode2RangeNameMap, roleName2RangeNameMap);
+        //formatter.setRangeMaps(roleName2RangeNameMap, roleCode2RangeNameMap);
+        //formatter.setpaths(PATHS);
 	}
 
     public LogicalExpressionGenerator() {
@@ -147,8 +147,8 @@ public class LogicalExpressionGenerator {
 	}
 
     public String getLogicalExpression(String named_graph, String code) {
-        HashMap hmap = getLogicalExpressionData(named_graph, code);
-        String expression = formatter.getLogicalExpression(hmap);
+        //HashMap hmap = getLogicalExpressionData(named_graph, code);
+        String expression = formatter.getLogialExpression(le, named_graph, code);
         return expression;
 	}
 
