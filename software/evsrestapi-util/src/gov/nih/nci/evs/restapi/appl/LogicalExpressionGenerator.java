@@ -72,7 +72,7 @@ import org.json.*;
 
 public class LogicalExpressionGenerator {
 	HashMap rangeHashMap = null;
-	LogicalExpression le = null;
+	gov.nih.nci.evs.restapi.appl.LogicalExpression le = null;
 	HashMap code2LabelMap = null;
 	HashMap roleName2RangeNameMap = null;
 	HashMap roleCode2RangeNameMap = null;
@@ -88,7 +88,7 @@ public class LogicalExpressionGenerator {
 
 		try {
 			code2LabelMap = generateLabelHashMap(named_graph);//loadOrGenerateLabelHashMap(named_graph);
-			le = new LogicalExpression(serviceUrl, named_graph, username, password);
+			le = new gov.nih.nci.evs.restapi.appl.LogicalExpression(serviceUrl, named_graph, username, password);
 			roleCode2RangeNameMap = le.getRoleCode2RangeNameMap();
 			roleName2RangeNameMap = le.getRoleName2RangeNameMap();
 		} catch (Exception ex) {
@@ -274,6 +274,22 @@ public class LogicalExpressionGenerator {
 		}
 		return w;
 	}
+
+
+	public void run(String code) {
+		String named_graph = ConfigurationController.namedGraph;
+		Vector w = new Vector();
+		String label = (String) code2LabelMap.get(code);
+		Vector output_vec = new Vector();
+		output_vec.add("Logical expression of " + label + " (" + code + ")");
+		String expression = getLogicalExpression(named_graph, code);
+		output_vec.add(expression);
+		//add version (Source; NCI Thesaurus, version )
+		w.addAll(output_vec);
+		String outputfile = code + ".txt";
+		Utils.saveToFile(outputfile, w);
+	}
+
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();

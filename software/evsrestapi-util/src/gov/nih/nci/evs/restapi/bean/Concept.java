@@ -72,6 +72,19 @@ public class Concept
 	public Concept() {
 	}
 
+	public Concept(
+		String label,
+		String code) {
+		this.idx = 0;
+		this.codingScheme = null;
+		this.version = null;
+		this.label = label;
+		this.code = code;
+		this.cui = null;
+		this.aui = null;
+		this.sab = null;
+	}
+
 // Constructor
 	public Concept(
 		int idx,

@@ -203,6 +203,31 @@ public class LogicalExpression {
 		return new SortUtils().quickSort(v);
 	}
 
+	public String construct_get_subproperty(String named_graph) {
+		String prefixes = owlSPARQLUtils.getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		buf.append("select distinct ?p1_label ?p1_code ?p2_label ?p2_code").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
+		buf.append("where  { ").append("\n");
+		buf.append("      ?p1 :NHC0 ?p1_code .   ").append("\n");
+		buf.append("      ?p1 rdfs:label ?p1_label . ").append("\n");
+		buf.append("      ?p2 :NHC0 ?p2_code .   ").append("\n");
+		buf.append("      ?p2 rdfs:label ?p2_label . ").append("\n");
+		buf.append("      ?p2 rdfs:subPropertyOf ?p1 .").append("\n");
+		buf.append("}").append("\n");
+		buf.append("").append("\n");
+		return buf.toString();
+	}
+
+	public Vector getSubproperty(String named_graph) {
+		String query = construct_get_subproperty(named_graph);
+		Vector v = owlSPARQLUtils.executeQuery(query);
+		if (v == null) return null;
+		if (v.size() == 0) return v;
+		return new SortUtils().quickSort(v);
+	}
+
 	public String construct_get_parents(String named_graph, String code) {
 		String prefixes = owlSPARQLUtils.getPrefixes();
 		StringBuffer buf = new StringBuffer();
