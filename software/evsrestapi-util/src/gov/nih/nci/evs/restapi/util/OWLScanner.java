@@ -1474,6 +1474,29 @@ C4910|<NHC0>C4910</NHC0>
 		return hmap;
 	}
 
+	public Vector scanSubproperties(Vector v) { //v: class_vec parent prop code|child prop code
+		Vector w = new Vector();
+		String line1 = (String) v.elementAt(0);
+		String line2 = (String) v.elementAt(1);
+/*
+    <owl:ObjectProperty rdf:about="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#R153">
+        <rdfs:subPropertyOf rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#R132"/>
+*/
+		for (int i=2; i<v.size(); i++) {
+			if (line1.indexOf("<owl:ObjectProperty ") != -1 && line2.indexOf("rdfs:subPropertyOf") != -1) {
+				int n = line1.lastIndexOf("#");
+				String childCode = line1.substring(n+1, line1.length()-2);
+				n = line2.lastIndexOf("#");
+				String parentCode = line2.substring(n+1, line2.length()-3);
+				w.add(parentCode + "|" + childCode);
+			}
+			line1 = line2;
+			line2 = (String) v.elementAt(i);
+		}
+		return w;
+	}
+
+
     public Vector extractOWLDisjointWith(Vector class_vec) {
         Vector w = new Vector();
         boolean istart = false;
