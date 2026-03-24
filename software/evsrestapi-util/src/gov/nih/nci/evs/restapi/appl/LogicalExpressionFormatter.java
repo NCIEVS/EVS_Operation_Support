@@ -75,7 +75,8 @@ public class LogicalExpressionFormatter {
 	HashMap roleCode2RangeNameMap = null;
 	static HashMap roleDataMap = null;
 	static HashMap range2ExpressionMap = null;
-	static String RANGE_RESULT = "range_results.txt";
+	//static String RANGE_RESULT = "range_results.txt";
+	static String RANGE_UNSPECIFIED = "[Range Unspecified]";
 
 	public LogicalExpressionFormatter(HashMap roleCode2RangeNameMap, HashMap roleName2RangeNameMap) {
 		this.roleName2RangeNameMap = roleName2RangeNameMap;
@@ -195,8 +196,8 @@ public class LogicalExpressionFormatter {
 					}
 				}
 				for (int k=0; k<list.size()/2; k++) {
-					Restriction r1 = (Restriction) list.get(k);
-					Restriction r2 = (Restriction) list.get(k+1);
+					Restriction r1 = (Restriction) list.get(2*k);
+					Restriction r2 = (Restriction) list.get(2*k+1);
 					RolePair rp = new RolePair(r1, r2);
 					rp_list.add(rp);
 				}
@@ -330,6 +331,29 @@ public class LogicalExpressionFormatter {
 		return true;
 	}
 
+
+	public Vector findRangesParticipatingInRoleUnionOrGroup(RoleGroup rg) {
+		//ROLE GROUP --> Disease_May_Have_Abnormal_Cell	Neoplastic B-Immunoblast (C37010)|Disease_May_Have_Associated_Disease	Immunoblastic Lymphoma (C3461)|Disease_May_Have_Abnormal_Cell	Neoplastic Centroblast (C37014)|Disease_May_Have_Associated_Disease	Centroblastic Lymphoma (C4074)|Disease, Disorder or Finding
+		Vector w = new Vector();
+		List<RolePair> pairs = rg.getRolePairs();
+		for (int j=0; j<pairs.size(); j++) {
+			RolePair rp = (RolePair) pairs.get(j);
+			Restriction r1 = (Restriction) rp.getRole1();
+			Restriction r2 = (Restriction) rp.getRole2();
+			String roleCode = r1.getRoleCode();
+			String range = (String) roleCode2RangeNameMap.get(roleCode);
+			if (!w.contains(range)) {
+				w.add(range);
+			}
+			roleCode = r2.getRoleCode();
+			range = (String) roleCode2RangeNameMap.get(roleCode);
+			if (!w.contains(range)) {
+				w.add(range);
+			}
+		}
+		return new SortUtils().quickSort(w);
+	}
+
     public LogicalExpressionElement getLogicalExpressionElement(HashMap hmap, String range) {
 		Vector roles = (Vector) hmap.get("ROLE");
 		List<Restriction> simpleRoleList = new ArrayList();
@@ -341,6 +365,8 @@ public class LogicalExpressionFormatter {
 				simpleRoleList.add(r);
 			}
 		}
+
+		System.out.println("*************** ROLE UNION ***************");
 		Vector roleUnions = (Vector) hmap.get("ROLE UNION");
 		List<RoleUnion> roleUnion_list = new ArrayList();
 		List roleList = new ArrayList();
@@ -364,19 +390,36 @@ public class LogicalExpressionFormatter {
 				}
 			}
 		}
-
 		Vector roleGroups = (Vector) hmap.get("ROLE GROUP");
+		/*
+		for (int i=0; i<roleGroups.size(); i++) {
+			RoleGroup rg = (RoleGroup) roleGroups.elementAt(i);
+			System.out.println(rg.toJson());
+		}
+		*/
 		List<RoleGroup> roleGroup_list = new ArrayList();
 		if (roleGroups != null && roleGroups.size() > 0) {
 			//List<RoleGroup> roleGroup_list = new ArrayList();
 			for (int i=0; i<roleGroups.size(); i++) {
 				RoleGroup rg = (RoleGroup) roleGroups.elementAt(i);
+				Vector range_vec = findRangesParticipatingInRoleUnionOrGroup(rg);
+				/*
 				List<RolePair> pairs = rg.getRolePairs();
 				RolePair rp = (RolePair) pairs.get(0);
 				Restriction r1 = rp.getRole1();
 				String label = (String) r1.getRoleLabel();
 				String range_3 = (String) roleName2RangeNameMap.get(label);
 				if (range_3.compareTo(range) == 0) {
+					roleGroup_list.add(rg);
+				}
+				*/
+				String range_3 = null;
+				if (range_vec.size() == 1) {
+					range_3 = (String) range_vec.elementAt(0);
+					if (range_3.compareTo(range) == 0) {
+						roleGroup_list.add(rg);
+					}
+				} else if (range.compareTo(RANGE_UNSPECIFIED) == 0) {
 					roleGroup_list.add(rg);
 				}
 			}
@@ -392,11 +435,12 @@ public class LogicalExpressionFormatter {
 
     public String getLogialExpression(gov.nih.nci.evs.restapi.appl.LogicalExpression le, String named_graph, String code) {
 		HashMap hmap = le.getLogicalExpressionData(named_graph, code);
-
 		hmap = parseLogicalExpressionData(hmap);
-		//Utils.dumpMultiValuedHashMap(roledatafile, hmap);
 		boolean bool = valiateRangesInLEData(hmap);
 		Vector ranges = findRangesInLEData(hmap);
+		ranges.add(RANGE_UNSPECIFIED);
+		//Utils.dumpVector("ranges", ranges);
+
 		ranges = new SortUtils().quickSort(ranges);
 		List<LogicalExpressionElement> elements = new ArrayList();
 		for (int i=0; i<ranges.size(); i++) {
@@ -416,7 +460,7 @@ public class LogicalExpressionFormatter {
 		String expression = null;
 		StringBuffer buf = new StringBuffer();
 		buf.append("\nLogical Expression of " + logicalExpression.getLabel() + " (" + logicalExpression.getCode() + ")").append("\n\n");
-		buf.append("Parent(s)").append("\n");
+		buf.append("\nParent(s)").append("\n");
 		for (int i=0; i<parents.size(); i++) {
 			Concept c = (Concept) parents.get(i);
 			buf.append(toString(c)).append("\n");
@@ -424,12 +468,22 @@ public class LogicalExpressionFormatter {
         elements = logicalExpression.getElements();
         for (int i=0; i<ranges.size(); i++) {
 			String range = (String) ranges.elementAt(i);
+			int knt = 0;
 			for (int j=0; j<elements.size(); j++) {
 				LogicalExpressionElement element = elements.get(j);
 				String range_e = element.getRange();
 				if (range_e.compareTo(range) == 0) {
-					String s = toString(element);
-					buf.append(s).append("\n");
+					knt++;
+				}
+			}
+			if (knt > 0) {
+				for (int j=0; j<elements.size(); j++) {
+					LogicalExpressionElement element = elements.get(j);
+					String range_e = element.getRange();
+					if (range_e.compareTo(range) == 0) {
+						String s = toString(element);
+						buf.append(s).append("\n");
+					}
 				}
 			}
 		}
@@ -463,7 +517,7 @@ public class LogicalExpressionFormatter {
 			RoleGroup rg = (RoleGroup) obj;
 			List<RolePair> pairs = rg.getRolePairs();
 			StringBuffer buf = new StringBuffer();
-			buf.append("\n\t").append("Role Group(s)").append("\n");
+			buf.append("Role Group(s)").append("\n");
 			for (int k=0; k<pairs.size(); k++) {
 				RolePair rp = (RolePair) pairs.get(k);
 				Restriction r1 = rp.getRole1();
@@ -477,32 +531,36 @@ public class LogicalExpressionFormatter {
 				           + " (" + r2.getTargetCode()
 				           + ")").append("\n");
 				if (k<pairs.size()-1) {
-					buf.append("\t\t").append("or").append("\n");
+					buf.append("\t").append("or").append("\n");
 				}
 			}
 			return buf.toString();
 		} else if (obj instanceof LogicalExpressionElement) {
 			LogicalExpressionElement e = (LogicalExpressionElement) obj;
+			List<Restriction> roles = e.getRoles();
+			List<RoleUnion> unions = e.getRoleUnions();
+			List<RoleGroup> groups = e.getRoleGroups();
 			StringBuffer buf = new StringBuffer();
-			buf.append("\n").append(e.getRange()).append("\n");
-            List<Restriction> roles = e.getRoles();
-            for (int i=0; i<roles.size(); i++) {
-				Restriction r = roles.get(i);
-				String s = toString(r);
-				buf.append("\t").append(s).append("\n");
-			}
-            List<RoleUnion> unions = e.getRoleUnions();
-            for (int i=0; i<unions.size(); i++) {
-				RoleUnion ru = unions.get(i);
-				String s = toString(ru);
-				buf.append("\t").append(s).append("\n");
-			}
+			if (roles.size() > 0 || unions.size() > 0 || groups.size() > 0) {
+				buf.append("\n").append(e.getRange()).append("\n");
 
-            List<RoleGroup> groups = e.getRoleGroups();
-            for (int i=0; i<groups.size(); i++) {
-				RoleGroup rg = groups.get(i);
-				String s = toString(rg);
-				buf.append("\t").append(s).append("\n");
+				for (int i=0; i<roles.size(); i++) {
+					Restriction r = roles.get(i);
+					String s = toString(r);
+					buf.append("\t").append(s).append("\n");
+				}
+
+				for (int i=0; i<unions.size(); i++) {
+					RoleUnion ru = unions.get(i);
+					String s = toString(ru);
+					buf.append("\t").append(s).append("\n");
+				}
+
+				for (int i=0; i<groups.size(); i++) {
+					RoleGroup rg = groups.get(i);
+					String s = toString(rg);
+					buf.append("\t").append(s).append("\n");
+				}
 			}
 
 			String s = buf.toString();
