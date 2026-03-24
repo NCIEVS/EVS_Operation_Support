@@ -1,8 +1,6 @@
 package gov.nih.nci.evs.restapi.appl;
 import gov.nih.nci.evs.restapi.util.*;
-import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.config.*;
-
 
 import java.io.*;
 import java.io.BufferedReader;
@@ -141,16 +139,7 @@ public class LogicalExpressionGenerator {
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public HashMap getLogicalExpressionData(String named_graph, String code) {
-        HashMap hmap = le.getLogicalExpressionData(named_graph, code);
-        return hmap;
-	}
 
-    public String getLogicalExpression(String named_graph, String code) {
-        //HashMap hmap = getLogicalExpressionData(named_graph, code);
-        String expression = formatter.getLogialExpression(le, named_graph, code);
-        return expression;
-	}
 
 	public static String construct_get_label(String prefixes, String named_graph) {
         StringBuffer buf = new StringBuffer();
@@ -275,6 +264,15 @@ public class LogicalExpressionGenerator {
 		return w;
 	}
 
+    public HashMap getLogicalExpressionData(String named_graph, String code) {
+        HashMap hmap = le.getLogicalExpressionData(named_graph, code);
+        return hmap;
+	}
+
+    public String getLogicalExpression(String named_graph, String code) {
+        String expression = formatter.getLogialExpression(le, named_graph, code);
+        return expression;
+	}
 
 	public void run(String code) {
 		String named_graph = ConfigurationController.namedGraph;
@@ -290,9 +288,31 @@ public class LogicalExpressionGenerator {
 		Utils.saveToFile(outputfile, w);
 	}
 
+	public void appendRangeToFile(String filename) {
+		Vector v = Utils.readFile(filename);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line0 = (String) v.elementAt(i);
+			String line = line0;
+			line = line.trim();
+			Vector u = StringUtils.parseData(line, '\t');
+			//Utils.dumpVector(line0, u);
+			if (u.size() > 1) {
+				String roleName = (String) u.elementAt(0);
+				String range = (String) roleName2RangeNameMap.get(roleName);
+				line0 = line0 + "\t\t(Range: " + range + ")";
+			}
+			w.add(line0);
+		}
+		int n = filename.lastIndexOf(".");
+		String outputfile = filename.substring(0, n) + "_with_ranges.txt";
+		Utils.saveToFile(outputfile, w);
+	}
+
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
+		LogicalExpressionGenerator test = new LogicalExpressionGenerator();
 		String filename = args[0];
         Vector codes = Utils.readFile(filename);
         System.out.println("codes: " + codes.size());
@@ -303,11 +323,12 @@ public class LogicalExpressionGenerator {
 			codes = extract_column_data(filename, 0, '|');
 		}
 		codes = removeDuplicats(codes, false);
-        LogicalExpressionGenerator test = new LogicalExpressionGenerator();
+
         Vector w = test.run(codes);
         int n = filename.lastIndexOf(".");
         String name = filename.substring(0, n);
         Utils.saveToFile("logical_expression_" + name + "_" + StringUtils.getToday() + ".txt", w);
+        //test.appendRangeToFile(filename);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
