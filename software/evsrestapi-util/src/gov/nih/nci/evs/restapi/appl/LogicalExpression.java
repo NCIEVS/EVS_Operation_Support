@@ -376,14 +376,13 @@ public class LogicalExpression {
         if (v != null && v.size() > 0) {
         	hmap.put("ROLE GROUP", v);
 		}
-
-System.out.println("++++++++++++++++++++++++++++++++++++++++");
-
+/*
 		Iterator it = hmap.keySet().iterator();
 		while (it.hasNext()) {
 			String key = (String) it.next();
 			System.out.println(key);
 		}
+*/
         return hmap;
 	}
 
@@ -477,9 +476,12 @@ System.out.println("++++++++++++++++++++++++++++++++++++++++");
 		StringBuffer buf2 = new StringBuffer();
 		buf2.append("\n\t").append("Role Group(s)").append("\n");
 		Vector role_group_vec = StringUtils.parseData(role_group_line, '|');
+
+		//Utils.dumpVector(role_group_line, role_group_vec);
+
 		for (int k=0; k<role_group_vec.size()/2; k++) {
-			buf2.append("\t\t").append((String) role_group_vec.elementAt(k)).append("\n");
-			buf2.append("\t\t").append((String) role_group_vec.elementAt(k+1)).append("\n");
+			buf2.append("\t\t").append((String) role_group_vec.elementAt(2*k)).append("\n");
+			buf2.append("\t\t").append((String) role_group_vec.elementAt(2*k+1)).append("\n");
 			if (k<role_group_vec.size()/2 - 1) {
 				buf2.append("\t").append("or").append("\n");
 			}
@@ -489,7 +491,7 @@ System.out.println("++++++++++++++++++++++++++++++++++++++++");
 
 	public HashMap generateRange2RoleGroupExpressionMap(Vector role_group_vec) {
 		if (role_group_vec == null || role_group_vec.size() == 0) {
-			System.out.println("INFO: role_group_vec == null || role_group_vec.size() == 0 return null");
+			System.out.println("INFO: role_group_vec == null || role_group_vec.size() == 0 return null\n");
 			return null;
 		}
 		HashMap expressionMap = new HashMap();
@@ -526,7 +528,7 @@ System.out.println("++++++++++++++++++++++++++++++++++++++++");
 
 	public HashMap generateRange2RoleUnionExpressionMap(Vector role_union_vec) {
 		if (role_union_vec == null || role_union_vec.size() == 0) {
-			System.out.println("INFO: role_union_vec == null || role_union_vec.size() == 0 return null");
+			System.out.println("INFO: role_union_vec == null || role_union_vec.size() == 0 return null\n");
 			return null;
 		}
 		HashMap expressionMap = new HashMap();
@@ -624,7 +626,7 @@ System.out.println("++++++++++++++++++++++++++++++++++++++++");
 			range2RolesHashMap.put(range, w);
 		}
 
-// multiple_role_groups:
+// ROLE GROUP:
         Vector multiple_role_groups = (Vector) hmap.get("ROLE GROUP");
         HashMap range2RoleGroupExpressionMap = null;
         range2RoleGroupExpressionMap = generateRange2RoleGroupExpressionMap(multiple_role_groups);
@@ -642,6 +644,13 @@ System.out.println("++++++++++++++++++++++++++++++++++++++++");
 			}
 		}
 
+        Iterator it3 = range2RolesHashMap.keySet().iterator();
+        while (it3.hasNext()) {
+			String key = (String) it3.next();
+			Vector v4 = (Vector) range2RolesHashMap.get(key);
+		}
+
+// ROLE UNION:
 		Vector role_unions = (Vector) hmap.get("ROLE UNION");
         HashMap range2RoleUnionExpressionMap = null;
         range2RoleUnionExpressionMap = generateRange2RoleUnionExpressionMap(role_unions);
@@ -771,9 +780,11 @@ System.out.println("++++++++++++++++++++++++++++++++++++++++");
 				String roleCode = (String) u.elementAt(6);
 				String roleTargetCode = (String) u.elementAt(7);
 				String roleTargetName = (String) u.elementAt(8);
+
 				range = (String) roleCode2RangeNameMap.get(roleCode);
 				id2RangeMap.put(id, range);
-				w2.add(roleName + "\t" + roleTargetName + " (" + roleTargetCode + ")");
+				String s = roleName + "\t" + roleTargetName + " (" + roleTargetCode + ")";
+				w2.add(s);
 				roleGroupId2RolesHashMap.put(id, w2);
 			}
 
@@ -825,8 +836,8 @@ System.out.println("++++++++++++++++++++++++++++++++++++++++");
 				knt++;
 			}
 		}
-		System.out.println("Total number of roles: " + roleCode2RangeNameMap.keySet().size());
-		System.out.println("Number of roles with a range: " + knt);
+		//System.out.println("Total number of roles: " + roleCode2RangeNameMap.keySet().size());
+		//System.out.println("Number of roles with a range: " + knt);
 		return w;
 	}
 
@@ -851,7 +862,7 @@ System.out.println("++++++++++++++++++++++++++++++++++++++++");
         String expression = test.run(named_graph, code);
 
         String label = test.getLabelByCode(named_graph, code);
-        System.out.println("Logical expression of the concept: " + label + " (" + code + ")");
+        System.out.println("Logical expression of: " + label + " (" + code + ")");
         System.out.println(expression);
 	}
 }
