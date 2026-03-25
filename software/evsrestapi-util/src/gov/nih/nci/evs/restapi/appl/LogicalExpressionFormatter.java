@@ -3,7 +3,6 @@ import gov.nih.nci.evs.restapi.util.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.config.*;
 
-
 import java.io.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -366,7 +365,6 @@ public class LogicalExpressionFormatter {
 			}
 		}
 
-		System.out.println("*************** ROLE UNION ***************");
 		Vector roleUnions = (Vector) hmap.get("ROLE UNION");
 		List<RoleUnion> roleUnion_list = new ArrayList();
 		List roleList = new ArrayList();
@@ -382,37 +380,16 @@ public class LogicalExpressionFormatter {
 						roleList.add(r);
 					}
 				}
-				if (roleList.size() > 1) {
-					RoleUnion ru_i = new RoleUnion(roleList);
-					roleUnion_list.add(ru_i);
-				} else if (roleList.size() == 1) {
-					simpleRoleList.add((Restriction) roleList.get(0));
-				}
+				RoleUnion ru_i = new RoleUnion(roleList);
+				roleUnion_list.add(ru_i);
 			}
 		}
 		Vector roleGroups = (Vector) hmap.get("ROLE GROUP");
-		/*
-		for (int i=0; i<roleGroups.size(); i++) {
-			RoleGroup rg = (RoleGroup) roleGroups.elementAt(i);
-			System.out.println(rg.toJson());
-		}
-		*/
 		List<RoleGroup> roleGroup_list = new ArrayList();
 		if (roleGroups != null && roleGroups.size() > 0) {
-			//List<RoleGroup> roleGroup_list = new ArrayList();
 			for (int i=0; i<roleGroups.size(); i++) {
 				RoleGroup rg = (RoleGroup) roleGroups.elementAt(i);
 				Vector range_vec = findRangesParticipatingInRoleUnionOrGroup(rg);
-				/*
-				List<RolePair> pairs = rg.getRolePairs();
-				RolePair rp = (RolePair) pairs.get(0);
-				Restriction r1 = rp.getRole1();
-				String label = (String) r1.getRoleLabel();
-				String range_3 = (String) roleName2RangeNameMap.get(label);
-				if (range_3.compareTo(range) == 0) {
-					roleGroup_list.add(rg);
-				}
-				*/
 				String range_3 = null;
 				if (range_vec.size() == 1) {
 					range_3 = (String) range_vec.elementAt(0);
@@ -439,7 +416,6 @@ public class LogicalExpressionFormatter {
 		boolean bool = valiateRangesInLEData(hmap);
 		Vector ranges = findRangesInLEData(hmap);
 		ranges.add(RANGE_UNSPECIFIED);
-		//Utils.dumpVector("ranges", ranges);
 
 		ranges = new SortUtils().quickSort(ranges);
 		List<LogicalExpressionElement> elements = new ArrayList();

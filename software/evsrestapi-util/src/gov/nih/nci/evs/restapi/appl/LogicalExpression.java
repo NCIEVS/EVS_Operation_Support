@@ -396,92 +396,6 @@ public class LogicalExpression {
         return hmap;
 	}
 
-    public static HashMap sortLogicalExpressionData(Vector v) {
-        HashMap hmap = new HashMap();
-        hmap.put("Parent", new Vector());
-        hmap.put("Role Group", new Vector());
-        hmap.put("Role", new Vector());
-        hmap.put("Role Union", new Vector());
-
-        boolean start = false;
-        //search for role groups
-        Vector w = new Vector();
-        StringBuffer rg_buf = new StringBuffer();
-
-        for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			if (line.indexOf("Role Group starts") != -1) {
-				start = true;
-				rg_buf = new StringBuffer();
-			} else if (line.indexOf("Role Group ends") != -1) {
-				String s = rg_buf.toString();
-				if (s.length() > 0) {
-					if (s.endsWith("|")) {
-						s = s.substring(0, s.length()-1);
-					}
-					w = (Vector) hmap.get("Role Group");
-					w.add(s);
-					hmap.put("Role Group", w);
-					rg_buf = new StringBuffer();
-				}
-				start = false;
-				rg_buf = new StringBuffer();
-			}
-			if (start) {
-				if (line.compareTo("or") == 0) {
-					//do nothing
-				} else if (line.compareTo("Role Group starts") == 0) {
-					//do nothing
-				} else if (line.indexOf("|U|C|I|R|") != -1) {
-					int n = line.lastIndexOf("R");
-					String role = line.substring(n, line.length());
-					rg_buf.append(role).append("|");
-				}
-			} else {
-				if (line.startsWith("P|")) {
-					Vector u = StringUtils.parseData(line, '|');
-					String role = (String) u.elementAt(1);
-					w = (Vector) hmap.get("Parent");
-					w.add(role);
-					hmap.put("Parent", w);
-				} else if (!line.startsWith("P|") && line.indexOf("|U|C|I|R|") == -1) {
-					if (line.indexOf("Role Group ends") == -1) {
-						//|U|R| Role Union
-						if (line.indexOf("|U|R|") == -1) {
-							Vector u = StringUtils.parseData(line, '|');
-							String role = (String) u.elementAt(u.size()-1);
-							w = (Vector) hmap.get("Role");
-							w.add(role);
-							hmap.put("Role", w);
-						}
-					}
-				}
-			}
-		}
-		StringBuffer ru_buf = new StringBuffer();
-        for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			if (line.indexOf("|U|R") != -1) {
-				Vector u = StringUtils.parseData(line, '|');
-				String role = (String) u.elementAt(u.size()-1);
-				int n = line.lastIndexOf("R");
-				role = line.substring(n, line.length());
-				ru_buf.append(role).append("|");
-			}
-		}
-		String s = ru_buf.toString();
-		if (s.length() > 0) {
-			if (s.endsWith("|")) {
-				s = s.substring(0, s.length()-1);
-			}
-			w = (Vector) hmap.get("Role Union");
-			w.add(s);
-			hmap.put("Role Union", w);
-		}
-        return hmap;
-	}
-
-
     public String generateRoleGroupExpression(String role_group_line) {
 		StringBuffer buf2 = new StringBuffer();
 		buf2.append("Role Group(s)").append("\n");
@@ -598,7 +512,7 @@ public class LogicalExpression {
 					value = (String) u.elementAt(0);
 					if (value.indexOf("Role Group") == -1) {
 						knt++;
-						buf.append("\t" + value).append("\n");
+						buf.append("\t\t" + value).append("\n");
 					}
 				}
 				//Role groups
@@ -659,7 +573,7 @@ public class LogicalExpression {
 			String roleName = (String) u.elementAt(4);
 			String roleTargetName = (String) u.elementAt(7);
 			String range = (String) roleCode2RangeNameMap.get(roleCode);
-			w.add(roleName + "\t" + roleTargetName + " (" + roleTargetCode + ")" + "|" + range);
+			w.add(roleName + "\t\t" + roleTargetName + " (" + roleTargetCode + ")" + "|" + range);
 		}
 		w = new SortUtils().quickSort(w);
 		map.put("ROLE", w);
@@ -794,10 +708,10 @@ public class LogicalExpression {
         Vector w = new Vector();
 
         if (parents != null && parents.size() > 0) {
-			buf.append("Parent").append("\n");
+			buf.append("Parent(s)").append("\n");
 			for (int i=0; i<parents.size(); i++) {
 				String line = (String) parents.elementAt(i);
-				parent_vec.add("\t" + line);
+				parent_vec.add("\t\t" + line);
 			}
 		}
 		parent_vec = new SortUtils().quickSort(parent_vec);
