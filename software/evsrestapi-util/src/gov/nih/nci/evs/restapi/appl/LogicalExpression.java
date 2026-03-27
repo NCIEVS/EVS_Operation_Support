@@ -396,18 +396,25 @@ public class LogicalExpression {
         return hmap;
 	}
 
+
     public String generateRoleGroupExpression(String role_group_line) {
-		StringBuffer buf2 = new StringBuffer();
-		buf2.append("Role Group(s)").append("\n");
-		Vector role_group_vec = StringUtils.parseData(role_group_line, '|');
-		for (int k=0; k<role_group_vec.size()/2; k++) {
-			buf2.append("\t\t").append((String) role_group_vec.elementAt(2*k)).append("\n");
-			buf2.append("\t\t").append((String) role_group_vec.elementAt(2*k+1)).append("\n");
-			if (k<role_group_vec.size()/2 - 1) {
+		StringBuffer buf = new StringBuffer();
+		buf.append("\n\tRole Group").append("\n");
+		Vector role_collection_vec = StringUtils.parseData(role_group_line, '$');
+		for (int i=0; i<role_collection_vec.size()-1; i++) { // last element is range
+			String role_collection = (String) role_collection_vec.elementAt(i);
+			StringBuffer buf2 = new StringBuffer();
+			Vector roles = StringUtils.parseData(role_collection, '|');
+			for (int k=0; k<roles.size(); k++) {
+				buf2.append("\t\t").append((String) roles.elementAt(k)).append("\n");
+			}
+			if (i<role_collection_vec.size()-2) {
 				buf2.append("\t").append("or").append("\n");
 			}
+			String s = buf2.toString();
+			buf.append(s);
 		}
-		return buf2.toString();
+		return buf.toString();
 	}
 
 	public Vector findRangesParticipatingInRoleUnionOrGroup(String role_group_line) {
@@ -456,9 +463,9 @@ public class LogicalExpression {
 		buf2.append("\n");
 		Vector role_union_vec = StringUtils.parseData(role_union_line, '|');
 		for (int k=0; k<role_union_vec.size()-1; k++) {
-			buf2.append("\t").append((String) role_union_vec.elementAt(k)).append("\n");
+			buf2.append("\t\t").append((String) role_union_vec.elementAt(k)).append("\n");
 			if (k<role_union_vec.size() - 2) {
-				buf2.append("\t").append("or").append("\n");
+				buf2.append("\t\t").append("or").append("\n");
 			}
 		}
 		return buf2.toString();
@@ -600,7 +607,7 @@ public class LogicalExpression {
 				String roleTargetName = (String) u.elementAt(7);
 				range = (String) roleCode2RangeNameMap.get(roleCode);
 				id2RangeMap.put(id, range);
-				w2.add(roleName + "\t" + roleTargetName + " (" + roleTargetCode + ")");
+				w2.add(roleName + "\t\t" + roleTargetName + " (" + roleTargetCode + ")");
 				roleUnionId2RolesHashMap.put(id, w2);
 			}
 
@@ -621,53 +628,75 @@ public class LogicalExpression {
 			}
 		}
 
+//		buf.append("select distinct ?x_code ?x_label ?u1 ?i1 ?rs ?p_label ?p_code ?y_code ?y_label").append("\n");
+//key: ?u1 ?i1
 		w = new Vector();
 		v = (Vector) hmap.get("ROLE GROUP");
 		if (v != null && v.size() > 0) {
 			HashMap roleGroupId2RolesHashMap = new HashMap();
-			String range = null;
-			HashMap id2RangeMap = new HashMap();
 			for (int i=0; i<v.size(); i++) {
 				String line = (String) v.elementAt(i);
 				Vector u = StringUtils.parseData(line, '|');
-				String id = (String) u.elementAt(2);
-				Vector w2 = new Vector();
-				if (roleGroupId2RolesHashMap.containsKey(id)) {
-					w2 = (Vector) roleGroupId2RolesHashMap.get(id);
+				String rg_id = (String) u.elementAt(2);
+				String collection_id = (String) u.elementAt(2) + "|" + (String) u.elementAt(3);
+				HashMap collection_map = new HashMap();
+				if (roleGroupId2RolesHashMap.containsKey(rg_id)) {
+					collection_map = (HashMap) roleGroupId2RolesHashMap.get(rg_id);
 				}
+				Vector role_vec = new Vector();
+				if (collection_map.containsKey(collection_id)) {
+					role_vec = (Vector) collection_map.get(collection_id);
+				}
+
 				String roleName = (String) u.elementAt(5);
 				String roleCode = (String) u.elementAt(6);
 				String roleTargetCode = (String) u.elementAt(7);
 				String roleTargetName = (String) u.elementAt(8);
-
-				range = (String) roleCode2RangeNameMap.get(roleCode);
-
-				//////////////////////////////////////////////////////////////////////////
-				id2RangeMap.put(id, range);
-				//////////////////////////////////////////////////////////////////////////
-
 				String s = roleName + "\t" + roleTargetName + " (" + roleTargetCode + ")";
-				w2.add(s);
-				roleGroupId2RolesHashMap.put(id, w2);
+				role_vec.add(s);
+				collection_map.put(collection_id, role_vec);
+				roleGroupId2RolesHashMap.put(rg_id, collection_map);
 			}
 
-			Iterator it = roleGroupId2RolesHashMap.keySet().iterator();
+			Iterator it = roleGroupId2RolesHashMap.keySet().iterator(); //rg_id
 			while (it.hasNext()) {
-				String id = (String) it.next();
-				StringBuffer buf = new StringBuffer();
-				Vector w2 = (Vector) roleGroupId2RolesHashMap.get(id);
-				for (int i=0; i<w2.size(); i++) {
-					String displayLabel = (String) w2.elementAt(i);
-					buf.append(displayLabel).append("|");
+				String rg_id = (String) it.next();
+				HashMap collection_map = (HashMap) roleGroupId2RolesHashMap.get(rg_id);
+				HashSet rangeSet = new HashSet();
+                StringBuffer b = new StringBuffer();
+				Iterator it2 = collection_map.keySet().iterator(); // collection_id
+				while (it2.hasNext()) {
+					String collection_id = (String) it2.next();
+					StringBuffer buf = new StringBuffer();
+					Vector w2 = (Vector) collection_map.get(collection_id);
+					for (int i=0; i<w2.size(); i++) {
+						String displayLabel = (String) w2.elementAt(i);
+						Vector u = StringUtils.parseData(displayLabel, '\t');
+						String roleName = (String) u.elementAt(0);
+				        String range = (String) roleName2RangeNameMap.get(roleName);
+				        rangeSet.add(range);
+						buf.append(displayLabel).append("|");
+					}
+					String s = buf.toString();
+					s = s.trim();
+					if (s.endsWith("|")) {
+						s = s.substring(0, s.length()-1);
+					}
+					b.append(s).append("$");
 				}
-
-				//////////////////////////////////////////////////////////////////////////
-				buf.append((String) id2RangeMap.get(id));
-				//////////////////////////////////////////////////////////////////////////
-
-				String s = buf.toString();
+				String s2 = b.toString();
+				if (s2.endsWith("$")) {
+					s2 = s2.substring(0, s2.length()-1);
+				}
+				if (rangeSet.size() == 1) {
+					Iterator it3 = rangeSet.iterator();
+					String rg_range = (String) it3.next();
+					s2 = s2 + "$" + rg_range;
+				} else {
+					s2 = s2 + "$" + RANGE_UNSPECIFIED;
+				}
 				Vector values = (Vector) map.get("ROLE GROUP");
-				values.add(s);
+				values.add(s2);
 				map.put("ROLE GROUP", values);
 			}
 		}
@@ -677,7 +706,6 @@ public class LogicalExpression {
     public String run(String named_graph, String code, boolean debug) {
 		String expression = null;
         HashMap hmap = getLogicalExpressionData(named_graph, code);
-
         if (debug) {
 			Utils.dumpMultiValuedHashMap("Raw Logical Expression Data", hmap);
 		}
@@ -746,7 +774,6 @@ public class LogicalExpression {
             Iterator it = range2RoleUnionExpressionMap.keySet().iterator();
             while (it.hasNext()) {
 				String range = (String) it.next();
-				System.out.println("RANGE: " + range);
 				Vector roleExpression_vec = (Vector) range2RoleUnionExpressionMap.get(range);
 				w = new Vector();
 				if (range2RolesHashMap.containsKey(range)) {
@@ -767,7 +794,6 @@ public class LogicalExpression {
             Iterator it = range2RoleGroupExpressionMap.keySet().iterator();
             while (it.hasNext()) {
 				String range = (String) it.next();
-				System.out.println("RANGE: " + range);
 				Vector roleExpression_vec = (Vector) range2RoleGroupExpressionMap.get(range);
 				w = new Vector();
 				if (range2RolesHashMap.containsKey(range)) {
@@ -777,12 +803,13 @@ public class LogicalExpression {
 			    range2RolesHashMap.put(range, w);
 			}
 		}
-
+        /*
         Iterator it3 = range2RolesHashMap.keySet().iterator();
         while (it3.hasNext()) {
 			String key = (String) it3.next();
 			Vector v4 = (Vector) range2RolesHashMap.get(key);
 		}
+		*/
 		String parentStr = buf.toString();
 		return parentStr + "\n" + range2RolesHashMap2Expression(range2RolesHashMap);
 	}
