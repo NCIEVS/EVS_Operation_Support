@@ -74,7 +74,7 @@ public class LogicalExpressionFormatter {
 	HashMap roleCode2RangeNameMap = null;
 	static HashMap roleDataMap = null;
 	static HashMap range2ExpressionMap = null;
-	//static String RANGE_RESULT = "range_results.txt";
+	static String RANGE_RESULT = "range_results.txt";
 	static String RANGE_UNSPECIFIED = "[Range Unspecified]";
 
 	public LogicalExpressionFormatter(HashMap roleCode2RangeNameMap, HashMap roleName2RangeNameMap) {
@@ -138,32 +138,36 @@ public class LogicalExpressionFormatter {
 			for (int i=0; i<roleunions.size(); i++) {
 				String line = (String) roleunions.elementAt(i);
 				Vector u = StringUtils.parseData(line, '|');
-				if (u.size() > 1) {
-					String id = (String) u.elementAt(2);
-					if (!ids.contains(id)) {
-						ids.add(id);
-					}
+				String id = (String) u.elementAt(2);
+				if (!ids.contains(id)) {
+					ids.add(id);
 				}
 			}
+
+//ROLE UNION --> C27781|Myxoid Liposarcoma|b0|b1|Disease_Mapped_To_Gene|R176|C99200|EWSR1/DDIT3 Fusion Gene
+//ROLE UNION --> C27781|Myxoid Liposarcoma|b0|b2|Disease_Mapped_To_Gene|R176|C99279|FUS/DDIT3 Fusion Gene
 			for (int i=0; i<ids.size(); i++) {
 				String id = (String) ids.elementAt(i);
 				List<Restriction> list = new ArrayList();
 				for (int j=0; j<roleunions.size(); j++) {
 					String line = (String) roleunions.elementAt(j);
 					Vector u = StringUtils.parseData(line, '|');
-					if (u.size() > 2) {
-						String line_id = (String) u.elementAt(2);
-						if (line_id.compareTo(id) == 0) {
-							Restriction r = line2Restriction(line);
-							list.add(r);
-						}
+					String line_id = (String) u.elementAt(2);
+					if (line_id.compareTo(id) == 0) {
+						Restriction r = line2Restriction(line);
+						list.add(r);
 					}
 				}
 				RoleUnion ru = new RoleUnion(list);
+
+				System.out.println(ru.toJson());
+
 				w.add(ru);
 			}
 			map.put("ROLE UNION", w);
 		}
+
+/////////////////////////////////////////////////////////////////////////////////////////
 		Vector rolegroups = (Vector) hmap.get("ROLE GROUP");
 		if (rolegroups != null && rolegroups.size() > 0) {
 			Vector ids = new Vector();
@@ -171,35 +175,41 @@ public class LogicalExpressionFormatter {
 				String line = (String) rolegroups.elementAt(i);
 				Vector u = StringUtils.parseData(line, '|');
 				if (u.size() > 2) {
-					String id = (String) u.elementAt(2);
+					String id = (String) u.elementAt(2) + "|" + (String) u.elementAt(3);
 					if (!ids.contains(id)) {
 						ids.add(id);
 					}
 				}
 			}
-
 ///////////////////////////////////////////////////////////////////////////////
 			w = new Vector();
 			List<RoleSet> list = new ArrayList();
 			for (int i=0; i<ids.size(); i++) {
 				String id = (String) ids.elementAt(i);
+				System.out.println(id);
 
 				List<Restriction> restrictions = new ArrayList();
 				for (int j=0; j<rolegroups.size(); j++) {
 					String line = (String) rolegroups.elementAt(j);
 					Vector u = StringUtils.parseData(line, '|');
-					if (u.size() > 2) {
-						String line_id = (String) u.elementAt(2);
-						if (line_id.compareTo(id) == 0) {
-							Restriction r = line2Restriction(line);
-							restrictions.add(r);
-						}
+
+					String line_id = (String) u.elementAt(2) + "|" + (String) u.elementAt(3);
+
+					if (line_id.compareTo(id) == 0) {
+						System.out.println("lineID: " + line_id);
+						Restriction r = line2Restriction(line);
+						System.out.println(r.toJson());
+						restrictions.add(r);
 					}
 				}
 				RoleSet set = new RoleSet(restrictions);
+				System.out.println(set.toJson());
+
 				list.add(set);
 			}
 			RoleGroup rg = new RoleGroup(list);
+			System.out.println(rg.toJson());
+
 			w.add(rg);
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -209,12 +219,18 @@ public class LogicalExpressionFormatter {
 	}
 
 	public Vector findRangesInLEData(HashMap hmap) {
+
+System.out.println("********************** 	findRangesInLEData 	**********************");
+
 		Vector ranges = new Vector();
+
 		Vector roles = (Vector) hmap.get("ROLE");
 		Vector roleUnions = (Vector) hmap.get("ROLE UNION");
 		Vector roleGroups = (Vector) hmap.get("ROLE GROUP");
+
 		for (int i=0; i<roles.size(); i++) {
 			Restriction r = (Restriction) roles.elementAt(i);
+			System.out.println(r.toJson());
 			if (r == null) {
 				System.out.println("ERROR r = null???");
 			}
@@ -227,10 +243,11 @@ public class LogicalExpressionFormatter {
 		if (roleUnions != null && roleUnions.size() > 0) {
 			for (int i=0; i<roleUnions.size(); i++) {
 				RoleUnion ru = (RoleUnion) roleUnions.elementAt(i);
+				System.out.println(ru.toJson());
 				List<Restriction> restrictions = ru.getRoles();
 				for (int j=0; j<restrictions.size(); j++) {
 					Restriction r = (Restriction) restrictions.get(j);
-					//System.out.println(r.toJson());
+					System.out.println(r.toJson());
 					String label = (String) r.getRoleLabel();
 					String range = (String) roleName2RangeNameMap.get(label);
 					if (!ranges.contains(range)) {
@@ -239,17 +256,57 @@ public class LogicalExpressionFormatter {
 				}
 			}
 		}
+
+/*
+{
+  "roleSets": [
+    {
+      "roles": [
+        {
+          "sourceCode": "C27781",
+          "sourceLabel": "Myxoid Liposarcoma",
+          "roleCode": "R114",
+          "roleLabel": "Disease_May_Have_Cytogenetic_Abnormality",
+          "targetCode": "C36317",
+          "targetLabel": "t(12;16)(q13;p11)"
+        },
+        {
+          "sourceCode": "C27781",
+          "sourceLabel": "Myxoid Liposarcoma",
+          "roleCode": "R89",
+          "roleLabel": "Disease_May_Have_Molecular_Abnormality",
+          "targetCode": "C37238",
+          "targetLabel": "FUS-DDIT3 Fusion Protein Expression"
+        }
+      ]
+    },
+    {
+      "roles": [
+        {
+          "sourceCode": "C27781",
+          "sourceLabel": "Myxoid Liposarcoma",
+          "roleCode": "R114",
+          "roleLabel": "Disease_May_Have_Cytogenetic_Abnormality",
+          "targetCode": "C36374",
+          "targetLabel": "t(12;22)(q13;q12)"
+        },
+*/
+
 		if (roleGroups != null && roleGroups.size() > 0) {
+
+			System.out.println("roleGroups.size(): " + roleGroups.size());
+
 			for (int i=0; i<roleGroups.size(); i++) {
 				RoleGroup rg = (RoleGroup) roleGroups.elementAt(i);
 				List<RoleSet> roleSets = rg.getRoleSets();
 				for (int k=0; k<roleSets.size(); k++) {
 					RoleSet set = (RoleSet) roleSets.get(k);
-					List list = set.getRoles();
+					List<Restriction> list = set.getRoles();
 					for (int m=0; m<list.size(); m++) {
 						Restriction r1 = (Restriction) list.get(m);
 						String label = (String) r1.getRoleLabel();
 						String range = (String) roleName2RangeNameMap.get(label);
+						System.out.println(range);
 						if (!ranges.contains(range)) {
 							ranges.add(range);
 						}
@@ -285,8 +342,42 @@ public class LogicalExpressionFormatter {
 		return true;
 	}
 
-	public boolean roleGroupwithMultipleRanges(HashMap hmap) {
-		Vector roleGroups = (Vector) hmap.get("ROLE GROUP");
+
+    public Vector findRangesInRoleUnion(RoleUnion ru) {
+		Vector ranges = new Vector();
+		List<Restriction> restrictions = ru.getRoles();
+		for (int j=0; j<restrictions.size(); j++) {
+			Restriction r1 = (Restriction) restrictions.get(j);
+			String label = (String) r1.getRoleLabel();
+			String range = (String) roleName2RangeNameMap.get(label);
+			if (!ranges.contains(range)) {
+				ranges.add(range);
+			}
+		}
+		return ranges;
+	}
+
+    public Vector findRangesInRoleGroup(RoleGroup rg) {
+		Vector ranges = new Vector();
+		List<RoleSet> roleSets = rg.getRoleSets();
+		for (int j=0; j<roleSets.size(); j++) {
+			RoleSet set = (RoleSet) roleSets.get(j);
+			List restrictions = set.getRoles();
+			for (int k=0; k<restrictions.size(); k++) {
+				Restriction r1 = (Restriction) restrictions.get(k);
+				String label = (String) r1.getRoleLabel();
+				String range = (String) roleName2RangeNameMap.get(label);
+				if (!ranges.contains(range)) {
+					ranges.add(range);
+				}
+			}
+		}
+		return ranges;
+	}
+
+
+
+    public Vector findRangesInRoleGroups(Vector roleGroups) {
 		Vector ranges = new Vector();
 		if (roleGroups != null && roleGroups.size() > 0) {
 			for (int i=0; i<roleGroups.size(); i++) {
@@ -306,31 +397,24 @@ public class LogicalExpressionFormatter {
 				}
 			}
 		}
-		if (ranges.size() > 1) return false;
+		if (ranges.size() == 0) {
+			ranges.add(RANGE_UNSPECIFIED);
+		}
+		return ranges;
+	}
+
+	public boolean roleGroupwithMultipleRanges(HashMap hmap) {
+		Vector roleGroups = (Vector) hmap.get("ROLE GROUP");
+		Vector ranges = findRangesInRoleGroups(roleGroups);
+		if (ranges != null && ranges.size() > 1) return false;
 		return true;
 	}
 
-
-	public Vector findRangesParticipatingInRoleUnionOrGroup(RoleGroup rg) {
-		//ROLE GROUP --> Disease_May_Have_Abnormal_Cell	Neoplastic B-Immunoblast (C37010)|Disease_May_Have_Associated_Disease	Immunoblastic Lymphoma (C3461)|Disease_May_Have_Abnormal_Cell	Neoplastic Centroblast (C37014)|Disease_May_Have_Associated_Disease	Centroblastic Lymphoma (C4074)|Disease, Disorder or Finding
-		Vector w = new Vector();
-		List<RoleSet> sets = rg.getRoleSets();
-		for (int j=0; j<sets.size(); j++) {
-			RoleSet rs = (RoleSet) sets.get(j);
-			List<Restriction> restrictions = rs.getRoles();
-            for (int i=0; i<restrictions.size(); i++) {
-				Restriction r = restrictions.get(i);
-				String roleCode = r.getRoleCode();
-				String range = (String) roleCode2RangeNameMap.get(roleCode);
-				if (!w.contains(range)) {
-					w.add(range);
-				}
-			}
-		}
-		return new SortUtils().quickSort(w);
-	}
-
     public LogicalExpressionElement getLogicalExpressionElement(HashMap hmap, String range) {
+
+
+System.out.println(	"@@@@@@@@ getLogicalExpressionElement " + range);
+
 		Vector roles = (Vector) hmap.get("ROLE");
 		List<Restriction> simpleRoleList = new ArrayList();
 		for (int i=0; i<roles.size(); i++) {
@@ -348,36 +432,36 @@ public class LogicalExpressionFormatter {
 		if (roleUnions != null && roleUnions.size() > 0) {
 			for (int i=0; i<roleUnions.size(); i++) {
 				RoleUnion ru = (RoleUnion) roleUnions.elementAt(i);
-				List<Restriction> restrictions = ru.getRoles();
-				for (int j=0; j<restrictions.size(); j++) {
-					Restriction r = (Restriction) restrictions.get(0);
-					String label = (String) r.getRoleLabel();
-					String range_2 = (String) roleName2RangeNameMap.get(label);
-					if (range_2.compareTo(range) == 0) {
-						roleList.add(r);
+				Vector ranges = findRangesInRoleUnion(ru);
+
+				if (ranges.size() > 1 && range.compareTo(RANGE_UNSPECIFIED) == 0) {
+					roleUnion_list.add(ru);
+			    } else {
+					String range_1 = (String) ranges.elementAt(0);
+					if (range_1.compareTo(range) == 0) {
+						roleUnion_list.add(ru);
 					}
 				}
-				RoleUnion ru_i = new RoleUnion(roleList);
-				roleUnion_list.add(ru_i);
 			}
 		}
 
 		Vector roleGroups = (Vector) hmap.get("ROLE GROUP");
 		List<RoleGroup> roleGroup_list = new ArrayList();
-		if (roleGroups != null && roleGroups.size() > 0) {
-			for (int i=0; i<roleGroups.size(); i++) {
-				RoleGroup rg = (RoleGroup) roleGroups.elementAt(i);
-				Vector range_vec = findRangesParticipatingInRoleUnionOrGroup(rg);
-				String range_3 = null;
-				if (range_vec.size() == 1) {
-					range_3 = (String) range_vec.elementAt(0);
-					if (range_3.compareTo(range) == 0) {
-						roleGroup_list.add(rg);
-					}
-				} else if (range.compareTo(RANGE_UNSPECIFIED) == 0) {
+		for (int i=0; i<roleGroups.size(); i++) {
+			RoleGroup rg = (RoleGroup) roleGroups.elementAt(i);
+			Vector range_vec = findRangesInRoleGroup(rg);
+			if (range_vec != null && range_vec.size() == 1 && range.compareTo((String) range_vec.elementAt(0)) == 0) {
+				roleGroup_list.add(rg);
+			} else if (range_vec == null || range_vec.size() == 0) {
+				if (range.compareTo(RANGE_UNSPECIFIED) == 0) {
 					roleGroup_list.add(rg);
 				}
 			}
+		}
+
+		if (simpleRoleList.size() == 0 && roleUnion_list.size() == 0 && roleGroup_list.size() == 0) {
+			System.out.println("INFO getLogicalExpressionElement " + range + " returns null.");
+			return null;
 		}
 
 		LogicalExpressionElement e = new LogicalExpressionElement(
@@ -385,35 +469,99 @@ public class LogicalExpressionFormatter {
 			roleUnion_list,
 			roleGroup_list,
 			range);
+
+
+		System.out.println("******************** DEBUG **************\n" + e.toJson());
+		if (simpleRoleList.size() == 0 && roleUnion_list.size() == 0 && roleGroup_list.size() == 0) {
+			System.out.println("INFON getLogicalExpressionElement " + range + " returns null.");
+			return null;
+		}
 		return e;
 	}
 
-    public String getLogicalExpression(gov.nih.nci.evs.restapi.appl.LogicalExpression le, String named_graph, String code) {
-		HashMap hmap = le.getLogicalExpressionData(named_graph, code);
+	public String getLogicalExpression(HashMap hmap) {
+		Vector w = (Vector) hmap.get("ROLE");
+		if (w == null) w = (Vector) hmap.get("ROLE GROUP");
+		if (w == null) w = (Vector) hmap.get("ROLE UNION");
+		Vector u = StringUtils.parseData((String) w.elementAt(0), '|');
+		String code = (String) u.elementAt(0);
+		String label = (String) u.elementAt(1);
 		hmap = parseLogicalExpressionData(hmap);
-
-		//boolean bool = valiateRangesInLEData(hmap);
-
 		Vector ranges = findRangesInLEData(hmap);
-
 		ranges.add(RANGE_UNSPECIFIED);
-
 		ranges = new SortUtils().quickSort(ranges);
 		List<LogicalExpressionElement> elements = new ArrayList();
 		for (int i=0; i<ranges.size(); i++) {
 			String range = (String) ranges.elementAt(i);
 			LogicalExpressionElement e = getLogicalExpressionElement(hmap, range);
-			elements.add(e);
+			if (e != null) {
+				elements.add(e);
+			}
+		}
+
+		//String label = le.getLabelByCode(named_graph, code);
+		List parents = (List) hmap.get("PARENT");
+
+		gov.nih.nci.evs.restapi.bean.LogicalExpression logicalExpression
+			= new gov.nih.nci.evs.restapi.bean.LogicalExpression(
+				  code, label, parents, elements, null); // null: expression not populated yet
+		System.out.println(logicalExpression.toJson());
+
+		String expression = null;
+		StringBuffer buf = new StringBuffer();
+		buf.append("\nLogical Expression of " + logicalExpression.getLabel() + " (" + logicalExpression.getCode() + ")").append("\n\n");
+		buf.append("\nParent(s)").append("\n");
+		for (int i=0; i<parents.size(); i++) {
+			Concept c = (Concept) parents.get(i);
+			buf.append(toString(c)).append("\n");
+		}
+		elements = logicalExpression.getElements();
+		for (int i=0; i<ranges.size(); i++) {
+			String range = (String) ranges.elementAt(i);
+			int knt = 0;
+			for (int j=0; j<elements.size(); j++) {
+				LogicalExpressionElement element = elements.get(j);
+				String range_e = element.getRange();
+				if (range_e.compareTo(range) == 0) {
+					knt++;
+				}
+			}
+			if (knt > 0) {
+				for (int j=0; j<elements.size(); j++) {
+					LogicalExpressionElement element = elements.get(j);
+					String range_e = element.getRange();
+					if (range_e.compareTo(range) == 0) {
+						String s = toString(element);
+						buf.append(s).append("\n");
+					}
+				}
+			}
+		}
+		expression = buf.toString();
+		return expression;
+	}
+
+
+    public String getLogicalExpression(gov.nih.nci.evs.restapi.appl.LogicalExpression le, String named_graph, String code) {
+		HashMap hmap = le.getLogicalExpressionData(named_graph, code);
+		hmap = parseLogicalExpressionData(hmap);
+		Vector ranges = findRangesInLEData(hmap);
+		ranges.add(RANGE_UNSPECIFIED);
+		ranges = new SortUtils().quickSort(ranges);
+		List<LogicalExpressionElement> elements = new ArrayList();
+		for (int i=0; i<ranges.size(); i++) {
+			String range = (String) ranges.elementAt(i);
+			LogicalExpressionElement e = getLogicalExpressionElement(hmap, range);
+			if (e != null) {
+				elements.add(e);
+			}
 		}
 
 		String label = le.getLabelByCode(named_graph, code);
 		List parents = (List) hmap.get("PARENT");
-
 		gov.nih.nci.evs.restapi.bean.LogicalExpression logicalExpression
 		    = new gov.nih.nci.evs.restapi.bean.LogicalExpression(
 			      code, label, parents, elements, null); // null: expression not populated yet
-		System.out.println(logicalExpression.toJson());
-
 		String expression = null;
 		StringBuffer buf = new StringBuffer();
 		buf.append("\nLogical Expression of " + logicalExpression.getLabel() + " (" + logicalExpression.getCode() + ")").append("\n\n");
@@ -533,69 +681,112 @@ public class LogicalExpressionFormatter {
         return expression;
 	}
 
-    public static void main(String[] args) {
+	public static HashMap loadRawLogicalExpressionData(String filename) {
+		HashMap hmap = new HashMap();
+		Vector v = Utils.readFile(filename);
+		String key = "PARENT";
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, ' ');
+			if (u.size() > 1) {
+				if (line.indexOf(" --> ") != -1) {
+					line = line.replace(" --> ", "$");
+				} else {
+					line = line.replace(" ", "$");
+				}
+				u = StringUtils.parseData(line, '$');
+				key = (String) u.elementAt(0);
+				line = (String) u.elementAt(1);
+				Vector w = new Vector();
+				if (hmap.containsKey(key)) {
+					w = (Vector) hmap.get(key);
+				}
+				w.add(line);
+				hmap.put(key, w);
+			} else {
+				u = StringUtils.parseData(line, '|');
+				if (key.compareTo("PARENT") == 0 && u.size() == 8) {
+					key = "ROLE";
+				} else if (key.compareTo("PARENT") == 0 && u.size() == 9) {
+					key = "ROLE GROUP";
+				} else if (key.compareTo("ROLE") == 0 && u.size() == 9) {
+					key = "ROLE GROUP";
+				} else if (key.compareTo("ROLE GROUP") == 0 && u.size() != 9) {
+					key = "ROLE UNION";
+				}
+
+				Vector w = new Vector();
+				if (hmap.containsKey(key)) {
+					w = (Vector) hmap.get(key);
+				}
+				w.add(line);
+				hmap.put(key, w);
+			}
+		}
+		return hmap;
+	}
+
+	public static HashMap getRoleCode2RangeNameMap() {
+		HashMap hmap = new HashMap();
+		Vector v = Utils.readFile(RANGE_RESULT);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.trim();
+			int n = line.indexOf(")");
+			if (n != -1) {
+				line = line.substring(n+1, line.length());
+			}
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(0);
+			String rangeName = (String) u.elementAt(3);
+			hmap.put(code, rangeName);
+		}
+		return hmap;
+	}
+
+	public static HashMap getRoleName2RangeNameMap() {
+		HashMap hmap = new HashMap();
+		Vector v = Utils.readFile(RANGE_RESULT);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.trim();
+			int n = line.indexOf(")");
+			if (n != -1) {
+				line = line.substring(n+1, line.length());
+			}
+			Vector u = StringUtils.parseData(line, '|');
+			String name = (String) u.elementAt(1);
+			String rangeName = (String) u.elementAt(3);
+			hmap.put(name, rangeName);
+		}
+		return hmap;
+	}
+
+    public static String run(String param) {
 		String serviceUrl = ConfigurationController.serviceUrl;
 		String named_graph =  ConfigurationController.namedGraph;
 		String username =  ConfigurationController.username;
 		String password =  ConfigurationController.password;
-		String code = args[0];
-		gov.nih.nci.evs.restapi.appl.LogicalExpression le = new gov.nih.nci.evs.restapi.appl.LogicalExpression(serviceUrl, named_graph, username, password);
-		String expression = run(le, named_graph, code);
+
+		String expression = null;
+		if (param.endsWith(".txt")) {
+        	LogicalExpressionFormatter formatter = new LogicalExpressionFormatter(getRoleCode2RangeNameMap(), getRoleName2RangeNameMap());
+			String rawdatafile = param;
+			HashMap hmap = loadRawLogicalExpressionData(rawdatafile);
+			Utils.dumpMultiValuedHashMap(rawdatafile, hmap);
+			expression = formatter.getLogicalExpression(hmap);
+
+		} else {
+		    gov.nih.nci.evs.restapi.appl.LogicalExpression le = new gov.nih.nci.evs.restapi.appl.LogicalExpression(serviceUrl, named_graph, username, password);
+		    String code = param;
+		    expression = run(le, named_graph, code);
+		}
+		return expression;
+	}
+
+    public static void main(String[] args) {
+		String param = args[0];
+		String expression = run(param);
 		System.out.println(expression);
-		/*
-        LogicalExpressionFormatter formatter = new LogicalExpressionFormatter(le.getRoleCode2RangeNameMap(), le.getRoleName2RangeNameMap());
-		String code = args[0];
-        String expression = formatter.getLogicalExpression(le, named_graph, code);
-        System.out.println(expression);
-        */
 	}
 }
-
-/*
-    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\build.xml:35: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
-    [javac] Compiling 372 source files to C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\build
-    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:204: error: incompatible types: List<RolePair> cannot be converted to List<RoleSet>
-    [javac]                             RoleGroup rg = new RoleGroup(rp_list);
-    [javac]                                                          ^
-    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:250: error: cannot find symbol
-    [javac]                             List<RolePair> pairs = rg.getRolePairs();
-    [javac]                                                      ^
-    [javac]   symbol:   method getRolePairs()
-    [javac]   location: variable rg of type RoleGroup
-    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:300: error: cannot find symbol
-    [javac]                             List<RolePair> pairs = rg.getRolePairs();
-    [javac]                                                      ^
-    [javac]   symbol:   method getRolePairs()
-    [javac]   location: variable rg of type RoleGroup
-    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:344: error: cannot find symbol
-    [javac]             for (int i=0; i<rs.size(); i++) {
-    [javac]                               ^
-    [javac]   symbol:   method size()
-    [javac]   location: variable rs of type RoleSet
-    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:345: error: cannot find symbol
-    [javac]                             List<Restriction> r = rs.get(i);
-    [javac]                                                     ^
-    [javac]   symbol:   method get(int)
-    [javac]   location: variable rs of type RoleSet
-    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:346: error: cannot find symbol
-    [javac]                             String roleCode = r.getRoleCode();
-    [javac]                                                ^
-    [javac]   symbol:   method getRoleCode()
-    [javac]   location: variable r of type List<Restriction>
-    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:495: error: cannot find symbol
-    [javac]                     List<RolePair> pairs = rg.getRolePairs();
-    [javac]                                              ^
-    [javac]   symbol:   method getRolePairs()
-    [javac]   location: variable rg of type RoleGroup
-    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionGenerator.java:273: error: cannot find symbol
-    [javac]         String expression = formatter.getLogialExpression(le, named_graph, code);
-    [javac]                                      ^
-    [javac]   symbol:   method getLogialExpression(LogicalExpression,String,String)
-    [javac]   location: variable formatter of type LogicalExpressionFormatter
-    [javac] Note: Some input files use or override a deprecated API.
-    [javac] Note: Recompile with -Xlint:deprecation for details.
-    [javac] Note: Some input files use unchecked or unsafe operations.
-    [javac] Note: Recompile with -Xlint:unchecked for details.
-    [javac] Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
-    [javac] 8 errors
-*/

@@ -803,13 +803,6 @@ public class LogicalExpression {
 			    range2RolesHashMap.put(range, w);
 			}
 		}
-        /*
-        Iterator it3 = range2RolesHashMap.keySet().iterator();
-        while (it3.hasNext()) {
-			String key = (String) it3.next();
-			Vector v4 = (Vector) range2RolesHashMap.get(key);
-		}
-		*/
 		String parentStr = buf.toString();
 		return parentStr + "\n" + range2RolesHashMap2Expression(range2RolesHashMap);
 	}
