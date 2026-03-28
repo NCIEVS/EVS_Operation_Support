@@ -270,7 +270,7 @@ public class LogicalExpressionGenerator {
 	}
 
     public String getLogicalExpression(String named_graph, String code) {
-        String expression = formatter.getLogialExpression(le, named_graph, code);
+        String expression = formatter.run(le, named_graph, code);
         return expression;
 	}
 

@@ -178,11 +178,13 @@ public class LogicalExpressionFormatter {
 				}
 			}
 
+///////////////////////////////////////////////////////////////////////////////
 			w = new Vector();
-			List<Restriction> list = new ArrayList();
+			List<RoleSet> list = new ArrayList();
 			for (int i=0; i<ids.size(); i++) {
 				String id = (String) ids.elementAt(i);
-				List<RolePair> rp_list = new ArrayList();
+
+				List<Restriction> restrictions = new ArrayList();
 				for (int j=0; j<rolegroups.size(); j++) {
 					String line = (String) rolegroups.elementAt(j);
 					Vector u = StringUtils.parseData(line, '|');
@@ -190,20 +192,17 @@ public class LogicalExpressionFormatter {
 						String line_id = (String) u.elementAt(2);
 						if (line_id.compareTo(id) == 0) {
 							Restriction r = line2Restriction(line);
-							list.add(r);
+							restrictions.add(r);
 						}
 					}
 				}
-				for (int k=0; k<list.size()/2; k++) {
-					Restriction r1 = (Restriction) list.get(2*k);
-					Restriction r2 = (Restriction) list.get(2*k+1);
-					RolePair rp = new RolePair(r1, r2);
-					rp_list.add(rp);
-				}
-				RoleGroup rg = new RoleGroup(rp_list);
-				//System.out.println(rg.toJson());
-				w.add(rg);
+				RoleSet set = new RoleSet(restrictions);
+				list.add(set);
 			}
+			RoleGroup rg = new RoleGroup(list);
+			w.add(rg);
+///////////////////////////////////////////////////////////////////////////////
+
 			map.put("ROLE GROUP", w);
 		}
 		return map;
@@ -243,20 +242,17 @@ public class LogicalExpressionFormatter {
 		if (roleGroups != null && roleGroups.size() > 0) {
 			for (int i=0; i<roleGroups.size(); i++) {
 				RoleGroup rg = (RoleGroup) roleGroups.elementAt(i);
-				List<RolePair> pairs = rg.getRolePairs();
-				for (int k=0; k<pairs.size(); k++) {
-					RolePair rp = (RolePair) pairs.get(k);
-					Restriction r1 = rp.getRole1();
-					Restriction r2 = rp.getRole1();
-					String label = (String) r1.getRoleLabel();
-					String range = (String) roleName2RangeNameMap.get(label);
-					if (!ranges.contains(range)) {
-						ranges.add(range);
-					}
-					label = (String) r2.getRoleLabel();
-					range = (String) roleName2RangeNameMap.get(label);
-					if (!ranges.contains(range)) {
-						ranges.add(range);
+				List<RoleSet> roleSets = rg.getRoleSets();
+				for (int k=0; k<roleSets.size(); k++) {
+					RoleSet set = (RoleSet) roleSets.get(k);
+					List list = set.getRoles();
+					for (int m=0; m<list.size(); m++) {
+						Restriction r1 = (Restriction) list.get(m);
+						String label = (String) r1.getRoleLabel();
+						String range = (String) roleName2RangeNameMap.get(label);
+						if (!ranges.contains(range)) {
+							ranges.add(range);
+						}
 					}
 				}
 			}
@@ -264,9 +260,9 @@ public class LogicalExpressionFormatter {
 		return ranges;
 	}
 
-	public boolean valiateRangesInLEData(HashMap hmap) {
+	public boolean roleUnionwithMultipleRanges(HashMap hmap) {
 		Vector roleUnions = (Vector) hmap.get("ROLE UNION");
-		Vector roleGroups = (Vector) hmap.get("ROLE GROUP");
+        Vector ranges = new Vector();
 		if (roleUnions != null && roleUnions.size() > 0) {
 			for (int i=0; i<roleUnions.size(); i++) {
 				RoleUnion ru = (RoleUnion) roleUnions.elementAt(i);
@@ -279,54 +275,38 @@ public class LogicalExpressionFormatter {
 					r = (Restriction) restrictions.get(j);
 					label = (String) r.getRoleLabel();
 					String range_j = (String) roleName2RangeNameMap.get(label);
-					if (range_j.compareTo(range) != 0) {
-						bool = false;
-						break;
+					if (!ranges.contains(range_j)) {
+						ranges.add(range_j);
 					}
-				}
-				if (!bool) {
-					System.out.println("Invalid RoleUnion: ");
-					System.out.println(ru.toJson());
 				}
 			}
 		}
+		if (ranges.size() > 1) return false;
+		return true;
+	}
+
+	public boolean roleGroupwithMultipleRanges(HashMap hmap) {
+		Vector roleGroups = (Vector) hmap.get("ROLE GROUP");
+		Vector ranges = new Vector();
 		if (roleGroups != null && roleGroups.size() > 0) {
 			for (int i=0; i<roleGroups.size(); i++) {
 				RoleGroup rg = (RoleGroup) roleGroups.elementAt(i);
-				List<RolePair> pairs = rg.getRolePairs();
-				RolePair rp = (RolePair) pairs.get(0);
-				Restriction r1 = rp.getRole1();
-				String label = (String) r1.getRoleLabel();
-				String range = (String) roleName2RangeNameMap.get(label);
-				Restriction r2 = rp.getRole2();
-				label = (String) r1.getRoleLabel();
-				String range_2 = (String) roleName2RangeNameMap.get(label);
-				if (range_2.compareTo(range) != 0) {
-					System.out.println("Invalid RoleGroup: ");
-					System.out.println(rg.toJson());
-					return false;
-				}
-				for (int k=1; k<pairs.size(); k++) {
-					rp = (RolePair) pairs.get(k);
-					r1 = rp.getRole1();
-					r2 = rp.getRole1();
-					label = (String) r1.getRoleLabel();
-					range_2 = (String) roleName2RangeNameMap.get(label);
-					if (range_2.compareTo(range) != 0) {
-						System.out.println("Invalid RoleGroup: ");
-						System.out.println(rg.toJson());
-						return false;
-					}
-					label = (String) r2.getRoleLabel();
-					range_2 = (String) roleName2RangeNameMap.get(label);
-					if (range_2.compareTo(range) != 0) {
-						System.out.println("Invalid RoleGroup: ");
-						System.out.println(rg.toJson());
-						return false;
+				List<RoleSet> roleSets = rg.getRoleSets();
+				for (int j=0; j<roleSets.size(); j++) {
+					RoleSet set = (RoleSet) roleSets.get(j);
+					List restrictions = set.getRoles();
+					for (int k=0; k<restrictions.size(); k++) {
+				        Restriction r1 = (Restriction) restrictions.get(k);
+						String label = (String) r1.getRoleLabel();
+						String range = (String) roleName2RangeNameMap.get(label);
+						if (!ranges.contains(range)) {
+							ranges.add(range);
+						}
 					}
 				}
 			}
 		}
+		if (ranges.size() > 1) return false;
 		return true;
 	}
 
@@ -334,20 +314,17 @@ public class LogicalExpressionFormatter {
 	public Vector findRangesParticipatingInRoleUnionOrGroup(RoleGroup rg) {
 		//ROLE GROUP --> Disease_May_Have_Abnormal_Cell	Neoplastic B-Immunoblast (C37010)|Disease_May_Have_Associated_Disease	Immunoblastic Lymphoma (C3461)|Disease_May_Have_Abnormal_Cell	Neoplastic Centroblast (C37014)|Disease_May_Have_Associated_Disease	Centroblastic Lymphoma (C4074)|Disease, Disorder or Finding
 		Vector w = new Vector();
-		List<RolePair> pairs = rg.getRolePairs();
-		for (int j=0; j<pairs.size(); j++) {
-			RolePair rp = (RolePair) pairs.get(j);
-			Restriction r1 = (Restriction) rp.getRole1();
-			Restriction r2 = (Restriction) rp.getRole2();
-			String roleCode = r1.getRoleCode();
-			String range = (String) roleCode2RangeNameMap.get(roleCode);
-			if (!w.contains(range)) {
-				w.add(range);
-			}
-			roleCode = r2.getRoleCode();
-			range = (String) roleCode2RangeNameMap.get(roleCode);
-			if (!w.contains(range)) {
-				w.add(range);
+		List<RoleSet> sets = rg.getRoleSets();
+		for (int j=0; j<sets.size(); j++) {
+			RoleSet rs = (RoleSet) sets.get(j);
+			List<Restriction> restrictions = rs.getRoles();
+            for (int i=0; i<restrictions.size(); i++) {
+				Restriction r = restrictions.get(i);
+				String roleCode = r.getRoleCode();
+				String range = (String) roleCode2RangeNameMap.get(roleCode);
+				if (!w.contains(range)) {
+					w.add(range);
+				}
 			}
 		}
 		return new SortUtils().quickSort(w);
@@ -384,6 +361,7 @@ public class LogicalExpressionFormatter {
 				roleUnion_list.add(ru_i);
 			}
 		}
+
 		Vector roleGroups = (Vector) hmap.get("ROLE GROUP");
 		List<RoleGroup> roleGroup_list = new ArrayList();
 		if (roleGroups != null && roleGroups.size() > 0) {
@@ -410,11 +388,14 @@ public class LogicalExpressionFormatter {
 		return e;
 	}
 
-    public String getLogialExpression(gov.nih.nci.evs.restapi.appl.LogicalExpression le, String named_graph, String code) {
+    public String getLogicalExpression(gov.nih.nci.evs.restapi.appl.LogicalExpression le, String named_graph, String code) {
 		HashMap hmap = le.getLogicalExpressionData(named_graph, code);
 		hmap = parseLogicalExpressionData(hmap);
-		boolean bool = valiateRangesInLEData(hmap);
+
+		//boolean bool = valiateRangesInLEData(hmap);
+
 		Vector ranges = findRangesInLEData(hmap);
+
 		ranges.add(RANGE_UNSPECIFIED);
 
 		ranges = new SortUtils().quickSort(ranges);
@@ -491,22 +472,20 @@ public class LogicalExpressionFormatter {
 
 		} else if (obj instanceof RoleGroup) {
 			RoleGroup rg = (RoleGroup) obj;
-			List<RolePair> pairs = rg.getRolePairs();
+			List<RoleSet> sets = rg.getRoleSets();
 			StringBuffer buf = new StringBuffer();
-			buf.append("Role Group(s)").append("\n");
-			for (int k=0; k<pairs.size(); k++) {
-				RolePair rp = (RolePair) pairs.get(k);
-				Restriction r1 = rp.getRole1();
-				Restriction r2 = rp.getRole1();
-				buf.append("\t\t" + r1.getRoleLabel()
-				           + "\t" + r1.getTargetLabel()
-				           + " (" + r1.getTargetCode()
-				           + ")").append("\n");
-				buf.append("\t\t" + r2.getRoleLabel()
-				           + "\t" + r2.getTargetLabel()
-				           + " (" + r2.getTargetCode()
-				           + ")").append("\n");
-				if (k<pairs.size()-1) {
+			buf.append("Role Group").append("\n");
+			for (int k=0; k<sets.size(); k++) {
+				RoleSet set = (RoleSet) sets.get(k);
+				List<Restriction> list = set.getRoles();
+				for (int m=0; m<list.size(); m++) {
+					Restriction r1 = (Restriction) list.get(m);
+					buf.append("\t\t" + r1.getRoleLabel()
+							   + "\t" + r1.getTargetLabel()
+							   + " (" + r1.getTargetCode()
+							   + ")").append("\n");
+				}
+				if (k < sets.size()-1) {
 					buf.append("\t").append("or").append("\n");
 				}
 			}
@@ -550,7 +529,7 @@ public class LogicalExpressionFormatter {
 
     public static String run(gov.nih.nci.evs.restapi.appl.LogicalExpression le, String named_graph, String code) {
         LogicalExpressionFormatter formatter = new LogicalExpressionFormatter(le.getRoleCode2RangeNameMap(), le.getRoleName2RangeNameMap());
-        String expression = formatter.getLogialExpression(le, named_graph, code);
+        String expression = formatter.getLogicalExpression(le, named_graph, code);
         return expression;
 	}
 
@@ -566,9 +545,57 @@ public class LogicalExpressionFormatter {
 		/*
         LogicalExpressionFormatter formatter = new LogicalExpressionFormatter(le.getRoleCode2RangeNameMap(), le.getRoleName2RangeNameMap());
 		String code = args[0];
-        String expression = formatter.getLogialExpression(le, named_graph, code);
+        String expression = formatter.getLogicalExpression(le, named_graph, code);
         System.out.println(expression);
         */
 	}
 }
 
+/*
+    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\build.xml:35: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
+    [javac] Compiling 372 source files to C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\build
+    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:204: error: incompatible types: List<RolePair> cannot be converted to List<RoleSet>
+    [javac]                             RoleGroup rg = new RoleGroup(rp_list);
+    [javac]                                                          ^
+    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:250: error: cannot find symbol
+    [javac]                             List<RolePair> pairs = rg.getRolePairs();
+    [javac]                                                      ^
+    [javac]   symbol:   method getRolePairs()
+    [javac]   location: variable rg of type RoleGroup
+    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:300: error: cannot find symbol
+    [javac]                             List<RolePair> pairs = rg.getRolePairs();
+    [javac]                                                      ^
+    [javac]   symbol:   method getRolePairs()
+    [javac]   location: variable rg of type RoleGroup
+    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:344: error: cannot find symbol
+    [javac]             for (int i=0; i<rs.size(); i++) {
+    [javac]                               ^
+    [javac]   symbol:   method size()
+    [javac]   location: variable rs of type RoleSet
+    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:345: error: cannot find symbol
+    [javac]                             List<Restriction> r = rs.get(i);
+    [javac]                                                     ^
+    [javac]   symbol:   method get(int)
+    [javac]   location: variable rs of type RoleSet
+    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:346: error: cannot find symbol
+    [javac]                             String roleCode = r.getRoleCode();
+    [javac]                                                ^
+    [javac]   symbol:   method getRoleCode()
+    [javac]   location: variable r of type List<Restriction>
+    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionFormatter.java:495: error: cannot find symbol
+    [javac]                     List<RolePair> pairs = rg.getRolePairs();
+    [javac]                                              ^
+    [javac]   symbol:   method getRolePairs()
+    [javac]   location: variable rg of type RoleGroup
+    [javac] C:\EVSFocus\EVS_Operation_Support_08212024\software\evsrestapi-util\src\gov\nih\nci\evs\restapi\appl\LogicalExpressionGenerator.java:273: error: cannot find symbol
+    [javac]         String expression = formatter.getLogialExpression(le, named_graph, code);
+    [javac]                                      ^
+    [javac]   symbol:   method getLogialExpression(LogicalExpression,String,String)
+    [javac]   location: variable formatter of type LogicalExpressionFormatter
+    [javac] Note: Some input files use or override a deprecated API.
+    [javac] Note: Recompile with -Xlint:deprecation for details.
+    [javac] Note: Some input files use unchecked or unsafe operations.
+    [javac] Note: Recompile with -Xlint:unchecked for details.
+    [javac] Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+    [javac] 8 errors
+*/

@@ -14,7 +14,7 @@ import com.thoughtworks.xstream.XStream;
 public class RoleGroup {
 
 // Variable declaration
-	private List<RolePair> rolePairs;
+	private List<RoleSet> roleSets;
 
 // Default constructor
 	public RoleGroup() {
@@ -22,20 +22,20 @@ public class RoleGroup {
 
 // Constructor
 	public RoleGroup(
-		List<RolePair> rolePairs) {
+		List<RoleSet> roleSets) {
 
-		this.rolePairs = rolePairs;
+		this.roleSets = roleSets;
 	}
 
 // Set methods
-	public void setRolePairs(List<RolePair> rolePairs) { 
-		this.rolePairs = rolePairs;
+	public void setRoleSets(List<RoleSet> roleSets) { 
+		this.roleSets = roleSets;
 	}
 
 
 // Get methods
-	public List<RolePair> getRolePairs() { 
-		return this.rolePairs;
+	public List<RoleSet> getRoleSets() { 
+		return this.roleSets;
 	}
 
 	public String toXML() {

@@ -11,42 +11,31 @@ import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.XStream;
 
-public class RolePair {
+public class RoleSet {
 
 // Variable declaration
-	private Restriction role1;
-	private Restriction role2;
+	private List<Restriction> roles;
 
 // Default constructor
-	public RolePair() {
+	public RoleSet() {
 	}
 
 // Constructor
-	public RolePair(
-		Restriction role1,
-		Restriction role2) {
+	public RoleSet(
+		List<Restriction> roles) {
 
-		this.role1 = role1;
-		this.role2 = role2;
+		this.roles = roles;
 	}
 
 // Set methods
-	public void setRole1(Restriction role1) { 
-		this.role1 = role1;
-	}
-
-	public void setRole2(Restriction role2) { 
-		this.role2 = role2;
+	public void setRoles(List<Restriction> roles) { 
+		this.roles = roles;
 	}
 
 
 // Get methods
-	public Restriction getRole1() { 
-		return this.role1;
-	}
-
-	public Restriction getRole2() { 
-		return this.role2;
+	public List<Restriction> getRoles() { 
+		return this.roles;
 	}
 
 	public String toXML() {
