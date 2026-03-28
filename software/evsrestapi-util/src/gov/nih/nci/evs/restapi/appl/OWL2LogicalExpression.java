@@ -83,6 +83,7 @@ public class OWL2LogicalExpression {
 	static HashMap code2LabelMap = null;
 	static HashMap roleCode2RangeNameMap = null;
 	static HashMap roleCode2RoleNameMap = null;
+	static HashMap roleName2RoleCodeMap = null;
 
 	static String CONCEPT_FILE = "concepts_with_rolegroups.txt";
 	static String RANGE_UNSPECIFIED = "[Range Unspecified]";
@@ -94,6 +95,7 @@ public class OWL2LogicalExpression {
         code2LabelMap = owlScanner.getCode2LabelMap();
         roleCode2RangeNameMap = new HashMap();
         roleCode2RoleNameMap  = new HashMap();
+        roleName2RoleCodeMap = new HashMap();
         for (int i=0; i<roleDomanAndRange_vec.size(); i++) {
 			String line = (String) roleDomanAndRange_vec.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
@@ -103,6 +105,7 @@ public class OWL2LogicalExpression {
 			String rangeName = (String) code2LabelMap.get(rangeCode);
 			roleCode2RangeNameMap.put(roleCode, rangeName);
 			roleCode2RoleNameMap.put(roleCode, roleName);
+			roleName2RoleCodeMap.put(roleName, roleCode);
 		}
 		Vector v = owlScanner.scanSubproperties(owlScanner.get_owl_vec());
 		for (int i=0; i<v.size(); i++) {
@@ -220,69 +223,8 @@ public class OWL2LogicalExpression {
 		return role_vec;
 	}
 
-/*
-Raw Logical Expression Data:
-        (1) P|C3720
-        (2) Role Group starts
-        (3) E|C|I|C|U|C|I|R|R114$C27711
-        (4) E|C|I|C|U|C|I|R|R89$C36706
-        (5) Role Group ends
-        (6) Role Group starts
-        (7) E|C|I|C|U|C|I|R|R114$C36435
-        (8) E|C|I|C|U|C|I|R|R89$C36707
-        (9) Role Group ends
-        (10) Role Group starts
-        (11) E|C|I|C|U|C|I|R|R114$C36436
-        (12) E|C|I|C|U|C|I|R|R89$C36708
-        (13) Role Group ends
-        (14) Role Group starts
-        (15) E|C|I|C|U|C|I|R|R114$C36437
-        (16) E|C|I|C|U|C|I|R|R89$C36711
-        (17) Role Group ends
-        (18) Role Group starts
-        (19) E|C|I|C|U|C|I|R|R114$C36590
-        (20) E|C|I|C|U|C|I|R|R89$C37216
-        (21) Role Group ends
-        (22) Role Group starts
-        (23) E|C|I|C|U|C|I|R|R114$C36591
-        (24) E|C|I|C|U|C|I|R|R89$C38348
-        (25) Role Group ends
-        (26) Role Group starts
-        (27) E|C|I|C|U|C|I|R|R114$C45439
-        (28) E|C|I|C|U|C|I|R|R89$C45442
-        (29) Role Group ends
-        (30) Role Group starts
-        (31) E|C|I|C|U|C|I|R|R114$C45440
-        (32) E|C|I|C|U|C|I|R|R89$C45443
-        (33) Role Group ends
-        (34) Role Group starts
-        (35) E|C|I|C|U|C|I|R|R114$C45441
-        (36) E|C|I|C|U|C|I|R|R89$C45444
-        (37) Role Group ends
-        (38) E|C|I|R|R104$C39687
-        (39) E|C|I|R|R105$C39679
-        (40) E|C|I|R|R106$C37208
-        (41) E|C|I|R|R106$C81946
-        (42) E|C|I|R|R113$C37024
-        (43) E|C|I|R|R113$C37026
-        (44) E|C|I|R|R113$C39680
-        (45) E|C|I|R|R115$C36156
-        (46) E|C|I|R|R115$C39695
-        (47) E|C|I|R|R115$C50764
-        (48) E|C|I|R|R176$C101046
-        (49) E|C|I|R|R176$C101059
-        (50) E|C|I|R|R176$C101075
-        (51) E|C|I|R|R176$C101083
-        (52) E|C|I|R|R176$C101085
-        (53) E|C|I|R|R176$C38184
-        (54) E|C|I|R|R176$C99361
-        (55) E|C|I|R|R176$C99869
-        (56) E|C|I|R|R176$C99873
-*/
-
     public Vector appendRoleRange(String codefile) {
 		long ms = System.currentTimeMillis();
-		//OWL2LogicalExpression test = new OWL2LogicalExpression();
 		long ms0 = System.currentTimeMillis();
 		Vector w0 = new Vector();
 		Vector codes = null;
@@ -292,7 +234,6 @@ Raw Logical Expression Data:
 		}
 
 		Vector display_name_vec = new Vector();
-
 		for (int i=0; i<codes.size(); i++) {
 			String code = (String) codes.elementAt(i);
 			String label = getLabel(code);
@@ -312,58 +253,6 @@ Raw Logical Expression Data:
         Utils.dumpVector("Concepts processed", display_name_vec);
         return w0;
     }
-
-/*
-Modified Logical Expression Data:
-	(1) P|C3720
-	(2) Role Group starts
-	(3) E|C|I|C|U|C|I|R|R114$C27711
-	(4) E|C|I|C|U|C|I|R|R89$C36706
-	(5) or
-	(6) E|C|I|C|U|C|I|R|R114$C36435
-	(7) E|C|I|C|U|C|I|R|R89$C36707
-	(8) or
-	(9) E|C|I|C|U|C|I|R|R114$C36436
-	(10) E|C|I|C|U|C|I|R|R89$C36708
-	(11) or
-	(12) E|C|I|C|U|C|I|R|R114$C36437
-	(13) E|C|I|C|U|C|I|R|R89$C36711
-	(14) or
-	(15) E|C|I|C|U|C|I|R|R114$C36590
-	(16) E|C|I|C|U|C|I|R|R89$C37216
-	(17) or
-	(18) E|C|I|C|U|C|I|R|R114$C36591
-	(19) E|C|I|C|U|C|I|R|R89$C38348
-	(20) or
-	(21) E|C|I|C|U|C|I|R|R114$C45439
-	(22) E|C|I|C|U|C|I|R|R89$C45442
-	(23) or
-	(24) E|C|I|C|U|C|I|R|R114$C45440
-	(25) E|C|I|C|U|C|I|R|R89$C45443
-	(26) or
-	(27) E|C|I|C|U|C|I|R|R114$C45441
-	(28) E|C|I|C|U|C|I|R|R89$C45444
-	(29) Role Group ends
-	(30) E|C|I|R|R104$C39687
-	(31) E|C|I|R|R105$C39679
-	(32) E|C|I|R|R106$C37208
-	(33) E|C|I|R|R106$C81946
-	(34) E|C|I|R|R113$C37024
-	(35) E|C|I|R|R113$C37026
-	(36) E|C|I|R|R113$C39680
-	(37) E|C|I|R|R115$C36156
-	(38) E|C|I|R|R115$C39695
-	(39) E|C|I|R|R115$C50764
-	(40) E|C|I|R|R176$C101046
-	(41) E|C|I|R|R176$C101059
-	(42) E|C|I|R|R176$C101075
-	(43) E|C|I|R|R176$C101083
-	(44) E|C|I|R|R176$C101085
-	(45) E|C|I|R|R176$C38184
-	(46) E|C|I|R|R176$C99361
-	(47) E|C|I|R|R176$C99869
-	(48) E|C|I|R|R176$C99873
-	*/
 
     public static HashMap sortLogicalExpressionData(Vector v) {
         HashMap hmap = new HashMap();
@@ -398,7 +287,8 @@ Modified Logical Expression Data:
 			}
 			if (start) {
 				if (line.compareTo("or") == 0) {
-					//do nothing
+					rg_buf.append("or|");
+
 				} else if (line.compareTo("Role Group starts") == 0) {
 					//do nothing
 				} else if (line.indexOf("|U|C|I|R|") != -1) {
@@ -555,7 +445,6 @@ Modified Logical Expression Data:
 		map.put("Role Union", w);
 
 		w = new Vector();
-
 		boolean singleRange = validateRoleGroups(hmap);
 		String range = null;
 		if (!singleRange) {
@@ -565,24 +454,33 @@ Modified Logical Expression Data:
 		for (int i=0; i<v.size(); i++) {
 			//R114$C36317|R89$C37238
 			String line = (String) v.elementAt(i);
-			StringBuffer buf = new StringBuffer();
-			Vector u = StringUtils.parseData(line, '|');
-			//R114$C36317
-			for (int j=0; j<u.size(); j++) {
-				String role = (String) u.elementAt(j);
-				Vector u2 = StringUtils.parseData(role, '$');
-				String roleCode = (String) u2.elementAt(0);
-				String roleTargetCode = (String) u2.elementAt(1);
-				String roleName = (String) roleCode2RoleNameMap.get(roleCode);
-				String roleTargetName = (String) code2LabelMap.get(roleTargetCode);
-				if (range == null) {
-					range = (String) roleCode2RangeNameMap.get(roleCode);
+			line = line.replace("|or|", "\t");
+			Vector role_set = StringUtils.parseData(line, '\t');
+
+			for (int k=0; k<role_set.size(); k++) {
+				line = (String) role_set.elementAt(k);
+				StringBuffer buf = new StringBuffer();
+				Vector u = StringUtils.parseData(line, '|');
+				//R114$C36317
+				for (int j=0; j<u.size(); j++) {
+					String role = (String) u.elementAt(j);
+					Vector u2 = StringUtils.parseData(role, '$');
+					String roleCode = (String) u2.elementAt(0);
+					String roleTargetCode = (String) u2.elementAt(1);
+					String roleName = (String) roleCode2RoleNameMap.get(roleCode);
+					String roleTargetName = (String) code2LabelMap.get(roleTargetCode);
+					if (range == null) {
+						range = (String) roleCode2RangeNameMap.get(roleCode);
+					}
+					buf.append(roleName + "\t" + roleTargetName + " (" + roleTargetCode + ")").append("|");
 				}
-				buf.append(roleName + "\t" + roleTargetName + " (" + roleTargetCode + ")").append("|");
+				String t = buf.toString();
+				t = t.substring(0, t.length()-1);
+				w.add(t);
+				if (k<role_set.size()-1) {
+					w.add("or");
+				}
 			}
-			String t = buf.toString();
-			t = t.substring(0, t.length()-1);
-			w.add(t + "|" + range);
 		}
 		map.put("Role Group", w);
 		return map;
@@ -608,13 +506,10 @@ Modified Logical Expression Data:
 					String value = (String) values.elementAt(j);
 					Vector u = StringUtils.parseData(value, '|');
 					value = (String) u.elementAt(0);
-					/*
 					if (value.indexOf("Role Group") == -1) {
 						knt++;
-						buf.append("\t" + value).append("\n");
+						buf.append("\t\t" + value).append("\n");
 					}
-					*/
-					buf.append("\t\t" + value).append("\n");
 				}
 				//Role groups
 				for (int j=0; j<values.size(); j++) {
@@ -656,39 +551,40 @@ Modified Logical Expression Data:
 
 	public HashMap generateRange2RoleGroupExpressionMap(Vector role_group_vec) {
 		if (role_group_vec == null || role_group_vec.size() == 0) {
-			System.out.println("INFO: role_group_vec == null || role_group_vec.size() == 0 return null");
+			System.out.println("INFO: role_group_vec == null || role_group_vec.size() == 0 return null\n");
 			return null;
 		}
 		HashMap expressionMap = new HashMap();
+		expressionMap.put(RANGE_UNSPECIFIED, new Vector());
 		Vector w = new Vector();
+		StringBuffer buf = new StringBuffer();
+		buf.append("\n\tRole Group");
 		for (int i=0; i<role_group_vec.size(); i++) {
 			String role_group_line = (String) role_group_vec.elementAt(i);
-			String expression = generateRoleGroupExpression(role_group_line);
-			Vector u = StringUtils.parseData(role_group_line, '|');
-			String roleRange = (String) u.elementAt(u.size()-1);
-			w = new Vector();
-		    if (expressionMap.containsKey(roleRange)) {
-				w = (Vector) expressionMap.get(roleRange);
+			if (role_group_line.compareTo("or") == 0) {
+				buf.append("\n\tor");
+			} else {
+				Vector u = StringUtils.parseData(role_group_line, '|');
+				for (int j=0; j<u.size(); j++) {
+					String role = (String) u.elementAt(j);
+					buf.append("\n\t\t").append(role);
+				}
 			}
-			int n = role_group_line.lastIndexOf("|");
-			String line = role_group_line.substring(0, n);
-			w.add(expression + "|RG");
-			expressionMap.put(roleRange, w);
 		}
+        String expression = buf.toString();
+		Vector ranges = findRangesParticipatingInRoleUnionOrGroup(role_group_vec);
+		String range = (String) ranges.elementAt(0);
+		if (ranges.size() > 1) {
+			range = RANGE_UNSPECIFIED;
+		}
+		w = new Vector();
+		if (expressionMap.containsKey(range)) {
+			w = (Vector) expressionMap.get(range);
+		}
+		w.add(expression);
+		expressionMap.put(range, w);
 		return expressionMap;
 	}
-
-/*
-
-Role Union --> Disease_Mapped_To_Gene	EWSR1/DDIT3 Fusion Gene (C99200)|Disease_Mapped_To_Gene	FUS/DDIT3 Fusion Gene (C99279)|Gene
-
-
-			Disease_Mapped_To_Gene	EWSR1/DDIT3 Fusion Gene (C99200)
-	or
-		Disease_Mapped_To_Gene	FUS/DDIT3 Fusion Gene (C99279)
-	or
-		Gene
-*/
 
     public String generateRoleUnionExpression(String role_union_line) {
 		StringBuffer buf2 = new StringBuffer();
@@ -703,19 +599,29 @@ Role Union --> Disease_Mapped_To_Gene	EWSR1/DDIT3 Fusion Gene (C99200)|Disease_M
 		return buf2.toString();
 	}
 
-    public String generateRoleGroupExpression(String role_group_line) {
-		StringBuffer buf2 = new StringBuffer();
-		buf2.append("\n\t").append("Role Group(s)").append("\n");
-		Vector role_group_vec = StringUtils.parseData(role_group_line, '|');
-		for (int k=0; k<role_group_vec.size()/2; k++) {
-			buf2.append("\t\t").append((String) role_group_vec.elementAt(k)).append("\n");
-			buf2.append("\t\t").append((String) role_group_vec.elementAt(k+1)).append("\n");
-			if (k<role_group_vec.size()/2 - 1) {
-				buf2.append("\t").append("or").append("\n");
+    public Vector findRangesParticipatingInRoleUnionOrGroup(Vector lines) {
+		System.out.println("findRangesParticipatingInRoleUnionOrGroup");
+
+		Vector ranges = new Vector();
+		for (int i=0; i<lines.size(); i++) {
+			String line = (String) lines.elementAt(i);
+			if (line.compareTo("or") != 0) {
+				Vector roles = StringUtils.parseData(line, '|');
+				for (int j=0; j<roles.size(); j++) {
+					String role = (String) roles.elementAt(j);
+					Vector u2 = StringUtils.parseData(role, '\t');
+					String roleName = (String) u2.elementAt(0);
+					String roleCode = (String) roleName2RoleCodeMap.get(roleName);
+					String range = (String) roleCode2RangeNameMap.get(roleCode);
+					if (!ranges.contains(range)){
+						ranges.add(range);
+					}
+				}
 			}
 		}
-		return buf2.toString();
+		return ranges;
 	}
+
 
     public String getLogicalExpression(HashMap hmap) {
 // Parents:
@@ -727,7 +633,7 @@ Role Union --> Disease_Mapped_To_Gene	EWSR1/DDIT3 Fusion Gene (C99200)|Disease_M
 			buf.append("Parent(s)").append("\n");
 			for (int i=0; i<parents.size(); i++) {
 				String line = (String) parents.elementAt(i);
-				parent_vec.add("\t" + line);
+				parent_vec.add("\t\t" + line);
 			}
 		}
 		parent_vec = new SortUtils().quickSort(parent_vec);
@@ -737,6 +643,8 @@ Role Union --> Disease_Mapped_To_Gene	EWSR1/DDIT3 Fusion Gene (C99200)|Disease_M
 		}
 // Role:
         HashMap range2RolesHashMap = new HashMap();
+        range2RolesHashMap.put(RANGE_UNSPECIFIED, new Vector());
+
         Vector v = (Vector) hmap.get("Role");
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
@@ -768,6 +676,8 @@ Role Union --> Disease_Mapped_To_Gene	EWSR1/DDIT3 Fusion Gene (C99200)|Disease_M
 			    range2RolesHashMap.put(range, w);
 			}
 		}
+
+
 		Vector role_unions = (Vector) hmap.get("Role Union");
         HashMap range2RoleUnionExpressionMap = null;
         range2RoleUnionExpressionMap = generateRange2RoleUnionExpressionMap(role_unions);
@@ -784,6 +694,10 @@ Role Union --> Disease_Mapped_To_Gene	EWSR1/DDIT3 Fusion Gene (C99200)|Disease_M
 			    range2RolesHashMap.put(range, w);
 			}
 		}
+
+
+
+
 		String parentStr = buf.toString();
 		String t = range2RolesHashMap2Expression(range2RolesHashMap);
 		return parentStr + "\n" + t;
@@ -873,33 +787,4 @@ Role Union --> Disease_Mapped_To_Gene	EWSR1/DDIT3 Fusion Gene (C99200)|Disease_M
     }
 }
 
-/*
-//replace or by Role Group ends
-	(8) E|C|I|C|U|C|I|R|R116$C4074
-	(9) or
-	(10) E|C|I|R|R108$C198590
 
-
-Raw Logical Expression Data:
-	(1) P|C178541
-	(2) P|C45219
-	(3) Role Group starts
-	(4) E|C|I|C|U|C|I|R|R113$C37010
-	(5) E|C|I|C|U|C|I|R|R116$C3461
-	(6) or
-	(7) E|C|I|C|U|C|I|R|R113$C37014
-	(8) E|C|I|C|U|C|I|R|R116$C4074
-	(9) or
-	(10) E|C|I|R|R108$C198590
-	(11) E|C|I|R|R115$C50764
-	(12) E|C|I|R|R140$C38172
-	(13) E|C|I|R|R140$C38174
-	(14) E|C|I|R|R140$C38176
-	(15) E|C|I|R|R140$C40571
-
-
-		Vector v = test.scanSubproperties();
-		//System.out.println(expression);
-		Utils.dumpVector("scanSubproperties", v);
-
-*/
