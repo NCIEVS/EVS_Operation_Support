@@ -73,6 +73,10 @@ public class LogicalExpressionFormatter {
 	HashMap roleName2RangeNameMap = null;
 	HashMap roleCode2RangeNameMap = null;
 	static HashMap roleDataMap = null;
+
+	String code = null;
+	String label = null;
+
 	static HashMap range2ExpressionMap = null;
 	static String RANGE_RESULT = "range_results.txt";
 	static String RANGE_UNSPECIFIED = "[Range Unspecified]";
@@ -80,6 +84,14 @@ public class LogicalExpressionFormatter {
 	public LogicalExpressionFormatter(HashMap roleCode2RangeNameMap, HashMap roleName2RangeNameMap) {
 		this.roleName2RangeNameMap = roleName2RangeNameMap;
 		this.roleCode2RangeNameMap = roleCode2RangeNameMap;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	public static Restriction line2Restriction(String line) {
@@ -411,10 +423,6 @@ System.out.println("********************** 	findRangesInLEData 	****************
 	}
 
     public LogicalExpressionElement getLogicalExpressionElement(HashMap hmap, String range) {
-
-
-System.out.println(	"@@@@@@@@ getLogicalExpressionElement " + range);
-
 		Vector roles = (Vector) hmap.get("ROLE");
 		List<Restriction> simpleRoleList = new ArrayList();
 		for (int i=0; i<roles.size(); i++) {
@@ -480,12 +488,19 @@ System.out.println(	"@@@@@@@@ getLogicalExpressionElement " + range);
 	}
 
 	public String getLogicalExpression(HashMap hmap) {
+		/*
 		Vector w = (Vector) hmap.get("ROLE");
 		if (w == null) w = (Vector) hmap.get("ROLE GROUP");
 		if (w == null) w = (Vector) hmap.get("ROLE UNION");
-		Vector u = StringUtils.parseData((String) w.elementAt(0), '|');
-		String code = (String) u.elementAt(0);
-		String label = (String) u.elementAt(1);
+		if (w == null) {
+			System.out.println("Please add code and label to the HashMap.");
+			return null;
+		}
+		*/
+
+		//Vector u = StringUtils.parseData((String) w.elementAt(0), '|');
+		//String code = (String) u.elementAt(0);
+		//String label = (String) u.elementAt(1);
 		hmap = parseLogicalExpressionData(hmap);
 		Vector ranges = findRangesInLEData(hmap);
 		ranges.add(RANGE_UNSPECIFIED);
@@ -509,7 +524,7 @@ System.out.println(	"@@@@@@@@ getLogicalExpressionElement " + range);
 
 		String expression = null;
 		StringBuffer buf = new StringBuffer();
-		buf.append("\nLogical Expression of " + logicalExpression.getLabel() + " (" + logicalExpression.getCode() + ")").append("\n\n");
+		buf.append("\nLogical Expression of " + label + " (" + code + ")").append("\n\n");
 		buf.append("\nParent(s)").append("\n");
 		for (int i=0; i<parents.size(); i++) {
 			Concept c = (Concept) parents.get(i);
@@ -762,31 +777,58 @@ System.out.println(	"@@@@@@@@ getLogicalExpressionElement " + range);
 		return hmap;
 	}
 
-    public static String run(String param) {
+    public String run(String rawdatafile) {
 		String serviceUrl = ConfigurationController.serviceUrl;
 		String named_graph =  ConfigurationController.namedGraph;
 		String username =  ConfigurationController.username;
 		String password =  ConfigurationController.password;
 
 		String expression = null;
-		if (param.endsWith(".txt")) {
-        	LogicalExpressionFormatter formatter = new LogicalExpressionFormatter(getRoleCode2RangeNameMap(), getRoleName2RangeNameMap());
-			String rawdatafile = param;
+		if (rawdatafile != null) {
+        	//LogicalExpressionFormatter formatter = new LogicalExpressionFormatter(getRoleCode2RangeNameMap(), getRoleName2RangeNameMap());
 			HashMap hmap = loadRawLogicalExpressionData(rawdatafile);
 			Utils.dumpMultiValuedHashMap(rawdatafile, hmap);
-			expression = formatter.getLogicalExpression(hmap);
+			expression = getLogicalExpression(hmap);
 
 		} else {
 		    gov.nih.nci.evs.restapi.appl.LogicalExpression le = new gov.nih.nci.evs.restapi.appl.LogicalExpression(serviceUrl, named_graph, username, password);
-		    String code = param;
 		    expression = run(le, named_graph, code);
 		}
 		return expression;
 	}
 
+    public String run() {
+		return run(null);
+	}
+
+/*
+    public String run(String rawdatafile) {
+		String serviceUrl = ConfigurationController.serviceUrl;
+		String named_graph =  ConfigurationController.namedGraph;
+		String username =  ConfigurationController.username;
+		String password =  ConfigurationController.password;
+
+		String expression = null;
+		if (rawdatafile != null) {
+        	//LogicalExpressionFormatter formatter = new LogicalExpressionFormatter(getRoleCode2RangeNameMap(), getRoleName2RangeNameMap());
+			HashMap hmap = loadRawLogicalExpressionData(rawdatafile);
+			Utils.dumpMultiValuedHashMap(rawdatafile, hmap);
+			expression = formatter.getLogicalExpression(hmap);
+		} else {
+		    gov.nih.nci.evs.restapi.appl.LogicalExpression le = new gov.nih.nci.evs.restapi.appl.LogicalExpression(serviceUrl, named_graph, username, password);
+		    expression = run(le, named_graph, code);
+		}
+		return expression;
+	}
+*/
+
     public static void main(String[] args) {
-		String param = args[0];
-		String expression = run(param);
+		String code = args[0];
+		String label = args[1];
+		LogicalExpressionFormatter formatter = new LogicalExpressionFormatter(getRoleCode2RangeNameMap(), getRoleName2RangeNameMap());
+		formatter.setCode(code);
+		formatter.setLabel(label);
+		String expression = formatter.run();
 		System.out.println(expression);
 	}
 }
