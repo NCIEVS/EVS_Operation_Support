@@ -340,31 +340,25 @@ public class OWL2LogicalExpression {
         return hmap;
 	}
 
-
     public static boolean validateRoleGroups(HashMap hmap) {
+		HashSet hset = new HashSet();
 		Vector role_group_vec = (Vector) hmap.get("Role Group");
 		for (int i=0; i<role_group_vec.size(); i++) {
 			String role_group = (String) role_group_vec.elementAt(i);
 			//R114$C36317|R89$C37238
             Vector u = StringUtils.parseData(role_group, '|');
-            String firstRole = (String) u.elementAt(0);
-            Vector u2 = StringUtils.parseData(firstRole, '$');
-            String firstRoleCode = (String) u2.elementAt(0);
-            String range = (String) roleCode2RangeNameMap.get(firstRoleCode);
-            for (int j=1; j<u.size(); j++) {
+            for (int j=0; j<u.size(); j++) {
 				String role = (String) u.elementAt(j);
+				//R114$C36317
 				Vector u3 = StringUtils.parseData(role, '$');
 				String roleCode = (String) u3.elementAt(0);
 				String roleRange = (String) roleCode2RangeNameMap.get(roleCode);
-				//String roleTargetCode = (String) u2.elementAt(1);
-				if (roleRange.compareTo(range) != 0) {
-					System.out.println("Multiple role ranges detected in " + role_group);
-					System.out.println(firstRoleCode + " range:  " + range);
-					System.out.println(roleCode + " range:  " + roleRange);
-					return false;
+                if (!hset.contains(roleRange)) {
+					hset.add(roleRange);
 				}
 			}
 		}
+		if (hset.size() > 1) return false;
 		return true;
 	}
 
@@ -527,7 +521,6 @@ public class OWL2LogicalExpression {
 
 	public HashMap generateRange2RoleUnionExpressionMap(Vector role_union_vec) {
 		if (role_union_vec == null || role_union_vec.size() == 0) {
-			System.out.println("INFO: role_union_vec == null || role_union_vec.size() == 0 return null");
 			return null;
 		}
 		HashMap expressionMap = new HashMap();
@@ -551,7 +544,7 @@ public class OWL2LogicalExpression {
 
 	public HashMap generateRange2RoleGroupExpressionMap(Vector role_group_vec) {
 		if (role_group_vec == null || role_group_vec.size() == 0) {
-			System.out.println("INFO: role_group_vec == null || role_group_vec.size() == 0 return null\n");
+			//System.out.println("INFO: role_group_vec == null || role_group_vec.size() == 0 return null\n");
 			return null;
 		}
 		HashMap expressionMap = new HashMap();
@@ -600,8 +593,6 @@ public class OWL2LogicalExpression {
 	}
 
     public Vector findRangesParticipatingInRoleUnionOrGroup(Vector lines) {
-		System.out.println("findRangesParticipatingInRoleUnionOrGroup");
-
 		Vector ranges = new Vector();
 		for (int i=0; i<lines.size(); i++) {
 			String line = (String) lines.elementAt(i);
@@ -664,6 +655,10 @@ public class OWL2LogicalExpression {
         HashMap range2RoleGroupExpressionMap = null;
         range2RoleGroupExpressionMap = generateRange2RoleGroupExpressionMap(multiple_role_groups);
         if (range2RoleGroupExpressionMap != null) {
+			Vector rg_vec = (Vector) range2RoleGroupExpressionMap.get(RANGE_UNSPECIFIED);
+			if (rg_vec != null && rg_vec.size() == 0) {
+				range2RoleGroupExpressionMap.remove(RANGE_UNSPECIFIED);
+			}
             Iterator it = range2RoleGroupExpressionMap.keySet().iterator();
             while (it.hasNext()) {
 				String range = (String) it.next();
@@ -676,7 +671,6 @@ public class OWL2LogicalExpression {
 			    range2RolesHashMap.put(range, w);
 			}
 		}
-
 
 		Vector role_unions = (Vector) hmap.get("Role Union");
         HashMap range2RoleUnionExpressionMap = null;
@@ -695,16 +689,18 @@ public class OWL2LogicalExpression {
 			}
 		}
 
-
-
+		Vector rg_vec = (Vector) range2RolesHashMap.get(RANGE_UNSPECIFIED);
+		if (rg_vec != null && rg_vec.size() == 0) {
+			range2RolesHashMap.remove(RANGE_UNSPECIFIED);
+		}
 
 		String parentStr = buf.toString();
 		String t = range2RolesHashMap2Expression(range2RolesHashMap);
 		return parentStr + "\n" + t;
 	}
 
-    public static String run(Vector class_data_vec) {
-		return run(class_data_vec, false);
+    public static String owl2LogicalExpression(Vector class_data_vec) {
+		return owl2LogicalExpression(class_data_vec, false);
 	}
 
 	public static Vector modifyLogicalExpressionData(Vector v) {
@@ -730,7 +726,7 @@ public class OWL2LogicalExpression {
 		return v;
 	}
 
-    public static String run(Vector class_data_vec, boolean debug) {
+    public static String owl2LogicalExpression(Vector class_data_vec, boolean debug) {
 		String expression = null;
 		OWL2LogicalExpression test = new OWL2LogicalExpression();
         Vector logicalExpressionData = test.getLogicalExpressionData(class_data_vec);
@@ -747,7 +743,7 @@ public class OWL2LogicalExpression {
 		}
         boolean bool = test.validateRoleGroups(hmap);
         if (!bool){
-        	System.out.println("WARNING: validateRoleGroups returns: " + bool);
+        	System.out.println("INFO: validateRoleGroups returns: " + bool);
 		}
 		hmap = test.formatLogicalExpression(hmap);
 		if (debug) {
@@ -757,16 +753,34 @@ public class OWL2LogicalExpression {
  		return expression;
     }
 
-    public String run(String owlfile) {
+    public String owl2LogicalExpression(String owlfile) {
 		Vector class_data_vec = Utils.readFile(owlfile);
-		return run(class_data_vec);
+		return owl2LogicalExpression(class_data_vec);
     }
 
     public void dumpRoleCode2RangeNameMap() {
 		Utils.dumpHashMap("RoleCode2RangeNameMap", roleCode2RangeNameMap);
 	}
 
-    public static void main(String[] args) {
+    public static Vector run(Vector codes) {
+		long ms = System.currentTimeMillis();
+		OWL2LogicalExpression test = new OWL2LogicalExpression();
+		Vector w = new Vector();
+		for (int i=0; i<codes.size(); i++) {
+			String code = (String) codes.elementAt(i);
+			System.out.println("Processing " + code + "...");
+			Vector class_data_vec = test.getOWLClassDataByCode(code);
+			w.addAll(class_data_vec);
+			String expression = test.owl2LogicalExpression(class_data_vec);
+		    String label = test.getLabel(code);
+		    w.add("\n" + label + " (" + code + "):");
+			w.add(expression);
+		}
+        return w;
+    }
+
+/*
+     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		OWL2LogicalExpression test = new OWL2LogicalExpression();
 		String owlfile = args[0];
@@ -785,6 +799,14 @@ public class OWL2LogicalExpression {
 		System.out.println(expression);
 
     }
+*/
+    public static void main(String[] args) {
+		String codefile = args[0];
+		Vector codes = Utils.readFile(codefile);
+		Vector w = run(codes);
+		Utils.saveToFile("result_" + codefile, w);
+	}
+
 }
 
 
