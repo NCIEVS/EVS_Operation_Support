@@ -72,11 +72,21 @@ public class LogicalExpressionGenerator {
 	HashMap rangeHashMap = null;
 	gov.nih.nci.evs.restapi.appl.LogicalExpression le = null;
 	HashMap code2LabelMap = null;
-	HashMap roleName2RangeNameMap = null;
+
+
+	//HashMap roleName2RangeNameMap = null;
+	//HashMap roleCode2RangeNameMap = null;
+
+	Vector roleDomanAndRange_vec = null;
 	HashMap roleCode2RangeNameMap = null;
+	HashMap roleCode2RoleNameMap = null;
+	HashMap roleName2RoleCodeMap = null;
+	HashMap roleName2RangeNameMap = null;
+
 	Vector PATHS = null;
 	HashMap range2ExpressionMap = null;
 	LogicalExpressionFormatter formatter = null;
+	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
 
 	private void initialize() {
 		String serviceUrl = ConfigurationController.serviceUrl;
@@ -84,13 +94,62 @@ public class LogicalExpressionGenerator {
 		String username = ConfigurationController.username;
 		String password = ConfigurationController.password;
 
+        boolean success = false;
 		try {
 			code2LabelMap = generateLabelHashMap(named_graph);//loadOrGenerateLabelHashMap(named_graph);
 			le = new gov.nih.nci.evs.restapi.appl.LogicalExpression(serviceUrl, named_graph, username, password);
 			roleCode2RangeNameMap = le.getRoleCode2RangeNameMap();
 			roleName2RangeNameMap = le.getRoleName2RangeNameMap();
+			success = true;
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+
+
+
+		if (code2LabelMap == null) {
+
+			System.out.println("================= code2LabelMap == null ================= ");
+			long ms0 = System.currentTimeMillis();
+			roleDomanAndRange_vec = OWLScanner.extractRoleDomainAndRange(NCIT_OWL);
+			Utils.dumpVector("roleDomanAndRange_vec", roleDomanAndRange_vec);
+
+//output_vec.add(roleCode + "|" + roleLabel + "|" + domainCode + "|" + rangeCode);
+
+			OWLScanner owlScanner = new OWLScanner(NCIT_OWL);
+			code2LabelMap = owlScanner.getCode2LabelMap();
+			System.out.println("code2LabelMap: " + code2LabelMap.keySet().size());
+
+			roleCode2RangeNameMap = new HashMap();
+			roleCode2RoleNameMap  = new HashMap();
+			roleName2RoleCodeMap = new HashMap();
+			roleName2RangeNameMap = new HashMap();
+			for (int i=0; i<roleDomanAndRange_vec.size(); i++) {
+				String line = (String) roleDomanAndRange_vec.elementAt(i);
+				Vector u = StringUtils.parseData(line, '|');
+				String roleCode = (String) u.elementAt(0);
+				String roleName = (String) u.elementAt(1);
+				String rangeCode = (String) u.elementAt(3);
+				String rangeName = (String) code2LabelMap.get(rangeCode);
+
+				roleCode2RangeNameMap.put(roleCode, rangeName);
+				roleCode2RoleNameMap.put(roleCode, roleName);
+				roleName2RoleCodeMap.put(roleName, roleCode);
+    			roleName2RangeNameMap.put(roleName, rangeName);
+			}
+			Vector v = owlScanner.scanSubproperties(owlScanner.get_owl_vec());
+			for (int i=0; i<v.size(); i++) {
+				String line = (String) v.elementAt(i);
+				Vector u = StringUtils.parseData(line, '|');
+				String parentCode = (String) u.elementAt(0);
+				String childCode = (String) u.elementAt(1);
+				String rangeName = (String) roleCode2RangeNameMap.get(parentCode);
+				roleCode2RangeNameMap.put(childCode, rangeName);
+			}
+			long ms = System.currentTimeMillis();
+			System.out.println("Total initialization run time (ms): " + (ms - ms0));
+			//ex.printStackTrace();
 		}
         PATHS = new Vector();
         PATHS.add("E|I|O|C");
@@ -314,6 +373,10 @@ public class LogicalExpressionGenerator {
 		long ms = System.currentTimeMillis();
 		LogicalExpressionGenerator test = new LogicalExpressionGenerator();
 		String filename = args[0];
+
+		test.appendRangeToFile(filename);
+
+		/*
         Vector codes = Utils.readFile(filename);
         System.out.println("codes: " + codes.size());
 		String firstLn = (String) codes.elementAt(0);
@@ -329,6 +392,8 @@ public class LogicalExpressionGenerator {
         String name = filename.substring(0, n);
         Utils.saveToFile("logical_expression_" + name + "_" + StringUtils.getToday() + ".txt", w);
         //test.appendRangeToFile(filename);
+        */
+
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
