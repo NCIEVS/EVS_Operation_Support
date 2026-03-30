@@ -956,6 +956,9 @@ public class StringUtils {
 			}
 			i++;
 		}
+		if (isNCItCode(str)) {
+			w.add(str);
+		}
 		return w;
 	}
 
@@ -989,5 +992,25 @@ public class StringUtils {
 			//ex.printStackTrace();
 		}
         return false;
+	}
+
+    public static String toHyperLink(String code) {
+		 return toHyperLink(code, code);
+	}
+
+    public static String toHyperLink(String code, String value) {
+		value = HTMLDecoder.decode(value);
+		return "<a href=\"#\" onclick=\"onValueSetNodeClicked('" + code + "');return false;\">" + value + "</a>";
+	}
+
+    public static String hyperlinkNCItCodes(String line) {
+		Vector codes = gov.nih.nci.evs.restapi.util.StringUtils.scanNCItCodes(line);
+		if (codes.size() == 0) return line;
+		for (int i=0; i<codes.size(); i++) {
+			String code = (String) codes.elementAt(i);
+			String s = toHyperLink(code);
+			line = line.replace(code, toHyperLink(code));
+		}
+		return line;
 	}
 }
