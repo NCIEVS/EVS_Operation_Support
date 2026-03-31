@@ -63,57 +63,27 @@ import java.util.*;
  */
 public class DelimitedDataExtractor {
 
-	public static HashMap extract(String filename, int keyCol, int valueCol, char delim) {
-		Vector w = Utils.readFile(filename);
-		HashMap hmap = new HashMap();
+	public static Vector<Integer> delimitedInt2integers(String delim_columns, char delim) {
+		Vector w = StringUtils.parseData(delim_columns, delim);
+		Vector columns = new Vector();
 		for (int i=0; i<w.size(); i++) {
 			String line = (String) w.elementAt(i);
-			Vector u = StringUtils.parseData(line, delim);
-			String key = (String) u.elementAt(keyCol);
-			String value = (String) u.elementAt(valueCol);
-			hmap.put(key, value);
+			columns.add(Integer.valueOf(Integer.parseInt(line)));
 		}
-		return hmap;
+		return columns;
 	}
 
 	public static Vector extract(String filename, String delim_columns, char delim) {
-		Vector w = StringUtils.parseData(delim_columns, delim);
-		Vector columns = new Vector();
-		for (int i=0; i<w.size(); i++) {
-			String line = (String) w.elementAt(i);
-			columns.add(Integer.valueOf(Integer.parseInt(line)));
-		}
-		return extract(filename, columns, delim);
+		return extract(filename, delimitedInt2integers(delim_columns, delim), delim);
 	}
 
 	public static Vector extract(String filename, Vector<Integer> columns, char delim) {
-		Vector w = Utils.readFile(filename);
-		Vector v = new Vector();
-		for (int i=0; i<w.size(); i++) {
-			String line = (String) w.elementAt(i);
-			Vector u = StringUtils.parseData(line, delim);
-			StringBuffer buf = new StringBuffer();
-			for (int k=0; k<columns.size(); k++) {
-				Integer column_obj = (Integer) columns.elementAt(k);
-				int column_int = Integer.parseInt(column_obj.toString());
-				String t = (String) u.elementAt(column_int);
-				buf.append(t).append(delim);
-			}
-			String s = buf.toString();
-			s = s.substring(0, s.length()-1);
-			v.add(s);
-		}
-		return v;
+		Vector data_vec = Utils.readFile(filename);
+		return extract(data_vec, columns, delim);
 	}
 
 	public static Vector extract(Vector data_vec, String delim_columns, char delim) {
-		Vector w = StringUtils.parseData(delim_columns, delim);
-		Vector columns = new Vector();
-		for (int i=0; i<w.size(); i++) {
-			String line = (String) w.elementAt(i);
-			columns.add(Integer.valueOf(Integer.parseInt(line)));
-		}
-		return extract(data_vec, columns, delim);
+		return extract(data_vec, delimitedInt2integers(delim_columns, delim), delim);
 	}
 
 	public static Vector extract(Vector w, Vector<Integer> columns, char delim) {
@@ -135,15 +105,56 @@ public class DelimitedDataExtractor {
 		return v;
 	}
 
-	public static void main(String[] args) throws Exception {
-		String serviceUrl = args[0];
-		String named_graph = args[1];
-		System.out.println("serviceUrl: " + serviceUrl);
-		System.out.println("named_graph: " + named_graph);
-		OWLSPARQLUtils owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, null, null);
-        owlSPARQLUtils.set_named_graph(named_graph);
-        Vector v = owlSPARQLUtils.getDomainAndRangeData(named_graph);
-        Vector trimmed_v = extract(v, "2|0|4", '|');
-        Utils.saveToFile("trimmed_domain_range.txt", trimmed_v);
+	public static HashMap createHashMap(String filename, int keyCol, int valueCol, char delim) {
+		Vector data_vec = Utils.readFile(filename);
+		return createHashMap(data_vec, keyCol, valueCol, delim);
 	}
+
+	public static HashMap createHashMap(Vector data_vec, int keyCol, int valueCol, char delim) {
+		HashMap hmap = new HashMap();
+		for (int i=0; i<data_vec.size(); i++) {
+			String line = (String) data_vec.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			String key = (String) u.elementAt(keyCol);
+			String value = (String) u.elementAt(valueCol);
+			hmap.put(key, value);
+		}
+		return hmap;
+	}
+
+	public static HashMap createHashMap(Vector data_vec, String delim_column_key, String delim_column_value, char delim) {
+		Vector<Integer> key_cols = delimitedInt2integers(delim_column_key, delim);
+		Vector<Integer> value_cols = delimitedInt2integers(delim_column_value, delim);
+		HashMap hmap = new HashMap();
+		for (int i=0; i<data_vec.size(); i++) {
+			String line = (String) data_vec.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			StringBuffer key_buf = new StringBuffer();
+			StringBuffer value_buf = new StringBuffer();
+			for (int j=0; j<u.size(); j++) {
+				Integer int_obj = Integer.valueOf(j);
+				if (key_cols.contains(int_obj)) {
+					key_buf.append((String) u.elementAt(j)).append(delim);
+				} else if (value_cols.contains(int_obj)) {
+					value_buf.append((String) u.elementAt(j)).append(delim);
+				}
+			}
+			String t_key = key_buf.toString();
+			if (t_key.endsWith("" + delim)) {
+				t_key = t_key.substring(0, t_key.length()-1);
+			}
+			String t_value = value_buf.toString();
+			if (t_value.endsWith("" + delim)) {
+				t_value = t_value.substring(0, t_value.length()-1);
+			}
+			Vector w = new Vector();
+			if (hmap.containsKey(t_key)) {
+				w = (Vector) hmap.get(t_key);
+			}
+			w.add(t_value);
+			hmap.put(t_key, w);
+		}
+		return hmap;
+	}
+
 }
