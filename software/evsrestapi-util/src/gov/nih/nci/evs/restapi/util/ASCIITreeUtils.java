@@ -1,6 +1,7 @@
 package gov.nih.nci.evs.restapi.util;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.common.*;
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.sql.*;
 import java.text.*;
@@ -57,6 +58,8 @@ import java.util.*;
  *
  */
 public class ASCIITreeUtils {
+
+	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
 
     public ASCIITreeUtils() {
 
@@ -384,14 +387,66 @@ public class ASCIITreeUtils {
 		HTMLHierarchy.run(datafile, title, root);
     }
 
+    public static int findLevel(String line) {
+		int level = 0;
+		for (int i=0; i<line.length(); i++) {
+			char c = line.charAt(i);
+			if (c != '\t') {
+				level = i;
+				break;
+			}
+		}
+		return level;
+	}
+
+ 	public static Vector getTransitiveClosure(String code) {
+		Vector parent_child_vec = Utils.readFile(PARENT_CHILD_FILE);
+		gov.nih.nci.evs.restapi.util.HierarchyHelper hh = new gov.nih.nci.evs.restapi.util.HierarchyHelper(parent_child_vec);
+		Vector v = hh.get_transitive_closure_v4(code);
+		return v;
+	}
+
+ 	public static Vector getTransitiveClosure(Vector parent_child_vec, String code) {
+		//Vector parent_child_vec = Utils.readFile(PARENT_CHILD_FILE);
+		gov.nih.nci.evs.restapi.util.HierarchyHelper hh = new gov.nih.nci.evs.restapi.util.HierarchyHelper(parent_child_vec);
+		Vector v = hh.get_transitive_closure_v4(code);
+		return v;
+	}
+
+    public static void run(String code) {
+		ASCIITreeUtils utils = new ASCIITreeUtils();
+		Vector parent_child_vec = utils.getTransitiveClosure(code);
+		Utils.saveToFile(code + "_parent_child.txt", parent_child_vec);
+		run(parent_child_vec, code);
+	}
+
+    public static void run(Vector parent_child_vec, String code) {
+		String treefile = code + "_asciitree.txt";
+		gov.nih.nci.evs.restapi.util.HierarchyHelper hh = new gov.nih.nci.evs.restapi.util.HierarchyHelper(parent_child_vec);
+		hh.printTree(parent_child_vec, treefile);
+
+        Vector v = Utils.readFile(treefile);
+        int maxLevel = 0;
+        for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			int level = findLevel(line);
+			if (level > maxLevel) {
+				maxLevel = level;
+			}
+		}
+        String root = code;
+        //String htmltreefile = DynamicTreePlus.generateDynamicHTMLTree(root, maxLevel);
+        //System.out.println(htmltreefile + " generated.");
+
+        String title = "hierarchy" + "_" + root;
+        Utils.saveToFile(title + ".txt", parent_child_vec);
+        PolyHierarchy.generateDynamicHTMLTree(title + ".txt");
+
+	}
+
  	public static void main(String[] args) {
 		ASCIITreeUtils utils = new ASCIITreeUtils();
-		String asciitreefile = args[0];
-		TreeItem root = utils.createTreeItem(asciitreefile);
-		TreeItem.printTree(root, 0);
-
-		Vector w = Utils.readFile(asciitreefile);
-		w = utils.get_parent_child_vec(w);
-		Utils.saveToFile("parent_child_vs.txt", w);
+		String code = args[0];
+		run(code);
 	}
 }
