@@ -100,12 +100,29 @@ public class JQueryHTMLTreeGenerator {
 	}
 
 	public String getHyperLink(String code) {
+		/*
 		if (HYPERLINK != null) {
 			return HYPERLINK + code;
 		} else {
 			return null;
 		}
+		*/
+		return hyperlinkCode(code);
 	}
+
+    public static String hyperlinkCode(String line) {
+		int n = line.lastIndexOf("(");
+		if (n != -1) {
+			String code = line.substring(n+1, line.length()-1);
+			if (HTMLTableDataConverter.isCode(code)) {
+				line = line.replace(code, HyperlinkHelper.toHyperlink(code));
+				return line;
+			}
+		}
+		return line;
+	}
+
+
 
     public String encode(String t) {
 		if (t == null) return null;
@@ -191,22 +208,31 @@ public class JQueryHTMLTreeGenerator {
 		String indent = getIndentation(level);
 		String label = hh.getLabel(code);
 		label = encode(label);
-		String text = label + " (" + code + ")";
-		String hyperlink = getHyperLink(code);
+		String line = label + " (" + code + ")";
+
+		/*
+		String hyperlink = getHyperLink(text);
 
 		if (nodeSet != null && nodeSet.contains(code)) {
 			if (hyperlink != null) {
-				out.println(indent + "<li><font color=\"" + fontColor + "\"><a href=\"" + hyperlink + "\">" + label + "</font></a>");
+				out.println(indent + "<li><font color=\"" + fontColor + "\"><a href=\"" + hyperlink + "\">" + code + "</font></a>");
 			} else {
-				out.println(indent + "<li><font color=\"" + fontColor + "\">" + label + "</font>");
+				out.println(indent + "<li><font color=\"" + fontColor + "\">" + code + "</font>");
 			}
 		} else {
 			if (hyperlink != null) {
-				out.println(indent + "<li><a href=\"" + hyperlink + "\">" + label + "</a>");
+				out.println(indent + "<li><a href=\"" + hyperlink + "\">" + code + "</a>");
 			} else {
-				out.println(indent + "<li>" + label);
+				out.println(indent + "<li>" + text);
 			}
 		}
+		*/
+
+		line = hyperlinkCode(line);
+		out.println("<li>");
+
+		out.println(line);
+		out.println("</li>");
 
 		Vector subs = hh.getSubclassCodes(code);
 		if (subs != null && subs.size() > 0) {
