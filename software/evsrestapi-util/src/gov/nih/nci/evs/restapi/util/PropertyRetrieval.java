@@ -229,6 +229,38 @@ public class PropertyRetrieval {
 	}
 
 
+	public static HashMap creatDataMap(Vector v) {
+		int propCol = 1;
+		int keyCol = 0;
+		int valueCol = 2;
+		char delim = '\t';
+		return creatDataMap(v, propCol, keyCol, valueCol, delim);
+	}
+
+	public static HashMap creatDataMap(Vector v, int propCol, int keyCol, int valueCol, char delim) {
+		HashMap dataMap = new HashMap();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			String propCode = (String) u.elementAt(propCol);
+			HashMap hmap = new HashMap();
+			if (dataMap.containsKey(propCode)) {
+				hmap = (HashMap) dataMap.get(propCode);
+			}
+			String key = (String) u.elementAt(keyCol);
+			Vector w = new Vector();
+			if (hmap.containsKey(keyCol)) {
+				w = (Vector) hmap.get(key);
+			}
+			String value = (String) u.elementAt(valueCol);
+			w.add(value);
+			hmap.put(key, w);
+			dataMap.put(propCode, hmap);
+		}
+		return dataMap;
+	}
+
+
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		String owlfile = args[0];
