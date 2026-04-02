@@ -84,6 +84,7 @@ public class OWL2LogicalExpression {
 	static HashMap roleCode2RangeNameMap = null;
 	static HashMap roleCode2RoleNameMap = null;
 	static HashMap roleName2RoleCodeMap = null;
+	static HashMap roleName2RangeNameMap = null;
 
 	static String CONCEPT_FILE = "concepts_with_rolegroups.txt";
 	static String RANGE_UNSPECIFIED = "[Range Unspecified]";
@@ -96,6 +97,7 @@ public class OWL2LogicalExpression {
         roleCode2RangeNameMap = new HashMap();
         roleCode2RoleNameMap  = new HashMap();
         roleName2RoleCodeMap = new HashMap();
+        roleName2RangeNameMap = new HashMap();
         for (int i=0; i<roleDomanAndRange_vec.size(); i++) {
 			String line = (String) roleDomanAndRange_vec.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
@@ -106,6 +108,7 @@ public class OWL2LogicalExpression {
 			roleCode2RangeNameMap.put(roleCode, rangeName);
 			roleCode2RoleNameMap.put(roleCode, roleName);
 			roleName2RoleCodeMap.put(roleName, roleCode);
+			roleName2RangeNameMap.put(roleName, rangeName);
 		}
 		Vector v = owlScanner.scanSubproperties(owlScanner.get_owl_vec());
 		for (int i=0; i<v.size(); i++) {
@@ -115,6 +118,8 @@ public class OWL2LogicalExpression {
 			String childCode = (String) u.elementAt(1);
 			String rangeName = (String) roleCode2RangeNameMap.get(parentCode);
 			roleCode2RangeNameMap.put(childCode, rangeName);
+			String childName = (String) roleCode2RoleNameMap.get(childCode);
+			roleName2RangeNameMap.put(childName, rangeName);
 		}
 		long ms = System.currentTimeMillis();
         System.out.println("Total initialization run time (ms): " + (ms - ms0));
