@@ -54,7 +54,6 @@ import java.util.*;
  *
  */
 public class HTMLTable {
-    //static String NCIT_URL = "https://nciterms.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&&ns=ncit&code=";
     static String NCIT_URL = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
 
     public static String hyperlink(String url, String code) {
@@ -153,49 +152,6 @@ public class HTMLTable {
 	}
 
     public static void printHeader(PrintWriter out, String pageTitle) {
-		/*
-		out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">");
-		out.println("<html xmlns:c=\"http://java.sun.com/jsp/jstl/core\">");
-		out.println("<head>");
-		out.println("<title>" + pageTitle + "</title>");
-		out.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
-		out.println("<style>");
-		out.println("table {");
-		out.println("    border-collapse: collapse;");
-		out.println("}");
-		out.println("table, td, th {");
-		out.println("    border: 1px solid black;");
-		out.println("}");
-		out.println("</style>");
-		out.println("</head>");
-		out.println("");
-		out.println("<body>");
-		out.println("");
-		out.println("");
-		out.println(" <!-- nci banner<div class=\"ncibanner\"> -->");
-		out.println("<div style='clear:both;margin-top:-5px;padding:8px;height:32px;color:white;background-color:#C31F40'>");
-		out.println("  <a href=\"http://www.cancer.gov\" target=\"_blank\">");
-		out.println("    <img");
-		//out.println("        src=\"https://nciterms.nci.nih.gov/ncitbrowser/images/banner-red.png\"");
-		//out.println("        src=\"https://nciterms.nci.nih.gov/ncitbrowser/images/nci-banner-1.gif\"");
-		out.println("      src=\"https://www.cancer.gov//sites/g/files/xnrzdm211/files/ncids_header/logos/Logo_NCI.svg\"");
-		out.println("        width=\"955\"");
-		out.println("        height=\"39\"");
-		out.println("        border=\"0\"");
-		out.println("        alt=\"National Cancer Institute\"");
-		out.println("    />");
-		out.println("  </a>");
-		out.println("</div>");
-		out.println("<!-- end nci banner -->");
-		out.println("");
-
-		//printBanner(out);
-
-		out.println("");
-		out.println("");
-		out.println("<center>");
-		out.println("<h1>" + pageTitle + "</h1>");
-		*/
 		out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">");
 		out.println("<html xmlns:c=\"http://java.sun.com/jsp/jstl/core\">");
 		out.println("<head>");

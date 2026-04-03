@@ -78,6 +78,8 @@ public class CSV2HTMLTable {
 		return w;
 	}
 
+	private static String HYPER_LINK = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
+
 	public static void main(String[] args) {
 		String serviceUrl = args[0];
 		String named_graph = args[1];
@@ -85,25 +87,30 @@ public class CSV2HTMLTable {
 		String password = args[3];
 		String csvfile = args[4];
 
+System.out.println("Step 0");
 		boolean skip_heading = false;
 		String delim = "|";
         Vector v = CSVFileReader.readCSV(csvfile, skip_heading, delim);
         int n = csvfile.lastIndexOf(".");
         String inputfile = csvfile.substring(0, n) + ".txt";
+        Utils.saveToFile(inputfile, v);
+System.out.println("Step 1");
 
 		if (args.length > 5) {
 			String columnIndexStr = args[5];
 			int columnIndex = Integer.parseInt(columnIndexStr);
 			String url = args[6];
-			Vector w = addHyperlinks(inputfile, columnIndex, url);
-			Utils.saveToFile(inputfile, w);
-		}
 
-        Utils.saveToFile(inputfile, v);
-		String outputfile = new HTMLTableDataConverter(serviceUrl, named_graph, username, password).convert(inputfile);
-		System.out.println(outputfile + " generated.");
-		v = Utils.readFile(outputfile);
-		outputfile = new HTMLTable().generate(v);
-		System.out.println(outputfile + " generated.");
+System.out.println("Step 2");
+			String outputfile = new HTMLTableDataConverter(serviceUrl, named_graph, username, password).convert(inputfile);
+			System.out.println(outputfile + " generated.");
+			Vector w = CSV2HTMLTable.addHyperlinks(inputfile, columnIndex, url);
+			Utils.saveToFile(inputfile, w);
+
+System.out.println("Step 3");
+			v = Utils.readFile(outputfile);
+			outputfile = new HTMLTable().generate(v);
+			System.out.println(outputfile + " generated.");
+	    }
 	}
 }

@@ -72,8 +72,13 @@ public class HTMLTableDataConverter {
 		this.named_graph = named_graph;
 		this.username = username;
 		this.password = password;
+		/*
 		metadataUtils = new MetadataUtils(serviceUrl, username, password);
 		this.ncit_version = metadataUtils.getVocabularyVersion(named_graph);
+		*/
+		OWLSPARQLUtils owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
+		owlSPARQLUtils.set_named_graph(named_graph);
+		this.ncit_version = owlSPARQLUtils.getVersion(named_graph);
 		System.out.println(this.ncit_version);
 	}
 
