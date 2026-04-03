@@ -56,13 +56,18 @@ import java.util.*;
 public class CSV2HTMLTable {
 
     public static Vector addHyperlinks(String datafile, int columnIndex, String url) {
+		char delim = '\t';
+		return addHyperlinks(datafile, columnIndex, url, delim);
+	}
+
+    public static Vector addHyperlinks(String datafile, int columnIndex, String url, char delim) {
 		Vector w = new Vector();
 		Vector v = Utils.readFile(datafile);
 		w.add((String) v.elementAt(0));
 
 		for (int i=1; i<v.size(); i++) {
 			String t = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(t, '|');
+			Vector u = StringUtils.parseData(t, delim);
 			StringBuffer buf = new StringBuffer();
 			for (int j=0; j<u.size(); j++) {
 				String value = (String) u.elementAt(j);
