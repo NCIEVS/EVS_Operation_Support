@@ -61,13 +61,12 @@ public class OWL2HTML {
 	}
 
     public static String toHyperLink(String code) {
-		//return "<a href=\"#\" onclick=\"onValueSetNodeClicked('" + code + "');return false;\">(" + code + ")</a>";
 		 return toHyperLink(code, code);
 	}
 
     public static String toHyperLink(String code, String value) {
 		value = HTMLDecoder.decode(value);
-		return "<a href=\"#\" onclick=\"onValueSetNodeClicked('" + code + "');return false;\">(" + value + ")</a>";
+		return "<a href=\"#\" onclick=\"onValueSetNodeClicked('" + code + "');return false;\">" + value + "</a>";
 	}
 
     public static String toTooltip(String code, String value) {

@@ -13,6 +13,13 @@ public class NCItProperties {
 	static HashMap roleName2RoleCodeMap = null;
 	static HashMap roleName2RangeNameMap = null;
 
+    static Vector annotationProperties = null;
+    static Vector objectProperties = null;
+	public static HashMap annotationPropertyCode2LabelMap = null;
+	public static HashMap annotationPropertyLabel2CodeMap = null;
+	public static HashMap objectPropertyCode2LabelMap = null;
+	public static HashMap objectPropertyLabel2CodeMap = null;
+
 	static {
 		long ms0 = System.currentTimeMillis();
         roleDomanAndRange_vec = OWLScanner.extractRoleDomainAndRange(NCIT_OWL);
@@ -45,6 +52,27 @@ public class NCItProperties {
 			String childName = (String) roleCode2RoleNameMap.get(childCode);
 			roleName2RangeNameMap.put(childName, rangeName);
 		}
+
+		annotationProperties = owlScanner.extractAnnotationProperties(owlScanner.get_owl_vec());
+		annotationPropertyCode2LabelMap = new HashMap();
+		annotationPropertyLabel2CodeMap = new HashMap();
+		for (int i=0; i<annotationProperties.size(); i++) {
+			String line = (String) annotationProperties.elementAt(i);
+			Vector u = gov.nih.nci.evs.restapi.util.StringUtils.parseData(line, '|');
+			annotationPropertyCode2LabelMap.put((String) u.elementAt(0),(String) u.elementAt(1));
+			annotationPropertyLabel2CodeMap.put((String) u.elementAt(1),(String) u.elementAt(0));
+		}
+
+		objectProperties = owlScanner.extractObjectProperties(owlScanner.get_owl_vec());
+		objectPropertyCode2LabelMap = new HashMap();
+		objectPropertyLabel2CodeMap = new HashMap();
+		for (int i=0; i<objectProperties.size(); i++) {
+			String line = (String) objectProperties.elementAt(i);
+			Vector u = gov.nih.nci.evs.restapi.util.StringUtils.parseData(line, '|');
+			objectPropertyCode2LabelMap.put((String) u.elementAt(0),(String) u.elementAt(1));
+			objectPropertyLabel2CodeMap.put((String) u.elementAt(1),(String) u.elementAt(0));
+		}
+
 		long ms = System.currentTimeMillis();
         System.out.println("Total initialization run time (ms): " + (ms - ms0));
 	}
@@ -53,7 +81,11 @@ public class NCItProperties {
 
 	}
 
-	static HashMap getCode2LabelMap() {
+	public static Vector get_roleDomanAndRange_vec() {
+		return roleDomanAndRange_vec;
+	}
+
+	public static HashMap getCode2LabelMap() {
 		return code2LabelMap;
 	}
 
@@ -69,26 +101,19 @@ public class NCItProperties {
 		return roleName2RoleCodeMap;
 	}
 
-
-	/*
-	public static void main(String[] args) {
-		String textfile = args[0];
-		Vector v = Utils.readFile(textfile);
-		Vector data_vec = new Vector();
-		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			line = escape(line);
-			data_vec.add(line);
-		}
-		NCItProperties test = new NCItProperties();
-		int n = textfile.lastIndexOf(".");
-
-		String outputfile = textfile.substring(0, n) + ".html";
-		String heading = (String) data_vec.elementAt(0);
-		heading = heading.trim();
-		data_vec.remove(0);
-		test.generate(outputfile, heading, data_vec);
+	public static HashMap getAnnotationPropertyCode2LabelMap() {
+		return annotationPropertyCode2LabelMap;
 	}
-	*/
 
+	public static HashMap getAnnotationPropertyLabel2CodeMap() {
+		return annotationPropertyLabel2CodeMap;
+	}
+
+	public static HashMap getObjectPropertyCode2LabelMap() {
+		return objectPropertyCode2LabelMap;
+	}
+
+	public static HashMap getObjectPropertyLabel2CodeMap() {
+		return objectPropertyLabel2CodeMap;
+	}
 }

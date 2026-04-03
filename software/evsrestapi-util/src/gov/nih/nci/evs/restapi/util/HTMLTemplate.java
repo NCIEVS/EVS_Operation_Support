@@ -23,7 +23,7 @@ public class HTMLTemplate {
 		for (int i=0; i<line.length(); i++) {
 			char c = line.charAt(i);
 			if (c == ' ' || c == '\t') {
-				buf.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+				buf.append("&nbsp;&nbsp;&nbsp;");
 			} else {
 				break;
 			}
