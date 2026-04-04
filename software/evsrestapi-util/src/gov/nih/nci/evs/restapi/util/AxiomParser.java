@@ -170,7 +170,8 @@ public class AxiomParser {
 
 	public static String getAxiomAnnotatedTarget(String axiom_line) {
 		Vector u = StringUtils.parseData(axiom_line, '|');
-		return (String) u.elementAt(5);
+		Utils.dumpVector(axiom_line, u);
+		return (String) u.elementAt(4);
 	}
 
 	public static HashMap getAxiomQualifiers(Vector w) {
@@ -179,18 +180,30 @@ public class AxiomParser {
 		for (int i=0; i<w.size(); i++) {
 			String axiom_line = (String) w.elementAt(i);
 			Vector u = StringUtils.parseData(axiom_line, '|');
-			String qualifierName = (String) u.elementAt(7);
-			String qualifierValue = (String) u.elementAt(8);
-			hmap.put(qualifierName, qualifierValue);
+			Utils.dumpVector(axiom_line, u);
+			for (int j=4; j<u.size(); j++) {
+				String t = (String) u.elementAt(j);
+				Vector u2 = StringUtils.parseData(t, '$');
+				String qualifierName = (String) u2.elementAt(0);
+				String qualifierValue = (String) u2.elementAt(1);
+				System.out.println(qualifierName + " --> " + qualifierValue);
+				hmap.put(qualifierName, qualifierValue);
+			}
 		}
 		return hmap;
 	}
 
 	public static Object axiomData2Object(Vector w) {
-		String type = getAxiomAnnotatedProperty(w);
+    	String type = getAxiomAnnotatedProperty(w);
 	    String code = getAxiomAnnotatedSourceCode(w);
 	    String label = getAxiomAnnotatedSourceLabel(w);
         String target = getAxiomAnnotatedTarget(w);
+
+        System.out.println("\n+++++++" + type);
+        System.out.println(code);
+        System.out.println(label);
+        System.out.println(target);
+
         HashMap hmap = getAxiomQualifiers(w);
 
         if (type.compareTo("FULL_SYN") == 0) {
@@ -306,10 +319,8 @@ public class AxiomParser {
 				}
 			}
             return go;
-
 		}
         return null;
-
 	}
 
     public static void printAxiomObject(Object obj) {
@@ -349,6 +360,7 @@ public class AxiomParser {
 		return hmap;
 	}
 
+
 	public Vector getAxioms(String named_graph, String code) {
 		Vector w = new Vector();
 		Vector v = getAxiomData(named_graph, code);
@@ -363,9 +375,28 @@ public class AxiomParser {
 		return w;
 	}
 
+
 	public Vector getAxiomData(String named_graph, String code) {
 		return owlSPARQLUtils.get_axioms_by_code(named_graph, code);
 	}
+
+	public static Object line2Object(String line) {
+		Vector u = StringUtils.parseData(line, '|');
+		String type = (String) u.elementAt(2);
+		if (type.compareTo("P90") == 0) {
+			return line2Synonym(line);
+		} else if (type.compareTo("P97") == 0) {
+			return line2Definition(line);
+		} else if (type.compareTo("P325") == 0) {
+			return line2AltDefinition(line);
+		} else if (type.compareTo("P211") == 0) {
+			return line2GoAnnotation(line);
+		} else if (type.compareTo("P375") == 0) {
+			return line2MapToEntry(line);
+		}
+		return null;
+	}
+
 
     public static Synonym line2Synonym(String line) {
 		line = line.trim();
@@ -594,43 +625,62 @@ public class AxiomParser {
 		v = new SortUtils().quickSort(v);
 		Vector w = new Vector();
 		String id = "";
-		String curr_id = null;
-		int count = 0;
+		List list = new ArrayList();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			curr_id = (String) u.elementAt(0);
-			if (id.compareTo("") == 0) {
-				id = curr_id;
-				w.add(line);
-			} else {
-				if (curr_id.compareTo(id) == 0) {
-					w.add(line);
-				} else {
-					count++;
-					Object obj = axiomData2Object(w);
-					String code = getCode(obj);
-					List list = new ArrayList();
-					if (hmap.containsKey(code)) {
-						list = (List) hmap.get(code);
-					}
-					list.add(obj);
-					hmap.put(code, list);
-					w = new Vector();
-					id = curr_id;
-					w.add(line);
+			id = (String) u.elementAt(1);
+			list = new ArrayList();
+			if (hmap.containsKey(id)) {
+				list = (List) hmap.get(id);
+			}
+			Object obj = line2Object(line);
+			list.add(obj);
+            hmap.put(id, list);
+		}
+		return hmap;
+	}
+
+
+	public static HashMap createAxiomHashMap(Vector v) {
+		HashMap axiomHashMap = new HashMap();
+		int colNum = 2;
+		char delim = '|';
+		Vector propCodes = DelimitedDataExtractor.retrieveDistinctColumnValues(v, colNum, delim);
+		Utils.dumpVector("retrieveDistinctColumnValues", propCodes);
+		for (int i=0; i<propCodes.size(); i++) {
+			String propCode = (String) propCodes.elementAt(i);
+			Vector w = DelimitedDataExtractor.retrieveColumnData(v, colNum, propCode, delim);
+			HashMap hmap = AxiomParser.loadAxioms(w);
+			Iterator it = hmap.keySet().iterator();
+			while (it.hasNext()) {
+				String key = (String) it.next();
+				List list = (List) hmap.get(key);
+				for (int j=0; j<list.size(); j++) {
+					Object obj = list.get(j);
+					AxiomParser.printAxiomObject(obj);
+				}
+			}
+			axiomHashMap.put(propCode, hmap);
+		}
+		return axiomHashMap;
+	}
+
+	public static void dumpAxiomHashMap(HashMap axiomHashMap) {
+		Iterator it = axiomHashMap.keySet().iterator();
+		while (it.hasNext()) {
+			String propCode = (String) it.next();
+			HashMap hmap = (HashMap) axiomHashMap.get(propCode);
+			Iterator it2 = hmap.keySet().iterator();
+			while (it2.hasNext()) {
+				String key = (String) it2.next();
+				List list = (List) hmap.get(key);
+				for (int j=0; j<list.size(); j++) {
+					Object obj = list.get(j);
+					AxiomParser.printAxiomObject(obj);
 				}
 			}
 		}
-		Object obj = axiomData2Object(w);
-		String code = getCode(obj);
-		List list = new ArrayList();
-		if (hmap.containsKey(code)) {
-			list = (List) hmap.get(code);
-		}
-		list.add(obj);
-		hmap.put(code, list);
-        return hmap;
 	}
 
     public static void main(String[] args) {

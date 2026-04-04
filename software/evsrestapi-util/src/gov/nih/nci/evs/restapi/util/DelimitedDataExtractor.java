@@ -157,4 +157,31 @@ public class DelimitedDataExtractor {
 		return hmap;
 	}
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	public static Vector retrieveDistinctColumnValues(Vector v, int colNum, char delim) {
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			String colValue = (String) u.elementAt(colNum);
+			if (!w.contains(colValue)) {
+				w.add(colValue);
+			}
+		}
+		return w;
+	}
+
+	public static Vector retrieveColumnData(Vector v, int colNum, String matchingColValue, char delim) {
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			String colValue = (String) u.elementAt(colNum);
+			if (colValue.compareTo(matchingColValue) == 0) {
+				w.add(line);
+			}
+		}
+		return w;
+	}
+
 }
