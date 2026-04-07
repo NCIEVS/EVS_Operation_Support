@@ -59,6 +59,7 @@ public class ReportGenerationUI {
 	static String NCIT_OWL_FILE = "ThesaurusInferred_forTS.owl";
 	static String AXIOM_FILE = "axiom_ThesaurusInferred_forTS.txt";
 	static String VS_FILE = "A8.txt";
+	static String ASSOCIATION_FILE = "associations.txt";
 
 	static String[] root_array = null;
 
@@ -237,7 +238,6 @@ public class ReportGenerationUI {
 		 }
 		});
 
-
 		c.gridx = gridx;
 		c.gridy = 0;
 		ctrlPanel.add(roleLabel, c);
@@ -253,12 +253,14 @@ public class ReportGenerationUI {
 
 //////////////////////////////////////////////////////////////////////////////////////
         JPanel controlPanel_5 = new JPanel();
-		JLabel vsLabel = new JLabel("Value Set File: ", JLabel.LEFT);
+		JLabel vsLabel = new JLabel("Association File: ", JLabel.LEFT);
 		JTextField tf5 = new JTextField(80);
 		tf5.setText(VS_FILE);
 		final JButton generateVSButton = new JButton("Generate");
 		generateVSButton.addActionListener(new ActionListener() {
 		 public void actionPerformed(ActionEvent e) {
+			 ReportSubmitter.generateAssociationFile();
+			 statusLabel.setText(ASSOCIATION_FILE + " generated.");
 			 ReportSubmitter.generateValueSetFile();
 			 statusLabel.setText(VS_FILE + " generated.");
 		 }

@@ -13,7 +13,7 @@ public class ReportSubmitter {
 	public static String SEMANTIC_TYPE_FILE = "P106.txt";
 	public static String NCIT_OWL_FILE = "ThesaurusInferred_forTS.owl";
 	public static String AXIOM_FILE = "axiom_ThesaurusInferred_forTS.txt";
-	public static String ASSOCIATION_FILE = "association.txt";
+	public static String ASSOCIATION_FILE = "associations.txt";
 	public static String VS_FILE = "A8.txt";
 
 	static String serviceUrl = ConfigurationController.serviceUrl;
