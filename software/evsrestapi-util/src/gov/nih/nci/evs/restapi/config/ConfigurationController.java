@@ -77,6 +77,7 @@ public class ConfigurationController {
 	public final static String axiomfile = properties.getProperty("axiomfile");
 	public final static String conceptCodeColumnNumber = properties.getProperty("conceptCodeColumnNumber");
 	public final static String downloadDirectory = properties.getProperty("downloadDirectory");
+	public final static String associationfile = properties.getProperty("associationfile");
 	public final static String hierfile = properties.getProperty("hierfile");
 	public final static String mapping_datafile = properties.getProperty("mapping_datafile");
 	public final static String mapping_filename = properties.getProperty("mapping_filename");
