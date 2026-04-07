@@ -989,7 +989,7 @@ public class OWLScanner {
         OWLRestriction r = null;
         String onProperty = null;
         String someValueFrom = null;
-        HashSet hset = new HashSet();
+        //HashSet hset = new HashSet();
         for (int i=0; i<class_vec.size(); i++) {
 			String t = (String) class_vec.elementAt(i);
 
@@ -1035,6 +1035,7 @@ public class OWLScanner {
 						someValueFrom = t.substring(1, n);
 						r.setSomeValuesFrom(someValueFrom);
 
+/* KLO, 04/07/2026
 						if (restrictionCode == null) {
 							if (!hset.contains(r.toString())) {
 								hset.add(r.toString());
@@ -1046,6 +1047,20 @@ public class OWLScanner {
 								w.add(r.toString());
 							}
 						}
+*/
+
+						if (restrictionCode == null) {
+							//if (!hset.contains(r.toString())) {
+								//hset.add(r.toString());
+								w.add(r.toString());
+							//}
+						} else if (r.getOnProperty().compareTo(restrictionCode) == 0) {
+							//if (!hset.contains(r.toString())) {
+								//hset.add(r.toString());
+								w.add(r.toString());
+							//}
+						}
+
 						r = null;
 					}
 				}

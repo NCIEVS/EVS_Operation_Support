@@ -639,6 +639,7 @@ short black_index = ref.getIndex();
     }
 
     public static boolean isNCItCode(String code) {
+		if (code == null || code.length() == 0) return false;
 		char c = code.charAt(0);
 		if (c != 'C') return false;
 		try {
@@ -651,6 +652,7 @@ short black_index = ref.getIndex();
 	}
 
     public static boolean isNCItCodes(String line) {
+		if (line == null || line.length() == 0) return false;
 		Vector w = StringUtils.parseData(line, '|');
 		for (int i=0; i<w.size(); i++) {
 			String code = (String) w.elementAt(i);
