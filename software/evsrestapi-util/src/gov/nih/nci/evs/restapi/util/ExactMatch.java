@@ -90,6 +90,10 @@ public class ExactMatch {
     String password = null;
     public OWLSPARQLUtils owlSPARQLUtils = null;
 
+    static int DEFAULT = 0;
+    static int BRANCH = 1;
+    static int SUBSET = 2;
+
 	static {
 		AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE_NAME;
 		PROPERTY_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.propertyfile;
@@ -148,7 +152,7 @@ public class ExactMatch {
 	}
 
 
-	public static boolean is_retired(String code) {
+	public boolean is_retired(String code) {
 		return retiredConcepts.contains(code);
 	}
 
@@ -307,32 +311,6 @@ public class ExactMatch {
 		return hmap;
 	}
 
-/*
-    public HashMap createCode2FULLSYNMap() {
-		String filename = AXIOM_FILE;
-		HashMap hmap = new HashMap();
-		Vector v = Utils.readFile(filename);
-        for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String code = (String) u.elementAt(1);
-			String prop_code = (String) u.elementAt(2);
-			if (prop_code.compareTo("P90") == 0) {
-				Vector w = new Vector();
-				if (hmap.containsKey(code)) {
-					w = (Vector) hmap.get(code);
-				}
-				String term = (String) u.elementAt(3);
-				term = HTMLDecoder.decode(term);
-				if (!w.contains(term)) {
-					w.add(term);
-				}
-				hmap.put(code, w);
-			}
-		}
-		return hmap;
-	}
-*/
 
 	public String getMatchedData(String code) {
 		Vector codes = new Vector();
@@ -457,6 +435,7 @@ public class ExactMatch {
 		return code_str + "\t" + pt_str + "\t" + syns_str;
 	}
 
+/*
 	public String run(String datafile, String outputfile) {
 		return run(datafile, outputfile, 0);
 	}
@@ -469,6 +448,7 @@ public class ExactMatch {
 	public String run(String datafile, String outputfile, int colIndex, boolean generateXLS) {
 		return run(new HashSet(), datafile, outputfile, colIndex, generateXLS);
 	}
+*/
 
 	public String run(HashSet branch, String datafile, String outputfile, int colIndex, boolean generateXLS) {
 		int col = colIndex;
@@ -858,7 +838,7 @@ public class ExactMatch {
 		}
 	}
 
-	public static Vector trimAxiomFile(Vector req_spec) {
+	public Vector trimAxiomFile(Vector req_spec) {
 		Vector v = Utils.readFile(AXIOM_FILE);
 		Vector w = new Vector();
 		for (int i=0; i<v.size(); i++) {
@@ -918,14 +898,30 @@ public class ExactMatch {
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
-	public static void run(String datafile, int colNum) {
+	////////////////////////////////////////////////////////////////////////////////////////////
+	public String run(String datafile, String outputfile) {
+		return run(datafile, outputfile, 0);
+	}
+
+	public String run(String datafile, String outputfile, int colIndex) {
+		boolean generateXLS = false;
+		return run(datafile, outputfile, colIndex, generateXLS);
+	}
+
+	public String run(String datafile, String outputfile, int colIndex, boolean generateXLS) {
+		return run(new HashSet(), datafile, outputfile, colIndex, generateXLS);
+	}
+
+	public void run(String datafile, int colNum) {
 		long ms = System.currentTimeMillis();
 		String outputfile = "results_" + datafile;
-		new ExactMatch().run(datafile, outputfile, colNum, true);
+		run(datafile, outputfile, colNum, true);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
-	public static void run(String datafile) {
+	public void run(String datafile) {
 		run(datafile, 0);
 	}
+
+
 }
