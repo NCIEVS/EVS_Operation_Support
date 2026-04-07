@@ -90,9 +90,9 @@ public class ExactMatch {
     String password = null;
     public OWLSPARQLUtils owlSPARQLUtils = null;
 
-    static int DEFAULT = 0;
-    static int BRANCH = 1;
-    static int SUBSET = 2;
+    public static int DEFAULT = 0;
+    public static int BRANCH = 1;
+    public static int SUBSET = 2;
 
 	static {
 		AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE_NAME;
