@@ -171,6 +171,17 @@ public class DelimitedDataExtractor {
 		return w;
 	}
 
+	public static Vector retrieveColumnValues(Vector v, int colNum, char delim) {
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			String colValue = (String) u.elementAt(colNum);
+			w.add(colValue);
+		}
+		return w;
+	}
+
 	public static Vector retrieveColumnData(Vector v, int colNum, String matchingColValue, char delim) {
 		Vector w = new Vector();
 		for (int i=0; i<v.size(); i++) {
