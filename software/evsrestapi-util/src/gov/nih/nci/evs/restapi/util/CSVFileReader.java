@@ -121,10 +121,10 @@ public class CSVFileReader {
 		int istart = 0;
 		for (int i=0; i<list_a.size(); i++) {
 			String[] a = (String[]) list_a.get(i);
-            System.out.println("(1) ");
+            //System.out.println("(1) ");
 			for (int k=0; k<a.length; k++) {
 				String t = (String) a[k];
-				System.out.println("\t" + t);
+				//System.out.println("\t" + t);
 			}
 
 			String s = convertToDelimitedValue(a, delim);
@@ -141,9 +141,7 @@ public class CSVFileReader {
 		String s = null;
 		for (int j=0; j<a.length; j++) {
 			s = (String) a[j];
-
-			System.out.println("(2) " + s);
-
+			//System.out.println("(2) " + s);
 			buf.append(s);
 			if (j<a.length-1) {
 				buf.append(delim);
