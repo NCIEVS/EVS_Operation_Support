@@ -455,14 +455,16 @@ System.out.println("********************** 	findRangesInLEData 	****************
 
 		Vector roleGroups = (Vector) hmap.get("ROLE GROUP");
 		List<RoleGroup> roleGroup_list = new ArrayList();
-		for (int i=0; i<roleGroups.size(); i++) {
-			RoleGroup rg = (RoleGroup) roleGroups.elementAt(i);
-			Vector range_vec = findRangesInRoleGroup(rg);
-			if (range_vec != null && range_vec.size() == 1 && range.compareTo((String) range_vec.elementAt(0)) == 0) {
-				roleGroup_list.add(rg);
-			} else if (range_vec == null || range_vec.size() == 0) {
-				if (range.compareTo(RANGE_UNSPECIFIED) == 0) {
+		if (roleGroups !=null && roleGroups.size() > 0) {
+			for (int i=0; i<roleGroups.size(); i++) {
+				RoleGroup rg = (RoleGroup) roleGroups.elementAt(i);
+				Vector range_vec = findRangesInRoleGroup(rg);
+				if (range_vec != null && range_vec.size() == 1 && range.compareTo((String) range_vec.elementAt(0)) == 0) {
 					roleGroup_list.add(rg);
+				} else if (range_vec == null || range_vec.size() == 0) {
+					if (range.compareTo(RANGE_UNSPECIFIED) == 0) {
+						roleGroup_list.add(rg);
+					}
 				}
 			}
 		}
