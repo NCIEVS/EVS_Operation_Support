@@ -190,16 +190,22 @@ public class ValueSetReportGenerator {
 				}
 			}
 		}
-	    Vector w = owlSPARQLUtils.getConceptsWithProperties(this.namedGraph, code, propertyLabels);
-		if (w == null || w.size() == 0) {
-			System.out.println("getConceptsWithProperties failed???");
-		}
-        Utils.saveToFile(headerConceptCode + "_ConceptsWithProperties.txt", w);
-        for (int i=0; i<w.size(); i++) {
-			String line = (String) w.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String condition_code = (String) u.elementAt(0);
-			condition_codes.add(condition_code);
+		if (code != null) {
+			Vector w = owlSPARQLUtils.getConceptsWithProperties(this.namedGraph, code, propertyLabels);
+			System.out.println("getConceptsWithProperties namedGraph: " + namedGraph);
+			System.out.println("getConceptsWithProperties code: " + code);
+			Utils.dumpVector("getConceptsWithProperties propertyLabels ", propertyLabels);
+
+			if (w == null || w.size() == 0) {
+				System.out.println("getConceptsWithProperties failed???");
+			}
+			Utils.saveToFile(headerConceptCode + "_ConceptsWithProperties.txt", w);
+			for (int i=0; i<w.size(); i++) {
+				String line = (String) w.elementAt(i);
+				Vector u = StringUtils.parseData(line, '|');
+				String condition_code = (String) u.elementAt(0);
+				condition_codes.add(condition_code);
+			}
 		}
 		return condition_codes;
 	}
@@ -307,12 +313,17 @@ System.out.println("Step 1");
 
 System.out.println("Step 2");
 		Vector v = findPropertyLabelAndValueInPropertyValueConditions();
+System.out.println("findPropertyLabelAndValueInPropertyValueConditions returns v: " + v.size());
 		for (int i=0; i<v.size(); i++) {
 			String labelAndValue = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(labelAndValue, '|');
 			String property_label = (String) u.elementAt(0);
 			String property_value = (String) u.elementAt(1);
 			Set condition_2_codes = findCodesMeetPropertyValueConditions(property_label, property_value);
+System.out.println("\tfindCodesMeetPropertyValueConditions property_label: " + property_label);
+System.out.println("\tfindCodesMeetPropertyValueConditions property_value: " + property_value);
+System.out.println("\tfindCodesMeetPropertyValueConditions returns condition_2_codes: " + condition_2_codes.size());
+
     		condition_codes.retainAll(condition_2_codes);
 		}
 
@@ -322,16 +333,24 @@ System.out.println("Step 3");
         Utils.saveToFile(headerConceptCode + ".txt", value_set);
         Vector warnings  = new Vector();
 
+System.out.println("\tcondition_codes: " + condition_codes.size());
         Vector value_set_codes = new Vector();
-        int k = 0;
-        for (int i=0; i<value_set.size(); i++) {
+		int k = 0;
+		for (int i=0; i<value_set.size(); i++) {
 			String line = (String) value_set.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			String value_set_code = (String) u.elementAt(1);
 			value_set_codes.add(value_set_code);
-			if (!condition_codes.contains(value_set_code)) {
-				k++;
-				warnings.add(line);
+		}
+
+		if (condition_codes != null && condition_codes.size() > 0) {
+			for (int i=0; i<value_set_codes.size(); i++) {
+				String value_set_code = (String) value_set_codes.elementAt(i);
+				if (!condition_codes.contains(value_set_code)) {
+					k++;
+					String line = (String) value_set.elementAt(i);
+					warnings.add(line);
+				}
 			}
 		}
 		setWarnings(warnings);
