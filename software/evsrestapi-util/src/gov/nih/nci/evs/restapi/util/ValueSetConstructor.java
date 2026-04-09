@@ -126,14 +126,20 @@ public class ValueSetConstructor {
 	    Vector v = new Vector();
 	    while (!stack.isEmpty()) {
 			String code = (String) stack.pop();
-			v = owlSPARQLUtils.get_concepts_in_subset(this.namedGraph, code);
-			w.addAll(v);
-			Vector subs = owlSPARQLUtils.getSubclassesByCode(this.namedGraph, code);
-			if (subs != null && subs.size() > 0) {
-				for (int k=0; k<subs.size(); k++) {
-					String sub = (String) subs.elementAt(k);
-					Vector u = StringUtils.parseData(sub, '|');
-					stack.push((String) u.elementAt(1));
+			if (code != null) {
+				v = owlSPARQLUtils.get_concepts_in_subset(this.namedGraph, code);
+				if (v == null || v.size() == 0) {
+					System.out.println("WARNING: owlSPARQLUtils.get_concepts_in_subset " + code + " returns null or nothing.");
+				} else {
+					w.addAll(v);
+				}
+				Vector subs = owlSPARQLUtils.getSubclassesByCode(this.namedGraph, code);
+				if (subs != null && subs.size() > 0) {
+					for (int k=0; k<subs.size(); k++) {
+						String sub = (String) subs.elementAt(k);
+						Vector u = StringUtils.parseData(sub, '|');
+						stack.push((String) u.elementAt(1));
+					}
 				}
 			}
 		}

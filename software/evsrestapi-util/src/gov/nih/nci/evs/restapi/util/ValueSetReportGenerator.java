@@ -1,4 +1,5 @@
 package gov.nih.nci.evs.restapi.util;
+import gov.nih.nci.evs.restapi.config.*;
 import gov.nih.nci.evs.restapi.model.*;
 import java.io.*;
 import java.text.*;
@@ -64,7 +65,7 @@ public class ValueSetReportGenerator {
     String username = null;
     String password = null;
     OWLSPARQLUtils owlSPARQLUtils = null;
-	MetadataUtils metadataUtils = null;
+	//MetadataUtils metadataUtils = null;
     String version = null;
     String definition = null;
     Vector conditions = null;
@@ -119,10 +120,11 @@ public class ValueSetReportGenerator {
 
         this.retired_concept_codes = new HashSet();
         //C155798|Chimeric Antigen Receptor T-cell Therapy|P310|Concept_Status|Retired_Concept
+        //Cyclophosphamide/Doxorubicin/Fluorouracil/Methotrexate/Prednisone/Vincristine|C10002|Concept_Status|Obsolete_Concept
         for (int i=0; i<concept_status_vec.size(); i++) {
 			String line = (String) concept_status_vec.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String status = (String) u.elementAt(4);
+			String status = (String) u.elementAt(3);
 			if (status.compareTo(RETIRED_CONCEPT) == 0) {
 				String code = (String) u.elementAt(0);
 				this.retired_concept_codes.add(code);
@@ -130,7 +132,7 @@ public class ValueSetReportGenerator {
 		}
 
 		this.headerConceptLabel = this.owlSPARQLUtils.getLabel(this.headerConceptCode);
-		this.metadataUtils = new MetadataUtils(serviceUrl, username, password);
+		//this.metadataUtils = new MetadataUtils(serviceUrl, username, password);
 
 		this.description = "";
 		this.label = this.owlSPARQLUtils.getLabel(headerConceptCode);
@@ -140,6 +142,10 @@ public class ValueSetReportGenerator {
 		this.conditions = new Vector();
 		this.version = getVersion();
 		this.definition = getDefinition();
+
+		System.out.println(version);
+		System.out.println(definition);
+
 		this.footer = "Source: " + NCI_THESAURUS + " (version: " + this.version + ")";
 		this.timestamp = "Last modified: " + StringUtils.getToday();
 
@@ -166,19 +172,22 @@ public class ValueSetReportGenerator {
 		Set condition_codes = new HashSet();
         String code = null;
 	    Vector propertyLabels = new Vector();
-	    for (int i=0; i<condition_data.size(); i++) {
-			String line = (String) condition_data.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String type = (String) u.elementAt(0);
-			if ((type.compareTo("Property") == 0 && u.size() == 2) ||
-			    (type.compareTo("PropertyValue") == 0 && u.size() == 3)) {
-				String property_code = (String) u.elementAt(1);
-                String property_label = null;
-				if (validator == null) {
-					System.out.println("Validator == null???");
+
+	    if (condition_data != null) {
+			for (int i=0; i<condition_data.size(); i++) {
+				String line = (String) condition_data.elementAt(i);
+				Vector u = StringUtils.parseData(line, '|');
+				String type = (String) u.elementAt(0);
+				if ((type.compareTo("Property") == 0 && u.size() == 2) ||
+					(type.compareTo("PropertyValue") == 0 && u.size() == 3)) {
+					String property_code = (String) u.elementAt(1);
+					String property_label = null;
+					if (validator == null) {
+						System.out.println("Validator == null???");
+					}
+					property_label = validator.getPropertyLabel(property_code);
+					propertyLabels.add(property_label);
 				}
-				property_label = validator.getPropertyLabel(property_code);
-				propertyLabels.add(property_label);
 			}
 		}
 	    Vector w = owlSPARQLUtils.getConceptsWithProperties(this.namedGraph, code, propertyLabels);
@@ -198,16 +207,18 @@ public class ValueSetReportGenerator {
 //w.add("Property|P322|CTDC");
     private Vector findPropertyLabelAndValueInPropertyValueConditions() {
 		Vector propertyLabelAndValue = new Vector();
-	    for (int i=0; i<condition_data.size(); i++) {
-			String line = (String) condition_data.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String type = (String) u.elementAt(0);
-			if (type.compareTo("Property") == 0 && u.size() == 3) {
-				String property_code = (String) u.elementAt(1);
-				String property_value = (String) u.elementAt(2);
-				String property_label = owlSPARQLUtils.getPropertyLabel(property_code);
-				if (!propertyLabelAndValue.contains(property_label + "|" + property_value)) {
-					propertyLabelAndValue.add(property_label + "|" + property_value);
+		if (condition_data != null) {
+			for (int i=0; i<condition_data.size(); i++) {
+				String line = (String) condition_data.elementAt(i);
+				Vector u = StringUtils.parseData(line, '|');
+				String type = (String) u.elementAt(0);
+				if (type.compareTo("Property") == 0 && u.size() == 3) {
+					String property_code = (String) u.elementAt(1);
+					String property_value = (String) u.elementAt(2);
+					String property_label = owlSPARQLUtils.getPropertyLabel(property_code);
+					if (!propertyLabelAndValue.contains(property_label + "|" + property_value)) {
+						propertyLabelAndValue.add(property_label + "|" + property_value);
+					}
 				}
 			}
 		}
@@ -216,15 +227,17 @@ public class ValueSetReportGenerator {
 
     private Vector findPropertyLabelsInPropertyQualifierConditions() {
 		Vector propertyLabels = new Vector();
-	    for (int i=0; i<condition_data.size(); i++) {
-			String line = (String) condition_data.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String type = (String) u.elementAt(0);
-			if (type.compareTo("PropertyQualifier") == 0) {
-				String property_code = (String) u.elementAt(1);
-				String property_label = validator.getPropertyLabel(property_code);
-				if (!propertyLabels.contains(property_label)) {
-					propertyLabels.add(property_label);
+		if (condition_data != null) {
+			for (int i=0; i<condition_data.size(); i++) {
+				String line = (String) condition_data.elementAt(i);
+				Vector u = StringUtils.parseData(line, '|');
+				String type = (String) u.elementAt(0);
+				if (type.compareTo("PropertyQualifier") == 0) {
+					String property_code = (String) u.elementAt(1);
+					String property_label = validator.getPropertyLabel(property_code);
+					if (!propertyLabels.contains(property_label)) {
+						propertyLabels.add(property_label);
+					}
 				}
 			}
 		}
@@ -248,16 +261,18 @@ public class ValueSetReportGenerator {
     private Set findCodesMeetPropertyQualifierConditions(String propertyLabel) {
         Vector qualifierCodes = new Vector();
         Vector qualifierValues = new Vector();
-        for (int i=0; i<condition_data.size(); i++) {
-			String line = (String) condition_data.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String type = (String) u.elementAt(0);
-			if (type.compareTo("PropertyQualifier") == 0) {
-				String property_code = (String) u.elementAt(1);
-				String property_label = validator.getPropertyLabel(property_code);
-				if (property_label.compareTo(propertyLabel) == 0) {
-					qualifierCodes.add((String) u.elementAt(2));
-					qualifierValues.add((String) u.elementAt(3));
+        if (condition_data != null) {
+			for (int i=0; i<condition_data.size(); i++) {
+				String line = (String) condition_data.elementAt(i);
+				Vector u = StringUtils.parseData(line, '|');
+				String type = (String) u.elementAt(0);
+				if (type.compareTo("PropertyQualifier") == 0) {
+					String property_code = (String) u.elementAt(1);
+					String property_label = validator.getPropertyLabel(property_code);
+					if (property_label.compareTo(propertyLabel) == 0) {
+						qualifierCodes.add((String) u.elementAt(2));
+						qualifierValues.add((String) u.elementAt(3));
+					}
 				}
 			}
 		}
@@ -279,12 +294,18 @@ public class ValueSetReportGenerator {
 
     public void runQA() {
         Set condition_codes = findCodesMeetPropertyConditions();
+
+        System.out.println("findCodesMeetPropertyConditions returns condition_codes: " + condition_codes.size());
+System.out.println("Step 1");
+
         Vector propertyLabelsOfPropQualConditions = findPropertyLabelsInPropertyQualifierConditions();
         for (int i=0; i<propertyLabelsOfPropQualConditions.size(); i++) {
 			String property_label = (String) propertyLabelsOfPropQualConditions.elementAt(i);
 			Set condition_2_codes = findCodesMeetPropertyQualifierConditions(property_label);
 			condition_codes.retainAll(condition_2_codes);
 		}
+
+System.out.println("Step 2");
 		Vector v = findPropertyLabelAndValueInPropertyValueConditions();
 		for (int i=0; i<v.size(); i++) {
 			String labelAndValue = (String) v.elementAt(i);
@@ -295,6 +316,7 @@ public class ValueSetReportGenerator {
     		condition_codes.retainAll(condition_2_codes);
 		}
 
+System.out.println("Step 3");
 		ValueSetConstructor vsc = new ValueSetConstructor(this.serviceUrl, this.namedGraph, this.username, this.password);
 		Vector value_set = vsc.generate_concept_in_subset(headerConceptCode);
         Utils.saveToFile(headerConceptCode + ".txt", value_set);
@@ -314,6 +336,7 @@ public class ValueSetReportGenerator {
 		}
 		setWarnings(warnings);
 
+System.out.println("Step 4");
 		Vector condition_code_vec = new Vector();
 		Iterator it = condition_codes.iterator();
 		while (it.hasNext()) {
@@ -321,6 +344,8 @@ public class ValueSetReportGenerator {
 			condition_code_vec.add(condition_code);
 		}
         missing_vec  = new Vector();
+System.out.println("\tvalue_set_codes.size(): " + value_set_codes.size());
+System.out.println("\tcondition_code_vec.size(): " + condition_code_vec.size());
         for (int i=0; i<condition_code_vec.size(); i++) {
 			String condition_code = (String) condition_code_vec.get(i);
 			if (!value_set_codes.contains(condition_code) && !isRetired(condition_code)) {
@@ -328,6 +353,8 @@ public class ValueSetReportGenerator {
 				missing_vec.add(condition_label + "|" + condition_code);
 			}
 		}
+
+System.out.println("Step 5");
 		Utils.saveToFile(headerConceptCode + "_missing_concepts.txt", missing_vec);
 	}
 
@@ -357,8 +384,9 @@ public class ValueSetReportGenerator {
 	}
 
 	public String getVersion() {
-		metadataUtils.dumpNameVersion2NamedGraphMap();
-		return metadataUtils.getLatestVersion(NCI_THESAURUS);
+		//metadataUtils.dumpNameVersion2NamedGraphMap();
+		//return metadataUtils.getLatestVersion(NCI_THESAURUS);
+		return owlSPARQLUtils.getVersion(namedGraph);
 	}
 
 	public String getDefinition() {
@@ -471,9 +499,6 @@ public class ValueSetReportGenerator {
 	}
 
 	public String getHyperlink(String value) {
-		//<a href="https://nciterms65.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&version=20.11e&ns=ncit&code=C118325">C118325</a>
-		//String str = "<a href=\"" + HYPERLINK_URL + value + "\">" + value + "</a>";
-		//System.out.println(str);
 		return value;
 	}
 
@@ -625,7 +650,12 @@ public class ValueSetReportGenerator {
 	public void generate() {
 	    OWLSPARQLUtils test = new OWLSPARQLUtils(serviceUrl, username, password);
         test.set_named_graph(namedGraph);
+
+System.out.println("*** headerConceptLabel: " + headerConceptLabel);
+
+        System.out.println("Calling runQA...");
         runQA();
+
 
         String pageTitle = this.tableTitle;
         String outputfile = headerConceptLabel.replace(" ", "_");
@@ -652,6 +682,21 @@ public class ValueSetReportGenerator {
 			}
 		}
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
+	public static void main(String[] args) {
+		String serviceUrl = ConfigurationController.serviceUrl;
+		String namedGraph = ConfigurationController.namedGraph;
+		String username = ConfigurationController.username;
+		String password = ConfigurationController.password;
+
+		gov.nih.nci.evs.restapi.util.ValueSetConditionValidator validator = new  gov.nih.nci.evs.restapi.util.ValueSetConditionValidator(serviceUrl, namedGraph, username, password);
+		Vector w = new Vector();
+		w.add("ValueSet|A8|C54453");
+		validator.setConditions(w);
+		//ValueSet|<code>|<association_code>|<header_concept_code>
+		ValueSetReportGenerator generator = new ValueSetReportGenerator(serviceUrl, namedGraph, username, password, validator);
+		generator.generate();
 	}
 }
 

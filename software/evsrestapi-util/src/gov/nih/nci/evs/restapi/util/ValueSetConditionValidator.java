@@ -248,29 +248,31 @@ public class ValueSetConditionValidator {
 			String line = (String) w.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			String type = (String) u.elementAt(0);
+			//Property|<code>
 			if (type.compareTo("Property") == 0) {
 				String property_code = (String) u.elementAt(1);
 				String s = createPropertyCondition(property_code);
 				this.conditions.add(s);
+			//PropertyValue|<code>|<value>
 			} else if (type.compareTo("PropertyValue") == 0) {
 				String property_code = (String) u.elementAt(1);
 				String property_value = (String) u.elementAt(2);
 				String s = createPropertyValueCondition(property_code, property_value);
 				this.conditions.add(s);
-
+            //PropertyQualifier|<code>|<qualifier_code>|<qualifier_value>
 			} else if (type.compareTo("PropertyQualifier") == 0) {
 				String property_code = (String) u.elementAt(1);
 				String qualifier_code = (String) u.elementAt(2);
 				String qualifier_value = (String) u.elementAt(3);
 				String s = createPropertyQualifierCondition(property_code, qualifier_code, qualifier_value);
 				this.conditions.add(s);
-
+            //ValueSet|<association_code>|<header_concept_code>
 			} else if (type.compareTo("ValueSet") == 0) {
 				String association_code = (String) u.elementAt(1);
 				String header_concept_code = (String) u.elementAt(2);
                 String s = createValueSetCondition(header_concept_code, association_code);
                 this.conditions.add(s);
-                this.headerConceptCode = (String) u.elementAt(2);;
+                this.headerConceptCode = (String) u.elementAt(2);
 			}
 		}
 	}
