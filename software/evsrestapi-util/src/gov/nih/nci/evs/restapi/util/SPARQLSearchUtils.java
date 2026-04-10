@@ -273,8 +273,6 @@ public class SPARQLSearchUtils extends OWLSPARQLUtils {
 				code2Label_hmap.put(code, key);
 				String term = (String) w2.elementAt(0);
 
-
-
 				Vector words = toKeywords(term);
 				String signature = getSignature(words);
 				Vector codes = new Vector();
@@ -1165,7 +1163,7 @@ public Vector getPropertyValues(String named_graph, String propertyName) {
         buf.append("").append("\n");
         buf.append("SELECT distinct ?x_code ?x_label ?z_target").append("\n");
         buf.append("{").append("\n");
-        buf.append("    graph <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl> {").append("\n");
+        buf.append("    graph <" + named_graph + "> {").append("\n");
         buf.append("            {").append("\n");
         buf.append("                ?x a owl:Class .").append("\n");
         buf.append("                ?x :NHC0 ?x_code .").append("\n");
@@ -1351,7 +1349,7 @@ public Vector getPropertyValues(String named_graph, String propertyName) {
 		StringBuffer buf = new StringBuffer();
 		buf.append(prefixes);
 		buf.append("select distinct ?x1_label ?x1_code ").append("\n");
-		buf.append("from <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl>").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
 		buf.append("where  { ").append("\n");
 		buf.append("                    ?x1 a owl:Class .").append("\n");
 		buf.append("                    ?x1 :NHC0 ?x1_code .").append("\n");
@@ -1521,7 +1519,46 @@ public Vector getPropertyValues(String named_graph, String propertyName) {
 		return false;
 	}
 
-	public static void main(String[] args) {
+	public static void run(String serviceUrl, String named_graph, String username, String password, String verbatimfile, int colNum, char delim) {
+		SPARQLSearchUtils searchUtils = new SPARQLSearchUtils(serviceUrl, named_graph, username, password);
+        Vector lines = Utils.readFile(verbatimfile);
+        System.out.println("Terms to match: " + lines.size());
+        Vector w = new Vector();
+	    int num_matched = 0;
+	    Vector no_match_verbatim_vec = new Vector();
+	    //Skip first header line
+		for (int i=1; i<lines.size(); i++) {
+			boolean matched = true;
+			String line = (String) lines.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			String term = (String) u.elementAt(colNum);
+			Vector v = searchUtils.mapTo(term);
+			if (v != null && v.size() > 0) {
+				Vector v2 = new Vector();
+				for (int j=0; j<v.size(); j++) {
+					String line1 = (String) v.elementAt(j);
+					w.add(line + delim + line1);
+				}
+			} else{
+				w.add(line + "\tNo match");
+				matched = false;
+				no_match_verbatim_vec.add(line);
+			}
+			if (matched) {
+				num_matched++;
+			}
+		}
+		Utils.saveToFile("results_" + verbatimfile, w);
+		Utils.saveToFile("nomatches_" + verbatimfile, no_match_verbatim_vec);
+
+		System.out.println("Number of terms: " + lines.size());
+		System.out.println("Number of terms matched: " + num_matched);
+		int no_matches = lines.size() - num_matched;
+		System.out.println("Number of terms NOT matched: " + no_matches);
+	}
+
+
+	public static void run(String[] args) {
 		long ms = System.currentTimeMillis();
 		String serviceUrl = ConfigurationController.serviceUrl;
 		String named_graph = ConfigurationController.namedGraph;
@@ -1531,58 +1568,9 @@ public Vector getPropertyValues(String named_graph, String propertyName) {
 		System.out.println("named_graph: " + named_graph);
 
 		String verbatimfile = args[0];
-		/*
-		String codingScheme = "NCI_Thesaurus";
-		MetadataUtils test = new MetadataUtils(serviceUrl, username, password);
-		String version = test.getLatestVersion(codingScheme);
-		String named_graph = test.getNamedGraph(codingScheme);
-		*/
-
-		SPARQLSearchUtils searchUtils = new SPARQLSearchUtils(serviceUrl, named_graph, username, password);
-        Vector verbatims = Utils.readFile(verbatimfile);
-        Vector w = new Vector();
-		int k = 0;
-
-	    int num_matched = 0;
-	    Vector no_match_verbatim_vec = new Vector();
-		for (int i=0; i<verbatims.size(); i++) {
-			boolean matched = true;
-			k++;
-			String verbatim = (String) verbatims.elementAt(i);
-			Vector u = StringUtils.parseData(verbatim, '\t');
-			String term = (String) u.elementAt(0);
-			String code = "NA";//
-			if (u.size() > 1) {
-				code = (String) u.elementAt(1);
-				System.out.println("(" + k + ") " + term + " (" + code + ")");
-			} else {
-				System.out.println("(" + k + ") " + term);
-			}
-
-			Vector v = searchUtils.mapTo(term);
-			if (v != null && v.size() > 0) {
-				Vector v2 = new Vector();
-				for (int j=0; j<v.size(); j++) {
-					String line = (String) v.elementAt(j);
-					w.add(verbatim + "|" + line);
-				}
-			} else{
-				w.add(verbatim + "||||||No match");
-				matched = false;
-				no_match_verbatim_vec.add(verbatim);
-			}
-			if (matched) {
-				num_matched++;
-			}
-		}
-		Utils.saveToFile("results_" + verbatimfile, w);
-		Utils.saveToFile("nomatches_" + verbatimfile, no_match_verbatim_vec);
-
-		System.out.println("Number of terms: " + verbatims.size());
-		System.out.println("Number of terms matched: " + num_matched);
-		int no_matches = verbatims.size() - num_matched;
-		System.out.println("Number of terms NOT matched: " + no_matches);
-
+		String colNum_str = args[1];
+		int colNum = Integer.parseInt(colNum_str);
+		char delim = '\t';
+		run(serviceUrl, named_graph, username, password, verbatimfile, colNum, delim);
 	}
-
 }
