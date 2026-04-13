@@ -71,33 +71,51 @@ import java.time.Duration;
 
 public class SPARQLRunner {
 
-	public static void run(String queryfile) {
+	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		String restURL = ConfigurationController.serviceUrl;
 		String namedGraph =  ConfigurationController.namedGraph;
 		String username =  ConfigurationController.username;
 		String password =  ConfigurationController.password;
+		String queryfile = args[0];
+
+		boolean codeGen = true;
+		if (args.length > 1) {
+			String codegenStr = args[1];
+			if (codegenStr.compareTo("false") == 0) {
+				codeGen = false;
+			}
+		}
 
 		OWLSPARQLUtils owlSPARQLUtils = new OWLSPARQLUtils(restURL, username, password);
 		owlSPARQLUtils.set_named_graph(namedGraph);
 		String query = owlSPARQLUtils.loadQuery(queryfile);
 		System.out.println(query);
 
-		Vector v = owlSPARQLUtils.execute(queryfile);
-		Utils.dumpVector("v", v);
+		boolean success = true;
 
-		int n = queryfile.lastIndexOf(".");
-		String className = queryfile.substring(0, n);
-		className = className.substring(0, 1).toUpperCase() + className.substring(1, className.length());
-		className = className.replace("_", "");
+		try {
+			Vector v = owlSPARQLUtils.execute(queryfile);
+			Utils.dumpVector("v", v);
+		} catch (Exception ex) {
+			//System.out.println("owlSPARQLUtils.execute failed.");
+			success = false;
+		}
 
-		CodeGenerator.run(className, queryfile);
+		if (codeGen) {
+			int n = queryfile.lastIndexOf(".");
+			String className = queryfile.substring(0, n);
+			className = className.substring(0, 1).toUpperCase() + className.substring(1, className.length());
+			className = className.replace("_", "");
+			CodeGenerator.run(className, queryfile);
+		}
+
+		if (!success) {
+			System.out.println("ERROR: owlSPARQLUtils.execute failed. - either the server is not available or SPARQL error.");
+		}
+
 	}
 
-	public static void main(String[] args) {
-		long ms = System.currentTimeMillis();
-		String queryfile = args[0];
-		run(queryfile);
-	}
+
 
 }

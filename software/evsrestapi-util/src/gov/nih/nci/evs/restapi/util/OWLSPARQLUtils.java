@@ -195,7 +195,7 @@ public class OWLSPARQLUtils {
 
     public void set_named_graph_id(String named_graph_id) {
 		this.named_graph_id = named_graph_id;
-		this.code2LabelMap = createCode2LabelMap();
+		//this.code2LabelMap = createCode2LabelMap();
 	}
 
     public void set_version(String version) {
