@@ -1558,6 +1558,68 @@ public Vector getPropertyValues(String named_graph, String propertyName) {
 	}
 
 
+	public String construct_search_by_source_code(String named_graph, String source_code) {
+		String prefixes = getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		buf.append("select distinct ?x_label ?x_code ?z_target ?p_code ?p_label ?q_code ?q_label ?q_value").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
+		buf.append("where {").append("\n");
+		buf.append("            ?x a owl:Class .").append("\n");
+		buf.append("            ?x :NHC0 ?x_code .").append("\n");
+		buf.append("            ?x rdfs:label ?x_label .").append("\n");
+		buf.append("            ?z_axiom a owl:Axiom .").append("\n");
+		buf.append("            ?z_axiom owl:annotatedSource ?x .").append("\n");
+		buf.append("            ?z_axiom owl:annotatedProperty ?p .").append("\n");
+		buf.append("            ?p rdfs:label ?p_label .").append("\n");
+		buf.append("            ?p :NHC0 ?p_code .            ").append("\n");
+		buf.append("            ?z_axiom owl:annotatedTarget ?z_target .").append("\n");
+		buf.append("            ?z_axiom ?q ?q_value .").append("\n");
+		buf.append("            ?q :NHC0 \"P385\"^^xsd:string .").append("\n");
+		buf.append("            ?q :NHC0 ?q_code .").append("\n");
+		buf.append("            ?q rdfs:label ?q_label .            ").append("\n");
+		buf.append("            ?z_axiom ?q \"" + source_code + "\"^^xsd:string .").append("\n");
+		buf.append("}").append("\n");
+		return buf.toString();
+	}
+
+	public Vector searchBySourceCode(String named_graph, String source_code) {
+		String query = construct_search_by_source_code(named_graph, source_code);
+		Vector v = executeQuery(query);
+		if (v == null) return null;
+		if (v.size() == 0) return v;
+		return new SortUtils().quickSort(v);
+	}
+
+	public Vector getDistinctSourceCode(String named_graph) {
+        return getDistinctQualifierValues(named_graph, "P90", "P385");
+	}
+
+	public String construct_get_distinct_prop_qualifier_values(String named_graph, String prop_code, String qualifier_code) {
+		String prefixes = getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		buf.append("select distinct ?q_value").append("\n");
+		buf.append("from <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus_26.03e.owl>").append("\n");
+		buf.append("where {").append("\n");
+		buf.append("            ?z_axiom a owl:Axiom .").append("\n");
+		buf.append("            ?z_axiom owl:annotatedProperty ?p .").append("\n");
+		buf.append("            ?p :NHC0 ?p_code .  ").append("\n");
+		buf.append("            ?p :NHC0 \"" + prop_code + "\"^^xsd:string .").append("\n");
+		buf.append("            ?z_axiom ?q ?q_value .").append("\n");
+		buf.append("            ?q :NHC0 \"" + qualifier_code + "\"^^xsd:string .").append("\n");
+		buf.append("}").append("\n");
+		return buf.toString();
+	}
+
+	public Vector getDistinctQualifierValues(String named_graph, String prop_code, String qualifier_code) {
+		String query = construct_get_distinct_prop_qualifier_values(named_graph, prop_code, qualifier_code);
+		Vector v = executeQuery(query);
+		if (v == null) return null;
+		if (v.size() == 0) return v;
+		return new SortUtils().quickSort(v);
+	}
+
 	public static void run(String[] args) {
 		long ms = System.currentTimeMillis();
 		String serviceUrl = ConfigurationController.serviceUrl;
@@ -1574,3 +1636,14 @@ public Vector getPropertyValues(String named_graph, String propertyName) {
 		run(serviceUrl, named_graph, username, password, verbatimfile, colNum, delim);
 	}
 }
+
+/*
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C155317"/>
+        <owl:annotatedProperty rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P90"/>
+        <owl:annotatedTarget>PDHX</owl:annotatedTarget>
+        <P383>PT</P383>
+        <P384>HGNC</P384>
+        <P385>HGNC:21350</P385>
+    </owl:Axiom>
+*/
