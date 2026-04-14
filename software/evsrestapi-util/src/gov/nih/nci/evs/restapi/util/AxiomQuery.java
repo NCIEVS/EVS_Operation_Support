@@ -104,8 +104,8 @@ public class AxiomQuery {
 		String prefixes = owlSPARQLUtils.getPrefixes();
 		StringBuffer buf = new StringBuffer();
 		buf.append(prefixes);
-		//Recombinant Amphiregulin|C1000|CRDGF|P383$AB|P384$NCI
-		buf.append("select distinct ?x_label ?x_code ?p_code ?z_target ?q_code ?q_value").append("\n");
+		//buf.append("select distinct ?x_label ?x_code ?p_code ?z_axiom ?z_target ?q_code ?q_value").append("\n");
+		buf.append("select ?x_code ?z_axiom ?z_target ?q_code ?q_value").append("\n");
 		buf.append("from <" + named_graph + ">").append("\n");
 		buf.append("where {").append("\n");
 		buf.append("            ?x a owl:Class .").append("\n");
@@ -149,16 +149,16 @@ public class AxiomQuery {
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
+
 			String key = (String) u.elementAt(0) + "|" +
 			             (String) u.elementAt(1) + "|" +
-			             (String) u.elementAt(2) + "|" +
-			             (String) u.elementAt(3);
+			             (String) u.elementAt(2);
 
 			String value = "";
 			if (hmap.containsKey(key)) {
 				value = (String) hmap.get(key);
 			}
-			String s = (String) u.elementAt(4) + "$" + (String) u.elementAt(5);
+			String s = (String) u.elementAt(3) + "$" + (String) u.elementAt(4);
 			if (value.compareTo("") == 0) {
 				hmap.put(key, s);
 			} else {
@@ -175,13 +175,70 @@ public class AxiomQuery {
 		Vector w1 = new Vector();
 		for (int i=0; i<keys.size(); i++) {
 		    String key = (String) keys.elementAt(i);
-		    w1.add(key + "|" + (String) hmap.get(key));
+		    String value = (String) hmap.get(key);
+		    w1.add(key + "|" + value);
 		}
 		return w1;
 	}
 
+	public static HashMap createAxiomHashMap(Vector v) {
+		HashMap hmap = new HashMap();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(0);
+			HashMap map = new HashMap();
+			if (hmap.containsKey(code)) {
+				map = (HashMap) hmap.get(code);
+			}
+			StringBuffer b = new StringBuffer();
+
+			for (int j=3; j<u.size(); j++) {
+				b.append((String) u.elementAt(j)).append("|");
+			}
+			String key = b.toString();
+			if (key.length() > 0) {
+				key = key.substring(0, key.length()-1);
+			}
+			Vector w = new Vector();
+			if (map.containsKey(key)) {
+				w = (Vector) map.get(key);
+			}
+			w.add((String) u.elementAt(2));
+			map.put(key, w);
+			hmap.put(code, map);
+		}
+		return hmap;
+	}
+
+	public static String vector2DelimitedStr(Vector v) {
+		if (v == null) return "";
+		StringBuffer b = new StringBuffer();
+		for (int j=0; j<v.size(); j++) {
+			b.append((String) v.elementAt(j)).append("|");
+		}
+		String s = b.toString();
+		if (s.length() > 0) {
+			s = s.substring(0, s.length()-1);
+		}
+		return s;
+	}
+
+	public static HashMap retrieveAxiomData(HashMap axiomMap, String target, Vector codes) {
+		HashMap hmap = new HashMap();
+		for (int i=0; i<codes.size(); i++) {
+			String code = (String) codes.elementAt(i);
+			HashMap map = (HashMap) axiomMap.get(code);
+			Vector values = (Vector) map.get(target);
+			String s = vector2DelimitedStr(values);
+			hmap.put(code, s);
+		}
+		return hmap;
+	}
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
+        Vector v = new Vector();
 		File f = new File("results_axiom_query.txt");
 		if (!f.exists()) {
 			String serviceUrl = ConfigurationController.serviceUrl;
@@ -189,13 +246,29 @@ public class AxiomQuery {
 			String username = ConfigurationController.username;
 			String password = ConfigurationController.password;
 			AxiomQuery test = new AxiomQuery(serviceUrl, named_graph, username, password);
-			Vector w = test.getAxioms(named_graph, "P90", null);
-			Utils.saveToFile("results_axiom_query.txt", w);
+			v = test.getAxioms(named_graph, "P90", null);
+			Utils.saveToFile("results_axiom_query.txt", v);
 		} else {
-			Vector v = Utils.readFile("results_axiom_query.txt");
-			v = sortAxiom(v);
-			Utils.saveToFile("sorted_results_axiom_query.txt", v);
+			v = Utils.readFile("results_axiom_query.txt");
 		}
+		v = sortAxiom(v);
+		Utils.saveToFile("sorted_results_axiom_query.txt", v);
+		HashMap axiomMap = createAxiomHashMap(v);
+
+        Vector w1 = new Vector();
+		String target = "P383$PT|P384$NCI";
+		String datafile = args[0];
+		Vector w = Utils.readFile(datafile);
+		int colNum = 3;
+		Vector codes = DelimitedDataExtractor.retrieveColumnValues(w, colNum, '|');
+		HashMap hmap = retrieveAxiomData(axiomMap, target, codes);
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			w1.add(key + "\t" + (String) hmap.get(key));
+		}
+		Utils.saveToFile("results.txt", w1);
+
 		long ms1 = System.currentTimeMillis();
 		long time_elapsed = ms1 - ms;
 		System.out.println("Total runtime: " + time_elapsed + " (milli-seconds).");
