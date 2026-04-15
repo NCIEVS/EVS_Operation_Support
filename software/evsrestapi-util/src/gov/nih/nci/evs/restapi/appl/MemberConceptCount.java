@@ -140,6 +140,7 @@ public class MemberConceptCount {
 	public static String formatCounts(String filename) {
 		Vector v = Utils.readFile(filename);
 		Vector w = new Vector();
+		w.add("Terminology\tCount");
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
