@@ -83,7 +83,7 @@ public class DelimitedDataExtractor {
 	}
 
 	public static Vector extract(Vector data_vec, String delim_columns, char delim) {
-		return extract(data_vec, delimitedInt2integers(delim_columns, delim), delim);
+		return extract(data_vec, delimitedInt2integers(delim_columns, '|'), delim);
 	}
 
 	public static Vector extract(Vector w, Vector<Integer> columns, char delim) {
