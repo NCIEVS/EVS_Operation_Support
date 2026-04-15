@@ -889,7 +889,7 @@ public class HierarchyHelper implements Serializable {
 		}
 	}
 
-    public void printTree(Vector parent_child_vec, String outputfile) {
+    public static void printTree(Vector parent_child_vec, String outputfile) {
 		HierarchyHelper hh = new HierarchyHelper(parent_child_vec);
 		PrintWriter pw = null;
 		try {
