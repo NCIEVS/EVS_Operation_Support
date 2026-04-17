@@ -1,4 +1,5 @@
 package gov.nih.nci.evs.restapi.util;
+import gov.nih.nci.evs.restapi.config.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import java.io.*;
 import java.net.*;
@@ -11,6 +12,20 @@ import java.text.*;
 import java.util.*;
 
 public class ExactMatchRunner {
+	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
+
+	public static void run(String termfile, int mode, String root, String datafile, int col, String outputfile) {
+		if (termfile == null) {
+			termfile = AXIOM_FILE;
+		}
+		if (mode == ExactMatch.DEFAULT) {
+			new ExactMatch(termfile).run(datafile, outputfile, col, true);
+		} else if (mode == ExactMatch.BRANCH) {
+			new ExactMatch(termfile).mapToBranch(root, datafile, col);
+		} else if (mode == ExactMatch.SUBSET) {
+			new ExactMatch(termfile).mapToSubset(root, datafile);
+		}
+	}
 
 	public static void run(String[] args) {
 		String datafile = args[0];
@@ -28,7 +43,6 @@ public class ExactMatchRunner {
 				new ExactMatch().run(datafile, outputfile, col, true);
 			}
 		} else if (mode == ExactMatch.BRANCH) {
-			//Example: "SRS_Base.txt" 1 C1909 2"
 			String root = args[2];
 			String col_str = args[3];
 			int col = Integer.parseInt(col_str);
@@ -44,11 +58,3 @@ public class ExactMatchRunner {
 	}
 }
 
-//0: datafile
-//1: mode
-//2: col_str    root     root
-//3: termfile   col_str
-
-//java -Xms512m -Xmx4g -classpath %CLASSPATH% ExactMatchRunner agents.txt 0 1 axioms.txt
-//java -Xms512m -Xmx4g -classpath %CLASSPATH% ExactMatchRunner agents.txt 1 root col_str
-//java -Xms512m -Xmx4g -classpath %CLASSPATH% ExactMatchRunner agents.txt 2 root
