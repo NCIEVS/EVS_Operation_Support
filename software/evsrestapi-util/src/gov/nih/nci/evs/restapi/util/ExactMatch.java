@@ -435,21 +435,6 @@ public class ExactMatch {
 		return code_str + "\t" + pt_str + "\t" + syns_str;
 	}
 
-/*
-	public String run(String datafile, String outputfile) {
-		return run(datafile, outputfile, 0);
-	}
-
-	public String run(String datafile, String outputfile, int colIndex) {
-		boolean generateXLS = false;
-		return run(datafile, outputfile, colIndex, generateXLS);
-	}
-
-	public String run(String datafile, String outputfile, int colIndex, boolean generateXLS) {
-		return run(new HashSet(), datafile, outputfile, colIndex, generateXLS);
-	}
-*/
-
 	public String run(HashSet branch, String datafile, String outputfile, int colIndex, boolean generateXLS) {
 		int col = colIndex;
 		long ms = System.currentTimeMillis();
@@ -796,20 +781,24 @@ public class ExactMatch {
 		return w;
 	}
 
+
 	public static Vector generateRestrictedAxiomFile(Vector codes) {
 		HashSet hset = Utils.vector2HashSet(codes);
-		Vector v = Utils.readFile(AXIOM_FILE);
 		Vector w = new Vector();
+		Vector v = Utils.readFile(AXIOM_FILE);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
+			Vector u = StringUtils.parseData(line, "|");
 			String code = (String) u.elementAt(1);
-			if (hset.contains(code)) {
+			String prop_code = (String) u.elementAt(2);
+			if (hset.contains(code) && prop_code.compareTo("P90") == 0) {
 				w.add(line);
 			}
 		}
+		v.clear();
+		w = new SortUtils().quickSort(w);
 		return w;
-	}
+    }
 
 	public static void updateResourceFile(String key, String value) {
 		try{
@@ -881,6 +870,7 @@ public class ExactMatch {
 	public static void mapToBranch(String root, String datafile, int colNum) {
 		HierarchyHelper hh = new HierarchyHelper(Utils.readFile(PARENT_CHILD_FILE));
 		Vector codes = hh.get_transitive_closure_v3(root);
+		Utils.saveToFile(root + ".txt", codes);
 		mapToCodes(codes, datafile, colNum);
 	}
 
@@ -890,7 +880,9 @@ public class ExactMatch {
 
 	public static void mapToCodes(Vector codes, String datafile, int colNum) {
 		long ms = System.currentTimeMillis();
+
 		Vector w = generateRestrictedAxiomFile(codes);
+
 		String axiomfile = "axiom_ThesaurusInferred_forTS_" + StringUtils.getToday() + ".txt";
 		Utils.saveToFile(axiomfile, w);
 		String outputfile = "results_" + datafile;

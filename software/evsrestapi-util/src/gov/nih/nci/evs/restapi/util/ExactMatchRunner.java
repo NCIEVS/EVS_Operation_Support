@@ -27,6 +27,10 @@ public class ExactMatchRunner {
 		}
 	}
 
+	public static void run(String termfile, String datafile, int col, String outputfile) {
+		new ExactMatch(termfile).run(datafile, outputfile, col, true);
+	}
+
 	public static void run(String[] args) {
 		String datafile = args[0];
 		String outputfile = "results_" + datafile;
