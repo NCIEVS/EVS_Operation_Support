@@ -435,6 +435,72 @@ public class ExactMatch {
 		return code_str + "\t" + pt_str + "\t" + syns_str;
 	}
 
+	public String run(String datafile, String outputfile, int colIndex) {
+		HashSet branch = new HashSet();
+		return run(branch, datafile, outputfile, colIndex);
+	}
+
+	public String run(HashSet branch, String datafile, String outputfile, int colIndex) {
+		int col = colIndex;
+		long ms = System.currentTimeMillis();
+		Vector no_matches = new Vector();
+		Vector matches = new Vector();
+        Vector v = Utils.readFile(datafile);
+        Vector w = new Vector();
+        String header = (String) v.elementAt(0);
+        w.add(header + "\tMatched NCIt Code(s)");
+
+        no_matches.add(header);
+        matches.add(header + "\tMatched NCIt Code(s)");
+		for (int i=1; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.trim();
+			if (line.length() > 0) {
+				Vector u = StringUtils.parseData(line, '\t');
+				String term = (String) u.elementAt(col);
+				String term_lc = term.toLowerCase();
+				if (!caseSensitive) {
+					term = term_lc;
+				}
+				boolean matched = false;
+				if (term2CodesMap.containsKey(term)) {
+					Vector codes_0 = (Vector) term2CodesMap.get(term);
+					Vector codes = new Vector();
+					for (int j=0; j<codes_0.size(); j++) {
+						String code = (String) codes_0.elementAt(j);
+						if (branch.size() > 0) {
+							if (branch.contains(code) && !is_retired(code)) {
+								codes.add(code);
+							}
+						} else {
+							if (!is_retired(code)) {
+								codes.add(code);
+							}
+						}
+					}
+					if (codes.size() > 0) {
+						w.add(line + "\t" + Utils.vector2Delimited(codes, "|"));
+						matches.add(line + "\t" + Utils.vector2Delimited(codes, "|"));
+						matched = true;
+					} else {
+						no_matches.add(line);
+						w.add(line + "\tNo match");
+					}
+
+				} else {
+					no_matches.add(line);
+					w.add(line + "\tNo match");
+				}
+			}
+		}
+		Utils.saveToFile(outputfile, w);
+		Utils.saveToFile("no_matches_" + outputfile, no_matches);
+		Utils.saveToFile("matches_" + outputfile, matches);
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		System.out.println(outputfile + " generated.");
+		return outputfile;
+	}
+
 	public String run(HashSet branch, String datafile, String outputfile, int colIndex, boolean generateXLS) {
 		int col = colIndex;
 		long ms = System.currentTimeMillis();
@@ -895,10 +961,12 @@ public class ExactMatch {
 		return run(datafile, outputfile, 0);
 	}
 
+/*
 	public String run(String datafile, String outputfile, int colIndex) {
 		boolean generateXLS = false;
 		return run(datafile, outputfile, colIndex, generateXLS);
 	}
+*/
 
 	public String run(String datafile, String outputfile, int colIndex, boolean generateXLS) {
 		return run(new HashSet(), datafile, outputfile, colIndex, generateXLS);
