@@ -126,17 +126,22 @@ public class ExactMatchSubmitter {
 	}
 
 	public static void runExactMatch(String datafile, int mode, int colNum, String termfile) {
+		String outputfile = "results_" + datafile;
+		new ExactMatch(termfile).run(datafile, outputfile, colNum);
+		/*
         String[] parameters = new String[4];
         parameters[0] = datafile;
         parameters[1] = "" + mode;
         parameters[2] = "" + colNum;
         parameters[3] = termfile;
         runExactMatch(parameters);
+        */
 	}
-
+/*
 	public static void runExactMatch(String[] parameters) {
         ExactMatchRunner.run(parameters);
 	}
+*/
 
     public static void run(String[] args) {
 		String datafile = args[0];
