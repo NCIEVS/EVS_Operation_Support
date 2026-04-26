@@ -478,7 +478,9 @@ public class ContainsSearchByTerm {
 				}
 			}
 			pts = pt_buf.toString();
-			pts = pts.substring(0, pts.length()-1);
+			if (pts.length() > 0) {
+				pts = pts.substring(0, pts.length()-1);
+			}
 		}
 		String pt_str = pts;
 
