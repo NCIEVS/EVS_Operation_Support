@@ -159,11 +159,12 @@ public class OWLSPARQLUtils {
 		this.restURL = serviceUrl;
 		this.username = username;
 		this.password = password;
-
 		this.httpUtils = new gov.nih.nci.evs.restapi.util.HTTPUtils(serviceUrl, username, password);
         this.jsonUtils = new JSONUtils();
         this.ontologyUri2LabelMap = createOntologyUri2LabelMap();
+        /*
         this.code2LabelMap = createCode2LabelMap();
+        */
     }
 
     public HashMap createCode2LabelMap() {
@@ -208,8 +209,10 @@ public class OWLSPARQLUtils {
 
     public void set_named_graph(String named_graph) {
 		this.named_graph = named_graph;
+		/*
 		propertyCode2labelHashMap = new HashMap();
 		code2LabelMap = createCode2LabelMap();
+		*/
 	}
 
 	public String get_version() {
@@ -359,10 +362,7 @@ public class OWLSPARQLUtils {
 	}
 
 	public Vector get_ontology_info() {
-		System.out.println("Calling get_ontology_info ***************");
 		String query = construct_get_ontology_info();
-		//System.out.println(query);
-
 		//Vector v = new HTTPUtils().runQuery(serviceUrl, username, password, query);
 		Vector v = executeQuery(query);
 		return v;
@@ -415,23 +415,6 @@ public class OWLSPARQLUtils {
 			String version = getVersion(graphName);
 			hmap.put(graphName, version);
 		}
-
-/*
-		Vector v = get_ontology_info();
-		//Utils.dumpVector("get_ontology_info", v);
-		if (v == null) {
-		    System.out.println("ERROR: get_ontology_info returns null." );
-		    return null;
-		}
-
-		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String graph = (String) u.elementAt(0);
-			String version = (String) u.elementAt(1);
-			hmap.put(graph, version);
-		}
-*/
         return hmap;
 	}
 
@@ -2580,11 +2563,9 @@ public class OWLSPARQLUtils {
 	}
 
 	public String getLabel(String code) {
-		/*
 		if (code2LabelMap == null) {
 			code2LabelMap = createCode2LabelMap();
 		}
-		*/
 		return (String) code2LabelMap.get(code);
 	}
 

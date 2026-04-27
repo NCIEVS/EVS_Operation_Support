@@ -1,6 +1,4 @@
 package gov.nih.nci.evs.restapi.util;
-
-//import gov.nih.nci.evs.restapi.appl.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.common.*;
 import gov.nih.nci.evs.restapi.config.*;
@@ -125,11 +123,10 @@ public class ServerMonitor {
 			pw.println("Default namedGraph: " + namedGraph);
 			for (int i=0; i<serviceUrl_vec.size(); i++) {
 				String serviceUrl = (String) serviceUrl_vec.elementAt(i);
-				System.out.println("serviceUrl: " + serviceUrl);
 				int j = i+1;
 				pw.println("(" + j + ") " + serviceUrl);
 				try {
-					MetadataUtils test = new MetadataUtils(serviceUrl, username, password);
+					MetadataUtils test = new MetadataUtils(serviceUrl, namedGraph, username, password);
 					String version = test.getLatestVersion(codingScheme);
 					pw.println(codingScheme);
 					pw.println("latest version: " + version);

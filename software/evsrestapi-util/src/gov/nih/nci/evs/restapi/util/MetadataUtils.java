@@ -125,14 +125,11 @@ public class MetadataUtils {
 		this.sparql_endpoint = this.serviceUrl;
 		this.owlSPARQLUtils = new OWLSPARQLUtils(sparql_endpoint, username, password);
 		owlSPARQLUtils.set_named_graph(this.namedGraph);
-
 		try {
 			this.nameVersion2NamedGraphMap = owlSPARQLUtils.getNameVersion2NamedGraphMap();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		//this.nameGraph2PredicateHashMap = createNameGraph2PredicateHashMap();
-		//this.basePrefixUIDHashMap = createBasePrefixUIDHashMap();
     }
 
 
@@ -173,7 +170,6 @@ public class MetadataUtils {
 			Vector u = StringUtils.parseData(nameVersion);
 			String codingSchemeName = (String) u.elementAt(0);
 			String version = (String) u.elementAt(1);
-			//System.out.println(nameVersion + " --> " + version);
 			Vector named_graphs = (Vector) nameVersion2NamedGraphMap.get(nameVersion);
 			for (int i=0; i<named_graphs.size(); i++) {
 				String named_graph = (String) named_graphs.elementAt(i);
