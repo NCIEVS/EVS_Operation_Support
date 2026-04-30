@@ -12,7 +12,7 @@ import java.text.*;
 import java.util.*;
 
 
-public class TermFileGenerator {
+public class AxiomFileTrimmer {
 	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
 
@@ -89,16 +89,16 @@ public class TermFileGenerator {
 		return codes;
 	}
 
-    public static Vector generateTermFile(int mode, Vector roots) {
+    public static Vector generateAxiomFile(int mode, Vector roots) {
 		Vector codes = getCodes(mode, roots);
         Vector w = retrieveAxioms(codes);
         return w;
 	}
 
-    public static void generateTermFile(int mode, Vector roots, String termfile) {
+    public static void generateAxiomFile(int mode, Vector roots, String axiomfile) {
 		Vector codes = getCodes(mode, roots);
         Vector w = retrieveAxioms(codes);
-        Utils.saveToFile(termfile, w);
+        Utils.saveToFile(axiomfile, w);
 	}
 
 	public static void main(String[] args) {
@@ -106,8 +106,8 @@ public class TermFileGenerator {
 		int mode = ExactMatch.BRANCH;
 		String root = "C2991";
 		roots.add("C2991");
-		String termfile = "axioms.txt";
-		generateTermFile(mode, roots, termfile);
+		String axiomfile = "axioms.txt";
+		generateAxiomFile(mode, roots, axiomfile);
 	}
 }
 
