@@ -1,10 +1,14 @@
 package gov.nih.nci.evs.restapi.util;
 import gov.nih.nci.evs.restapi.config.*;
 import gov.nih.nci.evs.restapi.bean.*;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.io.*;
 import java.util.*;
-import java.net.*;
-
+import java.util.stream.Collectors;
+/*
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -16,9 +20,76 @@ import org.apache.poi.xssf.usermodel.*;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.commons.text.*;
 import org.apache.poi.ss.usermodel.IndexedColors;
+*/
 
 public class ReflectionUtils {
+    private final Field[] fields;
+    private final Method[] methods;
+    private final Constructor<?>[] constructors;
+    private final Object object;
 
+    public ReflectionUtils(final Object object) {
+        this.object = object;
+        final var objectClass = object.getClass();
+        this.fields = objectClass.getDeclaredFields();
+        this.methods = objectClass.getDeclaredMethods();
+        this.constructors = objectClass.getConstructors();
+        Arrays.stream(fields).forEach(f -> f.setAccessible(true));
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    private static String getConstructorSimpleName(final Constructor<?> c) {
+        final var array = c.getName().split("\\.");
+        return array[array.length - 1];
+    }
+
+    private static String getParameterTypes(final Method m) {
+        return Arrays.stream(m.getParameterTypes()).map(Class::getSimpleName).collect(Collectors.joining(", "));
+    }
+
+    private static String getReturnType(final Method m) {
+        return m.getReturnType().getSimpleName();
+    }
+
+    private static String getConstructorParamTypes(final Constructor<?> c) {
+        return Arrays.stream(c.getParameterTypes()).map(Class::getSimpleName).collect(Collectors.joining(", "));
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    public String getClassName() {
+		return object.getClass().getSimpleName();
+	}
+
+    public Vector getFieldNames() {
+		Vector v = new Vector();
+        for (final var f : fields) {
+            try {
+				v.add(f.getName());
+            } catch (Exception e) {
+                System.err.printf("Error accessing field %s: %s%n", f.getName(), e.getMessage());
+            }
+        }
+        return v;
+    }
+
+    public HashMap getFieldValues() {
+		HashMap hmap = new HashMap();
+        for (final var f : fields) {
+            try {
+				String key = f.getName();
+				String value = (String) f.get(object);
+				if (value == null || value.compareTo("null") == 0) {
+					value = "";
+				}
+				hmap.put(key, value);
+            } catch (Exception e) {
+                System.err.printf("Error accessing field %s: %s%n", f.getName(), e.getMessage());
+            }
+        }
+        return hmap;
+    }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
     public static void generateReflectionRunner(String parentClassName, String methodSignature) {
 		int n = methodSignature.indexOf("(");
 		String outputfile = methodSignature.substring(0, n) + ".java";
