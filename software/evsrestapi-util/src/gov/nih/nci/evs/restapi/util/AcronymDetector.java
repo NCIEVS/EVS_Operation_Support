@@ -70,6 +70,9 @@ public class AcronymDetector {
 	static String A8_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.subsetfile;
     static HashMap code2TermsHashMap = null;
     static String ACRONYM_DATA = "acronyms.txt";
+    static int MAX_ACRONYM_LENGTH = 5;
+    static int DEFAULT_MAX_ACRONYM_LENGTH = 5;
+
 
     static {
 		code2TermsHashMap = createCode2TermsHashMap();
@@ -103,13 +106,17 @@ public class AcronymDetector {
 		return hmap;
 	}
 
-    public static int MAX_ACRONYM_LENGTH = 5;
+
 
     public static String removeSpecialCharacters(String term) {
 		term = term.replace("(", "");
 		term = term.replace(")", "");
 		term = term.replace(",", "");
 		return term;
+	}
+
+	public static void set_MAX_ACRONYM_LENGTH(int max_acronym_length) {
+		MAX_ACRONYM_LENGTH = max_acronym_length;
 	}
 
     public static HashMap findAcronyms(String code) {
@@ -343,6 +350,16 @@ public class AcronymDetector {
 	}
 
 	public static String run() {
+		return run(DEFAULT_MAX_ACRONYM_LENGTH);
+	}
+
+	public static String run(int max_acronym_length) {
+		if (max_acronym_length < 1) {
+			System.out.println("max_acronym_length cannot be less than 2.");
+			System.exit(0);
+		}
+
+		set_MAX_ACRONYM_LENGTH(max_acronym_length);
 		long ms = System.currentTimeMillis();
 		String serviceUrl = ConfigurationController.serviceUrl;
 		String named_graph = ConfigurationController.namedGraph;
