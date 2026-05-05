@@ -288,8 +288,10 @@ public class NCItWikiUtils {
         String version = ncitWikiUtils.getVersion();
 		System.out.println("NCIt version: " + version);
 
-		ApachePoiPieChartCS.generatePieChart(version);
+		//ApachePoiPieChartCS.generatePieChart(version);
 		//ApachePoiBarChart.generateBarChart(version);
+
+		ApachePoiPieChartCSByOWL.generatePieChart(version);
 
 	}
 
@@ -307,8 +309,9 @@ public class NCItWikiUtils {
         Utils.saveToFile("cs_data.txt", w);
         String version = ncitWikiUtils.getVersion();
 		System.out.println("NCIt version: " + version);
-		ApachePoiPieChartCS.generatePieChart(version);
+		//ApachePoiPieChartCS.generatePieChart(version);
 		//ApachePoiBarChart.generateBarChart(version);
+		ApachePoiPieChartCSByOWL.generatePieChart(version);
 	}
 
 /*
