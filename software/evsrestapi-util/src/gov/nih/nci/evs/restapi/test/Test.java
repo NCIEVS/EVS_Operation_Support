@@ -1,4 +1,5 @@
 package gov.nih.nci.evs.restapi.test;
+import gov.nih.nci.evs.restapi.config.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.common.*;
 import gov.nih.nci.evs.restapi.util.*;
@@ -69,6 +70,8 @@ import org.json.*;
  *
  */
 public class Test {
+	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
+
 	OWLSPARQLUtils owlSPARQLUtils = null;
 	String serviceUrl = null;
 	String named_graph = null;
