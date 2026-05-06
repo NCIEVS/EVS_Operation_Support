@@ -66,6 +66,7 @@ public class ExactMatch {
     public static int SUBSET = 2;
 
 	HashMap term2CodesMap = null;
+	HashMap code2LabelMap = null;
     boolean caseSensitive = false;
     String termfile = null;
     HashSet retiredConcepts = new HashSet();
@@ -77,6 +78,15 @@ public class ExactMatch {
 
     public void initialize() {
 		term2CodesMap = createTerm2CodesMap();
+		code2LabelMap = createCode2LabelMap();
+	}
+
+	public String getLabel(String code) {
+		return (String) code2LabelMap.get(code);
+	}
+
+	public String getDisplayLabel(String code) {
+		return (String) code2LabelMap.get(code) + " (" + code + ")";
 	}
 
 	public boolean is_retired(String code) {
@@ -124,6 +134,42 @@ public class ExactMatch {
 		return hmap;
 	}
 
+    public HashMap createCode2LabelMap() {
+		HashMap hmap = new HashMap();
+		Vector v = Utils.readFile(termfile);
+        for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String prop_code = (String) u.elementAt(2);
+			if (prop_code.compareTo("P90") == 0) {
+				String label = (String) u.elementAt(0);
+				String code = (String) u.elementAt(1);
+				hmap.put(code, label);
+			}
+		}
+		return hmap;
+	}
+
+	public Vector findMatchedConcepts(String term) {
+		Vector codes = new Vector();
+		String term_lc = term.toLowerCase();
+		if (!caseSensitive) {
+			term = term_lc;
+		}
+		boolean matched = false;
+		Vector w = new Vector();
+		if (term2CodesMap.containsKey(term)) {
+			Vector codes_0 = (Vector) term2CodesMap.get(term);
+			for (int j=0; j<codes_0.size(); j++) {
+				String code = (String) codes_0.elementAt(j);
+				if (!is_retired(code)) {
+					codes.add(code);
+				}
+			}
+		}
+		return codes;
+	}
+
 	public String run(String datafile, String outputfile, int col) {
 		System.out.println("ExactMatch datafile: " + datafile);
 		System.out.println("ExactMatch outputfile: " + col);
@@ -144,30 +190,13 @@ public class ExactMatch {
 			line = line.trim();
 			if (line.length() > 0) {
 				Vector u = StringUtils.parseData(line, '\t');
+				//boolean matched = false;
 				String term = (String) u.elementAt(col);
-				String term_lc = term.toLowerCase();
-				if (!caseSensitive) {
-					term = term_lc;
-				}
-				boolean matched = false;
-				if (term2CodesMap.containsKey(term)) {
-					Vector codes_0 = (Vector) term2CodesMap.get(term);
-					Vector codes = new Vector();
-					for (int j=0; j<codes_0.size(); j++) {
-						String code = (String) codes_0.elementAt(j);
-						if (!is_retired(code)) {
-							codes.add(code);
-						}
-					}
-					if (codes.size() > 0) {
-						w.add(line + "\t" + Utils.vector2Delimited(codes, "|"));
-						matches.add(line + "\t" + Utils.vector2Delimited(codes, "|"));
-						matched = true;
-					} else {
-						no_matches.add(line);
-						w.add(line + "\tNo match");
-					}
-
+				Vector codes = findMatchedConcepts(term);
+				if (codes != null && codes.size() > 0) {
+					w.add(line + "\t" + Utils.vector2Delimited(codes, "|"));
+					matches.add(line + "\t" + Utils.vector2Delimited(codes, "|"));
+					//matched = true;
 				} else {
 					no_matches.add(line);
 					w.add(line + "\tNo match");
