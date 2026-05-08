@@ -1,0 +1,1819 @@
+Acronym|Term
+1A|1 A
+1B|1d Beta
+1C|1 C
+1C|1 Candidate
+1C|1, Cardiac
+1D|1 Delta
+1D|1, Delta
+1E|1e, Estrogen-preferring
+1G|1 Gamma
+1G|1g Gene
+1S|1s Subunit
+1X|1 X-linked
+1X|1, X-linked
+1Y|1 Y-linked
+1Y|1, Y-linked
+2A|2a Activator
+2A|2a Agonist
+2B|2 Beta
+2B|2b, Beta
+3A|3 Alpha
+3B|3 Beta
+3G|3g Gene
+4A|4-domains A4a
+4C|4c, Cysteine
+6C|6c, Cgmp-specific
+A1|A1 140
+A1|Activator 1
+A1|Alpha 1
+A1|Antiquitin 1
+A1|At-hook 1a
+A1|Atpase 116
+A1|Atpase, 116
+A3|A 3
+A3|Alpha 3
+A5|A, 5
+A6|Antiporter 6)
+AATF|Apoptosis Antagonizing Transcription Factor
+AA|Amino Acid
+AA|Amino Acids
+AA|Amyloid A
+AA|Amyloid A-1
+AA|Amyloid A1
+ABC|Atp Binding Cassette
+ABP|Actin Binding Protein
+ABR|Auditory Brainstem Response
+AB|Ab Beta
+AB|Activin Beta-a
+AB|Activin Beta-b
+ACC|Acetyl Coa Carboxylase
+ACF|Apobec-1 Complementation Factor
+ACF|Apobec1 Complementation Factor
+ACS|Activity Card Sort
+ACS|Alternate Care Site
+ACT|Acoustic Cluster Therapy
+ACT|Adoptive Cell Transfer
+ACT|Adoptive Cellular Therapy
+ADAM|A Disintegrin And Metalloproteinase
+ADAM|A Disintegrin-like And Metalloprotease
+ADCC|Antibody Dependent Cellular Cytotoxicity
+ADC|Antibody Drug Conjugate
+ADR|Adverse Drug Reaction
+ADT|Androgen Deprivation Therapy
+AD|And Doxorubicin
+AEBP2|Adipocyte Enhancer Binding Protein 2
+AEGIS|Adroit Electronically Generated Information Service
+AE|Adipocyte Enhancer
+AE|Adipocyte Enhancer-binding
+AE|Adverse Event
+AE|Adverse Experience
+AGVHD|Acute Graft Versus Host Disease
+AHCC|Active Hexose Correlated Compound
+AHIC|American Health Information Community
+AHR|Aryl Hydrocarbon Receptor
+AHS|Adult Hope Scale
+AH|Aromatic Hydrocarbon
+AH|Aryl Hydrocarbon
+AIF|Apoptosis Inducing Factor
+AIM2|Absent In Melanoma 2
+AIR|Apoptosis Inducing Receptor
+AI|And Ifosfamide
+AK1|Adenylate Kinase 1
+AK2|Adenylate Kinase 2
+AK5|Adenylate Kinase 5
+AKAP|A Kinase Anchor Protein
+AKPS|Australia-modified Karnofsky Performance Scale
+AKPS|Australia-modified Karnofsky Performance Status
+ALAL|Acute Leukemia, Ambiguous Lineage
+ALCAM|Activated Leukocyte Cell Adhesion Molecule
+ALCL|Anaplastic Large Cell Lymphoma
+ALK|Anaplastic Lymphoma Kinase
+ALL|Acute Lymphatic Leukemia
+ALL|Acute Lymphoblastic Leukemia
+ALL|Acute Lymphocytic Leukaemia
+ALL|Acute Lymphocytic Leukemia
+ALL|Acute Lymphocytic Leukemias
+ALL|Acute Lymphogenous Leukemia
+ALL|Acute Lymphoid Leukemia
+AMFR|Autocrine Mobility Factor Receptor
+AMFR|Autocrine Motility Factor Receptor
+AMF|Autocrine Mobility Factor
+AMF|Autocrine Motility Factor
+AML1|Acute Myeloid Leukemia 1
+AML|Acute Myeloblastic Leukemia
+AML|Acute Myelocytic Leukemia
+AML|Acute Myelogenous Leukemia
+AML|Acute Myelogenous Leukemias
+AML|Acute Myeloid Leukemia
+AML|Acute Myleogenous Leukemia
+AMP|Absorbable Modified Polymer
+AMV|Avian Myeloblastosis Viral
+AM|Am Mouse
+ANADA|Abbreviated New Animal Drug Application
+ANDA|Abbreviated New Drug Application
+ANPB|Atrial Natriuretic Peptide B-type
+ANSI|American National Standards Institute
+AOM|Acute Otitis Media
+AP1|Activator Protein 1
+AP2|Activator Protein 2
+APAF1|Apoptotic Protease Activating Factor 1
+APC2|Adenomatosis Polyposis Coli 2
+APCS|Amyloid P Component, Serum
+APC|Absolute Phagocyte Count
+APC|Activated Protein C
+APC|Activated Protein C-binding
+APC|Adenomatosis Polyposis Coli
+APC|Adenomatous Polyposis Coli
+APP|A4 Precursor Protein-cleaving
+APP|Amyloid Precursor Protein
+APQ|Alabama Parenting Questionnaire
+ARB|Angiotensin Receptor Blockers
+ARF1|Adp Ribosylation Factor 1
+ARF6|Adp Ribosylation Factor 6
+ARF|Alternative Reading Frame
+ARID2|At Rich Interactive Domain 2
+ARID|At Rich Interactive Domain
+ARM|Axillary Reverse Mapping
+ARNT2|Aryl-hydrocarbon Receptor Nuclear Translocator 2
+ARNT|Aryl-hydrocarbon Receptor Nuclear Translocator
+ARP3|Actin Related Protein 3
+AR|Androgen Receptor
+ASH|Abundant Src Homology
+ASL|Arterial Spin Labeling
+AS|American Samoa
+AT1|Acid Transporter 1
+ATC|Anatomical Therapeutic Chemical
+ATF1|Activating Transcription Factor 1
+ATF2|Activating Transcription Factor 2
+ATF3|Activating Transcription Factor 3
+ATF4|Activating Transcription Factor 4
+ATF5|Activating Transcription Factor 5
+ATF6|Activating Transcription Factor 6
+ATM|Ataxia Telangiectasia Mutated
+AT|Ataxia Telangiectasia
+AVI|Aging Voice Index
+AVI|Audio Video Interleave
+B1|Box 1
+B2|B 2
+B2|Box 2
+B3|Beta 3
+B4|Beta 4
+B5|Beta 5
+BAALC|Brain And Acute Leukemia, Cytoplasmic
+BAF|Brm/brg1 Associated Factor
+BAI|Brief Appraisal Inventory
+BARD1|Brca1 Associated Ring Domain 1
+BAX|Bcl2 Associated X
+BA|B(a) Alpha-1,3-galactosyltransferase
+BA|B, Alpha
+BBBD|Blood Brain Barrier Disruption
+BBC3|Bcl2 Binding Component 3
+BCAR1|Breast Cancer Anti-estrogen Resistance 1
+BCAR2|Breast Cancer Anti-estrogen Resistance 2
+BCAR3|Breast Cancer Anti-estrogen Resistance 3
+BCAR4|Breast Cancer Anti-estrogen Resistance 4
+BCAS1|Breast Carcinoma Amplified Sequence 1
+BCAS2|Breast Carcinoma Amplified Sequence 2
+BCAS3|Breast Carcinoma Amplified Sequence 3
+BCAS4|Breast Carcinoma Amplified Sequence 4
+BCG|Bacille Calmette Guerin
+BCG|Bacillus Calmette Guerin
+BCKAD|Branched Chain Keto Acid Dehydrogenase
+BCMA|B Cell Maturation Antigen
+BCM|B Cell Maturation
+BCPT|Breast Cancer Prevention Trial
+BCRP1|Breast Cancer Resistance Protein 1
+BCR|Breakpoint Cluster Region
+BCTOS|Breast Cancer Treatment Outcomes Scale
+BCTOS|Breast Cancer Treatment Outcomes Scale-cosmetic
+BDNF|Brain Derived Neurotrophic Factor
+BDP1|B Double Prime 1
+BEX3|Brain Expressed X-linked 3
+BF1|Brain Factor 1
+BG8|Blood Group 8
+BID|Bh3 Interacting Domain
+BIRC3|Baculoviral Iap Repeat Containing 3
+BIR|Baculoviral Iap Repeat-containing
+BIR|Beta-cell Inward Rectifier
+BI|Biosimilar Ibi301
+BI|Biosimilar Ibi305
+BKLF|Basic Kruppel Like Factor
+BLA|Biologic License Application
+BLA|Biologics License Application
+BLA|Biologics Licensing Application
+BLC|B Lymphocyte Chemoattractant
+BMD|Bone Mineral Density
+BMF|Bcl2 Modifying Factor
+BMI|Body Mass Index
+BMK1|Big Map Kinase 1
+BMP1|Bone Morphogenetic Protein 1
+BMP2|Bone Morphogenetic Protein 2
+BMP2|Bone Morphogenetic Protein 2a
+BMP3|Bone Morphogenetic Protein 3
+BMP4|Bone Morphogenetic Protein 4
+BMP5|Bone Morphogenetic Protein 5
+BMP6|Bone Morphogenetic Protein 6
+BMP7|Bone Morphogenetic Protein 7
+BMPR|Bone Morphogenetic Protein Receptor
+BMP|Bone Morphogenetic Protein
+BMP|Bone Morphogenetic Protein-4
+BNP|B-type Natriuretic Peptide
+BNP|Brain Natriuretic Peptide
+BN|Brown Norway
+BOG|B5t Overexpressed Gene
+BOK|Bcl2-related Ovarian Killer
+BOLD|Blood Oxygen Level Dependent
+BPAP|Bilevel Positive Airway Pressure
+BPAP|Biphasic Positive Airway Pressure
+BPH|Benign Prostate Hyperplasia
+BPH|Benign Prostatic Hyperplasia
+BPH|Benign Prostatic Hypertrophy
+BRS|Brief Resilience Scale
+BR|B-r Regimen
+BR|Bendamustine/idelalisib/rituximab Regimen
+BR|Bendamustine/rituximab Regimen
+BR|Br Regimen
+BSA|Body Surface Area
+BSF1|B-cell Stimulatory Factor 1
+BSF|Bristol Stool Form
+BTF2|Basic Transcription Factor 2
+BTG1|B-cell Translocation Gene 1
+BTG2|B-cell Translocation Gene 2
+BTG|B-cell Translocation Gene
+BTK|Bruton Tyrosine Kinase
+BTK|Bruton's Tyrosine Kinase
+BXD|Banxia Xiexin Decoction
+C1R|Component 1, R
+C1|C 140
+C1|C, 1
+C1|C1 130kd
+C1|Chemokine 1
+C1|Component 1
+C1|Containing 1
+C2|C, 2
+C2|Chemokine 2
+C2|Component 2
+C2|Containing 2a
+C3|Component 3
+C4|Card-containing 4
+C4|Component 4a
+C4|Component 4b
+C4|Component 4f
+C4|Component 4s
+C4|Containing 4
+C5|Component 5
+C6|Component 6
+C7|Component 7
+C8A|Component 8 Alpha
+C8B|Component 8 Beta
+C8B|Component 8, Beta
+C8G|Component 8 Gamma
+C8G|Component 8, Gamma
+C8|Component 8
+C9|Component 9
+CA1|Carbonic Anhydrase 1
+CA2|Carbonic Anhydrase 2
+CA3|Carbonic Anhydrase 3
+CA8|Carbonic Anhydrase 8
+CA9|Carbonic Anhydrase 9
+CABG|Coronary Artery Bypass Graft
+CAD|Coronary Artery Disease
+CAK|Cell Adhesion Kinase
+CALM|Cancer And Living Meaningfully
+CARS|Concerns About Recurrence Scale
+CAR|Chimeric Antigen Receptor
+CAS|Coronavirus Anxiety Scale
+CAT|Computed Axial Tomography
+CAT|Computerized Axial Tomography
+CA|Cyclophosphamide And
+CBF|Cerebral Blood Flow
+CBG|Corticosteroid Binding Globulin
+CBL|Casitas B-lineage Lymphoma
+CCAP|Cancer Chromosome Aberration Project
+CCCH|Clear Cell Cribriform Hyperplasia
+CCC|Case Comprehensive Cancer
+CCG1|Cell Cycle Gene 1
+CCM2|Cerebral Cavernous Malformation 2
+CCM2|Cerebral Cavernous Malformations 2
+CCN|Cellular Communication Network
+CCN|Cyr61, Ctgf, Nov
+CCP|Cyclic Citrullinated Peptide
+CCQ|Clinical Copd Questionnaire
+CCR5|Cc Chemokine Receptor 5
+CCR8|Cc Chemokine Receptor 8
+CC|C-c Chemokine
+CC|C-c Ckr-1
+CC|C-c Ckr-10
+CC|C-c Ckr-3
+CC|C-c Ckr-4
+CC|C-c Ckr-5
+CC|C-c Ckr-6
+CC|C-c Ckr-8
+CC|C-c Ckr-9
+CC|Cc Chemokine
+CC|Cc Chemokine-1
+CC|Cell Chemokine
+CC|Cell Chemotactic
+CC|Cell-attracting Chemokine
+CC|Cell-directed Cc
+CC|Chemokine Cc-1
+CC|Chemokine Cc-1/cc-3
+CC|Chemokine Cc-2
+CC|Chemokine Cc-3
+CC|Chemokine, Cc
+CDC2|Cell Division Cycle 2
+CDC6|Cell Division Cycle 6
+CDC7|Cell Division Cycle 7
+CDC7|Cell Division Cycle 7-like
+CDC7|Cell Division Cycle 7-related
+CDC91|Cell Division Cycle 91-like 1
+CDCA7|Cell Division Cycle Associated 7
+CDCA8|Cell Division Cycle Associated 8
+CDCP1|Cub Domain Containing Protein 1
+CDE|Common Data Element
+CDISC|Clinical Data Interchange Standards Consortium
+CDK2|Cyclin Dependent Kinase 2
+CDK4|Cell Division Kinase 4
+CDK4|Cyclin Dependent Kinase 4
+CDK6|Cyclin Dependent Kinase 6
+CDK|Cyclin Dependent Kinase
+CDM|Common Data Model
+CDR1|Cerebellar Degeneration Related 1
+CD|Cell Death
+CD|Classification Determinant
+CD|Compact Disc-interactive
+CD|Complement Decay-accelerating
+CEBPA|Ccaat Enhancer Binding Protein Alpha
+CEBP|Ccaat Enhancer Binding Protein
+CER|Comparative Effectiveness Research
+CETP|Cholesteryl Ester Transfer Protein
+CFB|Complement Factor B
+CFD|Complement Factor D
+CFHR1|Complement Factor H Related 1
+CFHR5|Complement Factor H Related 5
+CFH|Complement Factor H
+CFI|Complement Factor I
+CFP|Complement Factor Properdin
+CGI|Clinical Global Impression
+CHF|Congestive Heart Failure
+CHI|Consolidated Health Informatics
+CHO|Chinese Hamster Ovary
+CHUK|Conserved Helix-loop-helix Ubiquitous Kinase
+CID|Combined Immune Deficiency
+CINCA|Chronic Infantile Neurological Cutaneous And
+CIN|Cervical Intraepith. Neoplasia
+CIN|Cervical Intraepithelial Neoplasia
+CIN|Cervix Intraepithelial Neoplasia
+CISD1|Cdgsh Iron Sulfur Domain 1
+CISD2|Cdgsh Iron Sulfur Domain 2
+CISH|Chromogenic In Situ Hybridization
+CK1|Casein Kinase 1
+CKB|Creatine Kinase, Brain
+CKMM|Creatine Kinase Mm Measurement
+CKM|Creatine Kinase, M-type
+CKM|Creatine Kinase, Muscle
+CK|Creatine Kinase
+CLK1|Cdc Like Kinase 1
+CLK2|Cdc Like Kinase 2
+CLK3|Cdc Like Kinase 3
+CLK4|Cdc Like Kinase 4
+CLLU1|Chronic Lymphocytic Leukemia Up-regulated 1
+CLL|Cell Lymphocytic Leukemia
+CLL|Chronic Lymphatic Leukemia
+CLL|Chronic Lymphocytic Leukemia
+CLL|Chronic Lymphoid Leukemia
+CLMF|Cytotoxic Lymphocyte Maturation Factor
+CMBB|Comprehensive Minority Biomedical Branch
+CMB|Catch My Breath
+CMC2|C-x(9)-c Motif Containing 2
+CMC2|C-x9-c Motif Containing 2
+CMC4|C-x(9)-c Motif Containing 4
+CMC4|C-x9-c Motif Containing 4
+CML|Chronic Myelocytic Leukemia
+CML|Chronic Myelogenous Leukemia
+CML|Chronic Myelogenous Leukemias
+CML|Chronic Myeloid Leukemia
+CMR|Complete Metabolic Response
+CMS|Concerned Member State
+CNB|Computerized Neurocognitive Battery
+CNG|Cyclic Nucleotide Gated
+CNS|Central Nervous System
+COA|Clinical Outcome Assessment
+COMP|Cartilage Oligomeric Matrix Protein
+COMP|Cartilage Oligomeric Matrix Protein(pseudoachondroplasia
+COPD|Chronic Obstructive Pulmonary Disease
+COT|Cancer Osaka Thyroid
+CO|Capacity Of
+CPAP|Continuous Positive Airway Pressure
+CPC|Chromosomal Passenger Complex
+CPM|Count Per Million
+CPM|Counts Per Million
+CPRA|Calculated Panel Reactive Antibody
+CPS1|Carbamoyl Phosphate Synthetase 1
+CPSQ3|Cerebral Palsy, Spastic Quadriplegic 3
+CPS|Control Preference Scale
+CPS|Control Preferences Scale
+CP|Carboplatin/paclitaxel Plus
+CP|Cyclic Propanolamide
+CRAM|Compressed Reference-oriented Alignment Map
+CRA|Clinical Research Associate
+CRBS|Coronavirus Racial Bias Scale
+CRC|Clinical Research Coordinator
+CRC|Conditionally Reprogrammed Cells
+CREB|Camp Responsive Element Binding
+CREM|Camp Responsive Element Modulator
+CRE|Camp Responsive Element
+CRF|Case Record Form
+CRF|Case Report Form
+CRHR2|Corticotropin Releasing Hormone Receptor 2
+CRH|Corticotropin Releasing Hormone
+CRLF2|Cytokine Receptor Like Factor 2
+CRO|Contract Research Organization
+CRTC1|Creb Regulated Transcription Coactivator 1
+CRTC2|Creb Regulated Transcription Coactivator 2
+CRTC3|Creb Regulated Transcription Coactivator 3
+CR|Complete Remission
+CR|Complete Response
+CSB|Cockayne Syndrome B
+CSF1R|Colony Stimulating Factor 1 Receptor
+CSF1|Colony Stimulating Factor 1
+CSF2|Colony Stimulating Factor 2
+CSF3R|Colony Stimulating Factor 3 Receptor
+CSF3|Colony Stimulating Factor 3
+CSF|Colony Stimulating Factor
+CSHL|Cold Spring Harbor Laboratory
+CSK|C-terminal Src Kinase
+CSK|Carboxyl-terminal Src Kinase
+CSR|Clinical Study Report
+CSR|Clinical Study Reports
+CSV|Comma Separated Values
+CTGF|Connective Tissue Growth Factor
+CTK|Consensus Tyrosine-lacking Kinase
+CTS9|Candidate Tumor Suppressor 9
+CT|Computed Tomographic
+CT|Computed Tomography
+CT|Computerized Tomography
+CUI|Concept Unique Identifier
+CV|Curriculum Vitae
+CWS|Cancer Worry Scale
+CW|Cw-type With
+DAD|Diffuse Alveolar Damage
+DBL|Diffuse B-cell Lymphoma
+DBP|Dehydrogenase Bifunctional Protein
+DCIS|Ductal Carcinoma In Situ
+DCT|Decentralized Clinical Trial
+DC|Dendritic Cell
+DC|Dendritic Cells
+DC|Dendritic Cells/dendritic
+DDB|Damage-specific Dna Binding
+DDIT3|Dna Damage Inducible Transcript 3
+DDR2|Discoidin Domain Receptor 2
+DDR2|Discoidin Domain-containing Receptor 2
+DDR|Discoidin Domain Receptor
+DDR|Discoidin Domain-containing Receptor
+DEXA|Dual Energy X-ray Absorptiometric
+DEXA|Dual Energy X-ray Absorptiometry
+DF|Disoproxil Fumarate
+DH|Double Hit
+DIBD|Development International Birth Date
+DIC|Disseminated Intravascular Coagulation
+DIPA|Diagnostic Infant Preschool Assessment
+DIPG|Diffuse Intrinsic Pontine Glioma
+DIRC3|Disrupted In Renal Carcinoma 3
+DM1|Dystrophia Myotonica 1
+DMC|Data Monitoring Committee
+DMC|Data Monitoring Committee/data
+DMF|Drug Master File
+DMPK|Dystrophia Myotonia Protein Kinase)
+DMPK|Dystrophia Myotonica Protein Kinase
+DM|Dm Mouse
+DM|Dystrophia Myotonica
+DNR|Do Not Resuscitate
+DN|Dbl Neg
+DN|Double Neg
+DN|Double Negative
+DN|Dysplastic Nodule
+DOD|Department Of Defense
+DPF1|Double Phd Fingers 1
+DPF2|Double Phd Fingers 2
+DPF3|Double Phd Fingers 3
+DP|Dbl Pos
+DP|Dead-box Protein
+DP|Double Positive
+DR3|Death Receptor 3
+DRG|Dorsal Root Ganglion
+DRI|Disease Risk Index
+DR|Donor Registration
+DSMB|Data Safety Monitoring Board
+DTD|Document Type Definition
+DTIC|Dimethyl Triazeno Imidazol Carboxamide
+DTIC|Dimethyl Triazeno Imidazole Carboxamide
+DTR|Diphtheria Toxin Receptor
+DUNS|Data Universal Number System
+DUNS|Data Universal Numbering System
+DVH|Dose Volume Histogram
+DVP|Daunorubicin, Vincristine, Prednisone
+DVT|Deep Vein Thrombosis
+DVT|Deep Venous Thrombosis
+E1|Enzyme 1
+E2|Ec 2.3.1.168
+E2|Ec 2.3.1.61
+E2|Ec 2.3.2.-
+E2|Ec 2.3.2.23
+E2|Ec 2.3.2.24
+E3|Ec 3.1.4.53
+E3|Ec 3.6.4.-
+E3|Enhancer 3
+EBF1|Early B-cell Factor 1
+EBF4|Early B-cell Factor 4
+EBP|Emopamil Binding Protein
+EBRT|External Beam Radiation Therapy
+EB|E Basic
+EC1|Entry Checkpoint 1
+ECK|Epithelial Cell Kinase
+ECOG|Eastern Cooperative Oncology Group
+ECP|Eosinophil Cationic Protein
+EC|E2 C
+EC|Enzyme C
+EDC|Electronic Data Capture
+EDR|Electronic Document Room
+EED|Embryonic Ectoderm Development
+EEK|Eph-and Elk-related Kinase
+EGFR|Epidermal Growth Factor Receptor
+EGF|Egf-like Growth Factor
+EGF|Epidermal Growth Factor
+EGF|Epidermal Growth Factor-like
+EGF|Epidermal Growth Factor-related
+EGR1|Early Growth Response 1
+EGR2|Early Growth Response 2
+EGR3|Early Growth Response 3
+EHF|Ets Homologous Factor
+EHK1|Eph Homology Kinase 1
+EHK2|Eph Homology Kinase 2
+EHR|Electronic Health Record
+EHR|Electronic Health Records
+EIEE|Early Infantile Epileptic Encephalopathy
+EIN|Endometrial Intraepithelial Neoplasia
+ELC|Essential Light Chain
+ELL|Eleven-nineteen Lysine-rich Leukemia
+EMA|European Medicines Agency
+EMD|Emery-dreifuss Muscular Dystrophy
+EMI|Emergent Metacognition Index
+EMK|Elkl Motif Kinase
+EMP1|Epithelial Membrane Protein 1
+EMP2|Epithelial Membrane Protein 2
+EMR|Electronic Medical Record
+EMR|Endoscopic Mucosal Resection
+EMT|Emergency Medical Technician
+EP2|Epididymal Protein 2b
+EP2|Epididymis-specific Protein 2
+EPA|Environmental Protection Agency
+EPDS|Edinburgh Postnatal Depression Scale
+ERCC|Excision Repair Cross Complementing-group
+ERE|Estrogen Response Element
+ERE|Estrogen Response Element-
+ERE|Estrogen Response Element-tata
+ERF|Ets2 Repressor Factor
+ERG|Early Response Gene
+ERO1A|Endoplasmic Reticulum Oxidoreductase 1 Alpha
+ERO1|Endoplasmic Reticulum Oxidoreductase 1
+ERO1|Endoplasmic Reticulum Oxidoreductin 1-like
+ERV|Expiratory Reserve Volume
+ER|Endoplasmic Reticulum
+ER|Estradiol Receptor
+ER|Estrogen Receptor
+ESAS|Edmonton Symptom Assessment System
+ESRP1|Epithelial Splicing Regulatory Protein 1
+ESR|Electron Spin Resonance
+ESR|Erythrocyte Sedimentation Rate
+ETFA|Electron Transfer Flavoprotein Alpha
+ETFA|Electron Transfer Flavoprotein, Alpha
+ETFB|Electron Transfer Flavoprotein Beta
+ETFB|Electron Transfer Flavoprotein, Beta
+ETFB|Electron Transferring Flavoprotein, Beta
+ETF|Electron Transfer Flavoprotein
+ETF|Electron Transfer Flavoprotein-ubiquinone
+ETF|Electron Transfer Flavoprotein:ubiquinone
+ETK1|Eph-like Tyrosine Kinase 1
+ETL|Extraction Transformation Load
+ETO|Eight Twenty One
+ETP|Endogenous Thrombin Potential
+ETS|E26 Transformation Specific
+ETS|Ets Transcriptional Suppressor
+ETV3|Ets Translocation Variant 3
+ETV6|Ets Translocation Variant 6
+EUA|Emergency Use Authorization
+EVC|Ellis Van Creveld
+EVC|Expiratory Vital Capacity
+EVI1|Ecotropic Virus Integration 1
+EVS|Enterprise Vocabulary Services
+EVS|Enterprise Vocabulary System
+EZF|Epithelial Zinc Finger
+F1|Family 11
+FABP1|Fatty Acid Binding Protein 1
+FABP2|Fatty Acid Binding Protein 2
+FABP3|Fatty Acid Binding Protein 3
+FABP4|Fatty Acid Binding Protein 4
+FABP5|Fatty Acid Binding Protein 5
+FABP6|Fatty Acid Binding Protein 6
+FACG|Fanconi Anemia Complementation Group
+FAF|Fas Associated Factor
+FAP|Fibroblast Activation Protein
+FA|Fanconi Anemia
+FA|Fanconi Anemia-associated
+FEI|Fda Establishment Identifier
+FEV|Fifth Ewing Variant
+FFAR1|Free Fatty Acid Receptor 1
+FFAR4|Free Fatty Acid Receptor 4
+FGD|Familial Glucocorticoid Deficiency
+FGF1|Fibroblast Growth Factor 1
+FGF2|Fibroblast Growth Factor 2
+FGF3|Fibroblast Growth Factor 3
+FGF4|Fibroblast Growth Factor 4
+FGF5|Fibroblast Growth Factor 5
+FGF6|Fibroblast Growth Factor 6
+FGF7|Fibroblast Growth Factor 7
+FGF8|Fibroblast Growth Factor 8
+FGF9|Fibroblast Growth Factor 9
+FGFR1|Fibroblast Growth Factor Receptor 1
+FGFR2|Fibroblast Growth Factor Receptor 2
+FGFR3|Fibroblast Growth Factor Receptor 3
+FGFR4|Fibroblast Growth Factor Receptor 4
+FGFR|Fibroblast Growth Factor Receptor
+FGF|Fgf Gene Family
+FGF|Fibroblast Growth Factor
+FHS|Framingham Heart Study
+FH|Fumarate Hydratase
+FIQOL|Fecal Incontinence Quality Of Life
+FI|Flexibility Index
+FLI1|Friend Leukemia Integration 1
+FL|Fetal Liver
+FL|Follicular Lymphoma
+FM|Fm Mouse
+FNAST|Finnegan Neonatal Abstinence Score Tool
+FNAST|Finnegan's Neonatal Abstinence Scoring Tool
+FNA|Fine Needle Aspiration
+FND|Follicular Nodular Disease
+FOBT|Fecal Occult Blood Test
+FPKM|Fragments Per Kilobase Million
+FPR1|Formyl Peptide Receptor 1
+FRC|Functional Residual Capacity
+FREM2|Fras1 Related Extracellular Matrix 2
+FRS2|Factor Receptor Substrate 2
+FRS3|Factor Receptor Substrate 3
+FR|Fr Regimen
+FSFI|Female Sexual Function Index
+FSG|French Sarcoma Group
+FSHB|Follicle Stimulating Hormone, Beta
+FSHR|Follicle Stimulating Hormone Receptor
+FSH|Follicle Stimulating Hormone
+FTP|File Transfer Protocol
+FVC|Forced Vital Capacity
+G1|G 1
+G1|Gap 1
+G1|Gene 1
+G1|Grade 1
+G2|Gap 2
+G2|Grade 2
+G3|Grade 3
+G4|Grade 4
+G6PC3|Glucose 6 Phosphatase, Catalytic, 3
+GAA|Glucosidase Alpha, Acid
+GAA|Glucosidase, Alpha, Acid
+GAC|General Adaptive Composite
+GAD-7|Generalized Anxiety Disorder - 7
+GAG|Group-specific Antigen Gene
+GAIP|G Alpha Interacting Protein
+GAI|Genetic Annotation Initiative
+GAN|Giant Axonal Neuropathy
+GAP|Gtpase Activating Protein
+GAS7|Growth Arrest Specific 7
+GBA|Glucosidase, Beta, Acid
+GBA|Glucosidase, Beta; Acid
+GBP1|Guanylate Binding Protein 1
+GBP2|Guanylate Binding Protein 2
+GB|Gb Borderline
+GB|Grade B
+GCHP|Goblet Cell-rich Hyperplastic Polyp
+GCM2|Glial Cells Missing 2
+GCM|Glial Cells Missing
+GCP|Good Clinical Practice
+GCSAM|Germinal Center-associated, Signaling And Motility
+GCSS|Genetic Counseling Satisfaction Scale
+GCS|Glasgow Coma Scale-ninds
+GCT|Germ Cell Tumor
+GC|Group-specific Component
+GDC|Gdc Data Category
+GDF2|Growth Differentiation Factor 2
+GDF3|Growth Differentiation Factor 3
+GDF5|Growth Differentiation Factor 5
+GDF6|Growth Differentiation Factor 6
+GDF8|Growth Differentiation Factor 8
+GDF9|Growth Differentiation Factor 9
+GDI|Gdp Dissociation Inhibitor
+GEC|Global Executive Composite
+GED|General Equivalency Diploma
+GFAP|Glial Fibrillary Acidic Protein
+GFI1|Growth Factor Independent 1
+GFRA2|Gdnf Family Receptor Alpha 2
+GFRA4|Gdnf Family Receptor Alpha 4
+GFRAL|Gdnf Family Receptor Alpha Like
+GFR|Gdnf Family Receptor
+GFR|Glomerular Filtration Rate
+GH1|Growth Hormone 1
+GHBP|Growth Hormone Binding Protein
+GHRH|Growth Hormone Releasing Hormone
+GHR|Growth Hormone Receptor
+GH|Genital Hiatus
+GH|Growth Hormone
+GH|Gut-homing Helper
+GIPR|Gastric Inhibitory Polypeptide Receptor
+GIP|Gastric Inhibitory Polypeptide
+GIP|Glucose-dep Insulinotropic Pep
+GIP|Glucose-dependent Insulinotropic Peptide
+GK|Glycerol Kinase
+GLIDE|Guided Lymphocyte Immunopeptide Derived Expansion
+GLP1R|Glucagon Like Peptide 1 Receptor
+GLP1|Glucagon Like Peptide 1
+GLP2R|Glucagon Like Peptide 2 Receptor
+GLP2|Glucagon Like Peptide 2
+GLP|Good Laboratory Practice
+GOP|Gemcitabine, Oxaliplatin, Paclitaxel
+GOS|Genomics Outcome Scale
+GO|Gene Ontology
+GO|Go Ontology
+GPA|Graded Prognostic Assessment
+GPER1|G Protein-coupled Estrogen Receptor 1
+GPI|Generic Product Identifier
+GPI|Glucose Phosphate Isomerase
+GPPO|Gatekeeper Preferred Provider Organization
+GPR2|G Protein-coupled Receptor 2
+GPR|G Protein-coupled Receptor
+GRAP2|Grb2 Related Adaptor Protein 2
+GRH|Gonadotrophin Releasing Hormone
+GRIA1|Glutamate Receptor, Ionotropic, Ampa 1
+GRIA2|Glutamate Receptor, Ionotropic, Ampa 2
+GRIA3|Glutamate Receptor, Ionotrophic, Ampa 3
+GRIA3|Glutamate Receptor, Ionotropic, Ampa 3
+GRIP1|Glutamate Receptor Interacting Protein 1
+GRK5|G-protein-coupled Receptor Kinase 5
+GRM1|Glutamate Receptor, Metabotropic 1
+GRM1|Glutamate Receptor, Metabotropic, 1
+GRM2|Glutamate Receptor, Metabotropic 2
+GRM2|Glutamate Receptor, Metabotropic, 2
+GRM3|Glutamate Receptor, Metabotropic 3
+GRM3|Glutamate Receptor, Metabotropic, 3
+GRM4|Glutamate Receptor, Metabotropic 4
+GRM5|Glutamate Receptor, Metabotropic 5
+GRM6|Glutamate Receptor, Metabotropic 6
+GRM7|Glutamate Receptor, Metabotropic 7
+GRM7|Glutamate Receptor, Metabotropic, 7
+GRM8|Glutamate Receptor, Metabotropic 8
+GRM8|Glutamate Receptor, Metabotropic, 8
+GRPR|Gastrin Releasing Peptide Receptor
+GR|Global Response
+GSE|Grape Seed Extract
+GSK3A|Glycogen Synthase Kinase 3 Alpha
+GSK3B|Glycogen Synthase Kinase 3 Beta
+GST|Glutathione S-transferase Theta
+GST|Glutathione S-transferase Theta-1
+GST|Glutathione S-transferase Theta-2
+GS|Genomic Scar
+GS|Gs Score
+GTF|Gene Transfer File
+GTF|Gene Transfer Format
+GTT|Gestational Trophoblastic Tumor
+GUDID|Global Unique Device Identification Database
+GVHD|Graft Versus Host Disease
+GX|Grade X
+H1|Histone 1
+H3|Histone 3
+H3|Homolog 3
+H4|Histone 4
+H4|Homolog 4
+H6|Homolog 6
+HAI|Hepatic Artery Infusion
+HAL|Haemophilia Activities List
+HAL|Hemophilia Activities List
+HARP|Hypoprebetalipoproteinemia, Acanthocytosis, Retinitis Pigmentosa
+HA|Hyaluronic Acid
+HBV|Hepatitis B Virus
+HCCQ|Health Care Climate Questionnaire
+HCK|Hemopoietic Cell Kinase
+HCMI|Human Cancer Models Initiative
+HCV|Hepatitis C Virus
+HDE|Humanitarian Device Exemption
+HDL|High Density Lipoprotein
+HD|Hd Domain
+HD|Hd Domain-containing
+HEK|Human Embryo Kinase
+HER2|Human Egf Receptor 2
+HET|Hsp27 Ere Tata-binding
+HGFR|Hepatocyte Growth Factor Receptor
+HGF|Hepatocyte Growth Factor
+HG|Hyperglycemic Glycogenolytic
+HIE|Health Information Exchange
+HIF|Hypoxia Inducible Factor
+HIP1|Huntingtin Interacting Protein 1
+HIPK2|Homeodomain Interacting Protein Kinase 2
+HIT|Heparin Induced Thrombocytopenia
+HIV|Human Immunodeficiency Virus
+HKSP|Human Kinesin Spindle Protein
+HL7|Health Level 7
+HLA|Human Leukocyte Antigen
+HLA|Human Leukocyte Antigen-dr
+HLTF|Helicase Like Transcription Factor
+HMGA1|High Mobility Group At-hook 1
+HMGA2|High Mobility Group At-hook 2
+HMGB2|High Mobility Group Box 2
+HMG|High Mobility Group
+HMMR|Hyaluronan Mediated Motility Receptor
+HMN|Hereditary Motor Neuronopathy
+HNF1A|Hepatocyte Nuclear Factor 1 Alpha
+HNF1B|Hepatocyte Nuclear Factor 1 Beta
+HNF1|Hepatic Nuclear Factor 1
+HNF1|Hepatocyte Nuclear Factor 1
+HNF4A|Hepatic Nuclear Factor 4 Alpha
+HNF4A|Hepatocyte Nuclear Factor 4 Alpha
+HOTS|H19 Opposite Tumor Suppressor
+HP1|Heterochromatin Protein 1
+HP1|Heterochromatin Protein 1-alpha
+HPV|Human Papilloma Virus
+HPV|Human Papillomavirus Vaccine
+HP|Hp Protein
+HRG|Histidine-proline Rich Glycoprotein
+HRR|Homologous Recombination Repair
+HR|Heart Rate
+HSP|Heat Shock Protein
+HSV|Herpes Simplex Virus
+HUI|Health Utilities Index
+HUVEC|Human Umbilical Vein Endothelial Cells
+IA|Ia Antigen
+IBMFS|Inherited Bone Marrow Failure Syndrome
+IB|Intrahepatic Bile
+IB|Item Bank
+ICER|Inducible Camp Early Repressor
+ICK|Intestinal Cell Kinase
+IC|Informed Consent
+IC|Inspiratory Capacity
+IDE|Investigational Device Exemption
+IDL|Intermediate Density Lipoprotein
+IDL|Intermediate Density Lipoproteins
+IDMC|Independent Data Monitoring Committee
+IEC|Independent Ethics Committee
+IE|Inhibitor Epsilon
+IGF1|Insulin-like Growth Factor 1
+IGF1|Insulin-like Growth Factor 1a
+IGF1|Insulin-like Growth Factor 1b
+IGF2R|Insulin-like Growth Factor 2 Receptor
+IGF2|Insulin-like Growth Factor 2
+IGFBP|Insulin-like Growth Factor Binding Protein
+IGF|Insulin-like Growth Factor
+IGF|Insulin-like Growth Factor-binding
+IGF|Insulin-like Growth Factor-dependent
+IG|Ig Gene
+IIM|Idiopathic Inflammatory Myopathy
+IIRS|Illness Intrusiveness Ratings Scale
+II|Ia-associated Invariant
+II|Igf Ii
+II|Ii I
+II|Ii Inhibitor
+II|Ii Inner
+II|Ii Integral
+II|Ii Interferon
+II|Ii Interleukin-1
+II|Ii Intrahepatic
+II|Ii Invariant
+II|Ii Isoform
+II|Ii, I
+II|Il1 Inhibitor
+II|Immune Interferon
+II|Inhibitor I1pp2a
+II|Inhibitor I2pp2a
+II|Interleukin Ii
+II|Intracellular Il-1
+II|Intracellular Interleukin-1
+ILC|Innate Lymphoid Cell
+ILC|Innate Lymphoid Cells
+ILK|Integrin Linked Kinase
+ILS|Integrated Learning System
+IMC|Imaging Mass Cytometry
+IM|Im Mouse
+IND|Investigational New Drug
+INN|International Nonproprietary Name
+INRG|International Neuroblastoma Risk Group
+IOPN|Intraductal Oncocytic Papillary Neoplasm
+IPF1|Insulin Promoter Factor 1
+IPSS|International Prognostic Scoring System
+IQ|Intelligence Quotient
+IRB|Independent Review Board
+IRB|Institutional Review Board
+IRF1|Interferon Regulatory Factor 1
+IRF2|Interferon Regulatory Factor 2
+IRF3|Interferon Regulatory Factor 3
+IRF4|Interferon Regulatory Factor 4
+IRF5|Interferon Regulatory Factor 5
+IRF6|Interferon Regulatory Factor 6
+IRF7|Interferon Regulatory Factor 7
+IRF8|Interferon Regulatory Factor 8
+IRF9|Interferon Regulatory Factor 9
+IRF|Interferon Regulatory Factor
+IRP|Int-1 Related Protein
+IRS1|Insulin Receptor Substrate 1
+IRS2|Insulin Receptor Substrate 2
+IRS4|Insulin Receptor Substrate 4
+IRT|Interactive Response Technology
+IRV|Inspiratory Reserve Volume
+ISG|Italian Sarcoma Group
+ISH|In Situ Hybridization
+ISP|Internet Service Provider
+ISS|International Staging System
+IS|Insertion Sequence
+ITK|Il2-inducible T-cell Kinase
+ITK|Inducible T-cell Kinase
+ITMIG|International Thymic Malignancy Interest Group
+IT|Information Technology
+IU|International Unit
+IU|International Units
+IVC|Inspiratory Vital Capacity
+JC|John Cunningham
+JIA|Juvenile Idiopathic Arthritis
+JPEG|Joint Photographic Experts Group
+JTB|Jumping Translocation Breakpoint
+K7|Keratin 7
+KAP|Kinase Associated Phosphatase
+KGFR|Keratinocyte Growth Factor Receptor
+KGF|Keratinocyte Growth Factor
+KIM1|Kidney Injury Molecule 1
+KLC1|Kinesin Light Chain 1
+KLF1|Kruppel Like Factor 1
+KLF2|Kruppel Like Factor 2
+KLF3|Kruppel Like Factor 3
+KLF4|Kruppel Like Factor 4
+KSHV|Kaposi Sarcoma Herpes Virus
+KUSP|Kilo United States Pharmacopeia
+KUSP|Kilo United States Pharmacopoeia
+KWWH|Keratoderma With Woolly Hair
+L1|L 1
+LAG3|Lymphocyte Activation Gene 3
+LAK|Lymphokine Activated Killer
+LAMP2|Lysosomal Associated Membrane Protein 2
+LASP1|Lim And Sh3 Protein 1
+LAST|Local Anesthetic Systemic Toxicity
+LAVH|Laparoscopically Assisted Vaginal Hysterectomy
+LBBB|Left Bundle Branch Block
+LBC|Lymphoid Blast Crisis
+LBP|Lipopolysaccharide Binding Protein
+LBR|Lamin B Receptor
+LC3|Light Chain 3
+LC3|Light Chain 3-like
+LCF|Lymphocyte Chemoattractant Factor
+LCIS|Lobular Ca In Situ
+LCIS|Lobular Carcinoma In Situ
+LCI|Lung Clearance Index
+LCP1|Lymphocyte Cytosolic Protein 1
+LCP2|Lymphocyte Cytosolic Protein 2
+LC|Lymphoid Cell
+LC|Lymphoid Cells
+LDB1|Lim Domain Binding 1
+LDB2|Lim Domain Binding 2
+LDB3|Lim Domain Binding 3
+LDH|Lactate Dehydrogenase H
+LDLR|Low Density Lipoprotein Receptor
+LDL|Low Density Lipoprotein
+LDL|Low Density Lipoprotein-cholesterol
+LDL|Low Density Lipoprotein-related
+LDS|Limited Data Set
+LEA|Local Education Agency
+LED|Light Emitting Diode
+LEF1|Lymphoid Enhancer-binding Factor 1
+LE|Long Evans
+LFA1|Lymphocyte Function-associated Antigen 1
+LFA3|Lymphocyte Function-associated Antigen 3
+LGG|Low Grade Glial
+LGG|Low Grade Glioma
+LGI1|Leucine-rich, Glioma Inactivated 1
+LHB|Luteinizing Hormone, Beta
+LH|Leuteinizing Hormone
+LH|Luteinizing Hormone
+LIFR|Leukemia Inhibitory Factor Receptor
+LIF|Leukemia Inhibitory Factor
+LK4|Lipid Kinase 4
+LLM|Large Language Model
+LMF1|Lipase Maturation Factor 1
+LM|Lm Mouse
+LN|Lobular Neoplasia
+LOS|Limits Of Stability
+LP|Lymphocyte Predominance
+LP|Lymphocyte Predominant
+LRBA|Lps Responsive Beige-like Anchor
+LRC|Leukocyte Receptor Cluster
+LRP1|Lipoprotein Receptor-related Protein 1
+LRP2|Lipoprotein Receptor-related Protein 2
+LRP4|Lipoprotein Receptor-related Protein 4
+LRP5|Lipoprotein Receptor-related Protein 5
+LRP8|Lipoprotein Receptor-related Protein 8
+LRRK1|Leucine Rich Repeat Kinase 1
+LRRN2|Leucine Rich Repeat Neuronal 2
+LRR|Leucine Rich Repeat
+LSF|Late Sv40 Factor
+LTK|Leukocyte Tyrosine Kinase
+LTRPC|Long Transient Receptor Potential Channel
+LT|Less Than
+LT|Lesser Than
+LV|Left Ventricular
+LXR|Liver X Receptor-like
+LX|Liver X
+M1|Mu 1
+M1|Mu, 1
+M1|Muscarinic 1
+M3|Mu 3
+M3|Muscarinic 3
+M4|Mu 4
+M4|Muscarinic 4
+M4|Muscarinic, 4
+M5|Muscarinic 5
+MA1|Ma Antigen 1
+MA2|Ma Antigen 2
+MACF1|Microtubule Actin Crosslinking Factor 1
+MAC|Membrane Attack Complex
+MAD2|Mitotic Arrest Deficient 2
+MAD2|Mitotic Arrest Deficient-like 2
+MADD|Map-kinase Activating Death Domain
+MADD|Map-kinase Activating Death Domain-containing
+MADD|Mothers Against Decapentaplegic, Drosophila
+MADH2|Mothers Against Dpp Homolog 2
+MADH4|Mothers Against Decapentaplegic Homolog 4
+MADH4|Mothers Against Dpp Homolog 4
+MADH6|Mothers Against Decapentaplegic Homolog 6
+MADH6|Mothers Against Dpp Homolog 6
+MADH7|Mothers Against Decapentaplegic Homolog 7
+MADH7|Mothers Against Dpp Homolog 7
+MAD|Mothers Against Decapentaplegic
+MAD|Mothers Against Dpp
+MAG|Myelin Associated Glycoprotein
+MANF|Mesencephalic Astrocyte-derived Neurotrophic Factor
+MAP2|Microtubule Associated Protein 2
+MAPD|Median Absolute Percentage Deviation
+MAPK|Mitogen Activated Protein Kinase
+MAP|Microtubule Associated Protein
+MAP|Mitogen Activated Protein
+MARK1|Microtubule Affinity Regulating Kinase 1
+MARK3|Microtubule Affinity Regulating Kinase 3
+MARK|Microtubule Affinity Regulating Kinase
+MASP2|Mbl Associated Serine Protease 2
+MAT|Mascc Antiemesis Tool
+MAZ|Myc Associated Zinc
+MBD4|Methyl-cpg Binding Domain 4
+MBL|Mannan Binding Lectin
+MBO|Malignant Bowel Obstruction
+MBP|Myelin Basic Protein
+MCAM|Melanoma Cell Adhesion Molecule
+MCL|Mantle Cell Lymphoma
+MCN|Mucinous Cystic Neoplasm
+MDL|Molecular Design Limited
+MDM2|Mouse Double Minute 2
+MDM4|Mouse Double Minute 4
+MD|M D
+ME1|Malic Enzyme 1
+MEC1|Mitosis Entry Checkpoint 1
+MEN1|Multiple Endocrine Neoplasia 1
+MEN|Multiple Endocrine Neoplasia
+MEP|Maximal Expiratory Pressure
+MFF|Mitochondrial Fission Factor
+MFH|Malignant Fibrous Histiocytoma
+MGA|Max Gene Associated
+MGP|Matrix Gla Protein
+MGSA|Melanoma Growth Stimulating Activity
+MGSA|Melanoma Growth Stimulatory Activity
+MHC|Major Histocompatibility Complex
+MHC|Myosin, Heavy Chain
+MH|Mesenchymal Hamartoma
+MIA2|Melanoma Inhibitory Activity 2
+MIA|Melanoma Inhibitory Activity
+MIF|Migration Inhibitory Factor
+MINT|Msx2 Interacting Nuclear Target
+MIP1G|Macrophage Inflammatory Protein 1 Gamma
+MIP2A|Macrophage Inflammatory Protein 2, Alpha
+MIP2B|Macrophage Inflammatory Protein 2, Beta
+MIP2|Macrophage Inflammatory Protein 2-beta
+MIP|Maximal Inspiratory Pressure
+MITF|Melanocyte Inducing Transcription Factor
+MI|Myocardial Infarction
+MKK6|Map Kinase Kinase 6
+MK|Menaquinone K4
+MLCK|Myosin Light Chain Kinase
+MLC|Myosin Light Chain
+MLF1|Myeloid Leukemia Factor 1
+MLL|Mixed Lineage Leukemia
+MME|Morphine Milligram Equivalents
+MMIF|Macrophage Migration Inhibitory Factor
+MMR|Measles Mumps Rubella
+MMTV|Mouse Mammary Tumor Virus
+MMTV|Murine Mammary Tumor Virus
+MMT|Manual Muscle Test
+MM|Matrix Market
+MM|Mm Measurement
+MM|Mm Mouse
+MOB|Mps One Binder
+MOG|Myelin Oligodendrocyte Glycoprotein
+MOK|Mapk/mak/mrk Overlapping Kinase
+MOU|Memorandum Of Understanding
+MPC1|Mitochondrial Pyruvate Carrier 1
+MPF|Megakaryocyte Potentiating Factor
+MPI|Mannose Phosphate Isomerase
+MPNST|Melanocytic Peripheral Nerve Sheath Tumor
+MPNST|Melanotic Peripheral Nerve Sheath Tumor
+MPP1|Membrane Palmitoylated Protein 1
+MPP1|Membrane Protein, Palmitoylated 1
+MPP2|Membrane Palmitoylated Protein 2
+MPP2|Membrane Protein, Palmitoylated 2
+MPP3|Membrane Palmitoylated Protein 3
+MPP3|Membrane Protein Palmitoylated 3
+MPP3|Membrane Protein, Palmitoylated 3
+MPRIP|Myosin Phosphatase Rho Interacting Protein
+MPZ|Myelin Protein Zero
+MP|Mercaptopurine, Prednisolone
+MRC|Medical Research Council
+MRI|Magnetic Resonance Imaging
+MRN|Medical Record Number
+MRP1|Multidrug Resistance-associated Protein 1
+MRP|Mitochondrial Rna Processing
+MRP|Mutual Recognition Procedure
+MRS|Magnetic Resonance Spectroscopic
+MRS|Magnetic Resonance Spectroscopy
+MRTFA|Myocardin Related Transcription Factor A
+MRTFB|Myocardin Related Transcription Factor B
+MR|Magnetic Resonance
+MR|Medical Record
+MSAS|Memorial Symptom Assessment Scale
+MSP|Macrophage Stimulating Protein
+MSR1|Macrophage Scavenger Receptor 1
+MTOR|Mammalian Target Of Rapamycin
+MTOR|Mechanistic Target Of Rapamycin
+MTS1|Multiple Tumor Suppressor 1
+MTS2|Multiple Tumor Suppressor 2
+MTTP|Microsomal Triglyceride Transfer Protein
+MT|More Than
+MVI|Macroscopic Vascular Invasion
+MVP|Major Vault Protein
+MV|Measles Virus
+MW|Molecular Weight
+N-|N-(3-hydroxy-7-mercapto-1-oxo-4-heptenyl)-d-valyl-d-cysteinyl-(z)-2,3 -didehydro-2-aminobutanoyl-
+NADA|New Animal Drug Application
+NAD|Nad-dependent Aldehyde Dehydrogenase
+NAD|Nad-linked Aldehyde Dehydrogenase
+NAD|Nadp-dependent Aldehyde Dehydrogenase
+NAF1|Nuclear Assembly Factor 1
+NAPA|Nsf Attachment Protein Alpha
+NAPB|Nsf Attachment Protein Beta
+NAP|Neutrophil Activation Probe
+NA|Neutrophil-specific Antigen
+NB|Notified Body
+NCAM1|Neural Cell Adhesion Molecule 1
+NCAM2|Neural Cell Adhesion Molecule 2
+NCF1|Neutrophil Cytosolic Factor 1
+NCF2|Neutrophil Cytosolic Factor 2
+NCF4|Neutrophil Cytosolic Factor 4
+NCF|Neutrophil Cytosolic Factor
+NCI|National Cancer Institute
+NCR|Natural Cytotoxicity Receptor
+NCR|Nk Cell-activating Receptor
+NCS1|Neuronal Calcium Sensor 1
+NC|Nash County
+NC|North Carolina
+NC|Northampton County
+NDA|New Drug Application
+NDC|National Drug Code
+NDRG1|N-myc Downstream Regulated Gene 1
+ND|North Dakota
+NFE2|Nuclear Factor Erythroid 2-like
+NFE2|Nuclear Factor, Erythroid 2
+NFE2|Nuclear Factor, Erythroid 2-like
+NFKB|Nuclear Factor Kappa B
+NGFR|Nerve Growth Factor Receptor
+NGF|Nerve Growth Factor
+NH|New Hampshire
+NJ|New Jersey
+NKC|Natural Killer Cell
+NKC|Natural Killer Cells
+NKTR|Natural Killer Triggering Receptor
+NKT|Natural Killer T-cells
+NKT|Natural Killer T-lymphocyte
+NKT|Natural Killer T-lymphocytes
+NK|Natural Killer
+NLK|Nemo Like Kinase
+NLR|Nacht, Leucine Rich
+NLT|Not Less Than
+NMDP|National Marrow Donor Program
+NMPA|National Medical Products Administration
+NMR|Nuclear Magnetic Resonance
+NMT|Not More Than
+NM|New Mexico
+NNDSS|National Notifiable Diseases Surveillance System
+NNK|Nicotine-derived Nitrosamine Ketone
+NNT|Nicotinamide Nucleotide Transhydrogenase
+NOEL|No Observable Effect Level
+NOS1|Nitric Oxide Synthase 1
+NOS2|Nitric Oxide Synthase 2
+NOS2|Nitric Oxide Synthase 2a
+NOS3|Nitric Oxide Synthase 3
+NOS|Nevus Of Skin
+NOS|Nitric Oxide Synthase
+NOS|Not Otherwise Specified
+NO|Nitric Oxide
+NPPB|Natriuretic Peptide Precursor B
+NRBP1|Nuclear Receptor Binding Protein 1
+NRIP1|Nuclear Receptor Interacting Protein 1
+NRIP3|Nuclear Receptor Interacting Protein 3
+NRK|Nik Related Kinase
+NSCLC|Non Small Cell Lung Cancer
+NSC|Nomenclature Standards Committee
+NSD2|Nuclear Set Domain-containing 2
+NSE|Neuron Specific Enolase
+NTRK|Neurotrophic Tyrosine Receptor Kinase
+NYTS|National Youth Tobacco Survey
+NY|New York
+OARS|Older Americans Resource Scale
+OCIA|Ovarian Cancer Immunoreactive Antigen
+OCIA|Ovarian Carcinoma Immunoreactive Antigen
+OCP2|Of Corti Protein 2
+OCT|Optical Coherence Tomography
+OCT|Optimal Cutting Temperature
+ODI|Oswestry Disability Index
+OD|Optical Density
+OGFR|Opioid Growth Factor Receptor
+OGI|Observer Global Impression
+OLR1|Ox Ldl Receptor 1
+OLR1|Oxidized Ldl Receptor 1
+OMFAQ|Oars Multidimensional Functional Assessment Questionnaire
+ORF|Open Reading Frame
+OS|Os Study
+OS|Osteosarcoma Study
+OTC|Over The Counter
+P1NP|Procollagen 1 N-terminal Propeptide
+P2|Protein 2
+P3NP|Procollagen 3 N-terminal Propeptide
+P3|Protein 3
+P5|Protein 5
+PACAP|Pituitary Adenylate Cyclase Activating Polypeptide
+PAK5|P21 Activated Kinase 5
+PAP2|Phosphatidic Acid Phosphatase 2b
+PAR4|Prostate Apoptosis Response 4
+PAR|Prostate Androgen Regulated
+PAS|Periodic Acid Schiff
+PAS|Periodic Acid-schiff Staining
+PAS|Platelets Additive Solution
+PAWR|Prkc, Apoptosis, Wt1, Regulator
+PA|Pulmonary Arterial
+PBK|Pdz Binding Kinase
+PBPC|Peripheral Blood Progenitor Cell
+PBP|Platelet Basic Protein
+PBP|Pro-platelet Basic Protein
+PB|Perineal Body
+PC7|Prohormone Convertase 7
+PC7|Proprotein Convertase 7
+PC9|Proprotein Convertase 9
+PCA3|Prostate Cancer Antigen 3
+PCA3|Prostate Cancer Associated 3
+PCAT1|Prostate Cancer Associated Transcript 1
+PCA|Protein Complementation Assay
+PCI|Percutaneous Coronary Intervention
+PCNA|Proliferating Cell Nuclear Antigen
+PCR|Polymerase Chain Reaction
+PCV|Personalized Cancer Vaccine
+PC|Pc Cell-derived
+PC|Plasma Cell
+PC|Plasma Cells
+PC|Pyruvate Carboxylase
+PDGFC|Platelet Derived Growth Factor C
+PDGFD|Platelet Derived Growth Factor D
+PDGFR|Platelet Derived Growth Factor Receptor
+PDGF|Platelet Derived Growth Factor
+PDI|Protein Disulfide Isomerase
+PDK2|Pyruvate Dehydrogenase Kinase 2
+PDK3|Pyruvate Dehydrogenase Kinase 3
+PDK|Pyruvate Dehydrogenase Kinase
+PDL1|Programmed Death Ligand 1
+PDQ|Physician Data Query
+PDSS2|Prenyl Diphosphate Synthase, Subunit 2
+PDX|Patient Derived Xenograft
+PD|Progressive Disease
+PEA3|Polyomavirus Enhancer Activator 3
+PEAK1|Pseudopodium Enriched Atypical Kinase 1
+PECAM|Platelet Endo Cell Adhesion Molecule
+PECAM|Platelet Endothelial Cell Adhesion Molecule
+PEDF|Pigment Epithelium Derived Factor
+PEF|Peak Expiratory Flow
+PEG3|Paternally Expressed Gene 3
+PEG|Percutaneous Endoscopic Gastrostomy
+PET|Positron Emission Tomography
+PF4|Platelet Factor 4
+PFG|Percutaneous Fluoroscopic Gastrostomy
+PGF|Placental Growth Factor
+PGI|Patient Global Impression
+PHQ-9|Patient Health Questionnaire - 9
+PHQ|Patient Health Questionnaire
+PH|Pleckstrin Homology
+PI3|Peptidase Inhibitor 3
+PI5|Peptidase Inhibitor 5
+PID|Phosphotyrosine Interaction Domain
+PIF1|Petite Integration Frequency 1
+PII|Personally Identifiable Information
+PIN|Prostate Intraepithelial Neopl.
+PIN|Prostate Intraepithelial Neoplasia
+PIN|Prostatic Intraepithelial Neoplasia
+PKA|Protein Kinase A
+PKB|Protein Kinase B
+PKB|Protein Kinase B-alpha
+PKD1|Polycystic Kidney Disease 1
+PKD2|Polycystic Kidney Disease 2
+PKD|Paroxysmal Kinesigenic Dyskinesia
+PKL|Pyruvate Kinase L
+PKM|Pyruvate Kinase Muscle
+PKM|Pyruvate Kinase, Muscle
+PKN|Protein Kinase N
+PKR|Pyruvate Kinase R
+PK|Phosphoenolpyruvate Kinase
+PK|Pyruvate Kinase
+PL|Polypodium Leucotomos
+PMP2|Peripheral Myelin Protein 2
+PNP|Purine Nucleoside Phosphorylase
+PNRC1|Proline-rich Nuclear Receptor Coactivator 1
+POT1|Protection Of Telomeres 1
+PPARG|Peroxisome Proliferative Activated Receptor, Gamma
+PPAR|Peroxisome Proliferative Activated Receptor
+PPD|Protected Personal Data
+PPD|Purified Protein Derivative
+PPI|Pan-notch Ppi Inhibitor
+PPI|Pan-notch Protein-protein Interaction
+PPM1D|Protein Phosphatase, Magnesium-dependent, 1, Delta
+PPOS|Patient Provider Orientation Scale
+PPO|Preferred Provider Organization
+PPY|Pancreatic Polypeptide Y
+PRA|Panel Reactive Antibody
+PRA|Percent Reactive Antibody
+PRC1|Polycomb Repressive Complex 1
+PRCC|Papillary Renal Cell Carcinoma
+PRO|Patient Reported Outcome
+PRO|Patient Reported Outcomes
+PRP|Platelet Rich Plasma
+PRRT|Peptide Receptor Radionuclide Therapy
+PR|Positive Regulatory
+PR|Protein Riz
+PR|Puerto Rico
+PSA|Prostate Specific Antigen
+PSA|Prostatic Specific Antigen
+PSCA|Prostate Stem Cell Antigen
+PSF1|Peptide Supply Factor 1
+PSF2|Peptide Supply Factor 2
+PSK2|Prostate-derived Ste20-like Kinase 2
+PSQI|Pittsburgh Sleep Quality Index
+PSTI|Pancreatic Secretory Trypsin Inhibitor
+PSX|Proteasome Subunit X
+PTBP2|Polypyrimidine Tract Binding Protein 2
+PTBP3|Polypyrimidine Tract Binding Protein 3
+PTB|Polypyrimidine Tract Binding
+PTK2B|Protein Tyrosine Kinase 2 Beta
+PTK2|Protein Tyrosine Kinase 2
+PTK4|Protein Tyrosine Kinase 4
+PTK5|Protein Tyrosine Kinase 5
+PTK6|Protein Tyrosine Kinase 6
+PTK7|Protein Tyrosine Kinase 7
+PTLD|Post Transplant Lymphoproliferative Disorder
+PTPRT|Protein Tyrosine Phosphatase, Receptor Type
+PTP|Protein Tyrosine Phosphatase
+PTS1|Peroxisomal Targeting Signal 1
+PTS2|Peroxisomal Targeting Signal 2
+PTS2|Peroxisome Targeting Signal 2
+PT|Pt Term
+PUI|Patient Under Investigation
+PUI|Person Under Investigation
+PXR|Pregnane X Receptor
+QA|Qaulity Assurance
+QA|Quality Assurance
+QC|Quality Control
+QOL|Quality Of Life
+QTL6|Quantitative Trait Locus 6
+R7|Recombinant 7
+RAE1|Ribonucleic Acid Export 1
+RAFT|Related Adhesion Focal Tyrosine
+RAG1|Recombination Activating Gene 1
+RAGE|Receptor Advanced Glycation Endproducts
+RAI1|Retinoic Acid Induced 1
+RAMP1|Receptor Activity Modifying Protein 1
+RAMP2|Receptor Activity Modifying Protein 2
+RARA|Retinoic Acid Receptor Alpha
+RARB|Retinoic Acid Receptor, Beta
+RARG|Retinoic Acid Receptor, Gamma
+RAR|Retinoic Acid Receptor
+RAR|Retinoic Acid-binding Receptor
+RAS|Retrovirus Associated Sequence
+RBBB|Right Bundle Branch Block
+RBC|Red Blood Cell
+RBC|Red Blood Cells
+RBC|Red Blood Corpuscule
+RBD|Receptor Binding Domain
+RBE|Relative Biological Effectiveness
+RBP1|Retinol Binding Protein 1
+RBP2|Retinol Binding Protein 2
+RBP3|Retinol Binding Protein 3
+RBP4|Retinol Binding Protein 4
+RBP|Retinol Binding Protein
+RB|Rb Binding
+RB|Retinoblastoma Binding
+RCAC|Reproductive Concerns After Cancer
+RCAD|Renal Cysts And Diabetes
+RCC|Rcc, Clear Cell
+RCC|Renal Cell Cancer
+RCC|Renal Cell Carcinoma
+RCC|Renal Clear Cell
+RCM|Reflectance Confocal Microscopy
+RDAS|Revised Dyadic Adjustment Scale
+RDS|R Data Serialization
+RDS|Respiratory Distress Syndrome
+RDS|Retinal Degeneration, Slow
+REEP1|Receptor Expression Enhancing Protein 1
+RFC1|Replication Factor C 140-kd
+RFC3|Replication Factor C, 36-kda
+RFC3|Replication Factor C, 38-kda
+RFC4|Replication Factor C, 40-kda
+RFC|Replication Factor C
+RFC|Replication Factor C1
+RFP|Ret Finger Protein
+RFP|Ring Finger Protein
+RFX5|Regulatory Factor X 5
+RFX|Regulatory Factor X
+RFX|Regulatory Factor X-associated
+RGM|Repulsive Guidance Molecule
+RGNEF|Rho Guanine Nucleotide Exchange Factor
+RHIO|Regional Health Information Organization
+RI8|Real Imager 8
+RIA|Receptor I A1
+RIM|Reference Information Model
+RIP|Receptor Interacting Protein
+RIP|Rip-associated Ich1/ced3-homologous Protein
+RI|Receptor I
+RI|Rhode Island
+RLC|Regulatory Light Chain
+RLF|Rearranged L-myc Fusion
+RMS|Reference Member State
+ROA|Route Of Administration
+ROD1|Regulator Of Differentiation 1
+RORA|Rar-related Orphan Receptor A
+RORA|Related Orphan Receptor A
+RORB|Rar-related Orphan Receptor B
+RORB|Rar-related Orphan Receptor Beta
+RORB|Related Orphan Receptor B
+RORB|Retinoid-related Orphan Receptor Beta
+RORC|Rar-related Orphan Receptor C
+RORC|Related Orphan Receptor C
+RP2|Retinitis Pigmentosa 2
+RPKM|Reads Per Kilobase Million
+RPMI|Roswell Park Memorial Institute
+RSIS|Repetitive Strain Injury Syndrome
+RSV|Respiratory Syncytial Virus
+RTK|Receptor Tyrosine Kinase
+RT|Radiation Therapy
+RT|Rhabdoid Tumor
+RT|Rhabdoid Tumour
+RVD|Right Ventricular Dysplasia
+RWD|Real World Data
+RWE|Real World Evidence
+RXRA|Retinoid X Receptor, Alpha
+RXRB|Retinoid X Receptor, Beta
+RXRG|Retinoid X Receptor, Gamma
+RXR|Retinoid X Receptor
+S1|Spike 1
+S2|Spike 2
+S2|Subunit 2
+S3|Subunit 3
+S6|S6k-alpha 6
+SA2|Stromal Antigen 2
+SA3|Stromal Antigen 3
+SAA|Serum Amyloid A-1
+SAA|Serum Amyloid A1
+SADS|Sudden Arrhythmic Death Syndrome
+SADS|Sudden Arrythmia Death Syndrome
+SAD|Sagittal Abdominal Diameter
+SAE|Serious Adverse Event
+SAE|Serious Adverse Experience
+SAFB|Scaffold Attachment Factor B
+SAM|Sterile Alpha Motif
+SAP2|Srf Accessory Protein 2
+SARS|Severe Acute Respiratory Syndrome
+SARS|Severe Acute Respiratory Syndrome-related
+SA|Statistical Analysis
+SA|Surface Area
+SBF1|Set Binding Factor 1
+SBRT|Stereotactic Body Radiation Therapy
+SCC1|Sister Chromatid Cohesion 1
+SCCA|Squamous Cell Carcinoma Antigen
+SCC|Small Cell Car.
+SCC|Small Cell Carcinoma
+SCC|Squamous Cell Cancer
+SCC|Squamous Cell Car.
+SCC|Squamous Cell Carcinoma
+SCF|Stem Cell Factor
+SCID|Severe Combined Immune Deficiency
+SCL|Stem Cell Leukemia
+SCN|Severe Congenital Neutropenia
+SCPBI|Sickle Cell Pain Burden Interview
+SCQ|Self-administered Comorbidity Questionnaire
+SC|Saluda County
+SC|South Carolina
+SC|Spartanburg County
+SC|Sumter County
+SDO|Standards Development Organization
+SDSP|Study Data Standardization Plan
+SDS|Symptom Distress Scale
+SD|South Dakota
+SF8|Short Form 8
+SFFV|Spleen Focus Forming Virus
+SFRP4|Secreted Frizzled Related Protein 4
+SF|Scatter Factor
+SF|Short Form
+SH2|Src Homology 2
+SHBG|Sex Hormone Binding Globulin
+SHH|Sonic Hedgehog Homolog
+SHP|Short Heterodimer Partner
+SHP|Small Heterodimer Partner
+SH|Skin-homing Helper
+SIAH2|Seven In Absentia Homolog 2
+SILS|Single Item Literacy Screener
+SIL|Squamous Intraepithelial Lesion
+SKAP1|Src Kinase Associated Phosphoprotein 1
+SKAP2|Src Kinase Associated Phosphoprotein 2
+SKP1|S-phase Kinase-associated Protein 1a
+SKP2|S-phase Kinase-associated Protein 2
+SLAM|Signaling Lymphocytic Activation Molecule
+SLA|Soluble Liver Antigen
+SLA|Soluble Liver Autoantigen
+SLA|Src Like Adaptor
+SLE|Systemic Lupus Erythematosus
+SLK|Ste20 Like Kinase
+SLPI|Secretory Leukocyte Peptidase Inhibitor
+SLPI|Secretory Leukocyte Protease Inhibitor
+SMAD|Smad, Mothers Against Dpp
+SMART|Sequential Multiple Assignment Randomized Trial
+SMART|Sequential, Multiple Assignment, Randomized Trial
+SMN1|Survival Motor Neuron 1
+SMPX|Small Muscle Protein X-linked
+SMPX|Small Muscle Protein, X-linked
+SMRP|Soluble Mesothelin Related Peptides
+SMRP|Soluble Mesothelin Related Proteins
+SMUG1|Single-strand-selective Monofunctional Uracil-dna Glycosylase 1
+SNAP|Soluble Nsf Attachment Protein
+SNRPF|Small Nuclear Ribonucleoprotein Polypeptide F
+SNRPN|Small Nuclear Ribonucleoprotein Polypeptide N
+SOCS1|Suppressor Of Cytokine Signaling 1
+SOCS2|Suppressor Of Cytokine Signaling 2
+SOCS3|Suppressor Of Cytokine Signaling 3
+SOC|System Organ Class
+SOFAA|Survey Of Food Allergy Anxiety
+SOP|Standard Operating Procedure
+SOP|Standard Operating Procedures
+SOS|Son Of Sevenless
+SPECT|Single Photon Emission Computed Tomography
+SPL|Structured Product Label
+SPL|Structured Product Labeling
+SPPB|Short Physical Performance Battery
+SRCAP|Snf2 Related Crebbp Activator Protein
+SRF|Serum Response Factor
+SRP|Signal Recognition Particle
+SRT|Stereotactic Radiation Therapy
+SRT|Syllable Repetition Task
+SSA|Sjogrens Ss-a Antigen
+SSG|Scandinavian Sarcoma Group
+SSM|Superficial Spreading Melanoma
+SSRP1|Signal Sequence Recognition Protein 1
+SSRP1|Structure Specific Recognition Protein 1
+SSRP|Structure Specific Recognition Protein
+SSX1|Sarcoma, Synovial, X-chromosome-related 1
+SSX2|Sarcoma, Synovial, X-chromosome-related 2
+SSX4|Sarcoma, Synovial, X-chromosome-related 4
+SSX|Sarcoma, Synovial, X-chromosome-related
+SSX|Synovial Sarcoma X
+SSX|Synovial Sarcoma, X
+STF|Subchromosomal Transferable Fragment
+STIC|Serous Tubal Intraepithelial Carcinoma
+SVC|Slow Vital Capacity
+T1|Theta 1
+T1|Translocase 1
+T1|Translocator 1
+T2DM|Type 2 Diabetes Mellitus
+T2|Theta 2
+T2|Type 2
+T3|Transferase 3
+TAA|Tumor Associated Antigen
+TAD3|Trna-specific Adenosine Deaminase 3
+TAL|T-cell Acute Lymphocytic
+TAM|Transient Abnormal Myelopoiesis
+TASS|Toxic Anterior Segment Syndrome
+TAS|Technology Attitude Scale
+TBII|Thyrotropin Binding Inhibitory Immunoglobulin
+TBK1|Tank Binding Kinase 1
+TBL1X|Transducin Beta Like 1 X-linked
+TBL1Y|Transducin Beta Like 1 Y-linked
+TBP|Tata Box-binding Protein
+TBP|Tata Box-binding Protein-like
+TBP|Tata Box-binding Protein-related
+TCF1|T Cell Factor 1
+TCF7|T Cell Factor 7
+TCM|Traditional Chinese Medicine
+TCRIM|T Cell Receptor Interacting Molecule
+TC|T Cell
+TC|T Cells
+TC|Truc-t Cell-targeting
+TER|Transitional Endoplasmic Reticulum
+TESS|Toronto Extremity Salvage Score
+TFAM|Transcription Factor A, Mitochondrial
+TFPI2|Tissue Factor Pathway Inhibitor 2
+TFPI|Tissue Factor Pathway Inhibitor
+TGFA|Transforming Growth Factor Alpha
+TGFB1|Transforming Growth Factor Beta 1
+TGFB1|Transforming Growth Factor, Beta 1
+TGFB2|Transforming Growth Factor, Beta 2
+TGFB3|Transforming Growth Factor Beta 3
+TGFB3|Transforming Growth Factor, Beta 3
+TGF|Transforming Growth Factor
+TGF|Transforming Growth Factor-alpha
+TG|Tg Gene
+TG|Thyroglobulin Gene
+THRA|Thyroid Hormone Receptor Alpha
+THRA|Thyroid Hormone Receptor, Alpha
+THRB|Thyroid Hormone Receptor Beta
+THRB|Thyroid Hormone Receptor, Beta
+THT|Thyroid Hormone Therapy
+TH|Tyrosine Hydroxylase
+TIL|Tumor Infiltrating Lymphocyte
+TIL|Tumor Infiltrating Lymphocytes
+TIM|Transforming Immortalized Mammary
+TINF2|Terf1 Interacting Nuclear Factor 2
+TIPS|Transjugular Intrahepatic Portosystemic Shunt
+TJP1|Tight Junction Protein 1
+TK1|Thymidine Kinase 1
+TK2|Thymidine Kinase 2
+TKI|Tyrosine Kinase Inhibitor
+TKT|Tyrosine-protein Kinase Tyro10
+TLR7|Toll Like Receptor 7
+TLR8|Toll Like Receptor 8
+TM|Target Module
+TM|Targeting Module
+TM|Tm Mouse
+TNFR1|Tumor Necrosis Factor Receptor 1
+TNFR2|Tumor Necrosis Factor Receptor 2
+TNFR|Tumor Necrosis Factor Receptor
+TNF|Tumor Necrosis Factor
+TNF|Tumor Necrosis Factor-alpha
+TNF|Tumor Necrosis Factor-beta
+TNF|Tumor Necrosis Factor-like
+TORC|Target Of Rapamycin Complex
+TOR|Target Of Rapamycin
+TPM|Transcripts Per Million
+TPN|Total Parenteral Nutrition
+TPR|Translocated Promoter Region
+TPT1|Tumor Protein, Translationally-controlled 1
+TP|Thymopoietin-related Peptide
+TR1|Thioredoxin Reductase 1
+TR3|Testicular Receptor 3
+TR3|Thioredoxin Reductase 3
+TR4|Testicular Receptor 4
+TRAF2|Tnf Receptor Associated Factor 2
+TRAF3|Tnf Receptor Associated Factor 3
+TRAF4|Tnf Receptor Associated Factor 4
+TRAF6|Tnf Receptor Associated Factor 6
+TRAF7|Tnf Receptor Associated Factor 7
+TRAG3|Taxol Resistance Associated Gene 3
+TRAP1|Tnf Receptor Associated Protein 1
+TRH|Thyrotropin Releasing Hormone
+TRK|Tropomyosin Receptor Kinase
+TRK|Tyrosine Receptor Kinase
+TRN|Tgf-beta Related Neurotrophic
+TRP|Transient Receptor Potential
+TSEB|Total Skin Electron Beam
+TSE|Total Skin Electron
+TSHR|Thyroid Stimulating Hormone Receptor
+TSH|Thyroid Stimulating Hormone
+TSI|Thyroid Stimulating Immunoglobulin
+TSLP|Thymic Stromal Lymphopoietin Protein
+TSPY1|Testis Specific Protein, Y-linked 1
+TSSC1|Tumor Suppressing Subtransferable Candidate 1
+TSSC4|Tumor Suppressing Subtransferable Candidate 4
+TSS|Tissue Source Site
+TTF|Translocation Three Four
+TTL|Tubulin Tyrosine Ligase
+TTPA|Tocopherol Transfer Protein, Alpha
+TT|Torque Teno
+TVL|Total Vaginal Length
+UBTF|Upstream Binding Transcription Factor
+UCDAI|Ulcerative Colitis Disease Activity Index
+UHDRS|Unified Huntington's Disease Rating Scale
+UIMC1|Ubiquitin Interaction Motif Containing 1
+UIP1|Uch Interacting Protein 1
+UIP1|Uch37 Interacting Protein 1
+UK|United Kingdom
+ULK4|Unc-51 Like Kinase 4
+UMC|Uppsala Monitoring Centre
+UMIN|University Medical Information Network
+UM|U.s. Minor
+UPA|Urokinase Plasminogen Activator
+UPA|Urokinase-type Plasminogen Activator
+UPC|Universal Product Code
+URL|Uniform Resource Locator
+USB1|U Six Biogenesis 1
+USB1|U6 Snrna Biogenesis 1
+USP1|Ubiquitin Specific Peptidase 1
+USP1|Ubiquitin Specific Protease 1
+USP6|Ubiquitin Specific Peptidase 6
+USP6|Ubiquitin Specific Protease 6
+USP7|Ubiquitin Specific Peptidase 7
+USP7|Ubiquitin Specific Protease 7
+USP8|Ubiquitin Specific Protease 8
+USP9X|Ubiquitin Specific Peptidase 9 X-linked
+USP9X|Ubiquitin Specific Peptidase 9, X-linked
+USP9X|Ubiquitin Specific Protease 9, X
+USP9X|Ubiquitin Specific Protease 9, X-linked
+USP9Y|Ubiquitin Specific Peptidase 9 Y-linked
+USP|Ubiquitin Specific Peptidase
+USP|Ubiquitin Specific Protease
+UST|User Site Testing
+US|Ultrasound Service
+US|United States
+US|Us State
+US|Us Survey
+V1|Variant 1
+VAMP8|Vesicle Associated Membrane Protein 8
+VAS|Visual Analog Scale
+VA|Veterans Administration
+VA|Veterans Affairs
+VCAM1|Vascular Cell Adhesion Molecule 1
+VCF|Variant Call Format
+VCP|Valosin Containing Protein
+VDBP|Vitamin D Binding Protein
+VDR|Vitamin D Receptor
+VEGFA|Vascular Endothelial Growth Factor A
+VEGFB|Vascular Endothelial Growth Factor B
+VEGFC|Vascular Endothelial Growth Factor C
+VEGFD|Vascular Endothelial Growth Factor D
+VEGF|Vascular Endothelial Growth Factor
+VHL|Von Hippel Lindau
+VIPR1|Vasoactive Intestinal Peptide Receptor 1
+VIPR2|Vasoactive Intestinal Peptide Receptor 2
+VIP|Vasoactive Intestinal Peptide
+VIP|Vasoactive Intestinal Polypeptide
+VI|Virgin Islands
+VLDLR|Very Low Density Lipoprotein Receptor
+VLDL|Very Low Density Lipoprotein
+VPR|Viral Protein R
+VPS2|Vacuolar Protein Sorting 2
+VV|Vaccinia Virus
+VWF|Viii-von Willebrand Factor
+VWF|Von Willebrand Factor
+WAI|Work Ability Index
+WBC|White Blood Cell
+WBC|White Blood Cells
+WBC|White Blood Corpuscle
+WDHA|Watery Diarrhea, Hypokalemia, And
+WD|Wd-40 Domain
+WF|Wistar Furth
+WGA|Whole Genome Association
+WGS|Whole Genome Sequencing
+WH|Wistar Han
+WIF1|Wnt Inhibitory Factor 1
+WIP|Was/wasl Interacting Protein
+WISP1|Wnt1 Induced Secreted Protein 1
+WIWI|Was It Worth It
+WLS|Wu Ling San
+WS|Williams-beuren Syndrome
+WT1|Wilms Tumor 1
+WT2|Wilms Tumor 2
+WV|West Virginia
+WW|Wac Wt
+WW|Wbp1l Wt
+WW|Wwc1 Wt
+WW|Wwox Wt
+WW|Wwp1 Wt
+WW|Wwp2 Wt
+WW|Wwtr1 Wt
+XAF1|Xiap Associated Factor 1
+XBP1|X-box Binding Protein 1
+XC|Xc Chemokine
+XIST|X Inactive Specific Transcript
+XK|X Kell
+XK|X-linked Kx
+XK|Xk, Kell
+XPC|Xeroderma Pigmentosum, Complementation
+XP|Xeroderma Pigmentosum
+XRCC2|X-ray Repair Cross Complementing 2
+XRCC6|X-ray Repair Cross Complementing 6
+XSLJZ|Xiang Sha Liu Jun Zi
+YAC|Yeast Artificial Chromosome
+YAML|Yaml Ain't Markup Language
+YAP1|Yes Associated Protein 1
+YYJ|Yiqi Yangyin Jiedu
+ZFPM1|Zinc Finger Protein, Multitype 1
+ZFPM2|Zinc Finger Protein, Multitype 2
+ZFTA|Zinc Finger Translocation Associated
+ZL|Z, Long
