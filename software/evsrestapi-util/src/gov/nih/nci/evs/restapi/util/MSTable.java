@@ -19,6 +19,55 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
 public class MSTable {
+	static String EVS_EXPLORE_URL = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
+
+	public static String createHyperlink(String code) {
+		return EVS_EXPLORE_URL + code;
+	}
+
+	public static String extractCode(String line) {
+		int n = line.lastIndexOf("(");
+		String s = line.substring(n+1, line.length()-1);
+		return s;
+	}
+
+	public static String extractLabel(String line) {
+		int n = line.lastIndexOf("(");
+		String s = line.substring(0, n);
+		return s;
+	}
+
+	public static void createNCItRun(XWPFDocument document, String line) {
+		XWPFParagraph paragraph = document.createParagraph();
+		XWPFRun run = paragraph.createRun();
+		String label = extractLabel(line);
+		run.setText(label + "(");
+		String code = extractCode(line);
+		String url = createHyperlink(code);
+		XWPFHyperlinkRun hyperlinkrun = createHyperlinkRun(paragraph, url);
+		hyperlinkrun.setText(code);
+		hyperlinkrun.setColor("0000FF");
+		hyperlinkrun.setUnderline(UnderlinePatterns.SINGLE);
+		run = paragraph.createRun();
+		run.setText(")");
+	}
+
+	static XWPFHyperlinkRun createHyperlinkRun(XWPFParagraph paragraph, String uri) {
+		String rId = paragraph.getDocument().getPackagePart().addExternalRelationship(
+		uri,
+		XWPFRelation.HYPERLINK.getRelation()
+		).getId();
+
+		CTHyperlink cthyperLink=paragraph.getCTP().addNewHyperlink();
+		cthyperLink.setId(rId);
+		cthyperLink.addNewR();
+
+		return new XWPFHyperlinkRun(
+		cthyperLink,
+		cthyperLink.getRArray(0),
+		paragraph
+		);
+	}
 
     public static void addImage(XWPFDocument document, String logo, int height, int width) {
 		XWPFParagraph image = document.createParagraph();
@@ -33,6 +82,14 @@ public class MSTable {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	public static void addHyperlinkToCell(XWPFTableCell cell, String url, String text) {
+		XWPFParagraph paragraph = cell.addParagraph();
+		XWPFHyperlinkRun run = createHyperlinkRun(paragraph, url);
+		run.setText(text);
+		run.setColor("0000FF");
+		run.setUnderline(UnderlinePatterns.SINGLE);
 	}
 
 	public static void run(String datafile) throws IOException {
@@ -75,7 +132,6 @@ public class MSTable {
 		XWPFRun run = tableRow.getCell(0).addParagraph().createRun();
 		run.setBold(true);
 		run.setText((String) u.elementAt(0));
-
 		for (int i=1; i<u.size(); i++) {
 			run = tableRow.addNewTableCell().addParagraph().createRun();
 			run.setBold(true);
@@ -85,9 +141,20 @@ public class MSTable {
 		for (int i=1; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			u = StringUtils.parseData(line, '|');
-			tableRow = table.createRow();
+            tableRow = table.createRow();
+            tableRow.setHeight(10);
 			for (int j=0; j<u.size(); j++) {
-				tableRow.getCell(j).setText((String) u.elementAt(j));
+				String code = (String) u.elementAt(j);
+				if (StringUtils.isNCItCode(code)) {
+					System.out.println(code + " isNCItCode? " + StringUtils.isNCItCode(code));
+					String url = createHyperlink(code);
+					String text = code;
+					addHyperlinkToCell(tableRow.getCell(j), url, text);
+				} else {
+					System.out.println(code + " isNCItCode? " + StringUtils.isNCItCode(code));
+					run = tableRow.getCell(j).addParagraph().createRun();
+					run.setText((String) u.elementAt(j));
+				}
 			}
 		}
 		document.write(out);
