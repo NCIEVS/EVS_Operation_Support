@@ -146,12 +146,10 @@ public class MSTable {
 			for (int j=0; j<u.size(); j++) {
 				String code = (String) u.elementAt(j);
 				if (StringUtils.isNCItCode(code)) {
-					System.out.println(code + " isNCItCode? " + StringUtils.isNCItCode(code));
 					String url = createHyperlink(code);
 					String text = code;
 					addHyperlinkToCell(tableRow.getCell(j), url, text);
 				} else {
-					System.out.println(code + " isNCItCode? " + StringUtils.isNCItCode(code));
 					run = tableRow.getCell(j).addParagraph().createRun();
 					run.setText((String) u.elementAt(j));
 				}

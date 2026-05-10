@@ -195,4 +195,31 @@ public class DelimitedDataExtractor {
 		return w;
 	}
 
+	public static Vector extractByMatchingColumnValue(Vector w, String delim_column_key, char delim, int col, String value) {
+		Vector<Integer> key_cols = delimitedInt2integers(delim_column_key, delim);
+		return extractByMatchingColumnValue(w, key_cols, delim, col, value);
+	}
+
+	public static Vector extractByMatchingColumnValue(Vector w, Vector<Integer> columns, char delim, int col, String value) {
+		Vector v = new Vector();
+		for (int i=0; i<w.size(); i++) {
+			String line = (String) w.elementAt(i);
+			Vector u = StringUtils.parseData(line, '\t');
+			String t = (String) u.elementAt(col);
+            if (t.compareTo(value) == 0) {
+				StringBuffer buf = new StringBuffer();
+				for (int k=0; k<columns.size(); k++) {
+					Integer column_obj = (Integer) columns.elementAt(k);
+					int column_int = Integer.parseInt(column_obj.toString());
+					String t2 = (String) u.elementAt(column_int);
+					buf.append(t2).append(delim);
+				}
+				String s = buf.toString();
+				s = s.substring(0, s.length()-1);
+				v.add(s);
+			}
+		}
+		return new SortUtils().quickSort(v);
+	}
+
 }
