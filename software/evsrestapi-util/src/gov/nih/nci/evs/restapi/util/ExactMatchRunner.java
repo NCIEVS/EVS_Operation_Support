@@ -184,6 +184,17 @@ No match
 		System.out.println("Total run time: " + timeElapsed + " (milli-seconds)");
 	}
 
+    public static void run(String datafile) {
+		Vector dataVec = new Vector();
+		dataVec.add("P90|P384$NCI|P383$SY");
+		dataVec.add("P90|P384$NCI|P383$PT");
+		dataVec.add("P310");
+		int mode = 0;
+		Vector roots = null;
+		int colNum = 0;
+		ExactMatchRunner.run(mode, roots, datafile, colNum, dataVec);
+	}
+
     //command line parameters: datafile mode_str root_str col_str
     public static void main(String[] args) {
 		Vector dataVec = new Vector();
