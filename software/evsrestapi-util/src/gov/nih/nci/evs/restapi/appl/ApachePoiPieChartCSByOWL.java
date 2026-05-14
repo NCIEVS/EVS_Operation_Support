@@ -23,6 +23,12 @@ import org.apache.poi.xssf.usermodel.XSSFDrawing;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import org.openxmlformats.schemas.drawingml.x2006.chart.*;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTPlotArea;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTBoolean;
+
+
+
 /**
  * <!-- LICENSE_TEXT_START -->
  * Copyright 2022 Guidehouse. This software was developed in conjunction
@@ -84,6 +90,7 @@ public class ApachePoiPieChartCSByOWL {
 	static HashMap contributingSourceMap = new HashMap();
 	static Vector cs_data_vec = null;
 	static String ncit_version = null;
+	static String EXCEL_FILENAME = "NCIT_Concept_Stats_By_Contributing_Source.xlsx";
 	static {
 		scanner = new OWLScanner(NCIT_OWL);
 		ncit_version = get_ncit_version();
@@ -276,16 +283,40 @@ public class ApachePoiPieChartCSByOWL {
 
 			data.setVaryColors(true);
 			data.addSeries(sources, values);
-			chart.plot(data);
 
-			try (FileOutputStream fileOut = new FileOutputStream("NCIT_Concept_Stats_By_Contributing_Source.xlsx")) {
+			// Extract the low-level CT Plot Area
+			CTPlotArea plotArea = chart.getCTChart().getPlotArea();
+			if (!plotArea.getPieChartList().isEmpty()) {
+				CTPieChart pieChart = plotArea.getPieChartArray(0);
+				CTPieSer series = pieChart.getSerArray(0);
+				CTDLbls labels = series.addNewDLbls();
+				labels.addNewShowSerName().setVal(false);//Don't show series name
+						labels.addNewShowVal().setVal(true);//show X value
+						labels.addNewShowCatName().setVal(true);//show Y value
+						labels.addNewShowPercent().setVal(false);
+			}
+
+			chart.plot(data);
+			try (FileOutputStream fileOut = new FileOutputStream(EXCEL_FILENAME)) {
 				wb.write(fileOut);
+				System.out.println(EXCEL_FILENAME +  " generated.");
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
 		}
 	}
 
 	public static void main(String[] args) {
+		long ms = System.currentTimeMillis();
 		generatePieChart(ApachePoiPieChartCSByOWL.ncit_version);
+	    long ms1 = System.currentTimeMillis();
+	    long timeElapsed = ms1 - ms;
+	    System.out.println("Total runtime " + timeElapsed + " (milli-seconds).");
 	}
 }
+
+
+
+
+
 
