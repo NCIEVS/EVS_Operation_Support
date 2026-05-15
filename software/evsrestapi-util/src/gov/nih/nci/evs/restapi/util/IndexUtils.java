@@ -1,10 +1,12 @@
 package gov.nih.nci.evs.restapi.util;
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.text.similarity.*;
 import opennlp.tools.stemmer.PorterStemmer;
+import java.net.URLEncoder;
 
 /**
  * <!-- LICENSE_TEXT_START -->
@@ -73,6 +75,8 @@ public class IndexUtils {
     public static HashMap signatureMap = null;
     public static HashMap id2LabelMap = null;
     static int MAX_MATCHES = 20;
+    static String version = null;
+    static int tooltip_width = 800;
 
     static {
 		long ms = System.currentTimeMillis();
@@ -564,6 +568,142 @@ public class IndexUtils {
 			}
 		}
 		return w;
+	}
+
+    public static String hyperlinkCode(String code) {
+		if (HTMLTableDataConverter.isCode(code)) {
+			code = code.replace(code, HyperlinkHelper.toHyperlink(code));
+			return code;
+		}
+		return code;
+	}
+
+	public static void generateHTML(String datafile, Vector v) {
+		int n = datafile.lastIndexOf(".");
+		String heading = datafile.substring(0, n);
+		String outputfile = datafile.substring(0, n) + ".html";
+		PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(outputfile, "UTF-8");
+
+			pw.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">");
+			pw.println("<html xmlns:c=\"http://java.sun.com/jsp/jstl/core\">");
+			pw.println("<head>");
+			pw.println("<title>Logical Expression</title>");
+			pw.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
+
+			pw.println("		<script>");
+			pw.println("            function onValueSetNodeClicked(node_id) {");
+			pw.println("				var url=\"https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/\"+ node_id;");
+			pw.println("				window.open(url, \"\", \"alwaysRaised,dependent,status,scrollbars,resizable,width=800,height=600\");");
+			pw.println("			}");
+			pw.println("		</script>");
+
+			pw.println("<style>");
+
+			pw.println(".scroll-container {");
+			pw.println("    height: 100px;");
+			pw.println("    overflow: auto;");
+			pw.println("    position: relative;");
+			pw.println("}");
+
+			pw.println("ul");
+			pw.println("{");
+			pw.println("    list-style-type: none;");
+			pw.println("}");
+			pw.println(".tooltip {");
+			pw.println("  position: relative;");
+			pw.println("  display: inline-block;");
+
+			pw.println("  border-bottom: 1px dotted black;");
+			pw.println("  cursor: pointer;");
+			pw.println("}");
+			pw.println("");
+			pw.println(".tooltiptext {");
+			pw.println("  visibility: hidden;");
+			pw.println("  width: " + tooltip_width + "px;");
+			pw.println("  background-color: black;");
+			pw.println("  color: #fff;");
+			pw.println("  border-radius: 6px;");
+			pw.println("  padding: 5px 0;");
+			pw.println("  position: absolute;");
+			pw.println("  z-index: 1;");
+			pw.println("}");
+			pw.println("");
+			pw.println(".tooltip:hover .tooltiptext {");
+			pw.println("  visibility: visible;");
+			pw.println("}");
+
+			pw.println("table {");
+			pw.println("    border-collapse: collapse;");
+			pw.println("}");
+			pw.println("table, td, th {");
+			pw.println("    border: 1px solid black;");
+			pw.println("}");
+			pw.println(" li {list-style-type: none;}");
+			pw.println("</style>");
+			pw.println("</head>");
+			pw.println("");
+			pw.println("<body>");
+
+			pw.println("<div>");
+			pw.println("<a href=\"https://evs.nci.nih.gov/\">");
+			pw.println("  <img");
+			pw.println("      src=\"https://evs.nci.nih.gov/sites/default/files/evs-logo_1.png\" alt=\"Enterprise Vocabulary Services Home Page\"");
+			pw.println("  />");
+			pw.println("</a>");
+			pw.println("</div>");
+
+			pw.println("<title>Indexing Results</title>");
+
+			pw.println("");
+			pw.println("<center>");
+			pw.println("<h2>Narrative</h2>");
+			pw.println("</center><P></P>");
+			String narrative = HTTPUtils.loadQuery(datafile, false);
+			pw.println("<P>" + narrative + "</P>");
+            pw.println("<center><h3>Table: " + heading + "</h3></center>");
+			pw.println("<table>");
+			pw.println("<th>Term");
+			for (int i=0; i<v.size(); i++) {
+				String line = (String) v.elementAt(i);
+				Vector u = StringUtils.parseData(line, '|');
+				pw.println("<tr>");
+				pw.println("<td>" + (String) u.elementAt(0) + "</td>");
+				String code = (String) u.elementAt(1);
+				code = hyperlinkCode(code);
+				pw.println("<td>" + code + "</td>");
+				pw.println("</tr>");
+			}
+			pw.println("</table>");
+			pw.println("<footer>(Source: NCI Thesaurus, version " + version + ")");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			try {
+				pw.close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+
+	public static void main(String[] args) {
+		long ms = System.currentTimeMillis();
+		String serviceUrl = ConfigurationController.serviceUrl;
+		String named_graph = ConfigurationController.namedGraph;
+		String username = ConfigurationController.username;
+		String password = ConfigurationController.password;
+		IndexUtils indexUtils = new IndexUtils(serviceUrl, named_graph, username, password);
+
+		String filename = args[0];
+
+		String term = HTTPUtils.loadQuery(filename, false);
+		boolean debug = false;
+		Vector v = indexUtils.indexTerm(term, debug);
+		Utils.dumpVector(term, v);
+		generateHTML(filename, v);
 	}
 }
 

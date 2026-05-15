@@ -62,6 +62,7 @@ public class MetadataTableGenerator {
     String username = null;
     String password = null;
 
+
     public MetadataTableGenerator(String serviceUrl, String named_graph, String username, String password) {
 		this.serviceUrl = serviceUrl;
 		this.named_graph = named_graph;
