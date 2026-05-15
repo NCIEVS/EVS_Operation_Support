@@ -238,71 +238,16 @@ public class ApachePoiPieChartCSByOWL {
 	}
 
 	public static void pieChart(String version, Vector src_vec, Vector count_vec) throws FileNotFoundException, IOException {
+		String excelfile = EXCEL_FILENAME;
 		String month_year = formatVersion(version);
-		try (XSSFWorkbook wb = new XSSFWorkbook()) {
-			//XSSFSheet sheet = wb.createSheet("NCIt Concept Count By Contributing Sources");
-			//XSSFSheet sheet = wb.createSheet("NCIt Concept Count By Contributing Sources");
-			XSSFSheet sheet = wb.createSheet("NCIt Concept Count By Sources");
-
-            Row row = sheet.createRow((short) 0);
-            Cell cell = row.createCell((short) 0);
-            cell.setCellValue("Contributing Source");
-            cell = row.createCell((short) 1);
-            cell.setCellValue("Concept Count");
-			for (int i=0; i<src_vec.size(); i++) {
-				int j = i+1;
-				row = sheet.createRow((short) j);
-				cell = row.createCell((short) 0);
-				String src = (String) src_vec.elementAt(i);
-				cell.setCellValue(src);
-				cell = row.createCell((short) 1);
-				int count = (Integer) count_vec.elementAt(i);
-				cell.setCellValue(Integer.valueOf(count));
-			}
-
-			XSSFDrawing drawing = sheet.createDrawingPatriarch();
-
-			XSSFClientAnchor anchor = drawing.createAnchor(0, 0, 0, 0, 0, src_vec.size()+1, 20, src_vec.size()+100);
-
-			XSSFChart chart = drawing.createChart(anchor);
-			chart.setTitleText("NCIt Concepts from various contributing sources (" + version + " " + month_year +")");
-			chart.setTitleOverlay(false);
-
-			XDDFChartLegend legend = chart.getOrAddLegend();
-			//legend.setPosition(LegendPosition.TOP_RIGHT);
-			legend.setPosition(LegendPosition.BOTTOM);
-
-			XDDFDataSource<String> sources = XDDFDataSourcesFactory.fromStringCellRange(sheet,
-					new CellRangeAddress(1, src_vec.size(), 0, 0));
-
-			XDDFNumericalDataSource<Double> values = XDDFDataSourcesFactory.fromNumericCellRange(sheet,
-					new CellRangeAddress(1, count_vec.size(), 1, 1));
-
-			//XDDFChartData data = chart.createData(ChartTypes.PIE3D, null, null);
-			XDDFChartData data = chart.createData(ChartTypes.PIE, null, null);
-
-			data.setVaryColors(true);
-			data.addSeries(sources, values);
-
-			// Extract the low-level CT Plot Area
-			CTPlotArea plotArea = chart.getCTChart().getPlotArea();
-			if (!plotArea.getPieChartList().isEmpty()) {
-				CTPieChart pieChart = plotArea.getPieChartArray(0);
-				CTPieSer series = pieChart.getSerArray(0);
-				CTDLbls labels = series.addNewDLbls();
-				labels.addNewShowSerName().setVal(false);//Don't show series name
-						labels.addNewShowVal().setVal(true);//show X value
-						labels.addNewShowCatName().setVal(true);//show Y value
-						labels.addNewShowPercent().setVal(false);
-			}
-
-			chart.plot(data);
-			try (FileOutputStream fileOut = new FileOutputStream(EXCEL_FILENAME)) {
-				wb.write(fileOut);
-				System.out.println(EXCEL_FILENAME +  " generated.");
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+		String chartTitle = "NCIt Concepts from various contributing sources (" + version + " " + month_year + ")";
+		String sheetLabel = "NCIt Concept Count By Sources";
+		String xLabel = "Contributing Source";
+		String yLabel = "Concept Count";
+		try {
+			ApachePoiPieChart.pieChart(excelfile, chartTitle, sheetLabel, xLabel, yLabel, src_vec, count_vec);
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 
