@@ -85,6 +85,7 @@ public class ApachePoiPieChartCSByOWL {
 	static String RESTRICTION_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.rolefile; //"roles.txt";
 	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
 	static OWLScanner scanner = null;
+	static HierarchyHelper hh = null;
 	static HashSet retired_concepts = null;
 	static HashMap code2LabelMap = new HashMap();
 	static HashMap contributingSourceMap = new HashMap();
@@ -111,6 +112,8 @@ public class ApachePoiPieChartCSByOWL {
 		}
 		System.out.println("Number of retired concepts: " + retired_concepts.size());
 
+		hh = new HierarchyHelper(Utils.readFile(PARENT_CHILD_FILE));
+        /*
 		String prop_code = "rdfs:label";
 		w = scanner.extractPropertyData(prop_code);
 		for (int i=0; i<w.size(); i++) {
@@ -121,8 +124,9 @@ public class ApachePoiPieChartCSByOWL {
 			label = HTMLDecoder.decode(label);
 			code2LabelMap.put(code, label);
 		}
+		*/
 
-		prop_code = "P322"; //Contributing_Source
+		String prop_code = "P322"; //Contributing_Source
 		w = scanner.extractPropertyData(prop_code);
 		Utils.saveToFile("cs_data_0.txt", w);
 
@@ -153,7 +157,8 @@ public class ApachePoiPieChartCSByOWL {
 		Iterator it = contributingSourceMap.keySet().iterator();
 		while (it.hasNext()) {
 			String code = (String) it.next();
-			String label = (String) code2LabelMap.get(code);
+			//String label = (String) code2LabelMap.get(code);
+			String label = hh.getLabel(code);
 			Vector w1 = (Vector) contributingSourceMap.get(code);
 			for (int j=0; j<w1.size(); j++) {
 				String cs = (String) w1.elementAt(j);
