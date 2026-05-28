@@ -76,6 +76,13 @@ public class ValueSetHomeGenerator {
         initialize();
 	}
 
+	public ValueSetHomeGenerator(String valueSetName, String valueSetDescription, String reportURI, String extractionRule) {
+		this.valueSetName = valueSetName;
+		this.valueSetDescription = valueSetDescription;
+		this.extractionRule = extractionRule;
+        initialize(reportURI);
+	}
+
 	public void initialize() {
 		valueSetConfigHashMap = ValueSetDefinitionConfig.getValueSetConfigHashMap();
 		vsc = getValueSetConfig(valueSetName);
@@ -83,9 +90,6 @@ public class ValueSetHomeGenerator {
 			System.out.println(valueSetName + " not found.");
 			return;
 		}
-		//System.out.println(vsc.toString());
-		//SPL Color Terminology|http://evs.nci.nih.gov/valueset/FDA/C54453|https://evs.nci.nih.gov/ftp1/FDA/SPL/FDA-SPL_NCIt_Subsets.xls|1:2:C54453
-
 		reportURI = vsc.getReportURI();
 		System.out.println(reportURI);
 		int n = reportURI.lastIndexOf("/");
@@ -101,8 +105,54 @@ public class ValueSetHomeGenerator {
 		System.out.println("Data extraction rule: ");
 		Vector u = StringUtils.parseData(extractionRule, ':');
 		sheet = Integer.parseInt((String) u.elementAt(0)) - 1;
-		col = Integer.parseInt((String) u.elementAt(1)) - 1;
-        code = (String) u.elementAt(2);
+
+		String s2 = (String) u.elementAt(1);
+		if (StringUtils.isInteger(s2)) {
+			col = Integer.parseInt((String) u.elementAt(1)) - 1;
+		}
+		if (u.size() == 3) {
+			String s3 = (String) u.elementAt(2);
+			if (s3.compareTo("all") != 0) {
+				code = s3;
+			}
+		}
+		System.out.println("sheet: " + sheet);
+		System.out.println("col: " + col);
+		System.out.println("code: " + code);
+
+		if (reportURI.indexOf("CDISC") != -1) {
+			cdisc = true;
+		}
+	}
+
+
+
+	public void initialize(String reportURI) {
+		System.out.println(reportURI);
+		int n = reportURI.lastIndexOf("/");
+		excelfile = reportURI.substring(n+1, reportURI.length());
+		System.out.println(excelfile);
+		File f = new File(excelfile);
+		if (!f.exists()) {
+			DownloadPage.download(reportURI, f);
+		} else {
+			System.out.println("Excel file " + excelfile + " exists.");
+		}
+		System.out.println("Data extraction rule: ");
+		Vector u = StringUtils.parseData(extractionRule, ':');
+		sheet = Integer.parseInt((String) u.elementAt(0)) - 1;
+
+		String s2 = (String) u.elementAt(1);
+		if (StringUtils.isInteger(s2)) {
+			col = Integer.parseInt((String) u.elementAt(1)) - 1;
+		}
+		if (u.size() == 3) {
+			String s3 = (String) u.elementAt(2);
+			if (s3.compareTo("all") != 0) {
+				code = s3;
+			}
+		}
+
 		System.out.println("sheet: " + sheet);
 		System.out.println("col: " + col);
 		System.out.println("code: " + code);
@@ -504,8 +554,6 @@ public class ValueSetHomeGenerator {
 		out.println("                    <tr><td colspan=\"2\" align=\"left\">");
 		//String valueSetDescription = "&lt;Populate value set description here.&gt;";
 		out.println("<p>" + valueSetDescription + "</p>");
-		//Terminology used for representation of the the framework of the Structured Product Labeling documents. </p><p>SPL Terminology can be downloaded from this location <a href=\"https://evs.nci.nih.gov/ftp1/FDA/SPL\">SPL</a>.
-		//</p>");
 		out.println("                    </td></tr>");
 		out.println("          </table>");
 		out.println("");
@@ -552,7 +600,7 @@ public class ValueSetHomeGenerator {
 		out.println("	    <form>");
 		out.println("<ul>");
 		out.println("<li>");
-		out.println("<input type=\"checkbox\" aria-labelledby=\"N_1\" id=\"N_1\" name=\"http://evs.nci.nih.gov/valueset/FDA/C54453\"  onclick=\"updateCheckbox('N_1'); return false; \" tabindex=\"3\" checked>SPL Color Terminology");
+		out.println("<input type=\"checkbox\" aria-labelledby=\"N_1\" id=\"N_1\" name=\"http://evs.nci.nih.gov/valueset/FDA/C54453\"  onclick=\"updateCheckbox('N_1'); return false; \" tabindex=\"3\" checked>" + valueSetName);
 		out.println("</li>");
 		out.println("</ul>");
 		out.println("	    </form>");
@@ -661,9 +709,7 @@ public class ValueSetHomeGenerator {
 		out.println("f5_cspm.go();}());</script>");
     }
 
-    public static void main(String[] args) {
-		String valueSetName = args[0];
-		String valueSetDescription = args[1];
+    public static void run(String valueSetName, String valueSetDescription) {
         ValueSetHomeGenerator valueSetHomeGenerator = new ValueSetHomeGenerator(valueSetName, valueSetDescription);
 		PrintWriter pw = null;
 		String outputfile = valueSetName.replace(" ", "_") + ".html";
@@ -682,6 +728,37 @@ public class ValueSetHomeGenerator {
 		}
 	}
 
+    public static void run(String valueSetName, String valueSetDescription, String reportURI, String extractionRule) {
+        ValueSetHomeGenerator valueSetHomeGenerator = new ValueSetHomeGenerator(valueSetName, valueSetDescription, reportURI, extractionRule);
+		PrintWriter pw = null;
+		String outputfile = valueSetName.replace(" ", "_") + ".html";
+		try {
+			pw = new PrintWriter(outputfile, "UTF-8");
+            valueSetHomeGenerator.run(pw);
+		} catch (Exception ex) {
+
+		} finally {
+			try {
+				pw.close();
+				System.out.println("Output file " + outputfile + " generated.");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+    public static void main(String[] args) {
+		ValueSetHomeGenerator valueSetHomeGenerator = null;
+		String valueSetName = args[0];
+		String valueSetDescription = args[1];
+		if (args.length == 2) {
+        	run(valueSetName, valueSetDescription);
+		} else {
+			String reportURI = args[2];
+			String extractionRule = args[3];
+			run(valueSetName, valueSetDescription, reportURI, extractionRule);
+		}
+	}
 }
 
 //SPL Color Terminology|http://evs.nci.nih.gov/valueset/FDA/C54453|https://evs.nci.nih.gov/ftp1/FDA/SPL/FDA-SPL_NCIt_Subsets.xls|1:2:C54453

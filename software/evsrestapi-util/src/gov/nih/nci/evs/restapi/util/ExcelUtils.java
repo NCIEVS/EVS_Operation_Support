@@ -673,14 +673,17 @@ public class ExcelUtils {
 
      public static int getHSSFStartRow(String file, int sheet, int col, String code) {
 		try {
+			System.out.println("file: " + file);
 			FileInputStream fis = new FileInputStream(new File(file));
 			//Get the workbook instance for XLS file
 			HSSFWorkbook workbook = new HSSFWorkbook(fis);
+			/*
 			try {
 				fis.close();
 			} catch (Exception ex) {
                 ex.printStackTrace();
 			}
+			*/
 
 			//Get first sheet from the workbook
 			HSSFSheet hSSFSheet = workbook.getSheetAt(sheet);
@@ -688,6 +691,8 @@ public class ExcelUtils {
 			if (col == -1) {
 				return 1;
 			}
+
+            if (code == null) return 1;
 
 			//Get iterator to all the rows in current sheet
 			Iterator<Row> rowIterator = hSSFSheet.iterator();
@@ -701,7 +706,6 @@ public class ExcelUtils {
 				if (row.getCell(col).getStringCellValue().compareTo(code) == 0) {
 					return lcv;
 				}
-
 				lcv++;
 			}
 		} catch (Exception ex) {

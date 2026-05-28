@@ -191,6 +191,20 @@ public class FileUtils
 		return true;
 	}
 
+    public static void deleteFile(String filename) {
+        Path path = Paths.get(filename);
+        try {
+            boolean result = Files.deleteIfExists(path);
+            if (result) {
+                System.out.println("File deleted successfully.");
+            } else {
+                System.out.println("File does not exist.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // Handles permission issues or non-empty directories
+        }
+    }
+
     public static void main(String[] args) {
 		String currentWorkingDir = getCurrentWorkingDirectory();
 		System.out.println("getCurrentWorkingDirectory: " + currentWorkingDir);

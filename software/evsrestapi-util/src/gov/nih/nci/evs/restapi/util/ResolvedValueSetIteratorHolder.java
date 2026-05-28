@@ -530,12 +530,20 @@ public class ResolvedValueSetIteratorHolder {
 							}
 							*/
 							value = getCellData(cell);
-
-							if (value != null && value.compareTo(code) == 0) {
-								buf = new StringBuffer();
-								tr(row, buf);
-								t = buf.toString();
-								resolvedValueSetList.add(t);
+							if (code != null) {
+								if (value != null && value.compareTo(code) == 0) {
+									buf = new StringBuffer();
+									tr(row, buf);
+									t = buf.toString();
+									resolvedValueSetList.add(t);
+								}
+							} else {
+								if (value != null) {
+									buf = new StringBuffer();
+									tr(row, buf);
+									t = buf.toString();
+									resolvedValueSetList.add(t);
+								}
 							}
 						}
 					} else {
