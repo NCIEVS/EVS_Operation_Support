@@ -55,7 +55,8 @@ import java.util.*;
  *
  */
 public class ValueSetHomeGenerator {
-	static String DEFAULT_URL = "https://nciterms65.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&ns=ncit";
+	//static String DEFAULT_URL = "https://nciterms65.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&ns=ncit";
+	static String DEFAULT_URL = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
     HashMap valueSetConfigHashMap = null;
     ValueSetConfig vsc = null;
     String valueSetName = null;

@@ -24,6 +24,14 @@ public class EmbedExcel2HTML {
 		int startIndex = 0;
 	}
 
+    public EmbedExcel2HTML(String excelfile, int sheet, int col, String code) {
+		this.excelfile = excelfile;
+		this.sheet = sheet;
+		this.col = col;
+		this.code = code;
+		this.startIndex = ExcelUtils.getExcelStartRow(excelfile, sheet, col, code);
+	}
+
     public Vector generatePageContent() {
 		ResolvedValueSetIteratorHolder rvsi = null;
 		try {
