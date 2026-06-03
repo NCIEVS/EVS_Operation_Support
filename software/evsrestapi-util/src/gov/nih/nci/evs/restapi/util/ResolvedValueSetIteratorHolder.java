@@ -530,19 +530,23 @@ public class ResolvedValueSetIteratorHolder {
 							}
 							*/
 							value = getCellData(cell);
-							if (code != null) {
-								if (value != null && value.compareTo(code) == 0) {
-									buf = new StringBuffer();
-									tr(row, buf);
-									t = buf.toString();
-									resolvedValueSetList.add(t);
-								}
+							if (value == null || value.compareTo("null") == 0) {
+								value = "";
 							} else {
-								if (value != null) {
-									buf = new StringBuffer();
-									tr(row, buf);
-									t = buf.toString();
-									resolvedValueSetList.add(t);
+								if (code != null) {
+									if (value != null && value.compareTo(code) == 0) {
+										buf = new StringBuffer();
+										tr(row, buf);
+										t = buf.toString();
+										resolvedValueSetList.add(t);
+									}
+								} else {
+									if (value != null) {
+										buf = new StringBuffer();
+										tr(row, buf);
+										t = buf.toString();
+										resolvedValueSetList.add(t);
+									}
 								}
 							}
 						}
@@ -974,6 +978,10 @@ public class ResolvedValueSetIteratorHolder {
 			}
 			*/
 			val = getCellData(cell);
+			if (val.compareTo("null") == 0) {
+				val = "";
+			}
+
 			if (pix.containsKey(rowIndex)) {
 				if (pix.get(rowIndex).containsKey(colIndex)) {
 					for (final HSSFPictureData pic : pix.get(rowIndex)
@@ -996,6 +1004,10 @@ public class ResolvedValueSetIteratorHolder {
 			if (isCode(val) && this.URL != null) {
 				val = getHyperLink(val);
 			}
+			if (val == null || val.compareTo("null") == 0) {
+				val = "";
+			}
+
 			out.append(val);
 			out.append("</td>\n");
 		} else {
@@ -1191,6 +1203,9 @@ public class ResolvedValueSetIteratorHolder {
 			if (isCode(val) && this.URL != null) {
 				val = getHyperLink(val);
 			}
+			if (val == null || val.compareTo("null") == 0) {
+				val = "";
+			}
 			out.append(val);
 			out.append("</td>\n");
 		}
@@ -1375,6 +1390,9 @@ public class ResolvedValueSetIteratorHolder {
 			}
 			*/
 			val = getCellData(cell);
+			if (val == null || val.compareTo("null") == 0) {
+				val = "";
+			}
 
 
 			if (pix.containsKey(rowIndex)) {

@@ -1,28 +1,90 @@
 package gov.nih.nci.evs.restapi.util;
 import gov.nih.nci.evs.restapi.bean.*;
-
 import java.io.*;
 import java.text.*;
 import java.util.*;
 
+/**
+ * <!-- LICENSE_TEXT_START -->
+ * Copyright 2022 Guidehouse. This software was developed in conjunction
+ * with the National Cancer Institute, and so to the extent government
+ * employees are co-authors, any rights in such works shall be subject
+ * to Title 17 of the United States Code, section 105.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *   1. Redistributions of source code must retain the above copyright
+ *      notice, this list of conditions and the disclaimer of Article 3,
+ *      below. Redistributions in binary form must reproduce the above
+ *      copyright notice, this list of conditions and the following
+ *      disclaimer in the documentation and/or other materials provided
+ *      with the distribution.
+ *   2. The end-user documentation included with the redistribution,
+ *      if any, must include the following acknowledgment:
+ *      "This product includes software developed by Guidehouse and the National
+ *      Cancer Institute."   If no such end-user documentation is to be
+ *      included, this acknowledgment shall appear in the software itself,
+ *      wherever such third-party acknowledgments normally appear.
+ *   3. The names "The National Cancer Institute", "NCI" and "Guidehouse" must
+ *      not be used to endorse or promote products derived from this software.
+ *   4. This license does not authorize the incorporation of this software
+ *      into any third party proprietary programs. This license does not
+ *      authorize the recipient to use any trademarks owned by either NCI
+ *      or GUIDEHOUSE
+ *   5. THIS SOFTWARE IS PROVIDED "AS IS," AND ANY EXPRESSED OR IMPLIED
+ *      WARRANTIES, (INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *      OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE) ARE
+ *      DISCLAIMED. IN NO EVENT SHALL THE NATIONAL CANCER INSTITUTE,
+ *      GUIDEHOUSE, OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *      INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *      BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *      LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *      CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *      LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *      ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *      POSSIBILITY OF SUCH DAMAGE.
+ * <!-- LICENSE_TEXT_END -->
+ */
+
+/**
+ * @author EVS Team
+ * @version 1.0
+ *
+ * Modification history:
+ *     Initial implementation kim.ong@nih.gov
+ *
+ */
 public class EmbedExcel2HTML {
+	//static String DEFAULT_URL = "https://nciterms65.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&ns=ncit";
 	static String DEFAULT_URL = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
+    HashMap valueSetConfigHashMap = null;
+    ValueSetConfig vsc = null;
+    String valueSetName = null;
+    String valueSetDescription = null;
 	private String name;
 	private String uri;
 	private String reportURI;
 	private String extractionRule;
 	String excelfile = null;
-	int sheet = 0;
 	int startIndex = 1;
-	int col = -1;
+	int sheet = 0;
+	int col = 0;
 	String code = null;
 	boolean cdisc = false;
 
-    public EmbedExcel2HTML(String excelfile, int sheet) {
-		this.excelfile = excelfile;
-		this.sheet = sheet;
-		int startIndex = 0;
+	public EmbedExcel2HTML(String valueSetName, String valueSetDescription) {
+		this.valueSetName = valueSetName;
+		this.valueSetDescription = valueSetDescription;
+        initialize();
 	}
+
+	public EmbedExcel2HTML(String valueSetName, String valueSetDescription, String reportURI, String extractionRule) {
+		this.valueSetName = valueSetName;
+		this.valueSetDescription = valueSetDescription;
+		this.extractionRule = extractionRule;
+        initialize(reportURI);
+	}
+
 
     public EmbedExcel2HTML(String excelfile, int sheet, int col, String code) {
 		this.excelfile = excelfile;
@@ -32,19 +94,114 @@ public class EmbedExcel2HTML {
 		this.startIndex = ExcelUtils.getExcelStartRow(excelfile, sheet, col, code);
 	}
 
+    public EmbedExcel2HTML(String excelfile, int sheet, int col, String code, boolean cdisc) {
+		this.excelfile = excelfile;
+		this.sheet = sheet;
+		this.col = col;
+		this.code = code;
+		this.startIndex = ExcelUtils.getExcelStartRow(excelfile, sheet, col, code);
+		this.cdisc = cdisc;
+	}
+
+	public void initialize() {
+		valueSetConfigHashMap = ValueSetDefinitionConfig.getValueSetConfigHashMap();
+		vsc = getValueSetConfig(valueSetName);
+		if (vsc == null) {
+			System.out.println(valueSetName + " not found.");
+			return;
+		}
+		reportURI = vsc.getReportURI();
+		System.out.println(reportURI);
+		int n = reportURI.lastIndexOf("/");
+		excelfile = reportURI.substring(n+1, reportURI.length());
+		System.out.println(excelfile);
+		File f = new File(excelfile);
+		if (!f.exists()) {
+			DownloadPage.download(reportURI, f);
+		} else {
+			System.out.println("Excel file " + excelfile + " exists.");
+		}
+		extractionRule = vsc.getExtractionRule();
+		System.out.println("Data extraction rule: ");
+		Vector u = StringUtils.parseData(extractionRule, ':');
+		sheet = Integer.parseInt((String) u.elementAt(0)) - 1;
+
+		String s2 = (String) u.elementAt(1);
+		if (StringUtils.isInteger(s2)) {
+			col = Integer.parseInt((String) u.elementAt(1)) - 1;
+		}
+		if (u.size() == 3) {
+			String s3 = (String) u.elementAt(2);
+			if (s3.compareTo("all") != 0) {
+				code = s3;
+			}
+		}
+		System.out.println("sheet: " + sheet);
+		System.out.println("col: " + col);
+		System.out.println("code: " + code);
+
+		if (reportURI.indexOf("CDISC") != -1) {
+			cdisc = true;
+		}
+	}
+
+
+
+	public void initialize(String reportURI) {
+		System.out.println(reportURI);
+		int n = reportURI.lastIndexOf("/");
+		excelfile = reportURI.substring(n+1, reportURI.length());
+		System.out.println(excelfile);
+		File f = new File(excelfile);
+		if (!f.exists()) {
+			DownloadPage.download(reportURI, f);
+		} else {
+			System.out.println("Excel file " + excelfile + " exists.");
+		}
+		System.out.println("Data extraction rule: ");
+		Vector u = StringUtils.parseData(extractionRule, ':');
+		sheet = Integer.parseInt((String) u.elementAt(0)) - 1;
+
+		String s2 = (String) u.elementAt(1);
+		if (StringUtils.isInteger(s2)) {
+			col = Integer.parseInt((String) u.elementAt(1)) - 1;
+		}
+		if (u.size() == 3) {
+			String s3 = (String) u.elementAt(2);
+			if (s3.compareTo("all") != 0) {
+				code = s3;
+			}
+		}
+
+		System.out.println("sheet: " + sheet);
+		System.out.println("col: " + col);
+		System.out.println("code: " + code);
+
+		if (reportURI.indexOf("CDISC") != -1) {
+			cdisc = true;
+		}
+	}
+
+	public ValueSetConfig getValueSetConfig(String terminology) {
+        Iterator it = valueSetConfigHashMap.keySet().iterator();
+        while (it.hasNext()) {
+			String uri = (String) it.next();
+			ValueSetConfig vsc = (ValueSetConfig) valueSetConfigHashMap.get(uri);
+			if (vsc.getName().compareTo(terminology) == 0) {
+				return vsc;
+			}
+		}
+		return null;
+	}
+
     public Vector generatePageContent() {
+		int startIndex = ExcelUtils.getExcelStartRow(excelfile, sheet, col, code);
+		if (code == null || code.compareTo("null") == 0) {
+			startIndex++;
+		}
+
 		ResolvedValueSetIteratorHolder rvsi = null;
 		try {
-			/*
-			System.out.println("Instantiating ResolvedValueSetIteratorHolder ...");
-			System.out.println("excelfile: " + excelfile);
-			System.out.println("sheet: " + sheet);
-			System.out.println("startIndex: " + startIndex);
-			System.out.println("col: " + col);
-			System.out.println("code: " + code);
-			System.out.println("url: " + DEFAULT_URL);
-			System.out.println("cdisc: " + cdisc);
-			*/
 		    rvsi = new ResolvedValueSetIteratorHolder(excelfile, sheet, startIndex, col, code, DEFAULT_URL, cdisc);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -183,6 +340,7 @@ public class EmbedExcel2HTML {
 		out.println("  <a href=\"#evs-content\" class=\"hideLink\" accesskey=\"1\" title=\"Skip repetitive navigation links\">skip navigation links</A>");
 		out.println("  <!-- End Skip Top Navigation -->");
 		out.println("");
+
 		out.println("<!-- nci banner -->");
 		out.println("<div style='clear:both;margin-top:-5px;padding:8px;height:47px;color:white;background-color:#C31F40'>");
 		out.println("  <a href=\"https://www.cancer.gov\" target=\"_blank\">");
@@ -193,145 +351,7 @@ public class EmbedExcel2HTML {
 		out.println("</div>");
 		out.println("<!-- end nci banner -->");
 
-		/*
-		out.println("");
-		out.println("  <div class=\"center-page_960\">");
-		out.println("    <!-- EVS Logo -->");
-		out.println("<div>");
-		out.println("  <img src=\"ncitbrowser/images/evs-logo-swapped.gif\" alt=\"EVS Logo\"");
-		out.println("       width=\"941\" height=\"26\" border=\"0\"");
-		out.println("       usemap=\"#external-evs\" />");
-		out.println("  <map id=\"external-evs\" name=\"external-evs\">");
-		out.println("    <area shape=\"rect\" coords=\"0,0,140,26\"");
-		out.println("      href=\"ncitbrowser/start.jsf\" target=\"_self\"");
-		out.println("      alt=\"NCI Term Browser\" />");
-		out.println("    <area shape=\"rect\" coords=\"520,0,745,26\"");
-		out.println("      href=\"https://evs.nci.nih.gov/\" target=\"_blank\"");
-		out.println("      alt=\"Enterprise Vocabulary Services\" />");
-		out.println("  </map>");
-		out.println("</div>");
-		out.println("");
-		out.println("");
-		out.println("<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" role='presentation'>");
-		out.println("  <tr>");
-		out.println("    <td width=\"5\"></td>");
-		out.println("    <td><a href=\"ncitbrowser/pages/multiple_search.jsf?nav_type=terminologies\">");
-		out.println("      <img name=\"tab_terms\" src=\"ncitbrowser/images/tab_terms.gif\"");
-		out.println("        border=\"0\" alt=\"Terminologies\" title=\"Terminologies\" /></a></td>");
-		out.println("    <td><a href=\"ncitbrowser/ajax?action=create_src_vs_tree\">");
-		out.println("      <img name=\"tab_valuesets\" src=\"ncitbrowser/images/tab_valuesets_clicked.gif\"");
-		out.println("        border=\"0\" alt=\"Value Sets\" title=\"ValueSets\" /></a></td>");
-		out.println("    <td><a href=\"ncitbrowser/pages/mapping_search.jsf?nav_type=mappings\">");
-		out.println("      <img name=\"tab_map\" src=\"ncitbrowser/images/tab_map.gif\"");
-		out.println("        border=\"0\" alt=\"Mappings\" title=\"Mappings\" /></a></td>");
-		out.println("  </tr>");
-		out.println("</table>");
-		out.println("");
-		out.println("<div class=\"mainbox-top\"><img src=\"ncitbrowser/images/mainbox-top.gif\" width=\"945\" height=\"5\" alt=\"\"/></div>");
-		out.println("<!-- end EVS Logo -->");
-		out.println("    <!-- Main box -->");
-		out.println("    <div id=\"main-area_960\">");
-		out.println("");
-		out.println("      <!-- Thesaurus, banner search area -->");
-		out.println("      <div class=\"bannerarea_960\">");
-		out.println("        <a class=\"vocabularynamebanner\" href=\"ncitbrowser/ajax?action=create_src_vs_tree&vsd_uri=http://evs.nci.nih.gov/valueset/FDA/C54453\">");
-		out.println("	             <div class=\"vocabularynamebanner\">");
-		out.println("                <div class=\"vocabularynameshort\" STYLE=\"font-size: 22px; font-family : Arial\">");
-		out.println(valueSetName);
-		out.println("                </div>");
-		out.println("              </div>");
-		out.println("	       </a>");
-		out.println("        <div class=\"search-globalnav_960\">");
-		out.println("          <!-- Search box -->");
-		out.println("          <div class=\"searchbox-top\"><img src=\"ncitbrowser/images/searchbox-top.gif\" width=\"352\" height=\"2\" alt=\"SearchBox Top\" /></div>");
-		out.println("          <div class=\"searchbox\">");
-		out.println("");
-		out.println("");
-		out.println("<form id=\"valueSetSearchForm\" name=\"valueSetSearchForm\" method=\"post\" action=\"ncitbrowser/ajax?action=search_value_set\" class=\"search-form-main-area\" enctype=\"application/x-www-form-urlencoded;charset=UTF-8\">");
-		out.println("<input type=\"hidden\" name=\"valueSetSearchForm\" value=\"valueSetSearchForm\" />");
-		out.println("<input type=\"hidden\" name=\"view\" value=\"1\" />");
-		out.println("            <input type=\"hidden\" id=\"checked_vocabularies\" name=\"checked_vocabularies\" value=\"\" />");
-		out.println("            <input type=\"hidden\" id=\"partial_checked_vocabularies\" name=\"partial_checked_vocabularies\" value=\"\" />");
-		out.println("            <input type=\"hidden\" id=\"value_set_home\" name=\"value_set_home\" value=\"true\" />");
-		out.println("            <input type=\"hidden\" name=\"vsd_uri\" value=\"http://evs.nci.nih.gov/valueset/FDA/C54453\" />");
-		out.println("<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"margin: 2px\" role='presentation'>");
-		out.println("  <tr valign=\"top\" align=\"left\">");
-		out.println("    <td align=\"left\" class=\"textbody\">");
-		out.println("");
-		out.println("                  <input CLASS=\"searchbox-input-2\"");
-		out.println("                    name=\"matchText\"");
-		out.println("                    value=\"\"");
-		out.println("                    onFocus=\"active = true\"");
-		out.println("                    onBlur=\"active = false\"");
-		out.println("                    onkeypress=\"return submitEnter('valueSetSearchForm:valueset_search',event)\"");
-		out.println("                    tabindex=\"1\"/>");
-		out.println("");
-		out.println("");
-		out.println("                <input id=\"valueSetSearchForm:valueset_search\" type=\"image\" src=\"ncitbrowser/images/search.gif\" name=\"valueSetSearchForm:valueset_search\" alt=\"Search value sets containing matched concepts\" tabindex=\"2\" class=\"searchbox-btn\" /><a href=\"ncitbrowser/pages/help.jsf#searchhelp\" tabindex=\"3\"><img src=\"ncitbrowser/images/search-help.gif\" alt=\"Search Help\" style=\"border-width:0;\" class=\"searchbox-btn\" /></a>");
-		out.println("");
-		out.println("");
-		out.println("    </td>");
-		out.println("  </tr>");
-		out.println("");
-		out.println("  <tr valign=\"top\" align=\"left\">");
-		out.println("    <td>");
-		out.println("      <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"margin: 0px\" role='presentation'>");
-		out.println("");
-		out.println("        <tr valign=\"top\" align=\"left\">");
-		out.println("        <td align=\"left\" class=\"textbody\">");
-		out.println("                     <input type=\"radio\" name=\"valueset_search_algorithm\" value=\"contains\" alt=\"Contains\" checked tabindex=\"3\"  onclick=\"onVSAlgorithmChanged();\">Contains");
-		out.println("                     <input type=\"radio\" name=\"valueset_search_algorithm\" value=\"exactMatch\" alt=\"Exact Match\"  tabindex=\"3\">Exact Match&nbsp;");
-		out.println("                     <input type=\"radio\" name=\"valueset_search_algorithm\" value=\"startsWith\" alt=\"Begins With\"  tabindex=\"3\"  onclick=\"onVSAlgorithmChanged();\">Begins With&nbsp;");
-		out.println("        </td>");
-		out.println("        </tr>");
-		out.println("");
-		out.println("        <tr align=\"left\">");
-		out.println("            <td height=\"1px\" bgcolor=\"#2F2F5F\" align=\"left\"></td>");
-		out.println("        </tr>");
-		out.println("        <tr valign=\"top\" align=\"left\">");
-		out.println("          <td align=\"left\" class=\"textbody\">");
-		out.println("                <input type=\"radio\" id=\"selectValueSetSearchOption\" name=\"selectValueSetSearchOption\" value=\"Name\" checked alt=\"Name\" checked tabindex=\"4\"  >Name&nbsp;");
-		out.println("                <input type=\"radio\" id=\"selectValueSetSearchOption\" name=\"selectValueSetSearchOption\" value=\"Code\"  alt=\"Code\" tabindex=\"4\" onclick=\"onVSCodeButtonPressed();\">Code&nbsp;");
-		out.println("          </td>");
-		out.println("        </tr>");
-		out.println("      </table>");
-		out.println("    </td>");
-		out.println("  </tr>");
-		out.println("</table>");
-		out.println("                <input type=\"hidden\" id=\"nav_type\" name=\"nav_type\" value=\"valuesets\" />");
-		out.println("                <input type=\"hidden\" id=\"view\" name=\"view\" value=\"source\" />");
-		out.println("          </div> <!-- searchbox -->");
-		out.println("");
-		out.println("          <div class=\"searchbox-bottom\"><img src=\"ncitbrowser/images/searchbox-bottom.gif\" width=\"352\" height=\"2\" alt=\"SearchBox Bottom\" /></div>");
-		out.println("          <!-- end Search box -->");
-		out.println("          <!-- Global Navigation -->");
-		out.println("");
-		*/
 		out.println("<table class=\"global-nav\" border=\"0\" width=\"100%\" height=\"37px\" cellpadding=\"0\" cellspacing=\"0\" role='presentation'>");
-/*
-		out.println("  <tr>");
-		out.println("    <td align=\"left\" valign=\"bottom\">");
-		out.println("      <a href=\"#\" onclick=\"javascript:window.open('ncitbrowser/pages/source_help_info-termbrowser.jsf',");
-		out.println("        '_blank','top=100, left=100, height=740, width=780, status=no, menubar=no, resizable=yes, scrollbars=yes, toolbar=no, location=no, directories=no');\" tabindex=\"13\">");
-		out.println("        Sources</a>");
-		out.println("");
-		out.println("");
-		out.println("");
-		out.println("");
-		out.println("");
-		out.println("");
-		out.println("    </td>");
-		out.println("    <td align=\"right\" valign=\"bottom\">");
-		out.println("      <a href=\"");
-		out.println("ncitbrowser/pages/help.jsf\" tabindex=\"16\">Help</a>");
-		out.println("");
-		out.println("    </td>");
-		out.println("");
-		out.println("    <td width=\"7\"></td>");
-		out.println("");
-		out.println("  </tr>");
-		out.println("");
-*/
 		out.println("</table>");
 		out.println("          <!-- end Global Navigation -->");
 		out.println("");
@@ -396,39 +416,14 @@ public class EmbedExcel2HTML {
 		out.println("        <div id=\"popupContentArea\">");
 		out.println("          <a name=\"evs-content\" id=\"evs-content\"></a>");
 		out.println("");
-		/*
-		out.println("      <table class=\"datatableValueSet_960\" summary=\"\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\" width=\"100%\">");
-		out.println("            <tr class=\"textbody\">");
-		out.println("                      <td>");
-		out.println("                         <div class=\"texttitle-blue\">Welcome</div>");
-		out.println("                      </td>");
-		out.println("");
-		out.println("                      <td>");
-		out.println("&nbsp;");
-		out.println("                      </td>");
-		out.println("");
-		out.println("                      <td>");
-		out.println("<table role='presentation'>");
-		out.println("<tr><td>");
-		out.println("<a href=\"ncitbrowser/ajax?action=values&vsd_uri=http://evs.nci.nih.gov/valueset/FDA/C54453\"><img src=\"ncitbrowser/images/values.gif\" alt=\"Values\" border=\"0\" tabindex=\"2\"></a>");
-		out.println("&nbsp;");
-		out.println("<a href=\"ncitbrowser/ajax?action=versions&vsd_uri=http://evs.nci.nih.gov/valueset/FDA/C54453\"><img src=\"ncitbrowser/images/versions.gif\" alt=\"Versions\" border=\"0\" tabindex=\"2\"></a>");
-		out.println("&nbsp;");
-		out.println("<a href=\"ncitbrowser/ajax?action=xmldefinitions&vsd_uri=http://evs.nci.nih.gov/valueset/FDA/C54453\"><img src=\"ncitbrowser/images/xmldefinitions.gif\" alt=\"XML Definition\" border=\"0\" tabindex=\"2\"></a>");
-		out.println("</td>");
-		out.println("</tr>");
-		out.println("</table>");
-		*/
+
 		out.println("                      </td>");
 		out.println("            </tr>");
 		out.println("                    <tr><td colspan=\"2\" align=\"left\"><b>");
 		//out.println(valueSetName);
 		out.println("                    </b></td></tr>");
 		out.println("                    <tr><td colspan=\"2\" align=\"left\">");
-		//String valueSetDescription = "&lt;Populate value set description here.&gt;";
-		//out.println("<p>" + valueSetDescription + "</p>");
-		//Terminology used for representation of the the framework of the Structured Product Labeling documents. </p><p>SPL Terminology can be downloaded from this location <a href=\"https://evs.nci.nih.gov/ftp1/FDA/SPL\">SPL</a>.
-		//</p>");
+
 		out.println("                    </td></tr>");
 		out.println("          </table>");
 		out.println("");
@@ -588,14 +583,10 @@ public class EmbedExcel2HTML {
 		out.println("f5_cspm.go();}());</script>");
     }
 
-    public static void main(String[] args) {
-		String excelfile = args[0];
-		int sheet = 0;
-        EmbedExcel2HTML EmbedExcel2HTML = new EmbedExcel2HTML(excelfile, sheet);
+    public static void run(String valueSetName, String valueSetDescription) {
+        EmbedExcel2HTML EmbedExcel2HTML = new EmbedExcel2HTML(valueSetName, valueSetDescription);
 		PrintWriter pw = null;
-		int n = excelfile .lastIndexOf(".");
-		String outputfile = excelfile.substring(0, n) + ".html";
-		outputfile= outputfile.replace(" ", "_");
+		String outputfile = valueSetName.replace(" ", "_") + ".html";
 		try {
 			pw = new PrintWriter(outputfile, "UTF-8");
             EmbedExcel2HTML.run(pw);
@@ -608,6 +599,38 @@ public class EmbedExcel2HTML {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
+		}
+	}
+
+    public static void run(String valueSetName, String valueSetDescription, String reportURI, String extractionRule) {
+        EmbedExcel2HTML EmbedExcel2HTML = new EmbedExcel2HTML(valueSetName, valueSetDescription, reportURI, extractionRule);
+		PrintWriter pw = null;
+		String outputfile = valueSetName.replace(" ", "_") + ".html";
+		try {
+			pw = new PrintWriter(outputfile, "UTF-8");
+            EmbedExcel2HTML.run(pw);
+		} catch (Exception ex) {
+
+		} finally {
+			try {
+				pw.close();
+				System.out.println("Output file " + outputfile + " generated.");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+    public static void main(String[] args) {
+		EmbedExcel2HTML EmbedExcel2HTML = null;
+		String valueSetName = args[0];
+		String valueSetDescription = args[1];
+		if (args.length == 2) {
+        	run(valueSetName, valueSetDescription);
+		} else {
+			String reportURI = args[2];
+			String extractionRule = args[3];
+			run(valueSetName, valueSetDescription, reportURI, extractionRule);
 		}
 	}
 }

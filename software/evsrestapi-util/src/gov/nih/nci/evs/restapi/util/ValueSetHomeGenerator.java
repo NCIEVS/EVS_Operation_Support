@@ -177,7 +177,12 @@ public class ValueSetHomeGenerator {
 
     public Vector generatePageContent() {
 		int startIndex = ExcelUtils.getExcelStartRow(excelfile, sheet, col, code);
-		System.out.println("startIndex: " + startIndex);
+		System.out.println("***************** startIndex: " + startIndex);
+
+		if (code == null || code.compareTo("null") == 0) {
+			startIndex++;
+		}
+
 		ResolvedValueSetIteratorHolder rvsi = null;
 		try {
 		    rvsi = new ResolvedValueSetIteratorHolder(excelfile, sheet, startIndex, col, code, DEFAULT_URL, cdisc);
