@@ -197,11 +197,6 @@ public class EmbedExcel2HTML {
 
     public Vector generatePageContent() {
 		int startIndex = ExcelUtils.getExcelStartRow(excelfile, sheet, col, code);
-		/*
-		if (code == null || code.compareTo("null") == 0) {
-			startIndex++;
-		}
-		*/
 		ResolvedValueSetIteratorHolder rvsi = null;
 
 		System.out.println(excelfile);
@@ -224,8 +219,6 @@ public class EmbedExcel2HTML {
 			String t = (String) iterator.next();
 			w.add(t);
 		}
-
-		System.out.println("w.size(): " + w.size());
 		return w;
 	}
 
@@ -595,12 +588,12 @@ public class EmbedExcel2HTML {
 	}
 
     public static void run(String valueSetName, String valueSetDescription, String reportURI, String extractionRule) {
-        EmbedExcel2HTML EmbedExcel2HTML = new EmbedExcel2HTML(valueSetName, valueSetDescription, reportURI, extractionRule);
+        EmbedExcel2HTML embedExcel2HTML = new EmbedExcel2HTML(valueSetName, valueSetDescription, reportURI, extractionRule);
 		PrintWriter pw = null;
 		String outputfile = valueSetName.replace(" ", "_") + ".html";
 		try {
 			pw = new PrintWriter(outputfile, "UTF-8");
-            EmbedExcel2HTML.run(pw);
+            embedExcel2HTML.run(pw);
 		} catch (Exception ex) {
 
 		} finally {
@@ -613,16 +606,288 @@ public class EmbedExcel2HTML {
 		}
 	}
 
+    // remove quicklink and footer
+    public static void generate(String valueSetName, String valueSetDescription, String reportURI, String extractionRule) {
+        EmbedExcel2HTML embedExcel2HTML = new EmbedExcel2HTML(valueSetName, valueSetDescription, reportURI, extractionRule);
+		PrintWriter pw = null;
+		String outputfile = valueSetName.replace(" ", "_") + ".html";
+		try {
+			pw = new PrintWriter(outputfile, "UTF-8");
+            embedExcel2HTML.generate(pw);
+		} catch (Exception ex) {
+
+		} finally {
+			try {
+				pw.close();
+				System.out.println("Output file " + outputfile + " generated.");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+
+    public void generate(PrintWriter out) {
+		out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">");
+		out.println("<html xmlns:c=\"http://java.sun.com/jsp/jstl/core\">");
+		out.println("<head>");
+		out.println("  <title>" + excelfile + "</title>");
+		out.println("  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
+		out.println("");
+		out.println("<style type=\"text/css\">");
+		out.println("/*margin and padding on body element");
+		out.println("  can introduce errors in determining");
+		out.println("  element position and are not recommended;");
+		out.println("  we turn them off as a foundation for YUI");
+		out.println("  CSS treatments. */");
+		out.println("body {");
+		out.println("	margin:0;");
+		out.println("	padding:0;");
+		out.println("}");
+		out.println("</style>");
+		out.println("");
+		out.println("");
+		out.println("<script type=\"text/javascript\" src=event_simulate.js\"></script>");
+		out.println("<script type=\"text/javascript\" src=value_set_tree_navigation.js\"></script>");
+		out.println("<!--Additional custom style rules for this example:-->");
+		out.println("<style type=\"text/css\">");
+		out.println("");
+		out.println("");
+		out.println(".ygtvcheck0 { background: url(ncitbrowser/images/yui/treeview/check0.gif) 0 0 no-repeat; width:16px; height:20px; float:left; cursor:pointer; }");
+		out.println(".ygtvcheck1 { background: url(ncitbrowser/images/yui/treeview/check1.gif) 0 0 no-repeat; width:16px; height:20px; float:left; cursor:pointer; }");
+		out.println(".ygtvcheck2 { background: url(ncitbrowser/images/yui/treeview/check2.gif) 0 0 no-repeat; width:16px; height:20px; float:left; cursor:pointer; }");
+		out.println("");
+		out.println("");
+		out.println(".ygtv-edit-TaskNode  {	width: 190px;}");
+		out.println(".ygtv-edit-TaskNode .ygtvcancel, .ygtv-edit-TextNode .ygtvok  {	border:none;}");
+		out.println(".ygtv-edit-TaskNode .ygtv-button-container { float: right;}");
+		out.println(".ygtv-edit-TaskNode .ygtv-input  input{	width: 140px;}");
+		out.println(".whitebg {");
+		out.println("	background-color:white;");
+		out.println("}");
+
+		out.println("table {");
+		out.println("    margin-left: auto;");
+		out.println("    margin-right: auto;");
+		out.println("    width:950px;");
+		out.println("}");
+
+
+		out.println("</style>");
+		out.println("");
+		out.println("  <link rel=\"stylesheet\" type=\"text/css\" href=\"ncitbrowser/css/styleSheet.css\" />");
+		out.println("  <link rel=\"shortcut icon\" href=\"ncitbrowser/favicon.ico\" type=\"image/x-icon\" />");
+		out.println("");
+		out.println("  <script type=\"text/javascript\" src=\"ncitbrowser/js/script.js\"></script>");
+		out.println("  <script type=\"text/javascript\" src=\"ncitbrowser/js/tasknode.js\"></script>");
+		out.println("  <script type=\"text/javascript\" src=\"ncitbrowser/js/search.js\"></script>");
+		out.println("  <script type=\"text/javascript\" src=\"ncitbrowser/js/dropdown.js\"></script>");
+		out.println("  <script type=\"text/javascript\">");
+		out.println("");
+		out.println("    function refresh() {");
+		out.println("");
+		out.println("      var selectValueSetSearchOptionObj = document.forms[\"valueSetSearchForm\"].selectValueSetSearchOption;");
+		out.println("");
+		out.println("      for (var i=0; i<selectValueSetSearchOptionObj.length; i++) {");
+		out.println("        if (selectValueSetSearchOptionObj[i].checked) {");
+		out.println("            selectValueSetSearchOption = selectValueSetSearchOptionObj[i].value;");
+		out.println("        }");
+		out.println("      }");
+		out.println("");
+		out.println("");
+		out.println("      window.location.href=\"ncitbrowser/pages/value_set_source_view.jsf?refresh=1\"");
+		out.println("          + \"&nav_type=valuesets\" + \"&opt=\"+ selectValueSetSearchOption;");
+		out.println("");
+		out.println("    }");
+		out.println("  </script>");
+		out.println("");
+		out.println("");
+		out.println("<style>");
+		out.println("html, body{ box-sizing:border-box}");
+		out.println("*, *:before, *:after{ box-sizing:inherit}");
+		out.println("");
+		out.println(".table-scroll{");
+		out.println("	position:relative;");
+		out.println("	margin:auto;");
+		out.println("	width:100%;");
+		out.println("	overflow:auto;");
+		out.println("	height:300px;");
+		out.println("	overflow-y:scroll;");
+		out.println("}");
+		out.println(".table-wrap{");
+		out.println("	margin-left:-9em;");
+		out.println("	outline:1px solid;");
+		out.println("	outline-offset:-1px;");
+		out.println("	overflow:auto;");
+		out.println("}");
+		out.println("</style>");
+		out.println("<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-21QRTJ0WQS\"></script>");
+		out.println("<script>");
+		out.println("	window.dataLayer = window.dataLayer || [];");
+		out.println("	function gtag(){dataLayer.push(arguments);}");
+		out.println("	gtag('js', new Date());");
+		out.println("	gtag('config', 'G-21QRTJ0WQS');");
+		out.println("</script>");
+		out.println("</head>");
+		out.println("");
+		out.println("<style>");
+		out.println(".outer {position:relative}");
+		out.println(".inner {");
+		out.println("  overflow-x:scroll;");
+		out.println("  overflow-y:scroll;");
+		out.println("  width:900px;");
+		out.println("  margin-left:5px;");
+		out.println("  height:500px;");
+		out.println("}");
+		out.println("</style>");
+		out.println("");
+		out.println("");
+		out.println("<style type=\"text/css\">");
+		out.println("    body, .mt {padding:0px;font-family: Tahoma, sans-serif;font-size: 0.9em;}");
+		out.println("    body {margin:0px;}");
+		out.println("    p {margin:30px 0px 30px 0px;}");
+		out.println("    table.mt {border-width: 1px;border-spacing:0px ;border-style: solid;border-color: #cfcfcf;border-collapse: collapse;background-color: transparent;}");
+		out.println("    table.mt th {border-width: 1px;padding: 1px;border-style: solid;border-color: #cfcfcf;white-space: nowrap; background-color: #afafaf;text-align:left;}");
+		out.println("    table.mt td {border-width: 1px;padding: 1px;border-style: solid;border-color: #cfcfcf;text-align: left;vertical-align:top;}");
+		out.println("    .frc {background: #efefef;}");
+		out.println("</style>");
+		out.println("");
+		out.println("<body onLoad=\"collapse_all();\">");
+		out.println("  <script type=\"text/javascript\" src=\"ncitbrowser/js/wz_tooltip.js\"></script>");
+		out.println("  <script type=\"text/javascript\" src=\"ncitbrowser/js/tip_centerwindow.js\"></script>");
+		out.println("  <script type=\"text/javascript\" src=\"ncitbrowser/js/tip_followscroll.js\"></script>");
+
+		out.println("");
+		out.println("      <!-- Page content -->");
+		out.println("      <div class=\"pagecontent\">");
+		out.println("");
+		out.println("      <a href=\"");
+		out.println("/ncitbrowser");
+		out.println("        <div id=\"popupContentArea\">");
+		out.println("          <a name=\"evs-content\" id=\"evs-content\"></a>");
+		out.println("");
+
+		out.println("                      </td>");
+		out.println("            </tr>");
+		out.println("                    <tr><td colspan=\"2\" align=\"left\"><b>");
+		out.println("                    </b></td></tr>");
+		out.println("                    <tr><td colspan=\"2\" align=\"left\">");
+
+		out.println("                    </td></tr>");
+		out.println("          </table>");
+		out.println("");
+		out.println("          <hr/>");
+		out.println("");
+		out.println("");
+		out.println("");
+		out.println("<style>");
+		out.println("#expandcontractdiv {border:1px solid #336600; background-color:#FFFFCC; margin:0 0 .5em 0; padding:0.2em;}");
+		out.println("#treecontainer { background: #fff }");
+		out.println("</style>");
+		out.println("");
+
+		out.println("<font>");
+		out.println("");
+		out.println("");
+		out.println("");
+		out.println("          <!-- Tree content -->");
+		out.println("");
+		out.println("<div>");
+		out.println("	    <font face=\"verdana\" size=1.7px>");
+		out.println("	    <form>");
+
+		out.println("	    </form>");
+		out.println("	    </font>");
+		out.println("");
+		out.println("          </div> <!-- popupContentArea -->");
+		out.println("");
+		out.println("            <div class=\"pagecontent\">");
+		out.println("               <a name=\"evs-content\" id=\"evs-content\"></a>");
+		out.println("                  <div class=\"tabTableContentContainer\">");
+		out.println("");
+		out.println("                  <div class=\"table-scroll\">");
+
+        out.println("             <table border=\"0\" role='presentation'>");
+        out.println("                <tr>");
+        out.println("                   <td>");
+        out.println("                   </td>");
+        out.println("                </tr>");
+        out.println("             </table>");
+
+		out.println("<table border=\"0\" width=\"900\" role='presentation'>");
+		out.println("	<tr><td>");
+		out.println("	<div style=\"float:left;width:360px;\">");
+
+		out.println("<table id=\"rvs_table\" width=\"905\" class=\"mt\">");
+
+        System.out.println("GeneratePageContent ...");
+        Vector w = new Vector();
+        try {
+		    w = generatePageContent();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		for (int i=0; i<w.size(); i++) {
+			String line = (String) w.elementAt(i);
+			out.println(line);
+		}
+
+		out.println("</table>");
+		out.println("");
+		out.println("	</div>");
+		out.println("	</td></tr>");
+		out.println("</table>");
+		out.println("</div></div>");
+
+		out.println("");
+		out.println("");
+		out.println("      </div> <!-- pagecontent -->");
+		out.println("    </div> <!--  main-area -->");
+		out.println("    <div class=\"mainbox-bottom\"></div>");
+		out.println("");
+		out.println("  </div> <!-- center-page -->");
+		out.println("");
+		out.println("   <form id=\"hidden_form\" enctype=\"application/x-www-form-urlencoded;charset=UTF-8\">");
+		out.println("      <input type=\"hidden\" id=\"checkedNodes\" name=\"checkedNodes\" value=\"\" />");
+		out.println("      <input type=\"hidden\" id=\"partialCheckedNodes\" name=\"partialCheckedNodes\" value=\"null\" />");
+		out.println("   </form>");
+		out.println("");
+		out.println("        <script type=\"text/javascript\">");
+		out.println("            fxheaderInit('rvs_table',300,1,0);");
+		out.println("            fxheader();");
+		out.println("        </script>");
+		out.println("</body>");
+		out.println("</html>");
+		out.println("");
+		out.println("<script id=\"f5_cspm\">(function(){var f5_cspm={f5_p:'HKBPMAPPLKJGJMDKKCFGGPPBPMCDKJOMMNBNILHHLHACAFKCNLHKAJJHJOJODDGLJMCBMPIHBEONKAHAALBAKBMCAKPECOBAEPJANKJLHHNHNHFDODKKFNMDDLCGOJNK',setCharAt:function(str,index,chr){if(index>str.length-1)return str;return str.substr(0,index)+chr+str.substr(index+1);},get_byte:function(str,i){var s=(i/16)|0;i=(i&15);s=s*32;return((str.charCodeAt(i+16+s)-65)<<4)|(str.charCodeAt(i+s)-65);},set_byte:function(str,i,b){var s=(i/16)|0;i=(i&15);s=s*32;str=f5_cspm.setCharAt(str,(i+16+s),String.fromCharCode((b>>4)+65));str=f5_cspm.setCharAt(str,(i+s),String.fromCharCode((b&15)+65));return str;},set_latency:function(str,latency){latency=latency&0xffff;str=f5_cspm.set_byte(str,40,(latency>>8));str=f5_cspm.set_byte(str,41,(latency&0xff));str=f5_cspm.set_byte(str,35,2);return str;},wait_perf_data:function(){try{var wp=window.performance.timing;if(wp.loadEventEnd>0){var res=wp.loadEventEnd-wp.navigationStart;if(res<60001){var cookie_val=f5_cspm.set_latency(f5_cspm.f5_p,res);window.document");
+		out.println(".cookie='f5avr1069532048aaaaaaaaaaaaaaaa_cspm_='+encodeURIComponent(cookie_val)+';path=/;'+'';}");
+		out.println("return;}}");
+		out.println("catch(err){return;}");
+		out.println("setTimeout(f5_cspm.wait_perf_data,100);return;},go:function(){var chunk=window.document.cookie.split(/\s*;\s*/);for(var i=0;i<chunk.length;++i){var pair=chunk[i].split(/\s*=\s*/);if(pair[0]=='f5_cspm'&&pair[1]=='1234')");
+		out.println("{var d=new Date();d.setTime(d.getTime()-1000);window.document.cookie='f5_cspm=;expires='+d.toUTCString()+';path=/;'+';';setTimeout(f5_cspm.wait_perf_data,100);}}}}");
+		out.println("f5_cspm.go();}());</script>");
+    }
+
+	public static void excel2HTML(String excelfile) {
+		int n = excelfile.lastIndexOf(".");
+		String valueSetName = excelfile.substring(0, n);
+		String valueSetDescription = valueSetName;
+		String reportURI = "https://evs.nci.nih.gov/ftp1/" + excelfile;
+		String extractionRule = "1:all";
+		EmbedExcel2HTML.generate(valueSetName, valueSetDescription, reportURI, extractionRule);
+	}
+
     public static void main(String[] args) {
 		EmbedExcel2HTML EmbedExcel2HTML = null;
 		String valueSetName = args[0];
 		String valueSetDescription = args[1];
 		if (args.length == 2) {
-        	run(valueSetName, valueSetDescription);
+        	EmbedExcel2HTML.run(valueSetName, valueSetDescription);
 		} else {
 			String reportURI = args[2];
 			String extractionRule = args[3];
-			run(valueSetName, valueSetDescription, reportURI, extractionRule);
+			EmbedExcel2HTML.run(valueSetName, valueSetDescription, reportURI, extractionRule);
 		}
 	}
 }
