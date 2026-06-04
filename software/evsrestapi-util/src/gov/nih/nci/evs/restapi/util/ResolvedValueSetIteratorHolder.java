@@ -446,6 +446,10 @@ public class ResolvedValueSetIteratorHolder {
 
 
     private void table(Sheet workbook_sheet, int startIndex, int col, String code, boolean cdisc) {
+		if (code == null) {
+			startIndex++;
+		}
+
 		HashSet hset = new HashSet();
 		if (workbook_sheet == null) {
 			return;
@@ -512,23 +516,6 @@ public class ResolvedValueSetIteratorHolder {
 						HSSFCell cell = row.getCell(col);
 						if (cell != null) {
 							String value = null;
-							/*
-							switch (cell.getCellType()) {
-								case HSSFCell.CELL_TYPE_FORMULA:
-									value = cell.getCellFormula();
-									break;
-
-								case HSSFCell.CELL_TYPE_NUMERIC:
-									value = "" + cell.getNumericCellValue();
-									break;
-
-								case HSSFCell.CELL_TYPE_STRING:
-									value = cell.getStringCellValue();
-									break;
-
-								default:
-							}
-							*/
 							value = getCellData(cell);
 							if (value == null || value.compareTo("null") == 0) {
 								value = "";
@@ -591,30 +578,19 @@ public class ResolvedValueSetIteratorHolder {
 						XSSFCell cell = row.getCell(col);
 						if (cell != null) {
 							String value = null;
-							/*
-							switch (cell.getCellType()) {
-								case XSSFCell.CELL_TYPE_FORMULA:
-									value = cell.getCellFormula();
-									break;
-
-								case XSSFCell.CELL_TYPE_NUMERIC:
-									value = "" + cell.getNumericCellValue();
-									break;
-
-								case XSSFCell.CELL_TYPE_STRING:
-									value = cell.getStringCellValue();
-									break;
-
-								default:
-							}
-							*/
 							value = getCellData(cell);
-
-							if (value != null && value.compareTo(code) == 0) {
+							if (code == null) {
 								buf = new StringBuffer();
 								tr(row, buf);
 								t = buf.toString();
 								resolvedValueSetList.add(t);
+							} else {
+								if (value != null && value.compareTo(code) == 0) {
+									buf = new StringBuffer();
+									tr(row, buf);
+									t = buf.toString();
+									resolvedValueSetList.add(t);
+								}
 							}
 						}
 					} else {
@@ -978,7 +954,7 @@ public class ResolvedValueSetIteratorHolder {
 			}
 			*/
 			val = getCellData(cell);
-			if (val.compareTo("null") == 0) {
+			if (val == null || val.compareTo("null") == 0) {
 				val = "";
 			}
 

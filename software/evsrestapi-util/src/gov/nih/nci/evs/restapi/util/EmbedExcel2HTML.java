@@ -145,11 +145,8 @@ public class EmbedExcel2HTML {
 		}
 	}
 
-
-
 	public void initialize(String reportURI) {
-		System.out.println(reportURI);
-		int n = reportURI.lastIndexOf("/");
+	    int n = reportURI.lastIndexOf("/");
 		excelfile = reportURI.substring(n+1, reportURI.length());
 		System.out.println(excelfile);
 		File f = new File(excelfile);
@@ -165,7 +162,11 @@ public class EmbedExcel2HTML {
 		String s2 = (String) u.elementAt(1);
 		if (StringUtils.isInteger(s2)) {
 			col = Integer.parseInt((String) u.elementAt(1)) - 1;
+		} else {
+			col = 0;
+			code = null;
 		}
+
 		if (u.size() == 3) {
 			String s3 = (String) u.elementAt(2);
 			if (s3.compareTo("all") != 0) {
@@ -196,11 +197,22 @@ public class EmbedExcel2HTML {
 
     public Vector generatePageContent() {
 		int startIndex = ExcelUtils.getExcelStartRow(excelfile, sheet, col, code);
+		/*
 		if (code == null || code.compareTo("null") == 0) {
 			startIndex++;
 		}
-
+		*/
 		ResolvedValueSetIteratorHolder rvsi = null;
+
+		System.out.println(excelfile);
+		System.out.println(sheet);
+		System.out.println(startIndex);
+		System.out.println(col);
+		System.out.println("code: " + code);
+		System.out.println(DEFAULT_URL);
+		System.out.println(cdisc);
+
+
 		try {
 		    rvsi = new ResolvedValueSetIteratorHolder(excelfile, sheet, startIndex, col, code, DEFAULT_URL, cdisc);
 		} catch (Exception ex) {
@@ -212,6 +224,8 @@ public class EmbedExcel2HTML {
 			String t = (String) iterator.next();
 			w.add(t);
 		}
+
+		System.out.println("w.size(): " + w.size());
 		return w;
 	}
 
@@ -436,31 +450,7 @@ public class EmbedExcel2HTML {
 		out.println("#treecontainer { background: #fff }");
 		out.println("</style>");
 		out.println("");
-		/*
-		out.println("");
-		out.println("<font face=\"verdana\" size=\"1\">");
-		out.println("<div id=\"expandcontractdiv\">");
-		out.println("<a href=\"#\" onclick=\"expand_all();\" tabindex=\"1\" >Expand all</a>");
-		out.println("&nbsp;");
-		out.println("Expand&nbsp;");
-		out.println("<select id=\"level\" onchange=\"expand_tree();\">");
-		out.println("    <option value=\"0\" selected>0</option>");
-		out.println("    <option value=\"1\">1</option>");
-		out.println("    <option value=\"2\">2</option>");
-		out.println("    <option value=\"3\">3</option>");
-		out.println("    <option value=\"4\">4</option>");
-		out.println("    <option value=\"5\">5</option>");
-		out.println("</select>");
-		out.println("&nbsp;");
-		out.println("Levels");
-		out.println("&nbsp;");
-		out.println("<a href=\"#\" onclick=\"collapse_all();\" tabindex=\"2\">Collapse all</a>");
-		out.println("&nbsp;");
-		out.println("<a href=\"#\" onclick=\"select_all();\" tabindex=\"1\">Check all</a>");
-		out.println("&nbsp;");
-		out.println("<a href=\"#\" onclick=\"select_none();\" tabindex=\"2\">Uncheck all</a>");
-		out.println("</div>");
-		*/
+
 		out.println("<font>");
 		out.println("");
 		out.println("");
@@ -470,13 +460,7 @@ public class EmbedExcel2HTML {
 		out.println("<div>");
 		out.println("	    <font face=\"verdana\" size=1.7px>");
 		out.println("	    <form>");
-		/*
-		out.println("<ul>");
-		out.println("<li>");
-		out.println("<input type=\"checkbox\" aria-labelledby=\"N_1\" id=\"N_1\" name=\"http://evs.nci.nih.gov/valueset/FDA/C54453\"  onclick=\"updateCheckbox('N_1'); return false; \" tabindex=\"3\" checked>SPL Color Terminology");
-		out.println("</li>");
-		out.println("</ul>");
-		*/
+
 		out.println("	    </form>");
 		out.println("	    </font>");
 		out.println("");
@@ -511,7 +495,15 @@ public class EmbedExcel2HTML {
 		out.println("<table id=\"rvs_table\" width=\"900\" class=\"mt\">");
 
         System.out.println("GeneratePageContent ...");
-		Vector w = generatePageContent();
+        Vector w = new Vector();
+        try {
+		    w = generatePageContent();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		System.out.println("w: " + w.size());
+
 		for (int i=0; i<w.size(); i++) {
 			String line = (String) w.elementAt(i);
 			out.println(line);

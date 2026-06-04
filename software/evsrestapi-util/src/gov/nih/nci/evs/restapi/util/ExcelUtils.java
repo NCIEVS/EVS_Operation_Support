@@ -664,6 +664,7 @@ public class ExcelUtils {
 	}
 
     public static int getExcelStartRow(String filename, int sheet, int col, String code) {
+		if (code == null) return 0;
 		if (filename.toLowerCase().endsWith(FILE_TYPES[0])) {
 			return getHSSFStartRow(filename, sheet, col, code);
 		} else {
@@ -692,17 +693,13 @@ public class ExcelUtils {
 				return 1;
 			}
 
-            if (code == null) return 1;
-
 			//Get iterator to all the rows in current sheet
 			Iterator<Row> rowIterator = hSSFSheet.iterator();
-
 			//Get iterator to all cells of current row
 			int lcv = 0;
 			while (rowIterator.hasNext()) {
 				Row row = rowIterator.next();
 				if (row == null) return -1;
-				//if (row.getCell(0).getStringCellValue().compareTo(code) == 0 ||
 				if (row.getCell(col).getStringCellValue().compareTo(code) == 0) {
 					return lcv;
 				}
@@ -750,7 +747,6 @@ public class ExcelUtils {
 			while (rowIterator.hasNext()) {
 				Row row = rowIterator.next();
 				if (row == null) return -1;
-				//if (row.getCell(0).getStringCellValue().compareTo(code) == 0 ||
 				if (row.getCell(col).getStringCellValue().compareTo(code) == 0) {
 					num = lcv;
 				}
@@ -843,6 +839,7 @@ public class ExcelUtils {
 	 }
 
      public static int getXSSFStartRow(String file, int sheet, int col, String code) {
+		if (code == null) return 0;
 		try {
 			FileInputStream fis = new FileInputStream(new File(file));
 			//Get the workbook instance for XLS file
@@ -921,11 +918,6 @@ public class ExcelUtils {
 	}
 
     public static void test(String excelfile, int sheet, int col, String code) {
-		System.out.println("excelfile: " + excelfile);
-		System.out.println("sheet: " + sheet);
-		System.out.println("col: " + col);
-		System.out.println("code: " + code);
-
 		String header = getExcelHeader(excelfile, sheet);
 		System.out.println(header);
 

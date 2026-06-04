@@ -250,14 +250,27 @@ public class ReleaseFileDataProcessor {
 		Utils.saveToFile("excelfiles_" + FILE_INFO_AT_FTP_SITE, w0);
 	}
 
+	public static void excel2HTML(String excelfile) {
+		int n = excelfile.lastIndexOf(".");
+		String valueSetName = excelfile.substring(0, n);
+		String valueSetDescription = valueSetName;
+		String reportURI = "https://evs.nci.nih.gov/ftp1/" + excelfile;
+		String extractionRule = "1:all";
+		EmbedExcel2HTML.run(valueSetName, valueSetDescription, reportURI, extractionRule);
+	}
+
 	public static void main(String[] args) {
+
         //SPL Color Terminology|http://evs.nci.nih.gov/valueset/FDA/C54453|https://evs.nci.nih.gov/ftp1/FDA/SPL/FDA-SPL_NCIt_Subsets.xls|1:2:C54453
 		String valueSetName = "SPL Color Terminology";
 		String reportURI = "https://evs.nci.nih.gov/ftp1/FDA/SPL/FDA-SPL_NCIt_Subsets.xls";
 		String valueSetDescription = "Terminology used for representation of the the framework of the Structured Product Labeling documents. SPL Terminology can be downloaded from this location SPL.";
 		String extractionRule = "1:2:C54453";
-		EmbedExcel2HTML.run(valueSetName, valueSetDescription, reportURI, extractionRule);
+		//EmbedExcel2HTML.run(valueSetName, valueSetDescription, reportURI, extractionRule);
         ValueSetHomeGenerator.run(valueSetName, valueSetDescription, reportURI, extractionRule);
+
+        //String excelfile = "C201601.xlsx";
+        //excel2HTML(excelfile);
 	}
 }
 
