@@ -9,6 +9,14 @@ import java.nio.file.*;
 import java.text.*;
 import java.util.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.stream.Stream;
+
+
 /**
  * <!-- LICENSE_TEXT_START -->
  * Copyright 2022 Guidehouse. This software was developed in conjunction
@@ -205,24 +213,116 @@ public class FileUtils
         }
     }
 
-    public static void main(String[] args) {
-		String currentWorkingDir = getCurrentWorkingDirectory();
-		System.out.println("getCurrentWorkingDirectory: " + currentWorkingDir);
-		String today = getToday("MMddyy");
-		System.out.println("getToday: " + today);
-		boolean exists = directoryExists(today);
-		System.out.println("directory exist? " + exists);
-		String dirname = currentWorkingDir + File.separator + today + File.separator;
-		if (!exists) {
-			System.out.println(dirname);
-    		boolean created = createDirectory(dirname);
-    		System.out.println("directory created? " + created);
+    public static Vector listSubdirectories() {
+		String currentDir = System.getProperty("user.dir");
+		File folder = new File(currentDir);
+		File[] listOfFiles = folder.listFiles();
+		Vector w = new Vector();
+		if(listOfFiles != null) {
+			for (int i = 0; i < listOfFiles.length; i++) {
+				if (listOfFiles[i].isFile()) {
+				} else if (listOfFiles[i].isDirectory()) {
+					w.add(currentDir + File.separator + listOfFiles[i].getName());
+				}
+			}
 		}
-		exists = directoryExists(dirname);
-		System.out.println("directory exist? " + exists);
-		Vector filesToCopy = new Vector();
-		filesToCopy.add("cmd.exe");
-		filesToCopy.add("run.bat");
-		copyFile(currentWorkingDir, dirname, filesToCopy);
+		return w;
 	}
+
+	public static void updateFile(String srcDir, String src_file, String targetSubDir) {
+		Vector w = listSubdirectories();
+		String file2Copy = srcDir + File.separator + src_file;
+		Vector targetDirs = new Vector();
+		for (int i=0; i<w.size(); i++) {
+			String t = (String) w.elementAt(i);
+			String targetDir = t + File.separator + targetSubDir;
+			File f = new File(targetDir);
+			if (f.exists()) {
+				targetDirs.add(targetDir);
+			}
+		}
+		copyFiles(src_file, srcDir, targetDirs);
+	}
+
+	public static void deleteFles(String filename) {
+		Vector subdir = listSubdirectories();
+		for (int i=0; i<subdir.size(); i++) {
+			String sub = (String) subdir.elementAt(i);
+			String targetFileName = sub + File.separator + "lib" + File.separator + filename;
+			System.out.println("Delete " + targetFileName);
+			FileUtils.deleteFile(targetFileName);
+		}
+	}
+
+	public static void deleteDirectory(String dirName) {
+		Vector subdir = listSubdirectories();
+		for (int i=0; i<subdir.size(); i++) {
+			String sub = (String) subdir.elementAt(i);
+			String targetDir = sub + File.separator + dirName;
+			System.out.println("Delete directory" + targetDir);
+			deleteDir(targetDir);
+		}
+	}
+
+	public static void deleteDir(String dir) { //"path/to/directory"
+		Path pathToBeDeleted = Paths.get(dir);
+		try (Stream<Path> walk = Files.walk(pathToBeDeleted)) {
+			walk.sorted(Comparator.reverseOrder())
+				.forEach(path -> {
+					try {
+						Files.delete(path);
+					} catch (IOException e) {
+						System.err.printf("Failed to delete %s: %s%n", path, e.getMessage());
+					}
+				});
+			System.out.println("Directory " + dir + " deleted successfully!");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void copyFiles(Vector src_files, String srcDir, String targetDir) {
+		for (int i=0; i<src_files.size(); i++) {
+			String srcFileName = (String) src_files.elementAt(i);
+			String targetFileName = srcFileName.replace(srcDir + File.separator, targetDir + File.separator);
+			FileUtils.copyfile(srcFileName, targetFileName);
+		}
+	}
+
+	public static void copyFiles(String src_file, String srcDir, Vector targetDirs) {
+		String srcFileName = srcDir + File.separator + src_file;
+		for (int i=0; i<targetDirs.size(); i++) {
+			String targetDir = (String) targetDirs.elementAt(i);
+			String targetFileName = targetDir + File.separator + src_file;
+			FileUtils.copyfile(srcFileName, targetFileName);
+		}
+	}
+
+	public static void copyFiles(Vector src_files, Vector target_files) {
+		for (int i=0; i<src_files.size(); i++) {
+			String srcFileName = (String) src_files.elementAt(i);
+			String targetFileName = (String) target_files.elementAt(i);
+			FileUtils.copyfile(srcFileName, targetFileName);
+		}
+	}
+
+	public static void createFolder(String packageName) {
+		Vector path = Utils.parseData(packageName, '.');
+        ProcessBuilder processBuilder = new ProcessBuilder();
+		String folderName = "";
+		for (int i=0; i<path.size(); i++) {
+			folderName = folderName + (String) path.elementAt(i);
+			File f = new File(folderName);
+			try {
+				if (!f.exists()) {
+					f.mkdir();
+				}
+				folderName = folderName + File.separator;
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+
 }
