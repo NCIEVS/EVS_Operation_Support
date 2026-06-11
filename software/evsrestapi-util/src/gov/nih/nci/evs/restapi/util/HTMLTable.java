@@ -124,16 +124,19 @@ public class HTMLTable {
 	public static void printBanner(PrintWriter out) {
 		out.println("<div>");
 		out.println("  <img");
-		//out.println("      src=\"https://nciterms.nci.nih.gov/ncitbrowser/images/evs-logo-swapped.gif\"");
+		out.println("      src=\"https://nciterms.nci.nih.gov/ncitbrowser/images/evs-logo-swapped.gif\"");
+		/*
 		File f = new File("Logo_NCI.svg");
 		if (!f.exists()) {
 			System.out.println("WARNING: Logo_NCI.svg not found." );
 		} else {
 			System.out.println("INFO: Logo_NCI.svg found." );
 		}
+		*/
 
-		//out.println("      src=\"https://www.cancer.gov//sites/g/files/xnrzdm211/files/ncids_header/logos/Logo_NCI.svg\"");
-		out.println("      src=\"Logo_NCI.svg\"");
+
+		out.println("      src=\"https://www.cancer.gov/sites/www/files/ncids_header/logos/Logo_NCI.svg\"");
+		//out.println("      src=\"Logo_NCI.svg\"");
 		out.println("      alt=\"EVS Logo\"");
 		out.println("      width=\"100%\"");
 		out.println("      height=\"26\"");
@@ -178,16 +181,16 @@ public class HTMLTable {
 		out.println("<div>");
 		out.println("  <center>");
 		out.println("  <img");
-
+/*
 		File f = new File("Logo_NCI.svg");
 		if (!f.exists()) {
 			System.out.println("WARNING: Logo_NCI.svg not found." );
 		} else {
 			System.out.println("INFO: Logo_NCI.svg found." );
 		}
-
-		//out.println("      src=\"https://www.cancer.gov//sites/g/files/xnrzdm211/files/ncids_header/logos/Logo_NCI.svg\"");
-		out.println("      src=\"Logo_NCI.svg\"");
+*/
+		out.println("      src=\"https://www.cancer.gov/sites/www/files/ncids_header/logos/Logo_NCI.svg\"");
+		//out.println("      src=\"Logo_NCI.svg\"");
 		out.println("      alt=\"EVS Logo\"");
 		out.println("      width=\"955\"");
 		out.println("      height=\"39\"");
