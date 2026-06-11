@@ -292,6 +292,23 @@ public class TableDataLoader {
 					}
 				}
 			}
+			rowNum++;
+			rowNum++;
+			colNum = 0;
+			row = sheet.createRow(rowNum);
+			cell = row.createCell(colNum);
+			String footer = (String) map.get("footer");
+            cell.setCellValue(footer);
+			cellStyle = workbook.createCellStyle();
+			cellStyle.setAlignment(HorizontalAlignment.CENTER);
+			cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+			cellStyle.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
+			cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+			cell.setCellStyle(cellStyle);
+
+			mergedRegion = new CellRangeAddress(rowNum, rowNum, colNum, colNum+7);
+			sheet.addMergedRegion(mergedRegion);
+
 			try (FileOutputStream fileOut = new FileOutputStream(xlsxfile)) {
 				workbook.write(fileOut);
 				System.out.println("Excel file created successfully.");
