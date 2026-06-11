@@ -1013,4 +1013,8 @@ public class StringUtils {
 		}
 		return line;
 	}
+
+	public static String get_NCI_LOGO_URL() {
+		return "https://www.cancer.gov/sites/www/files/ncids_header/logos/Logo_NCI.svg";
+	}
 }
