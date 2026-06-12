@@ -50,6 +50,8 @@ import org.apache.poi.xssf.usermodel.XSSFShape;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import org.apache.poi.openxml4j.util.ZipSecureFile;
+
 /**
  * <!-- LICENSE_TEXT_START -->
  * Copyright 2022 Guidehouse. This software was developed in conjunction
@@ -121,7 +123,7 @@ public class ResolvedValueSetIteratorHolder {
     private String excelfile = null;
     private int sheet = 0;
 
-    public String URL = "https://nciterms.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&ns=ncit";
+    public String URL = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
 
     public ResolvedValueSetIteratorHolder() {
 
@@ -153,8 +155,16 @@ public class ResolvedValueSetIteratorHolder {
 		Workbook workbook = null;
 		String fileName = file.getAbsolutePath();
 		this.excelfile = fileName;
-		//String folderName = file.getParent();
-        InputStream in = getInputStream(fileName);
+
+		FileInputStream in = null;
+		try {
+			in = new FileInputStream(this.excelfile);
+			ZipSecureFile.setMinInflateRatio(-1.0d);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+        //InputStream in = getInputStream(fileName);
+
 		try {
 			if (fileName.toLowerCase().endsWith(FILE_TYPES[0])) {
 				workbook = new HSSFWorkbook(in);
@@ -174,10 +184,19 @@ public class ResolvedValueSetIteratorHolder {
 
 
     public ResolvedValueSetIteratorHolder(final String filename, int sheet, int startIndex, int endIndex) throws IOException {
+		System.out.println("ResolvedValueSetIteratorHolder: " + filename);
+
 		this.excelfile = filename;
 		this.sheet = sheet;
 		resolvedValueSetList = new ArrayList();
+
+		File f = new File(filename);
+		if (!f.exists()) {
+			System.out.println("ERROR: " + filename + " does not exist.");
+			return;
+		}
 		book = createWorkBook(new File(filename));
+
         if (book == null) {
             palette = null;
             evaluator = null;
@@ -202,6 +221,13 @@ public class ResolvedValueSetIteratorHolder {
         if (url != null) this.URL = url;
 		this.excelfile = filename;
 		this.sheet = sheet;
+
+		File f = new File(filename);
+		if (!f.exists()) {
+			System.out.println("ERROR: " + filename + " does not exist.");
+			return;
+		}
+
         book = createWorkBook(new File(filename));
 		if (book instanceof HSSFWorkbook) {
 			HSSFWorkbook hssfWorkbook = (HSSFWorkbook) book;
@@ -218,6 +244,14 @@ public class ResolvedValueSetIteratorHolder {
 
     // public ResolvedValueSetIteratorHolder(final InputStream in) throws IOException {
     public ResolvedValueSetIteratorHolder(String filename) throws IOException {
+
+		File f = new File(filename);
+		if (!f.exists()) {
+			System.out.println("ERROR: " + filename + " does not exist.");
+			return;
+		}
+
+
 		this.excelfile = filename;
 		resolvedValueSetList = new ArrayList();
 		book = createWorkBook(new File(filename));
