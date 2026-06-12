@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.stream.Stream;
+import java.util.stream.*;
 
 
 /**
@@ -324,5 +325,123 @@ public class FileUtils
 		}
 	}
 
+
+///////////////////////////////////////////////////////////////////////////////////////////
+    public static List listRegularFiles(String startPathName, String ext) {
+		List<String> result = null;
+		Path startPath = null;
+		if (startPathName == null) {
+			startPath = Paths.get(System.getProperty("user.dir"));
+		} else {
+			startPath = Paths.get(startPathName);
+		}
+		try (Stream<Path> stream = Files.walk(startPath)) {
+			result = stream
+				.filter(Files::isRegularFile)
+				.map(Path::toString)
+				.filter(path -> path.endsWith("." + ext))
+				.collect(Collectors.toList());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+    }
+
+    public static List listRegularFiles(String startPathName) {
+		List<String> result = null;
+		Path startPath = null;
+		if (startPathName == null) {
+			startPath = Paths.get(System.getProperty("user.dir"));
+		} else {
+			startPath = Paths.get(startPathName);
+		}
+		try (Stream<Path> stream = Files.walk(startPath)) {
+			result = stream
+				.filter(Files::isRegularFile)
+				.map(Path::toString)
+				.collect(Collectors.toList());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+    }
+
+    public static List listDirectories(String startPathName) {
+		List<String> result = null;
+		Path startPath = null;
+		if (startPathName == null) {
+			startPath = Paths.get(System.getProperty("user.dir"));
+		} else {
+			startPath = Paths.get(startPathName);
+		}
+		try (Stream<Path> stream = Files.walk(startPath)) {
+			result = stream
+				.filter(Files::isDirectory)
+				.map(Path::toString)
+				.collect(Collectors.toList());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+    }
+
+    public static List listFilesInDirectory(String startPathName) {
+		List<String> result = null;
+		Path startPath = null;
+		if (startPathName == null) {
+			startPath = Paths.get(System.getProperty("user.dir"));
+		} else {
+			startPath = Paths.get(startPathName);
+		}
+		try (Stream<Path> stream = Files.walk(startPath)) {
+			result = stream
+				.map(Path::toString)
+				.collect(Collectors.toList());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+    }
+
+    public static List listRegularFiles() {
+		List<String> result = null;
+        Path startPath = Paths.get(System.getProperty("user.dir"));
+		try (Stream<Path> stream = Files.walk(startPath)) {
+			result = stream
+				.filter(Files::isRegularFile)
+				.map(Path::toString)
+				.collect(Collectors.toList());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+    }
+
+    public static List listDirectories() {
+		List<String> result = null;
+        Path startPath = Paths.get(System.getProperty("user.dir"));
+		try (Stream<Path> stream = Files.walk(startPath)) {
+			result = stream
+				.filter(Files::isDirectory)
+				.map(Path::toString)
+				.collect(Collectors.toList());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+    }
+
+    public static List listFilesInDirectory() {
+		List<String> result = null;
+        Path startPath = Paths.get(System.getProperty("user.dir"));
+		try (Stream<Path> stream = Files.walk(startPath)) {
+			result = stream
+				.map(Path::toString)
+				.collect(Collectors.toList());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+    }
 
 }
