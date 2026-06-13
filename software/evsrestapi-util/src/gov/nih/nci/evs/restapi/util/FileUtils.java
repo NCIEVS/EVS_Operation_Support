@@ -444,4 +444,20 @@ public class FileUtils
 		return result;
     }
 
+    public static String readRegularFiles(String startPathName, String ext) {
+		List<String> result = listRegularFiles(startPathName, ext);
+		File f = new File(startPathName);
+		String srcfile = "src_" + f.getName() + ".txt";
+		Vector w0 = new Vector();
+		int k = 0;
+		for (int i=0; i<result.size(); i++) {
+			k = i+1;
+			String filename = result.get(i);
+			w0.add("\n(" + k + ") " + filename);
+			Vector w = Utils.readFile(filename);
+			w0.addAll(w);
+		}
+		Utils.saveToFile(srcfile, w0);
+		return srcfile;
+    }
 }
