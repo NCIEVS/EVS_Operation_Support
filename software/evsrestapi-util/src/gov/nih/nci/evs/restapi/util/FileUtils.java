@@ -468,7 +468,7 @@ public class FileUtils
 						istart = false;
 						break;
 					}
-					if (istart) {
+					if (istart && line.startsWith("import ")) {
 						if (!importStmts.contains(line)) {
 							importStmts.add(line);
 						}
