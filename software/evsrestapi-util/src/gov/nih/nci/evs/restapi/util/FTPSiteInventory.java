@@ -62,9 +62,9 @@ public class FTPSiteInventory {
 		currentWorkingDirectory = System.getProperty("user.dir");
 	}
 
-	public static void download(String uri, String outputfile) {
-		try (BufferedInputStream in = new BufferedInputStream(new URL(uri).openStream());
-		  FileOutputStream fileOutputStream = new FileOutputStream(outputfile)) {
+	public static void download(String url, String outputfile) {
+		try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
+		    FileOutputStream fileOutputStream = new FileOutputStream(outputfile)) {
 			byte dataBuffer[] = new byte[1024];
 			int bytesRead;
 			while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
@@ -175,12 +175,16 @@ public class FTPSiteInventory {
 	}
 
 	public static void generate(String filename) {
+        generate(filename, false);
+	}
+
+	public static void generate(String filename, boolean showURL) {
 		int n = filename.lastIndexOf(".");
 		String htmlfile = filename.substring(0, n) + ".html";
 		PrintWriter pw = null;
 		try {
 			pw = new PrintWriter(htmlfile);
-			generate(pw, filename);
+			generate(pw, filename, showURL);
 		} catch (Exception ex) {
 
 		} finally {
@@ -192,8 +196,12 @@ public class FTPSiteInventory {
 		}
 	}
 
-
 	public static void generate(PrintWriter out, String filename) {
+		generate(out, filename, false);
+	}
+
+
+	public static void generate(PrintWriter out, String filename, boolean showURL) {
 		out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">");
 		out.println("<html xmlns:c=\"http://java.sun.com/jsp/jstl/core\">");
 		out.println("<head>");
@@ -235,6 +243,11 @@ public class FTPSiteInventory {
 		out.println("<h3>Published Files</h3>");
 		out.println("<table>");
 		out.println("<tr>");
+		if (showURL) {
+			out.println("<th>");
+			out.println("URL");
+			out.println("</th>");
+		}
 		out.println("<th>");
 		out.println("Name");
 		out.println("</th>");
@@ -254,12 +267,29 @@ public class FTPSiteInventory {
 			String t3 = (String) u.elementAt(3);
 			String s1 = toHyperLink(t0, t1);
 			out.println("<tr>");
-			out.println("<td width=\"60%\">");
-			out.println(s1);
-			out.println("</td>");
-			out.println("<td width=\"30%\">");
-			out.println(t2);
-			out.println("</td>");
+
+			if (showURL) {
+				out.println("<td width=\"45%\">");
+				out.println(t0);
+				out.println("</td>");
+
+				out.println("<td width=\"30%\">");
+				out.println(s1);
+				out.println("</td>");
+
+				out.println("<td width=\"15%\">");
+				out.println(t2);
+				out.println("</td>");
+			} else {
+
+				out.println("<td width=\"60%\">");
+				out.println(s1);
+				out.println("</td>");
+
+				out.println("<td width=\"30%\">");
+				out.println(t2);
+				out.println("</td>");
+			}
 			out.println("<td width=\"10%\">");
 			out.println(t3);
 			out.println("</td>");
@@ -282,14 +312,18 @@ public class FTPSiteInventory {
 	}
 
     public static void run(String outputfile) {
+		run(outputfile, false);
+	}
+
+    public static void run(String outputfile, boolean showURL) {
 		long ms = System.currentTimeMillis();
         File f = new File(outputfile);
         if (!f.exists()) {
 			Vector w = run();
-			Utils.dumpVector(EVS_FTP_URL, w);
+			//Utils.dumpVector(EVS_FTP_URL, w);
 			Utils.saveToFile(outputfile, w);
 		}
-        generate(outputfile);
+        generate(outputfile, showURL);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
