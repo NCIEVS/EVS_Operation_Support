@@ -10,6 +10,7 @@ import java.time.Month;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.*;
+import java.time.format.DateTimeFormatter;
 
 /**
  * <!-- LICENSE_TEXT_START -->
@@ -119,14 +120,26 @@ public class DateUtils {
 		return day.getValue();
 	}
 
+	public static int getDayOfMonth() {
+		return LocalDate.now().getDayOfMonth();
+	}
+
+	public static String getCurrDate() {
+		int year = DateUtils.getCurrentYear();
+		int month = DateUtils.getCurrentMonth();
+		int day = getDayOfMonth();
+        LocalDate date = LocalDate.of(year, month, day);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+        String formattedDate = date.format(formatter);
+        return formattedDate;
+    }
+
     public static void printDayOfWeek(DayOfWeek dow) {
 		Locale locale = Locale.getDefault();
 		System.out.println(dow.getDisplayName(TextStyle.FULL, locale));
 		System.out.println(dow.getDisplayName(TextStyle.NARROW, locale));
 		System.out.println(dow.getDisplayName(TextStyle.SHORT, locale));
 	}
-
-
 
     public static int getDaysInMonth(int year, int month) {
 		YearMonth yearMonthObject = YearMonth.of(year, month);
@@ -364,11 +377,13 @@ public class DateUtils {
 	    return version;
 	}
 
+/*
 	public static int getDayOfMonth() {
 		LocalDate currentDate = LocalDate.now();
         int dayOfMonth = currentDate.getDayOfMonth();
         return dayOfMonth;
 	}
+*/
 
 	public Vector getReleaseSchedule(int year, int month) throws Exception {
         Vector w = new Vector();
