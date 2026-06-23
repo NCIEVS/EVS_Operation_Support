@@ -12,9 +12,10 @@ public class NCItUtils {
 	public static String ROLE_FILE = "roles.txt";
 	public static String PROPERTY_FILE = "properties.txt";
 	public static String OBJECT_PROPERTY_FILE = "objectProperies.txt";
+
 	public static String ANNOTATION_PROPERTIES_FILE = "supported_properties.txt";
+
 	public static String SEMANTIC_TYPE_FILE = "P106.txt";
-	public static String NCIT_OWL_FILE = "ThesaurusInferred_forTS.owl";
 	public static String AXIOM_FILE = "axiom_ThesaurusInferred_forTS.txt";
 	public static String ASSOCIATION_FILE = "associations.txt";
 	public static String VS_FILE = "A8.txt";
@@ -57,7 +58,7 @@ public class NCItUtils {
             if (result) {
                 System.out.println("File deleted successfully.");
             } else {
-                System.out.println("File does not exist.");
+                System.out.println("The folder is empty -- No file needs to be deleted.");
             }
         } catch (IOException e) {
             e.printStackTrace(); // Handles permission issues or non-empty directories
@@ -65,6 +66,9 @@ public class NCItUtils {
     }
 
 	public static void generateReports(String owlfile, String outputDir) {
+		System.out.println("owlfile: " + owlfile);
+		System.out.println("outputDir: " + outputDir);
+
 		File f = new File(owlfile);
 		if (!f.exists()) {
 			System.out.println("The system cannot find " + owlfile);
@@ -72,6 +76,7 @@ public class NCItUtils {
 		} else {
 			System.out.println(owlfile +" exists.");
 		}
+
 		long ms = System.currentTimeMillis();
 		deleteFile(outputDir);
 		createDirectory(outputDir);
@@ -79,9 +84,15 @@ public class NCItUtils {
         OWLScanner owlscanner = new OWLScanner(owlfile);
         // Axiom file
 		Vector w = owlscanner.extractAxiomData(null);
+
 		String outputfile = outputDir + File.separator + AXIOM_FILE;
 		Utils.saveToFile(outputfile, w);
+
+		System.out.println("BEFORE HTMLDecoder outputfile: " + outputfile + " :" + w.size());
+
 		HTMLDecoder.run(outputfile);
+		System.out.println("AFTER HTMLDecoder outputfile: " + outputfile + " :" + w.size());
+
 		long size = getFileSize(outputfile);
 		System.out.println(outputfile + " generated. (Number of lines: " + w.size() + ", File size: " + size + ")");
 
@@ -144,14 +155,8 @@ public class NCItUtils {
 	}
 
 	public static void main(String[] args) {
-		String dir = null;
-		if (args.length == 0) {
-			dir = StringUtils.getToday();
-		} else {
-			dir = args[0];
-		}
-		String outputDir = getCurrentWorkingDirectory() + File.separator + dir;
-		String owlfile = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
+		String owlfile = args[0];
+		String outputDir = args[1];
 		generateReports(owlfile, outputDir);
 	}
 }
