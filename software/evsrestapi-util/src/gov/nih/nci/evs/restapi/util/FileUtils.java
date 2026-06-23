@@ -505,4 +505,55 @@ public class FileUtils
 		}
 		return null;
 	}
+
+	public static String getFileCreationTime(String filename) {
+		Path path = Paths.get(filename);
+		try {
+			BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+			return attr.creationTime().toString();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+
+	public static String getFileLastAccessTime(String filename) {
+		Path path = Paths.get(filename);
+		try {
+			BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+			return attr.lastAccessTime().toString();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+
+	public static String getFileLastModifiedTime(String filename) {
+		Path path = Paths.get(filename);
+		try {
+			BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+			return attr.lastModifiedTime().toString();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+
+
+    public static long toActualTimestamp(String timestampString) {
+		Vector u1 = StringUtils.parseData(timestampString, 'T');
+		Vector u2 = StringUtils.parseData((String) u1.elementAt(1), '.');
+		String s = (String) u1.elementAt(0) + " " + (String) u2.elementAt(0);
+		System.out.println(s);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			Date date = sdf.parse(s);
+			String specifiedDateString = sdf.format(date);
+			long actualTimestamp = sdf.parse(specifiedDateString).getTime();
+			return actualTimestamp;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return -1;
+	}
 }
