@@ -10,12 +10,12 @@ import java.text.*;
 import java.util.*;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.attribute.*;
+import java.nio.file.*;
 import java.util.Comparator;
 import java.util.stream.Stream;
 import java.util.stream.*;
+
 
 
 /**
@@ -483,4 +483,26 @@ public class FileUtils
 		return srcfile;
     }
 
+	public static Vector getFileAttributes(File dir) {
+		Vector w = new Vector();
+		//File dir = new File(dirName);
+		for (File child : dir.listFiles()) {
+			if (!child.isDirectory()) {
+				String t = getFileAttributes(child.getPath());
+				w.add(child.getPath() + "|" + t);
+			}
+		}
+		return w;
+	}
+
+	public static String getFileAttributes(String filename) {
+		Path path = Paths.get(filename);
+		try {
+			BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+			return attr.creationTime() + "|" + attr.lastAccessTime() + "|" + attr.lastModifiedTime();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
 }
