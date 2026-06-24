@@ -1108,6 +1108,11 @@ C4910|<NHC0>C4910</NHC0>
 		return w;
 	}
 
+    public Vector extractConceptStatus(Vector class_vec) {
+		String propertyCode = "P310";
+		return ScannerUtils.extractProperties(class_vec, propertyCode);
+	}
+
     public Vector extractSuperclasses(Vector class_vec) {
 		System.out.println("extractSuperclasses " + class_vec.size());
         Vector w = new Vector();

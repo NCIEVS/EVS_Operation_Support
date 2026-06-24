@@ -544,7 +544,6 @@ public class FileUtils
 		Vector u1 = StringUtils.parseData(timestampString, 'T');
 		Vector u2 = StringUtils.parseData((String) u1.elementAt(1), '.');
 		String s = (String) u1.elementAt(0) + " " + (String) u2.elementAt(0);
-		System.out.println(s);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		try {
 			Date date = sdf.parse(s);
