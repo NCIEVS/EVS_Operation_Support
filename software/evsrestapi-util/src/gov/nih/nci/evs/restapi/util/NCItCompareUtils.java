@@ -28,6 +28,7 @@ public class NCItCompareUtils {
     }
 
     public void run() {
+		Vector w = new Vector();
 		String path = FileUtils.getCurrentWorkingDirectory() + File.separator + observedDir;
 		Vector filenames = FileUtils.listFileNames(path);
 		Vector files = FileUtils.listFiles(path);
@@ -37,10 +38,11 @@ public class NCItCompareUtils {
 			String path2 = FileUtils.getCurrentWorkingDirectory() + File.separator + expectedDir + File.separator + f1.getName();
 			File f2 = new File(path2);
 			if (f2.exists()) {
-				System.out.println("\n" + observedDir + " " + f1.getName() + " (length: " + getFileLength(path1) + " size: " + getFileSize(path1) + ")");
-				System.out.println(expectedDir + " " + f2.getName() + " (length: " + getFileLength(path2) + " size: " + getFileSize(path2) + ")");
+				w.add("\n" + observedDir + " " + f1.getName() + " (length: " + getFileLength(path1) + " size: " + getFileSize(path1) + ")");
+				w.add(expectedDir + " " + f2.getName() + " (length: " + getFileLength(path2) + " size: " + getFileSize(path2) + ")");
 			}
 		}
+		Utils.saveToFile(observedDir + "_vs_" + expectedDir + ".txt", w);
 	}
 
 	public static void main(String[] args) {
