@@ -1107,6 +1107,27 @@ public class HierarchyHelper implements Serializable {
 		Utils.saveToFile(asciitreefile, w);
 	}
 
+    public static void printPathToRoots(Vector parent_child_vec, String code, String outputfile) {
+		HierarchyHelper hh = new HierarchyHelper(parent_child_vec);
+		PrintWriter pw = null;
+		if (outputfile == null) {
+			outputfile = "path_to_roots_" + code + ".txt";
+		}
+		try {
+			pw = new PrintWriter(outputfile, "UTF-8");
+			hh.path2Roots(pw, code);
+		} catch (Exception ex) {
+
+		} finally {
+			try {
+				pw.close();
+				System.out.println("Output file " + outputfile + " generated.");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
     public static void main(String[] args) {
 		Vector v = Utils.readFile("tvs_rel.txt");
 		HierarchyHelper test = new HierarchyHelper(v, 1);
