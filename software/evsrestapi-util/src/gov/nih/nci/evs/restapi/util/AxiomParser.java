@@ -699,9 +699,9 @@ public class AxiomParser {
 			Vector u2 = StringUtils.parseData(qualifier, '$');
 			String qualifierCode = (String) u2.elementAt(0);
 			String qualifierValue = (String) u2.elementAt(1);
-		w.add("        <" + qualifierCode + ">" + qualifierValue + "</" + qualifierCode + ">");
+			w.add("        <" + qualifierCode + ">" + qualifierValue + "</" + qualifierCode + ">");
+	    }
 		w.add("    </owl:Axiom>");
-		}
 		return w;
 	}
 
