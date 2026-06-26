@@ -683,6 +683,28 @@ public class AxiomParser {
 		}
 	}
 
+    public static Vector line2AxiomStatements(String line) {
+		Vector w = new Vector();
+		Vector u = StringUtils.parseData(line, '|');
+		String code = (String) u.elementAt(0);
+		String propCode = (String) u.elementAt(1);
+		String target = (String) u.elementAt(2);
+		w.add("    <owl:Axiom>");
+		w.add("        <owl:annotatedSource rdf:resource=\"http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#" + code + "\"/>");
+		w.add("        <owl:annotatedProperty rdf:resource=\"http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#" + propCode + "\"/>");
+		w.add("        <owl:annotatedTarget>" + target + "</owl:annotatedTarget>");
+
+		for (int i=3; i<u.size(); i++) {
+			String qualifier = (String) u.elementAt(i);
+			Vector u2 = StringUtils.parseData(qualifier, '$');
+			String qualifierCode = (String) u2.elementAt(0);
+			String qualifierValue = (String) u2.elementAt(1);
+		w.add("        <" + qualifierCode + ">" + qualifierValue + "</" + qualifierCode + ">");
+		w.add("    </owl:Axiom>");
+		}
+		return w;
+	}
+
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		/*
