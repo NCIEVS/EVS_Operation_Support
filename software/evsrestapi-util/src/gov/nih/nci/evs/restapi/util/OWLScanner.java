@@ -336,7 +336,7 @@ public class OWLScanner {
 		return w;
 	}
 
-    public String getCode(String line) {
+    public static String getCode(String line) {
 		int n = line.lastIndexOf("#");
 		String t = line.substring(n+1, line.length());
 		n = t.indexOf("\"");
@@ -344,13 +344,13 @@ public class OWLScanner {
 		return t;
 	}
 
-	public String extractCode(String line) {
+	public static String extractCode(String line) {
 		int n = line.lastIndexOf("#");
 		line = line.substring(n+1, line.length()-3);
         return line;
     }
 
-	public String extractAnnotatedTarget(String line) {
+	public static String extractAnnotatedTarget(String line) {
 		int n = line.indexOf(owlannotatedTarget_open);
 		line = line.substring(n+owlannotatedTarget_open.length()+1, line.length());
 		n = line.lastIndexOf(owlannotatedTarget_close);
@@ -358,12 +358,12 @@ public class OWLScanner {
         return line.trim();
     }
 
-	public String extractQualifier(String line) {
+	public static String extractQualifier(String line) {
 		int n = line.indexOf(">");
         return line.substring(1, n);
     }
     //<P378>CDISC</P378>
-	public String extractQualifierValue(String line) {
+	public static String extractQualifierValue(String line) {
 		int n = line.indexOf(">");
 		line = line.substring(n+1, line.length());
 		n = line.lastIndexOf("<");
