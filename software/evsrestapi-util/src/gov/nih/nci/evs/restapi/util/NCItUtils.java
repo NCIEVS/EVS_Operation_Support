@@ -83,7 +83,8 @@ public class NCItUtils {
 
         OWLScanner owlscanner = new OWLScanner(owlfile);
         // Axiom file
-		Vector w = owlscanner.extractAxiomData(null);
+		//Vector w = owlscanner.extractAxiomData(null);
+		Vector w = ScannerUtils.extractAxioms(Utils.readFile(owlfile));
 
 		String outputfile = outputDir + File.separator + AXIOM_FILE;
 		Utils.saveToFile(outputfile, w);

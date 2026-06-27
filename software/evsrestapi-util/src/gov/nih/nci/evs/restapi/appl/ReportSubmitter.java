@@ -78,7 +78,8 @@ public class ReportSubmitter {
 
 
 	public static void generateAxiomFile() {
-		 Vector w = owlscanner.extractAxiomData(null);
+		 //Vector w = owlscanner.extractAxiomData(null);
+		 Vector w = ScannerUtils.extractAxioms(owlscanner.get_owl_vec());
 		 Utils.saveToFile(AXIOM_FILE, w);
 		 HTMLDecoder.run(AXIOM_FILE);
 		 System.out.println(AXIOM_FILE + " generated.");

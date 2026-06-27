@@ -564,7 +564,6 @@ public class OWLScanner {
 			}
 
 			line = line.trim();
-			//line = line.trim();
 			if (line.indexOf(open_tag) != -1) {
 				v = new Vector();
 				istart = true;
@@ -604,10 +603,14 @@ public class OWLScanner {
 					} else {
 						owlannotatedTarget_start = false;
 						qualify_data = line;
+						String t = extractCode(owlannotatedProperty_value);
+						if (t.compareTo("hasDbXref") == 0) {
+							t = "oboInOwl:hasDbXref";
+						}
 						OWLAxiom owl_Axiom = new OWLAxiom(axiom_knt,
 						                         label,
 							                     extractCode(owlannotatedSource_value),
-												 extractCode(owlannotatedProperty_value),
+												 t,
 												 extractAnnotatedTarget(owlannotatedTarget_value),
 												 extractQualifier(qualify_data),
 												 extractQualifierValue(qualify_data));
@@ -2078,10 +2081,15 @@ C4910|<NHC0>C4910</NHC0>
 					} else {
 						owlannotatedTarget_start = false;
 						qualify_data = line;
+
+						String t = extractCode(owlannotatedProperty_value);
+						if (t.compareTo("hasDbXref") == 0) {
+							t = "oboInOwl:hasDbXref";
+						}
 						OWLAxiom owl_Axiom = new OWLAxiom(axiom_knt,
 						                         label,
 							                     extractCode(owlannotatedSource_value),
-												 extractCode(owlannotatedProperty_value),
+												 t,
 												 extractAnnotatedTarget(owlannotatedTarget_value),
 												 extractQualifier(qualify_data),
 												 extractQualifierValue(qualify_data));
