@@ -50,7 +50,7 @@ public class NCItCompareUtils {
     }
 
 
-    public void run() {
+    public static void run(String observedDir, String expectedDir) {
 		Vector w = new Vector();
 		String path = FileUtils.getCurrentWorkingDirectory() + File.separator + observedDir;
 		Vector filenames = FileUtils.listFileNames(path);
@@ -88,8 +88,13 @@ public class NCItCompareUtils {
 	}
 
 	public static void runDiff(String dir1, String dir2) {
+		System.out.println(dir1);
+		System.out.println(dir2);
+
 		List list1 = listFilesInDirectory(dir1);
-		int lcv = 0;
+		Utils.dumpList("listFilesInDirectory", list1);
+
+    	int lcv = 0;
 		Vector v1_not_in_v2 = new Vector();
 		Vector v2_not_in_v1 = new Vector();
 		for (int i=0; i<list1.size(); i++) {
@@ -121,8 +126,9 @@ public class NCItCompareUtils {
 	public static void main(String[] args) {
 		String observedDir = args[0];
 		String expectedDir = args[1];
-		NCItCompareUtils test = new NCItCompareUtils(observedDir, expectedDir);
-		test.run();
+
+		run(observedDir, expectedDir);
+		runDiff(observedDir, expectedDir);
 	}
 }
 
