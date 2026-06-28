@@ -121,6 +121,21 @@ public class OWLScanner {
 		propertyCode2LabelHashMap = createPropertyCode2LabelHashMap();
     }
 
+    public OWLScanner(Vector owl_vec) {
+        this.owl_vec = owl_vec;
+        Vector label_data = extractRDFSLabels(owl_vec);
+        code2LabelMap = new HashMap();
+        for (int i=0; i<label_data.size(); i++) {
+			String t = (String) label_data.elementAt(i);
+			Vector u = StringUtils.parseData(t, '|');
+			String code = (String) u.elementAt(0);
+			String label = (String) u.elementAt(1);
+			code2LabelMap.put(code, label);
+		}
+		propertyCode2LabelHashMap = createPropertyCode2LabelHashMap();
+    }
+
+
 	public HashMap createPropertyCode2LabelHashMap() {
 		Vector v = getSupportedProperties();
 		HashMap hmap = new HashMap();
@@ -564,6 +579,7 @@ public class OWLScanner {
 			}
 
 			line = line.trim();
+			//line = line.trim();
 			if (line.indexOf(open_tag) != -1) {
 				v = new Vector();
 				istart = true;
@@ -603,14 +619,10 @@ public class OWLScanner {
 					} else {
 						owlannotatedTarget_start = false;
 						qualify_data = line;
-						String t = extractCode(owlannotatedProperty_value);
-						if (t.compareTo("hasDbXref") == 0) {
-							t = "oboInOwl:hasDbXref";
-						}
 						OWLAxiom owl_Axiom = new OWLAxiom(axiom_knt,
 						                         label,
 							                     extractCode(owlannotatedSource_value),
-												 t,
+												 extractCode(owlannotatedProperty_value),
 												 extractAnnotatedTarget(owlannotatedTarget_value),
 												 extractQualifier(qualify_data),
 												 extractQualifierValue(qualify_data));
@@ -2081,15 +2093,10 @@ C4910|<NHC0>C4910</NHC0>
 					} else {
 						owlannotatedTarget_start = false;
 						qualify_data = line;
-
-						String t = extractCode(owlannotatedProperty_value);
-						if (t.compareTo("hasDbXref") == 0) {
-							t = "oboInOwl:hasDbXref";
-						}
 						OWLAxiom owl_Axiom = new OWLAxiom(axiom_knt,
 						                         label,
 							                     extractCode(owlannotatedSource_value),
-												 t,
+												 extractCode(owlannotatedProperty_value),
 												 extractAnnotatedTarget(owlannotatedTarget_value),
 												 extractQualifier(qualify_data),
 												 extractQualifierValue(qualify_data));
