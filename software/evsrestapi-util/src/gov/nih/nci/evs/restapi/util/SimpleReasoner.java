@@ -28,6 +28,14 @@ public class SimpleReasoner {
 		System.out.println("\tTotal initialization run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
+	public HashMap getRoleMap() {
+		return roleMap;
+	}
+
+	public Vector get_parent_child_vec() {
+		return parent_child_vec;
+	}
+
     public HashMap createRoleMap(Vector v) {
 		HashMap hmap = new HashMap();
 		for (int i=0; i<v.size(); i++) {

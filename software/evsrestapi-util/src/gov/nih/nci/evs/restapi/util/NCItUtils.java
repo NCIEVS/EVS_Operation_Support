@@ -35,7 +35,7 @@ public class NCItUtils {
 		generateReports(owlfile, outputDir);
 	}
 
-	private static long getFileSize(String filename) {
+	public static long getFileSize(String filename) {
 		File file = new File(filename);
 	    long length = file.length();
 	    return length;
