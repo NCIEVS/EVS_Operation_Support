@@ -108,6 +108,43 @@ public class SimpleReasoner {
 		return w;
 	}
 
+    public Vector get_ancestor_codes_and_roles(String code) {
+		Vector parent_codes = get_ancestor_codes(code);
+		if (parent_codes == null || parent_codes.size() == 0) return new Vector();
+		Vector w = new Vector();
+		Stack stack = new Stack();
+		stack.push("@@|" + code);
+		HashSet hset = new HashSet();
+		while (!stack.isEmpty()) {
+			String next_line = (String) stack.pop();
+			Vector u = StringUtils.parseData(next_line, '|');
+			String next_code = (String) u.elementAt(1);
+			if (next_code != null) {
+				if (!hset.contains(next_code)) {
+					hset.add(next_code);
+					if (next_code.compareTo(code) != 0) {
+						Vector roles = (Vector) roleMap.get(next_code);
+						if (roles != null) {
+							for (int k=0; k<roles.size(); k++) {
+								String role = (String) roles.elementAt(k);
+								w.add(next_code + "|" + role);
+						    }
+						}
+					}
+				}
+				Vector v = hh.getSuperclassCodes(next_code);
+				if (v != null) {
+					for (int i=0; i<v.size(); i++) {
+						String parent_code = (String) v.elementAt(i);
+						stack.push(next_code + "|" + parent_code);
+					}
+				}
+			}
+		}
+		hset.clear();
+		return w;
+	}
+
     public static Vector generateOWLRestrictionStmts(String roleCode, String targetCode) {
 		Vector w = new Vector();
 		w.add("        <rdfs:subClassOf>");
