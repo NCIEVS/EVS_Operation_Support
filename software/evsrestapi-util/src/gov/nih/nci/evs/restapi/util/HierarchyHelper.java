@@ -845,6 +845,28 @@ public class HierarchyHelper implements Serializable {
 		}
 	}
 
+	public Vector getPaths2Roots(String code) {
+		Stack stack = new Stack();
+		Vector w = new Vector();
+		stack.push(code);
+		while (!stack.isEmpty()) {
+            String line = (String) stack.pop();
+            Vector u = StringUtils.parseData(line, '|');
+            String next_code = (String) u.elementAt(u.size()-1);
+            Vector v = getSuperclassCodes(next_code);
+            if (v != null) {
+                for (int i=0; i<v.size(); i++) {
+					String sup = (String) v.elementAt(i);
+					String nextLine = line + "|" + sup;
+					stack.push(nextLine);
+				}
+			} else {
+				w.add(line);
+			}
+		}
+		return w;
+	}
+
 	public void path2Roots(PrintWriter pw, String code) {
 		Stack stack = new Stack();
 		stack.push(code);

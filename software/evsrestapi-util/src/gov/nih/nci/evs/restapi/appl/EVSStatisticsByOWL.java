@@ -114,6 +114,7 @@ public class EVSStatisticsByOWL {
 	static OWLScanner scanner = null;
 	HashMap propertyMap = null;
 
+/////////////////////////////////////////////////////////////////////////////////////
     public HashMap getPropertyCode2CountMap() {
 		HashMap countMap = new HashMap();
 		Iterator it = propertyMap.keySet().iterator();
@@ -122,6 +123,7 @@ public class EVSStatisticsByOWL {
 			//if (prop_code.startsWith("P")) {
 				HashMap hmap = (HashMap) propertyMap.get(prop_code);
 				Iterator it2 = hmap.keySet().iterator();
+
 				while (it2.hasNext()) {
 					String code = (String) it2.next();
 					Vector v = (Vector) hmap.get(code);
@@ -131,15 +133,16 @@ public class EVSStatisticsByOWL {
 					}
 					int count = int_obj.intValue();
 					int_obj = Integer.valueOf(count+v.size());
+					int countInt = count+v.size();
 					countMap.put(prop_code, int_obj);
 				}
-			//}
 		}
 		return countMap;
 	}
 
     static {
 		ANNOTATED_TARGETS = new String[] {"term-name", "go-term", "Target_Term"};
+
 		ANNOTATED_TARGET_CODES = new String[] {"P382", "P388", "P392"};
 		ANNOTATED_TARGET_LIST = Arrays.asList(ANNOTATED_TARGET_CODES);
 		ANNOTATED_TARGET_HASHMAP = new HashMap();
@@ -180,19 +183,22 @@ public class EVSStatisticsByOWL {
 			String code = (String) u.elementAt(0);
 			String prop_label = (String) u.elementAt(1);
 			String value = (String) u.elementAt(2);
+
 			HashMap map = new HashMap();
 			if (hmap.containsKey(prop_label)) {
 				map = (HashMap) hmap.get(prop_label);
 			}
+
 			Vector w = new Vector();
 			if (prop_label.startsWith("P")) {
 				if (map.containsKey(code)) {
 					w = (Vector) map.get(code);
 				}
-				if (!w.contains(value)) {
+				//if (!w.contains(value)) {
 					w.add(value);
-				}
+				//}
 				map.put(code, w);
+
 			} else if (prop_label.startsWith("A")) {
 				if (map.containsKey(value)) {
 					w = (Vector) map.get(value);
@@ -202,6 +208,7 @@ public class EVSStatisticsByOWL {
 				}
 				map.put(value, w);
 			}
+            hmap.put(prop_label, map);
 		}
 		return hmap;
 	}
@@ -270,7 +277,6 @@ public class EVSStatisticsByOWL {
 
 		String prop_code = "rdfs:label";
 		System.out.println(prop_code);
-		//10-Point Importance Scale|C153596|Importance Score 8|C153606
 
 		w = Utils.readFile(PARENT_CHILD_FILE);
 		for (int i=0; i<w.size(); i++) {
@@ -300,7 +306,6 @@ public class EVSStatisticsByOWL {
 
 
 		prop_code = "P322"; //Contributing_Source
-		System.out.println(prop_code);
 		w = scanner.extractPropertyData(prop_code);
 		Utils.saveToFile(prop_code + ".txt", w);
 		for (int i=0; i<w.size(); i++) {
@@ -321,7 +326,6 @@ public class EVSStatisticsByOWL {
 		}
 
         prop_code = "P372"; //Publish_Value_Set
-        System.out.println(prop_code);
         publishedValueSets = new HashSet();
 		w = scanner.extractPropertyData(prop_code);
 
@@ -344,7 +348,6 @@ public class EVSStatisticsByOWL {
 				String cs = (String) cs_vec.elementAt(0);
 				valueset2ContributingSourceMap.put(code, cs);
 			}
-
 			if (yesOrNo.compareTo("Yes") == 0) {
 				publishedValueSets.add(code);
 			}
@@ -570,7 +573,7 @@ public class EVSStatisticsByOWL {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static HashMap getPropertyCountHashMap(String owlfile) {
 		OWLScanner owlscanner = new OWLScanner(owlfile);
-		Vector v = owlscanner.extractProperties(owlscanner.get_owl_vec());
+		Vector v = owlscanner.extractProperties(owlscanner.get_owl_vec()); //??????????????????????????????
 		HashMap propertyCountHashMap = new HashMap();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String)v.elementAt(i);
@@ -602,7 +605,7 @@ public class EVSStatisticsByOWL {
 				int knt = getAnnotatedTargetCount(named_graph, prop_code);
 				count = count + knt;
 				v.add(property_name + " (" + property_code + ")" + "|" + knt);
-				System.out.println("(*)" + property_name + " (" + property_code + ")" + "|" + knt);
+				//System.out.println("(*)" + property_name + " (" + property_code + ")" + "|" + knt);
 
 			} else if (property_code.startsWith("P") && !hmap.containsKey(property_code)) {
 				w = null;
@@ -612,12 +615,12 @@ public class EVSStatisticsByOWL {
 					count = count + prop_count;
 					v.add(property_name + " (" + property_code + ")" + "|" +  prop_count);
 
-					System.out.println(property_name + " (" + property_code + ")" + "|" + prop_count);
+					//System.out.println(property_name + " (" + property_code + ")" + "|" + prop_count);
 				} catch (Exception ex) {
 					int knt = getPropertyCount(property_code);
 					count = count + knt;
 					v.add(property_name + " (" + property_code + ")" + "|" +  knt);
-					System.out.println("(**)" + property_name + " (" + property_code + ")" + "|" + knt);
+					//System.out.println("(**)" + property_name + " (" + property_code + ")" + "|" + knt);
 				}
 
 			} else if (property_code.startsWith("P") && hmap.containsKey(property_code)) {
@@ -630,7 +633,7 @@ public class EVSStatisticsByOWL {
 					String prop_name = (String) propertyCode2NameHashMap.get(prop_code);
 					String label2 = prop_name + " (" + prop_code + ")";
 					v.add(label1 + " of " + label2 + "|" + knt);
-					System.out.println(label1 + " of " + label2 + "|" + knt);
+					//System.out.println(label1 + " of " + label2 + "|" + knt);
 				}
 			}
 		}
@@ -769,7 +772,7 @@ public class EVSStatisticsByOWL {
 		Vector v = null;//(construct_get_value_set_data(named_graph, publishedOnly));
 		v = create_value_set_data(publishedOnly);
 		Utils.saveToFile("value_set_data.txt", v);
-		System.out.println("Fle saved as  " + "value_set_data.txt");
+		//System.out.println("Flie saved as  " + "value_set_data.txt");
 
 		Vector w = new Vector();
 		for (int i=0; i<v.size(); i++) {
@@ -1411,6 +1414,7 @@ public class EVSStatisticsByOWL {
 
         System.out.println("getPropertyCounts ...");
         Vector property_knt_vec = getPropertyCountData();
+        //System.out.println("property_knt_vec: " + property_knt_vec.size());
         //Vector v0 = Utils.readFile(AXIOM_FILE);
         //v = getPropertyCounts(v0);
 	    tableName = addTableNumber("Properties");
@@ -1487,6 +1491,7 @@ public class EVSStatisticsByOWL {
 		System.out.println(outputfile + " generated.");
 	}
 
+/////////////////////////////////////////////////////////////////////////////////////
 	public Vector getPropertyCountData() {
 		Vector w = new Vector();
 		int total = 0;
@@ -1496,10 +1501,11 @@ public class EVSStatisticsByOWL {
 			if (prop_code.startsWith("P")) {
 				Integer knt_obj = (Integer) propertyCode2CountMap.get(prop_code);
 				if (knt_obj == null) {
-					//System.out.println("WARNING: " + prop_code + " count not found.");
+
 				} else {
 					int knt = knt_obj.intValue();
 					w.add((String) propertyCode2NameHashMap.get(prop_code) + " (" + prop_code + ")|" + knt);
+					//System.out.println((String) propertyCode2NameHashMap.get(prop_code) + " (" + prop_code + ")|" + knt);
 					total = total + knt;
 				}
 			}
@@ -1547,8 +1553,8 @@ public class EVSStatisticsByOWL {
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-
-            String prop_code = (String) u.elementAt(2);
+            String prop_code = (String) u.elementAt(1);
+            //String prop_code = (String) u.elementAt(2);
 			if (INV_ANNOTATED_TARGET_HASHMAP.containsKey(prop_code)) {
 				prop_code = (String) INV_ANNOTATED_TARGET_HASHMAP.get(prop_code);
 				String qual_code = "null";
@@ -1561,8 +1567,9 @@ public class EVSStatisticsByOWL {
 				knt_obj = Integer.valueOf(knt+1);
 				qualifierCountMap.put(key, knt_obj);
 			}
-            prop_code = (String) u.elementAt(2);
-			for (int j=4; j<u.size(); j++) {
+            prop_code = (String) u.elementAt(1);
+            //for (int j=4; j<u.size(); j++) {
+			for (int j=3; j<u.size(); j++) {
 				String s = (String) u.elementAt(j);
 				Vector u2 = StringUtils.parseData(s, '$');
 				String qual_code = (String) u2.elementAt(0);
@@ -1578,7 +1585,7 @@ public class EVSStatisticsByOWL {
 		}
 		int count = 0;
 
-        dumpHashMap(qualifierCountMap);
+        //dumpHashMap(qualifierCountMap);
 
 		Iterator it = qualifierCountMap.keySet().iterator();
 		while (it.hasNext()) {
