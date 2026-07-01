@@ -70,11 +70,11 @@ public class OWLScanner {
 
     String owlfile = null;
     Vector owl_vec = null;
-    String NAMESPACE = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
-    String NAMESPACE_TARGET = "<!-- " + NAMESPACE;
-    String OWL_CLS_TARGET = NAMESPACE_TARGET + "C";
-    String OWL_PROPERTY_TARGET = NAMESPACE_TARGET + "P";
-    String OWL_ANNOTATION_PROPERTY_TARGET = NAMESPACE_TARGET + "A";
+    static String NAMESPACE = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
+    static String NAMESPACE_TARGET = "<!-- " + NAMESPACE;
+    static String OWL_CLS_TARGET = NAMESPACE_TARGET + "C";
+    static String OWL_PROPERTY_TARGET = NAMESPACE_TARGET + "P";
+    static String OWL_ANNOTATION_PROPERTY_TARGET = NAMESPACE_TARGET + "A";
 
 	static String open_tag = "<owl:Axiom>";
 	static String close_tag = "</owl:Axiom>";
@@ -3760,6 +3760,72 @@ C4910|<NHC0>C4910</NHC0>
 		output_vec = new SortUtils().quickSort(output_vec);
 		return output_vec;
 	}
+	public static Vector removeRestrictionSourceCode(Vector v) {
+		if (v == null) return null;
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			w.add((String) u.elementAt(1) + "|" + (String) u.elementAt(2));
+		}
+		return w;
+	}
+
+    public static Vector extractSimpleOWLRestrictions(Vector class_vec) {
+        Vector w = new Vector();
+        boolean restriction_start = false;
+        String restrictionCode = null;
+        String classId = null;
+        OWLRestriction r = null;
+        String onProperty = null;
+        String someValueFrom = null;
+        boolean istart = false;
+         for (int i=0; i<class_vec.size(); i++) {
+			String t = (String) class_vec.elementAt(i);
+			if (t.indexOf(NAMESPACE_TARGET) != -1 && t.endsWith("-->")) {
+				int n = t.lastIndexOf("#");
+				t = t.substring(n, t.length());
+				n = t.lastIndexOf(" ");
+				classId = t.substring(1, n);
+				//System.out.println("classId: " + classId);
+				r = null;
+				istart = true;
+			}
+			if (istart) {
+				//t = t.trim();
+				if (t.startsWith("            <owl:Restriction>")) {
+					//System.out.println("owl:Restriction starts.");
+					restriction_start = true;
+					r = new OWLRestriction();
+					r.setClassId(classId);
+				} else if (r != null) {
+					//t = t.trim();
+					if (t.startsWith("                <owl:onProperty")) {
+						int n = t.lastIndexOf("#");
+						t = t.substring(n, t.length());
+						n = t.lastIndexOf("\"");
+						onProperty = t.substring(1, n);
+						r.setOnProperty(onProperty);
+					}
+					if (t.startsWith("                <owl:someValuesFrom")) {
+						int n = t.lastIndexOf("#");
+						t = t.substring(n, t.length());
+						n = t.lastIndexOf("\"");
+						someValueFrom = t.substring(1, n);
+						r.setSomeValuesFrom(someValueFrom);
+						if (restrictionCode == null) {
+							w.add(r.toString());
+						} else if (r.getOnProperty().compareTo(restrictionCode) == 0) {
+							w.add(r.toString());
+						}
+						r = null;
+					}
+				}
+		    }
+		}
+		return w;
+	}
+
 
     public static void main(String[] args) {
 		long ms = System.currentTimeMillis();

@@ -184,13 +184,46 @@ public class SimpleReasoner {
         return w0;
 	}
 
+    // In v1 but not in v2
+	public static Vector v1_v2(Vector v1, Vector v2) {
+		if (v2 == null || v2.size() == 0) {
+			return v1;
+		}
+		if (v1 == null) return new Vector();
+		Vector w = new Vector();
+        HashSet hset = Utils.vector2HashSet(v2);
+        for (int i=0; i<v1.size(); i++) {
+			String t = (String) v1.elementAt(i);
+			if (!hset.contains(t)) { // not in v2
+				w.add(t);
+			}
+		}
+		return new SortUtils().quickSort(w);
+	}
+
+
 	public static void main(String[] args) {
 		String assertedOWL = args[0];
 		SimpleReasoner reasoner = new SimpleReasoner(assertedOWL);
 		long ms = System.currentTimeMillis();
-		String code = "C3224";
+		String code = args[1];
+
+		Vector w1 = reasoner.get_roles(code);
+		Utils.dumpVector("get_roles", w1);
+
+		//w1 = reasoner.get_ancestor_codes(code);
+		//Utils.dumpVector("get_ancestor_codes", w1);
+
 		Vector w = reasoner.get_ancestor_roles(code);
+		Utils.dumpVector("get_ancestor_roles", w);
+
+		w = v1_v2(w, w1);
+		Utils.dumpVector("inherited roles", w);
+
+
+
 		w = reasoner.generateOWLRestrictionStmts(w);
+
 		Utils.dumpVector("get_ancestor_roles", w);
 		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
 	}
