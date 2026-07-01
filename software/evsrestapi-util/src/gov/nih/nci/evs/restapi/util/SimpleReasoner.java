@@ -76,13 +76,21 @@ public class SimpleReasoner {
 		return w;
 	}
 
+    public Vector get_roles(String code) {
+		Vector roles = (Vector) roleMap.get(code);
+		return roles;
+	}
+
+
     public Vector get_ancestor_roles(String code) {
+		Vector my_roles = (Vector) roleMap.get(code);
 		Vector parent_codes = get_ancestor_codes(code);
 		if (parent_codes == null || parent_codes.size() == 0) return new Vector();
 		Vector w = new Vector();
 		Stack stack = new Stack();
 		stack.push(code);
 		HashSet hset = new HashSet();
+
 		while (!stack.isEmpty()) {
 			String next_code = (String) stack.pop();
 			if (next_code != null) {
@@ -91,7 +99,12 @@ public class SimpleReasoner {
 					if (next_code.compareTo(code) != 0) {
 						Vector roles = (Vector) roleMap.get(next_code);
 						if (roles != null) {
-							w.addAll(roles);
+							for (int k=0; k<roles.size(); k++) {
+								String role = (String) roles.elementAt(k);
+								if (!w.contains(role)) {
+									w.add(role);
+								}
+							}
 						}
 					}
 				}
@@ -109,6 +122,7 @@ public class SimpleReasoner {
 	}
 
     public Vector get_ancestor_codes_and_roles(String code) {
+		Vector my_roles = (Vector) roleMap.get(code);
 		Vector parent_codes = get_ancestor_codes(code);
 		if (parent_codes == null || parent_codes.size() == 0) return new Vector();
 		Vector w = new Vector();
@@ -127,7 +141,9 @@ public class SimpleReasoner {
 						if (roles != null) {
 							for (int k=0; k<roles.size(); k++) {
 								String role = (String) roles.elementAt(k);
-								w.add(next_code + "|" + role);
+								if (!w.contains(next_code + "|" + role)) {
+									w.add(next_code + "|" + role);
+								}
 						    }
 						}
 					}
