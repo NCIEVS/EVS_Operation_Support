@@ -2466,6 +2466,56 @@ C4910|<NHC0>C4910</NHC0>
         return extractEnum(class_vec, "Semantic_Type");
 	}
 
+    public Vector extractAllEnumDataType(Vector class_vec) {
+		Vector w = new Vector();
+		boolean istart = false;
+		String id = null;
+		for (int i=0; i<class_vec.size(); i++) {
+			String line = (String) class_vec.elementAt(i);
+			if (line.indexOf("    // Datatypes") != -1) {
+				istart = true;
+			} else if (line.indexOf("    // Object Properties") != -1) {
+				break;
+			}
+			if (istart) {
+				if (line.indexOf("<!-- " + NAMESPACE) != -1) {
+					int n = line.lastIndexOf("#");
+					id = line.substring(n+1, line.length()-4);
+					//if (id.endsWith("-enum")) {
+						w.add(id);
+					//}
+				}
+			}
+		}
+		w = new SortUtils().quickSort(w);
+		return w;
+	}
+
+    public Vector extractEnumDataType(Vector class_vec) {
+		Vector w = new Vector();
+		boolean istart = false;
+		String id = null;
+		for (int i=0; i<class_vec.size(); i++) {
+			String line = (String) class_vec.elementAt(i);
+			if (line.indexOf("    // Datatypes") != -1) {
+				istart = true;
+			} else if (line.indexOf("    // Object Properties") != -1) {
+				break;
+			}
+			if (istart) {
+				if (line.indexOf("<!-- " + NAMESPACE) != -1) {
+					int n = line.lastIndexOf("#");
+					id = line.substring(n+1, line.length()-4);
+					if (id.endsWith("-enum")) {
+						w.add(id);
+					}
+				}
+			}
+		}
+		w = new SortUtils().quickSort(w);
+		return w;
+	}
+
     public Vector extractEnum(Vector class_vec, String type) {
         Vector w = new Vector();
         boolean istart = false;
@@ -2487,7 +2537,7 @@ C4910|<NHC0>C4910</NHC0>
 			}
 
 
-			if (t.indexOf(NAMESPACE_TARGET + type + "-enum -->") != -1) {
+			if (t.indexOf(NAMESPACE_TARGET + type + " -->") != -1) {
 				istart = true;
 			}
 			if (istart && t.indexOf("</rdfs:Datatype>") != -1) {
