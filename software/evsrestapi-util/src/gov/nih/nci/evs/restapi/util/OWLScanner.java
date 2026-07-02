@@ -1,5 +1,4 @@
 package gov.nih.nci.evs.restapi.util;
-import gov.nih.nci.evs.restapi.config.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import java.io.*;
 import java.io.BufferedReader;
@@ -65,9 +64,6 @@ import java.util.*;
  *
  */
 public class OWLScanner {
-
-    static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
-
     String owlfile = null;
     Vector owl_vec = null;
     static String NAMESPACE = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
@@ -2466,7 +2462,7 @@ C4910|<NHC0>C4910</NHC0>
         return extractEnum(class_vec, "Semantic_Type");
 	}
 
-    public Vector extractAllEnumDataType(Vector class_vec) {
+    public Vector extractAllEnumDataTypes(Vector class_vec) {
 		Vector w = new Vector();
 		boolean istart = false;
 		String id = null;
@@ -2491,7 +2487,7 @@ C4910|<NHC0>C4910</NHC0>
 		return w;
 	}
 
-    public Vector extractEnumDataType(Vector class_vec) {
+    public Vector extractEnumDataTypes(Vector class_vec) {
 		Vector w = new Vector();
 		boolean istart = false;
 		String id = null;
@@ -3704,8 +3700,9 @@ C4910|<NHC0>C4910</NHC0>
 	}
 
     static String INSERT_CONTENT_HERE = "INSERT CONTENT HERE";
-	public static void extractBranchTemplate() {
-        Vector v = Utils.readFile(NCIT_OWL);
+
+	public static void extractBranchTemplate(String owlfile) {
+        Vector v = Utils.readFile(owlfile);
         Vector w = new Vector();
         boolean switchOff = false;
         for (int i=0; i<v.size(); i++) {
@@ -3876,30 +3873,45 @@ C4910|<NHC0>C4910</NHC0>
 		return w;
 	}
 
-
-    public static void main(String[] args) {
-		long ms = System.currentTimeMillis();
-		/*
-        String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
-        String owlfile = ConfigurationController.owlfile;
-        owlfile = reportGenerationDirectory + File.separator + owlfile;
-		OWLScanner scanner = new OWLScanner(owlfile);
-		Vector w = scanner.extractEquivalenceClasses();
-		Utils.saveToFile("equivalence_classses.txt", w);
-		*/
-		//extractBranchTemplate();
-        String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
-        String owlfile = ConfigurationController.owlfile;
-        owlfile = reportGenerationDirectory + File.separator + owlfile;
-		OWLScanner scanner = new OWLScanner(owlfile);
-		Vector codes = new Vector();
-		codes.add("C12345");
-		codes.add("C12545");
-		Vector w = scanner.getOWLClassDataByCode(scanner.get_owl_vec(), codes);
-		Utils.saveToFile("classdata.txt", w);
-        System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+    public Vector extractAnnotationPropertyRanges() {
+		Vector w = new Vector();
+		boolean istart = false;
+		String id = null;
+		String label = null;
+		String range = null;
+		for (int i=0; i<owl_vec.size(); i++) {
+			String line = (String) owl_vec.elementAt(i);
+			if (line.indexOf("    // Annotation properties") != -1) {
+				istart = true;
+			} else if (line.indexOf("    // Datatypes") != -1) {
+				break;
+			}
+			if (istart) {
+				if (line.indexOf("<!-- " + NAMESPACE) != -1) {
+					if (id != null) {
+						w.add(id + "|" + label + "|" + range);
+					}
+					int n = line.lastIndexOf("#");
+					id = line.substring(n+1, line.length()-4);
+					label = null;
+					range = null;
+				} else if (line.indexOf("<rdfs:label>") != -1) {
+					line = line.trim();
+					line = line.substring(1, line.length()-1);
+					line = line.replace("<", "|");
+					line = line.replace(">", "|");
+					Vector u = StringUtils.parseData(line, '|');
+					label = (String) u.elementAt(1);
+				} else if (line.indexOf("<rdfs:range rdf:resource=") != -1) {
+					int n = line.lastIndexOf("#");
+					range = line.substring(n+1, line.length()-3);
+				}
+			}
+		}
+		w.add(id + "|" + label + "|" + range);
+		w = new SortUtils().quickSort(w);
+		return w;
 	}
-
 }
 
 
