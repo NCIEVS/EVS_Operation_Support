@@ -1616,7 +1616,7 @@ C4910|<NHC0>C4910</NHC0>
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public String extractClassId(String line) {
+    public static String extractClassId(String line) {
         String t = line;
         String classId = null;
 		if (t.indexOf(NAMESPACE_TARGET) != -1 && t.endsWith("-->")) {
@@ -3910,6 +3910,25 @@ C4910|<NHC0>C4910</NHC0>
 		}
 		w.add(id + "|" + label + "|" + range);
 		w = new SortUtils().quickSort(w);
+		return w;
+	}
+
+    public static Vector extractClassIDs(Vector owl_vec) {
+		Vector w = new Vector();
+		String classId = null;
+		String label = null;
+		for (int i=0; i<owl_vec.size(); i++) {
+			String t = (String) owl_vec.elementAt(i);
+		    if (t.indexOf("// Annotations") != -1) {
+				break;
+			}
+			if (t.indexOf(NAMESPACE_TARGET) != -1 && t.endsWith("-->")) {
+				classId = extractClassId(t);
+				if (StringUtils.isNCItCode(classId)) {
+					w.add(classId);
+				}
+			}
+		}
 		return w;
 	}
 }
