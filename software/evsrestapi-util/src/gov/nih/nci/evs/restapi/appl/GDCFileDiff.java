@@ -97,7 +97,6 @@ public class GDCFileDiff {
 	}
 
     public static Vector compareColumnValues(Vector w, Vector v1, Vector v2, int keyCol, int valueCol, String valueColLabel, char delim) {
-		//System.out.println("Compare column " + valueCol);
         HashMap hmap1 = DelimitedDataExtractor.createHashMap(v1, 2, 3, delim);
         HashMap hmap2 = DelimitedDataExtractor.createHashMap(v2, 2, 3, delim);
 
@@ -117,7 +116,7 @@ public class GDCFileDiff {
 			}
 		}
 
-        Iterator it2 = hmap1.keySet().iterator();
+        Iterator it2 = hmap2.keySet().iterator();
         while (it2.hasNext()) {
 			String key2 = (String) it2.next();
 			if (!hmap1.containsKey(key2)) {
