@@ -33,6 +33,11 @@ public class OWLClassLoader {
 		return id;
 	}
 
+	public void clear() {
+		classDataHashMap.clear();
+		classIdVec.clear();
+	}
+
 	public void loadOWLClasses() {
 		classDataHashMap = new HashMap();
 		classIdVec = new Vector();
