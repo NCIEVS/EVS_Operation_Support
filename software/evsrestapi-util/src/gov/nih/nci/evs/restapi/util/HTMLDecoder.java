@@ -5,10 +5,19 @@ import java.util.Vector;
 
 public class HTMLDecoder {
 
+	public static Vector run(Vector v) {
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			String new_line = HTMLDecoder.decode(line);
+			w.add(new_line);
+		}
+		return w;
+	}
+
 	public static void run(String filename) {
 		Vector w = new Vector();
 		Vector v = Utils.readFile(filename);
-		int knt = 0;
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			String new_line = HTMLDecoder.decode(line);
