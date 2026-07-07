@@ -1,5 +1,4 @@
 package gov.nih.nci.evs.restapi.util;
-import gov.nih.nci.evs.restapi.config.*;
 
 import java.io.*;
 import java.util.*;
@@ -57,6 +56,104 @@ public class NCItDiffUtils {
 		loader2.clear();
 	}
 
+	public static Vector compareHierarchies(String owlfile1, String owlfile2) {
+		Vector v1 = Utils.readFile(owlfile1);
+		OWLScanner scanner1 = new OWLScanner(v1);
+		Vector parent_child_vec1 = scanner1.extractHierarchicalRelationships(v1);
+		Vector v2 = Utils.readFile(owlfile2);
+		OWLScanner scanner2 = new OWLScanner(v2);
+		Vector parent_child_vec2 = scanner2.extractHierarchicalRelationships(v2);
+
+		Vector w = new Vector();
+		w.add(owlfile1 + "\t" + owlfile2);
+		Vector w1 = v1_v2(parent_child_vec1, parent_child_vec2);
+		for (int i=0; i<w1.size(); i++) {
+			String line = (String) w1.elementAt(i);
+			w.add(line + "\t");
+		}
+		Vector w2 = v1_v2(parent_child_vec2, parent_child_vec1);
+		for (int i=0; i<w2.size(); i++) {
+			String line = (String) w2.elementAt(i);
+			w.add("|" + line);
+		}
+
+		parent_child_vec1.clear();
+		parent_child_vec2.clear();
+		scanner1.get_owl_vec().clear();
+		scanner2.get_owl_vec().clear();
+        return w;
+	}
+
+	public static Vector compareProperties(String owlfile1, String owlfile2) {
+		System.out.println(owlfile1);
+		System.out.println(owlfile2);
+		long ms = System.currentTimeMillis();
+		OWLClassLoader loader1 = new OWLClassLoader(owlfile1);
+		HashMap classDataHashMap1 = loader1.getClassDataHashMap();
+		Vector classIdVec1 = loader1.getClassIdVec();
+		System.out.println("classIdVec1: " + classIdVec1.size());
+
+		OWLClassLoader loader2 = new OWLClassLoader(owlfile2);
+		HashMap classDataHashMap2 = loader1.getClassDataHashMap();
+		Vector classIdVec2 = loader1.getClassIdVec();
+		System.out.println("classIdVec2: " + classIdVec2.size());
+
+		Vector diff_codes = new Vector();
+		if (classIdVec1.size() != classIdVec2.size()) {
+			System.out.println("WARNING: Number of classes - " + classIdVec1.size() + " versus " + classIdVec2.size());
+		}
+        Vector w = new Vector();
+        Vector diff_vec = new Vector();
+		int lcv = 0;
+		int increment = 10000;
+		int total = classIdVec1.size();
+		SortUtils sort = new SortUtils();
+		for (int i=0; i<classIdVec1.size(); i++) {
+			int j = i;
+			if (lcv == increment) {
+				if (j > 0) {
+					System.out.println("" + j + " out of " + total + " completed.");
+				}
+				lcv = 0;
+			}
+			lcv++;
+			String id = (String) classIdVec1.elementAt(i);
+			if (classIdVec2.contains(id)) {
+				Vector v1 = (Vector) classDataHashMap1.get(id);
+				Vector v2 = (Vector) classDataHashMap2.get(id);
+				OWLScanner scanner1 = new OWLScanner(v1);
+				Vector prop_vec1 = scanner1.extractProperties(v1);
+				OWLScanner scanner2 = new OWLScanner(v2);
+				Vector prop_vec2 = scanner2.extractProperties(v2);
+ 				if (prop_vec1.size() != prop_vec2.size()) {
+					String s = id + "\t" + prop_vec1.size() + "\t" + prop_vec2.size();
+					w.add(s);
+					diff_vec.add(id);
+				} else {
+					Vector v1_v2 = v1_v2(prop_vec1, prop_vec2);
+					if (v1_v2.size() != 0) {
+						v1 = sort.quickSort(v1);
+						v2 = sort.quickSort(v2);
+						for (int k=0; k<v1.size(); k++) {
+							String value1 = (String) v1.elementAt(k);
+							String value2 = (String) v2.elementAt(k);
+							if (value1.compareTo(value2) != 0) {
+								w.add(id + "|" + value1 + "|" + value2);
+							}
+						}
+					}
+				}
+			}
+		}
+		System.out.println("" + total + " out of " + total + " completed.");
+		Utils.saveToFile("diff_properties.txt", w);
+		loader1.clear();
+		loader2.clear();
+		w.clear();
+		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
+		return diff_vec;
+	}
+
 	public Vector compareProperties() {
 		Vector diff_codes = new Vector();
 		if (classIdVec1.size() != classIdVec2.size()) {
@@ -68,8 +165,11 @@ public class NCItDiffUtils {
 		int increment = 10000;
 		int total = classIdVec1.size();
 		for (int i=0; i<classIdVec1.size(); i++) {
+			int j = i;
 			if (lcv == increment) {
-				System.out.println("" + lcv + " out of " + total + " completed.");
+				if (j > 0) {
+					System.out.println("" + j + " out of " + total + " completed.");
+				}
 				lcv = 0;
 			}
 			lcv++;
@@ -90,7 +190,6 @@ public class NCItDiffUtils {
 		System.out.println("" + total + " out of " + total + " completed.");
 		Utils.saveToFile("diff_properties.txt", w);
 		return diff_vec;
-
 	}
 
 	public Vector compareRestrictions() {
@@ -157,7 +256,7 @@ public class NCItDiffUtils {
 			System.out.println("WARNING: Number of classes - " + classIdVec1.size() + " versus " + classIdVec2.size());
 		}
 		Vector w = new Vector();
-		w.add(owlfile1 + "\t" + owlfile2);
+		w.add(owlfile1 + "|" + owlfile2);
 		Vector w1 = v1_v2(classIdVec1, classIdVec2);
 		for (int i=0; i<w1.size(); i++) {
 			String code = (String) w1.elementAt(i);
@@ -265,12 +364,79 @@ public class NCItDiffUtils {
 		return w;
 	}
 
+	public static Vector sampling(String owlfile1, String owlfile2, int m) {
+		System.out.println(owlfile1);
+		System.out.println(owlfile2);
+		long ms = System.currentTimeMillis();
+		OWLClassLoader loader1 = new OWLClassLoader(owlfile1);
+		HashMap classDataHashMap1 = loader1.getClassDataHashMap();
+		Vector classIdVec1 = loader1.getClassIdVec();
+		System.out.println("classIdVec1: " + classIdVec1.size());
+
+		OWLClassLoader loader2 = new OWLClassLoader(owlfile2);
+		HashMap classDataHashMap2 = loader1.getClassDataHashMap();
+		Vector classIdVec2 = loader1.getClassIdVec();
+		System.out.println("classIdVec2: " + classIdVec2.size());
+
+		Vector diff_codes = new Vector();
+		if (classIdVec1.size() != classIdVec2.size()) {
+			System.out.println("WARNING: Number of classes - " + classIdVec1.size() + " versus " + classIdVec2.size());
+		}
+		List list = new RandomVariateGenerator().selectWithNoReplacement(m, classIdVec1.size());
+
+        Vector w = new Vector();
+        Vector diff_vec = new Vector();
+		int lcv = 0;
+		int increment = 10000;
+		int total = classIdVec1.size();
+		SortUtils sort = new SortUtils();
+		w = new Vector();
+		for (int i=0; i<classIdVec1.size(); i++) {
+			int j = i;
+			if (lcv == increment) {
+				if (j > 0) {
+					System.out.println("" + j + " out of " + total + " completed.");
+				}
+				lcv = 0;
+			}
+			lcv++;
+			Integer int_obj = Integer.valueOf(j);
+			String id = (String) classIdVec1.elementAt(i);
+			if (classIdVec2.contains(id)) {
+				Vector v1 = (Vector) classDataHashMap1.get(id);
+				Vector v2 = (Vector) classDataHashMap2.get(id);
+				OWLScanner scanner1 = new OWLScanner(v1);
+				Vector prop_vec1 = scanner1.extractProperties(v1);
+				OWLScanner scanner2 = new OWLScanner(v2);
+				Vector prop_vec2 = scanner2.extractProperties(v2);
+				if (list.contains(int_obj)) {
+					prop_vec1 = sort.quickSort(prop_vec1);
+					prop_vec2 = sort.quickSort(prop_vec2);
+					w.add("\n\n" + owlfile1 + " " + id);
+					w.addAll(v1);
+					w.addAll(prop_vec1);
+					w.add("\n\n" + owlfile2 + " " + id);
+					w.addAll(v2);
+					w.addAll(prop_vec2);
+				}
+			}
+		}
+		System.out.println("" + total + " out of " + total + " completed.");
+
+		loader1.clear();
+		loader2.clear();
+		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
+		return w;
+	}
+
 	public static void main(String[] args) {
+		long ms = System.currentTimeMillis();
 		String owlfile1 = args[0];
 		String owlfile2 = args[1];
 
-		NCItDiffUtils test = new NCItDiffUtils(owlfile1, owlfile2);
+		//NCItDiffUtils test = new NCItDiffUtils(owlfile1, owlfile2);
 		//test.compareProperties();
+		/*
 		//Vector w = test.compareRestrictions();
 		//Utils.saveToFile("diff_roles_codes.txt", w);
 		Vector w = test.compareClasses();
@@ -278,6 +444,16 @@ public class NCItDiffUtils {
 		Utils.saveToFile(codefile, w);
 		w = checkCodesStatus(owlfile1, codefile);
 		Utils.saveToFile("status_" + codefile, w);
+
+        //Vector w = compareHierarchies(owlfile1, owlfile2);
+        */
+        //Vector w = compareProperties(owlfile1, owlfile2);
+        //Utils.saveToFile("code_diff_properties.txt", w);
+
+        Vector w = sampling(owlfile1, owlfile2, 100);
+        Utils.saveToFile("sample_classes.txt", w);
+
+        System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
 
