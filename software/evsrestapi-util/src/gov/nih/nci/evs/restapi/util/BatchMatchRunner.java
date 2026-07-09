@@ -7,14 +7,31 @@ import java.util.*;
 
 public class BatchMatchRunner {
 	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
-
+    static String TERMFILE = "termfile.txt";
     String inputDir = null;
     String outputDir = null;
     String currentDir = null;
+    String termfile = null;
+
+    static {
+		createTermFile();
+	}
 
     public BatchMatchRunner(String inputDir, String outputDir) {
 		this.inputDir = inputDir;
 		this.outputDir = outputDir;
+	}
+
+	public static void createTermFile() {
+		Vector v = Utils.readFile(AXIOM_FILE);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (line.indexOf("P90") != -1) {
+				w.add(line);
+			}
+		}
+		Utils.saveToFile(TERMFILE, w);
 	}
 
     public void run() {
@@ -64,6 +81,8 @@ public class BatchMatchRunner {
 		}
 	}
 
+
+
 	public void generateExcelReport() {
 		String excelfile = outputDir + ".xlsx";
 		System.out.println("excelfile: " + excelfile);
@@ -77,10 +96,11 @@ public class BatchMatchRunner {
 		addHeading(datafile);
 		System.out.println("Running " + f.getName());
 		System.out.println("outputfile: " + outputfile);
-		new ExactMatch(AXIOM_FILE).run(datafile, outputfile, colNum);
+		new ExactMatch(TERMFILE).run(datafile, outputfile, colNum);
 	}
 
 	public static void main(String args[]) {
+		long ms = System.currentTimeMillis();
 		String inputDir = args[0];
 		String outputDir = args[1];
 		int colNum = 0;
@@ -89,5 +109,6 @@ public class BatchMatchRunner {
 			colNum = Integer.parseInt(col_str);
 		}
 		new BatchMatchRunner(inputDir, outputDir).run(colNum);
+		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
