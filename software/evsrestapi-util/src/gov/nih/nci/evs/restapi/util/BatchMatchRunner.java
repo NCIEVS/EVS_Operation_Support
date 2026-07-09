@@ -99,6 +99,35 @@ public class BatchMatchRunner {
 		new ExactMatch(TERMFILE).run(datafile, outputfile, colNum);
 	}
 
+	public void concatenateOutputs() {
+		Vector w = new Vector();
+		long ms = System.currentTimeMillis();
+		String output_dir = currentDir + File.separator + outputDir;
+		File f = new File(output_dir);
+		if (!f.exists()) {
+			System.out.println("Directory " + output_dir + " does not exists - program abort.");
+			System.exit(0);
+		}
+		Vector outputfiles = FileUtils.listFileNames(output_dir);
+		Vector v = Utils.readFile((String) outputfiles.elementAt(0));
+		String heading = (String) v.elementAt(0);
+		v.clear();
+		heading = "Input File Name\t" + heading;
+		w.add(heading);
+		for (int i=0; i<outputfiles.size(); i++) {
+			String outputfile = (String) outputfiles.elementAt(i);
+			f = new File(outputfile);
+			String filename = f.getName();
+			Vector w1 = Utils.readFile(outputfile);
+			for (int j=1; j<w1.size(); j++) {
+				String line = (String) w1.elementAt(j);
+				w.add(filename + "\t" + line);
+			}
+		}
+		Utils.saveToFile("results_" + outputDir + ".txt", w);
+	    System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
 	public static void main(String args[]) {
 		long ms = System.currentTimeMillis();
 		String inputDir = args[0];
@@ -108,7 +137,10 @@ public class BatchMatchRunner {
 			String col_str = args[2];
 			colNum = Integer.parseInt(col_str);
 		}
-		new BatchMatchRunner(inputDir, outputDir).run(colNum);
+
+		BatchMatchRunner test = new BatchMatchRunner(inputDir, outputDir);
+		test.run(colNum);
+		test.concatenateOutputs();
 		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
