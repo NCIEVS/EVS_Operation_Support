@@ -37,7 +37,7 @@ public class GDCSubmitter {
 		String excelfile = OUTPUT_DIR + ".xlsx";
 		System.out.println("excelfile: " + excelfile);
 		char delim = '\t';
-		System.out.println("Calling geneerateExcelReport...");
+		System.out.println("Calling generateExcelReport...");
 		Text2Excel.generateExcel(OUTPUT_DIR, excelfile, delim);
 	}
 

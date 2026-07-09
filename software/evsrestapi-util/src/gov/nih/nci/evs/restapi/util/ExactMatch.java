@@ -172,7 +172,7 @@ public class ExactMatch {
 
 	public String run(String datafile, String outputfile, int col) {
 		System.out.println("ExactMatch datafile: " + datafile);
-		System.out.println("ExactMatch outputfile: " + col);
+		System.out.println("ExactMatch col: " + col);
 
 		long ms = System.currentTimeMillis();
 
@@ -209,6 +209,7 @@ public class ExactMatch {
 		Utils.saveToFile("matches_" + outputfile, matches);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 		System.out.println(outputfile + " generated.");
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 		return outputfile;
 	}
 
