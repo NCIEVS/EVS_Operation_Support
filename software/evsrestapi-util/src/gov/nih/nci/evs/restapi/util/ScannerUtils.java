@@ -639,5 +639,16 @@ public class ScannerUtils {
 		}
         return w;
 	}
+
+	public static Vector extractClassData(Vector class_vec) {
+        Vector w = new Vector();
+		Vector relationships = extractRelationships(class_vec);
+		w.addAll(relationships);
+		Vector properties = extractProperties(class_vec);
+		w.addAll(properties);
+		Vector axioms = extractAxioms(class_vec);
+		w.addAll(axioms);
+		return w;
+	}
 }
 
