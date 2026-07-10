@@ -539,5 +539,105 @@ public class ScannerUtils {
 		return w;
 	}
 
+	public static Vector extractRelationships(Vector class_vec) {
+        boolean equiv_class_begin = false;
+        boolean restriction_start = false;
+        String classId = null;
+        OWLRestriction r = null;
+        String onProperty = null;
+        String someValueFrom = null;
+        Vector w = new Vector();
+        String path = "";
+
+        Stack stack = new Stack();
+        for (int i=0; i<class_vec.size(); i++) {
+			String line = (String) class_vec.elementAt(i);
+			String t = line;
+			if (t.indexOf(NAMESPACE_TARGET) != -1 && t.endsWith("-->")) {
+				int n = t.lastIndexOf("#");
+				t = t.substring(n, t.length());
+				n = t.lastIndexOf(" ");
+				classId = t.substring(1, n);
+				r = null;
+				path = path + ("C");
+			}
+
+			if (line.indexOf("<owl:equivalentClass>") != -1) {
+				equiv_class_begin = true;
+			}
+			if (line.indexOf("</owl:equivalentClass>") != -1) {
+				equiv_class_begin = false;
+			}
+
+			if (line.indexOf("<rdfs:subClassOf ") != -1) {
+				int n = line.lastIndexOf("#");
+				String id = line.substring(n+1, line.length()-3);
+				w.add(classId + "|subClassOf|" + id);
+			}
+
+			if (equiv_class_begin) {
+				if (line.indexOf("rdf:Description rdf:about") != -1) {
+					int n = line.lastIndexOf("#");
+					String id = line.substring(n+1, line.length()-3);
+					w.add(classId + "|subClassOf|" + id);
+				}
+			}
+
+			if (line.indexOf("<owl:equivalentClass>") != -1) {
+				path = path + ("E");
+			} else if (line.indexOf("<owl:Class>") != -1) {
+				path = path + ("C");
+			} else if (line.indexOf("<owl:intersectionOf ") != -1) {
+				path = path + ("I");
+			} else if (line.indexOf("<owl:unionOf ") != -1) {
+				path = path + ("U");
+			} else if (line.indexOf("<rdfs:subClassOf>") != -1) {
+				path = path + ("S");
+
+			} else if (line.indexOf("</owl:Class>") != -1) {
+				int n = path.lastIndexOf("C");
+				path = path.substring(0, n);
+			} else if (line.indexOf("</owl:intersectionOf>") != -1) {
+				int n = path.lastIndexOf("I");
+				path = path.substring(0, n);
+			} else if (line.indexOf("</owl:unionOf>") != -1) {
+				int n = path.lastIndexOf("U");
+				path = path.substring(0, n);
+			} else if (line.indexOf("</owl:equivalentClass>") != -1) {
+				int n = path.lastIndexOf("E");
+				path = path.substring(0, n);
+			} else if (line.indexOf("</rdfs:subClassOf>") != -1) {
+				int n = path.lastIndexOf("S");
+				path = path.substring(0, n);
+			} else {
+
+				t = t.trim();
+				if (t.indexOf("<owl:Restriction>") != -1) {
+					restriction_start = true;
+					r = new OWLRestriction();
+					r.setClassId(classId);
+				} else if (r != null) {
+					t = t.trim();
+					if (t.startsWith("<owl:onProperty")) {
+						int n = t.lastIndexOf("#");
+						t = t.substring(n, t.length());
+						n = t.lastIndexOf("\"");
+						onProperty = t.substring(1, n);
+						r.setOnProperty(onProperty);
+					}
+					if (t.startsWith("<owl:someValuesFrom")) {
+						int n = t.lastIndexOf("#");
+						t = t.substring(n, t.length());
+						n = t.lastIndexOf("\"");
+						someValueFrom = t.substring(1, n);
+						r.setSomeValuesFrom(someValueFrom);
+						w.add(r.toString() + " " + path);
+						r = null;
+					}
+				}
+			}
+		}
+        return w;
+	}
 }
 
