@@ -539,6 +539,7 @@ public class ScannerUtils {
 		return w;
 	}
 
+//rdf:Description
 	public static Vector extractRelationships(Vector class_vec) {
         boolean equiv_class_begin = false;
         boolean restriction_start = false;
@@ -575,13 +576,22 @@ public class ScannerUtils {
 				w.add(classId + "|subClassOf|" + id);
 			}
 
-			if (equiv_class_begin) {
 				if (line.indexOf("rdf:Description rdf:about") != -1) {
 					int n = line.lastIndexOf("#");
 					String id = line.substring(n+1, line.length()-3);
-					w.add(classId + "|subClassOf|" + id);
+					if (equiv_class_begin) {
+						w.add(classId + "|subClassOf|" + id);
+					} else {
+						w.add(classId + "|subClassOf (SCID)|" + id);
+					}
 				}
-			}
+
+/*
+	(80)         <rdfs:subClassOf>
+	(81)             <owl:Class>
+	(82)                 <owl:intersectionOf rdf:parseType="Collection">
+	(83)                     <rdf:Description rdf:about="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C3172"/>
+*/
 
 			if (line.indexOf("<owl:equivalentClass>") != -1) {
 				path = path + ("E");
