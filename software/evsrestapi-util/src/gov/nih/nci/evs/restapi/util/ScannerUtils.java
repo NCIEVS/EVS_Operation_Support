@@ -582,7 +582,7 @@ public class ScannerUtils {
 					if (equiv_class_begin) {
 						w.add(classId + "|subClassOf|" + id);
 					} else {
-						w.add(classId + "|subClassOf (SCID)|" + id);
+						w.add(classId + "|subClassOf" + "(" + path + ")|" + id);
 					}
 				}
 
