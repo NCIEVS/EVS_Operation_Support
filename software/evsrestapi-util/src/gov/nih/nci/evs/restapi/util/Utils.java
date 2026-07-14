@@ -108,6 +108,33 @@ public class Utils {
 		System.out.println("\n");
 	}
 
+    public static Vector outputMultiValuedHashMap(String label, HashMap hmap) {
+		Vector w = new Vector();
+   	    w.add("\n" + label + ":");
+		if (hmap == null) {
+			w.add("\tNone");
+			return w;
+		}
+		Vector key_vec = new Vector();
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String nv = (String) it.next();
+			key_vec.add(nv);
+		}
+		key_vec = new SortUtils().quickSort(key_vec);
+		for (int k=0; k<key_vec.size(); k++) {
+			String nv = (String) key_vec.elementAt(k);
+			w.add("\n");
+			Vector v = (Vector) hmap.get(nv);
+			for (int i=0; i<v.size(); i++) {
+				String q = (String) v.elementAt(i);
+				w.add(nv + " --> " + q);
+			}
+		}
+		return w;
+	}
+
+
     public static void dumpVector(String label, Vector v) {
 		System.out.println("\n" + label + ":");
 		if (v == null) return;
@@ -121,6 +148,22 @@ public class Utils {
 			System.out.println("\t(" + j + ") " + t);
 		}
 		System.out.println("\n");
+	}
+
+    public static Vector outputVector(String label, Vector v) {
+		Vector w = new Vector();
+		w.add("\n" + label + ":");
+		if (v == null) return w;
+		if (v.size() == 0) {
+			w.add("\tNone");
+			return w;
+		}
+        for (int i=0; i<v.size(); i++) {
+			String t = (String) v.elementAt(i);
+			int j = i+1;
+			w.add("\t(" + j + ") " + t);
+		}
+		return w;
 	}
 
     public static void dumpVector(String label, Vector v, boolean display_label, boolean display_index) {
