@@ -7,21 +7,28 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class OWLClassLoader {
-	private String owlClassData = null;
+	private String owlfile = null;
 	public Vector classIdVec = null;
 	static String TARGET = "<!-- http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
 	public HashMap classDataHashMap = null;
 	public static String CLASSID_FILE = "classIds.txt";
+	public Vector owl_vec = null;
 
-	public OWLClassLoader(String owlClassData) {
-		this.owlClassData = owlClassData;
+	public OWLClassLoader(String owlfile) {
+		this.owlfile = owlfile;
+		this.owl_vec = Utils.readFile(owlfile);
+		initialize();
+	}
+
+	public OWLClassLoader(Vector owl_vec) {
+		this.owl_vec = owl_vec;
 		initialize();
 	}
 
 	public void initialize() {
 		long ms = System.currentTimeMillis();
 		loadOWLClasses();
-		Utils.saveToFile(CLASSID_FILE, classIdVec);
+		//Utils.saveToFile(CLASSID_FILE, classIdVec);
         System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
@@ -38,6 +45,7 @@ public class OWLClassLoader {
 		classIdVec.clear();
 	}
 
+/*
 	public void loadOWLClasses() {
 		classDataHashMap = new HashMap();
 		classIdVec = new Vector();
@@ -45,7 +53,7 @@ public class OWLClassLoader {
 		BufferedReader reader;
 		String classId = null;
 		try {
-			reader = new BufferedReader(new FileReader(owlClassData));
+			reader = new BufferedReader(new FileReader(owlfile));
 			int k=0;
 			String line = reader.readLine();
 			while (line != null) {
@@ -69,6 +77,54 @@ public class OWLClassLoader {
 			e.printStackTrace();
 		}
 	}
+*/
+
+	public void loadOWLClasses() {
+		classDataHashMap = new HashMap();
+		classIdVec = new Vector();
+		Vector w = new Vector();
+		String classId = null;
+		for (int i=0; i<owl_vec.size(); i++) {
+			String line = (String) owl_vec.elementAt(i);
+			if (line.indexOf(TARGET) != -1) {
+				if (classId != null) {
+					classIdVec.add(classId);
+					classDataHashMap.put(classId, w);
+				}
+				classId = extractClassId(line);
+				w = new Vector();
+			}
+			w.add(line);
+		}
+		if (classId != null && w.size() > 0) {
+			classIdVec.add(classId);
+			classDataHashMap.put(classId, w);
+		}
+	}
+
+	public void loadOWLClasses2() {
+		classDataHashMap = new HashMap();
+		classIdVec = new Vector();
+		Vector w = new Vector();
+		String classId = null;
+		for (int i=0; i<owl_vec.size(); i++) {
+			String line = (String) owl_vec.elementAt(i);
+			//int k = 0;
+			if (line.indexOf(TARGET) != -1) {
+				if (classId != null) {
+					classIdVec.add(classId);
+					classDataHashMap.put(classId, w);
+				}
+				classId = extractClassId(line);
+				w = new Vector();
+			}
+			w.add(line);
+			if (classId != null && w.size() > 0) {
+				classIdVec.add(classId);
+				classDataHashMap.put(classId, w);
+			}
+		}
+	}
 
 	public Vector getClassIdVec() {
 		return classIdVec;
@@ -83,14 +139,19 @@ public class OWLClassLoader {
 	}
 
 	public static void main(String[] args) {
-		String owlClassData = args[0];
-		OWLClassLoader loader = new OWLClassLoader(owlClassData);
+		String owlfile = args[0];
+		OWLClassLoader loader = new OWLClassLoader(owlfile);
 		HashMap classDataHashMap = loader.getClassDataHashMap();
 		Vector classIdVec = loader.getClassIdVec();
-		System.out.println(classIdVec.size());
+		System.out.println("*****classIdVec.size()********" + classIdVec.size());
 		System.out.println(classDataHashMap.keySet().size());
-		String code = "C99999";
+
+		String code = "C1000";
 		Vector w = (Vector) classDataHashMap.get(code);
+		Utils.dumpVector(code, w);
+
+		code = "C99999";
+		w = (Vector) classDataHashMap.get(code);
 		Utils.dumpVector(code, w);
 	}
 
