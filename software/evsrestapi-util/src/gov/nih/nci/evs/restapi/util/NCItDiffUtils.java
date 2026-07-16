@@ -52,8 +52,8 @@ public class NCItDiffUtils {
 		Utils.saveToFile("codes_" + owlfile2.substring(0, n) + ".txt", classIdVec2);
 		Vector w = compareClasses();
 		Utils.saveToFile("diff_codes.txt", w);
-		loader1.clear();
-		loader2.clear();
+		//loader1.clear();
+		//loader2.clear();
 	}
 
 	public static Vector compareHierarchies(String owlfile1, String owlfile2) {
@@ -202,6 +202,10 @@ public class NCItDiffUtils {
 		int lcv = 0;
 		int increment = 10000;
 		int total = classIdVec1.size();
+		System.out.println("classIdVec1.size(): " + total);
+
+		SortUtils sort = new SortUtils();
+
 		for (int i=0; i<classIdVec1.size(); i++) {
 			int j = i;
 			if (lcv == increment) {
@@ -233,6 +237,22 @@ public class NCItDiffUtils {
 					role_vec2 = new SortUtils().quickSort(role_vec2);
 					w.addAll(role_vec2);
 					diff_codes.add(id);
+				} else {
+					boolean bool = true;
+					role_vec1 = sort.quickSort(role_vec1);
+					role_vec2 = sort.quickSort(role_vec2);
+					for (int k=0; k<role_vec1.size(); k++) {
+						String r1 = (String) role_vec1.elementAt(k);
+						String r2 = (String) role_vec2.elementAt(k);
+						if (r1.compareTo(r2) != 0) {
+							w.add(owlfile1);
+							w.addAll(role_vec1);
+							w.add(owlfile2);
+							w.addAll(role_vec2);
+							diff_codes.add(id);
+							break;
+						}
+					}
 				}
 			}
 		}
@@ -434,11 +454,14 @@ public class NCItDiffUtils {
 		String owlfile1 = args[0];
 		String owlfile2 = args[1];
 
-		//NCItDiffUtils test = new NCItDiffUtils(owlfile1, owlfile2);
+		NCItDiffUtils test = new NCItDiffUtils(owlfile1, owlfile2);
 		//test.compareProperties();
+
+		System.out.println("Calling compareRestrictions ...");
+
+		Vector w = test.compareRestrictions();
+		Utils.saveToFile("diff_roles_codes.txt", w);
 		/*
-		//Vector w = test.compareRestrictions();
-		//Utils.saveToFile("diff_roles_codes.txt", w);
 		Vector w = test.compareClasses();
 		String codefile = "diff_codes.txt";
 		Utils.saveToFile(codefile, w);
@@ -450,8 +473,8 @@ public class NCItDiffUtils {
         //Vector w = compareProperties(owlfile1, owlfile2);
         //Utils.saveToFile("code_diff_properties.txt", w);
 
-        Vector w = sampling(owlfile1, owlfile2, 100);
-        Utils.saveToFile("sample_classes.txt", w);
+        //Vector w = sampling(owlfile1, owlfile2, 100);
+        //Utils.saveToFile("sample_classes.txt", w);
 
         System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
 	}
