@@ -8,23 +8,6 @@ import java.io.IOException;
 
 public class OWLScrubber {
 
-	public static Vector load(String owlClassData) {
-		long ms = System.currentTimeMillis();
-		Vector w = new Vector();
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(owlClassData));
-			String line = reader.readLine();
-			while (line != null) {
-				w.add(line);
-    			line = reader.readLine();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-        System.out.println("\tTotal load run time (ms): " + (System.currentTimeMillis() - ms));
-        return w;
-	}
-
 	public static Vector run(Vector v, String target) {
 		int num_lines = 0;
 		int k = 0;
@@ -45,6 +28,18 @@ public class OWLScrubber {
         return w;
 	}
 
+	public static Vector run(Vector v, Vector propVec) {
+		for (int i=0; i<propVec.size(); i++) {
+			String propCode = (String) propVec.elementAt(i);
+			int k = i+1;
+			System.out.println("(" + k + ") " + propCode);
+			v = run(v, propCode);
+		}
+		System.out.println("Post scrub: " + v.size());
+		return v;
+	}
+
+/*
 	public static Vector run(String dataVec, String scrubbedProperties) {
 		Vector v = load(dataVec);
 		Vector propVec = Utils.readFile(scrubbedProperties);
@@ -66,5 +61,5 @@ public class OWLScrubber {
 		Utils.saveToFile("scrubbed_data.txt", v);
 		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
 	}
-
+*/
 }

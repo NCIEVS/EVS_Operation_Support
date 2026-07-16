@@ -42,10 +42,7 @@ public class InferredFileGenerator {
 		EXCLUDED_PROPERTIES.add("P320");  // (Not at FTP)
 	}
 
-
 	//Remove P325 P325|LITERAL along with Axiom
-
-
     static String[] TEMPORARY_FILES = new String[] {
 			ONTOLOGY_INFO_FILE,
 			METADATA,
@@ -89,56 +86,40 @@ public class InferredFileGenerator {
 		long ms = System.currentTimeMillis();
 		System.out.println("OWL File: " + assertedOWL);
 		InheritanceAnalyzer analyzer = new InheritanceAnalyzer(assertedOWL);
-
-System.out.println("InheritanceAnalyzer matchAncestorRelations ...");
+		System.out.println("InheritanceAnalyzer findConceptsWithInheritedAnonymousSuperClasses ...");
 
         conceptsWithInheritedAnonymousSuperClasses = analyzer.matchAncestorRelations(false);
 	    conceptsWithInheritedAnonymousSuperClassesMap = Utils.vector2HashMap(
 			conceptsWithInheritedAnonymousSuperClasses, 0, 1);
-		Utils.dumpHashMap("conceptsWithInheritedAnonymousSuperClassesMap", conceptsWithInheritedAnonymousSuperClassesMap);
+		Utils.dumpHashMap("conceptsWithInheritedAnonymousSuperClasses", conceptsWithInheritedAnonymousSuperClassesMap);
 		//analyzer.deleteTemporaryFiles();
 
 		Vector parent_child_vec = analyzer.get_parent_child_vec();
 		parent_child_vec = HTMLDecoder.run(parent_child_vec);
 		hh = new HierarchyHelper(parent_child_vec);
 
-        analyzer.clear();
-
-////////////////////////////////////////////////////////////////////////////
-
         this.owl_vec = Utils.readFile(assertedOWL);
-
-		System.out.println("Checking " + SCRUBBED_PROPERTIES_FILE);
-		File f = new File(SCRUBBED_PROPERTIES_FILE);
-		if (!f.exists()) {
-			Vector v = findScrubbedPropertyCodes(assertedOWL, NCIT_OWL);
-			Utils.saveToFile(SCRUBBED_PROPERTIES_FILE, v);
-		}
+        System.out.println("extractClassData...");
+		extractClassData(this.owl_vec, CLASSDATA);
 
 		System.out.println("Step 1: Run OWLScrubber " + SCRUBBED_PROPERTIES_FILE);
-		f = new File(SCRUBBED_CLASSDATA_FILE);
-		if (!f.exists()) {
-			Vector v = OWLScrubber.run(CLASSDATA, SCRUBBED_PROPERTIES_FILE);
-			Utils.saveToFile(SCRUBBED_CLASSDATA_FILE, v);
-		}
+        Vector propVec = Utils.readFile(SCRUBBED_PROPERTIES_FILE);
+        Utils.dumpVector("SCRUBBED_PROPERTIES_FILE", propVec);
+
+        Vector v = Utils.readFile(CLASSDATA);
+		v = OWLScrubber.run(v, propVec);
+
+		Utils.saveToFile(SCRUBBED_CLASSDATA_FILE, v);
+		System.out.println(SCRUBBED_CLASSDATA_FILE + " generated.");
 
 		System.out.println("Step 2: OWLClassLoader " + SCRUBBED_CLASSDATA_FILE);
 		loader = new OWLClassLoader(SCRUBBED_CLASSDATA_FILE);
 
-		//loader = new OWLClassLoader(assertedOWL);
 		classDataHashMap = loader.getClassDataHashMap();
 		classIdVec = loader.getClassIdVec();
 
 		Vector equiv_classes = Utils.readFile("equivalentClasses.txt");
-		//	extractEquivalenceClasses(this.owl_vec);
 		equiv_class_set = Utils.vector2HashSet(equiv_classes);
-
-/*
-		OWLScanner owlscanner = new OWLScanner(this.owl_vec);
-		Vector parent_child_vec = owlscanner.extractHierarchicalRelationships(owlscanner.get_owl_vec());
-		parent_child_vec = HTMLDecoder.run(parent_child_vec);
-		hh = new HierarchyHelper(parent_child_vec);
-*/
 
 		System.out.println("Instantiating reasoner...");
 		reasoner = analyzer.getSimpleReasoner();//new SimpleReasoner(this.owl_vec);
@@ -147,28 +128,14 @@ System.out.println("InheritanceAnalyzer matchAncestorRelations ...");
 		extractOntologyInfo(this.owl_vec );
 
 		System.out.println("extractMetadata...");
-		f = new File(METADATA);
-		if (!f.exists()) {
-			extractMetadata(NCIT_OWL, METADATA, EXCLUDED_PROPERTIES);
-		}
+		extractMetadata(NCIT_OWL, METADATA, EXCLUDED_PROPERTIES);
 		metadata_vec = Utils.readFile(METADATA);
 
-        System.out.println("extractClassData...");
-        /*
-		f = new File(CLASSDATA);
-		if (!f.exists()) {
-			extractClassData(this.assertedOWL, CLASSDATA);
-		}
-		*/
-		extractClassData(this.owl_vec, CLASSDATA);
-
         System.out.println("extractAnnotations...");
-		//this.owl_vec = reasoner.get_owl_vec();//Utils.readFile(assertedOWL);
 		System.out.println("extractAnnotations: this.owl_vec " + this.owl_vec.size());
 		extractAnnotations(this.owl_vec, ANNOTATIONS_FILE);
 
-///////////////////////////////////////////////////////////////
-		System.out.println("\tTotal initializaion run time (ms): " + (System.currentTimeMillis() - ms));
+		System.out.println("\tTotal InferredFileGenerator initializaion run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 	public boolean isDefined(String code) {
@@ -266,16 +233,6 @@ System.out.println("InheritanceAnalyzer matchAncestorRelations ...");
 	    Utils.saveToFile(outputfile, w);
 	}
 
-/*
-	public void extractClassData(String filename, String outputfile) {
-	    String target = "// Classes";
-	    int istart = TextFileExtractor.findLineNumber(filename, target) - 3;
-	    target = "// Annotations";
-	    int iend = TextFileExtractor.findLineNumber(filename, target) - 3;
-	    TextFileExtractor.extractLinesFromFile(filename, istart, iend, outputfile);
-	}
-*/
-
 	public void extractClassData(Vector v, String outputfile) {
 	    String target = "// Classes";
 	    int istart = TextFileExtractor.findLineNumber(v, target) - 3;
@@ -285,12 +242,13 @@ System.out.println("InheritanceAnalyzer matchAncestorRelations ...");
 	    Utils.saveToFile(outputfile, w);
 	}
 
-	public static void extractMetadata(String filename, String outputfile) {
+	public static void extractMetadata(Vector v, String outputfile) {
 	    String target = "// Annotation properties";
-	    int istart = TextFileExtractor.findLineNumber(filename, target) - 3;
+	    int istart = TextFileExtractor.findLineNumber(v, target) - 3;
 	    target = "// Classes";
-	    int iend = TextFileExtractor.findLineNumber(filename, target) - 3;
-	    TextFileExtractor.extractLinesFromFile(filename, istart, iend, outputfile);
+	    int iend = TextFileExtractor.reverseFindLineNumber(v, target) - 3;
+	    Vector w = TextFileExtractor.extractLines(v, istart, iend);
+	    Utils.saveToFile(outputfile, w);
 	}
 
 	public Vector extractEquivalenceClasses(Vector owl_vec) {
@@ -308,13 +266,11 @@ System.out.println("InheritanceAnalyzer matchAncestorRelations ...");
 		return retiredConcepts.contains(code);
 	}
 
-
-
-    public Vector composeInferredOWLClass(String code, String ancestor) {
+    public Vector composeInferredOWLClass(String code, String ancestor, Vector class_vec) {
 		Vector sup_class_vec = (Vector) classDataHashMap.get(ancestor);
 		Vector v = ScannerUtils.extractRelationships(sup_class_vec);
 		HashMap sup_hmap = createRelationshipHashMap(v);
-		return composeInferredOWLClass(code, sup_hmap);
+		return composeInferredOWLClass(code, sup_hmap, class_vec);
 	}
 
     public Vector generateInheritedSubClassOfStmts(HashMap hmap) {
@@ -350,8 +306,8 @@ w.add("        </rdfs:subClassOf>");
          return w;
 	}
 
-    public Vector composeInferredOWLClass(String code, HashMap hmap) {
-		Vector class_vec = (Vector) classDataHashMap.get(code);
+    public Vector composeInferredOWLClass(String code, HashMap hmap, Vector class_vec) {
+		//Vector class_vec = (Vector) classDataHashMap.get(code);
 		Vector w = new Vector();
 	    String target = "</owl:equivalentClass>";
 	    int iend = TextFileExtractor.reverseFindLineNumber(class_vec, target);
@@ -404,14 +360,16 @@ w.add("        </rdfs:subClassOf>");
 
 		if (conceptsWithInheritedAnonymousSuperClassesMap.containsKey(code)) {
 			String ancestor = (String) conceptsWithInheritedAnonymousSuperClassesMap.get(code);
-    		return composeInferredOWLClass(code, ancestor);
+    		classData = composeInferredOWLClass(code, ancestor, classData);
 		}
 
 		Vector w = new Vector();
 		Vector ancestor_roles = null;
         Vector w1 = OWLScanner.extractSimpleOWLRestrictions(classData);
+        //Utils.dumpVector("asserted_roles_" + code, w1);
         w1 = removeRestrictionSourceCode(w1);
 		Vector w2 = reasoner.get_ancestor_roles(code);
+		//Utils.dumpVector("(1) asserted_ancestor_roles_" + code, w2);
 		ancestor_roles = new Vector();
 		if (w1 == null) {
 			ancestor_roles = w2;
@@ -423,17 +381,17 @@ w.add("        </rdfs:subClassOf>");
 				}
 			}
 		}
-
 		if (ancestor_roles.size() > 0) {
 			Vector v3 = reasoner.generateOWLRestrictionStmts(ancestor_roles);
-            if (v3 != null && v3.size() > 0) {
+           if (v3 != null && v3.size() > 0) {
 				String target = "rdfs:subClassOf";
 				int iend = TextFileExtractor.findLastOccurrenceLineNumber(classData, target);
 				if (iend == -1) {
 					target = "<rdfs:label>";
 					iend = TextFileExtractor.findLineNumber(classData, target);
-				} else {
-					iend = iend -1;
+				}
+				else {
+					iend = iend - 2;
 				}
 				Vector v1 = TextFileExtractor.extractLines(classData, 0, iend+1);
 				Vector v2 = TextFileExtractor.extractLines(classData, iend+1, classData.size());
@@ -538,13 +496,15 @@ w.add("        </rdfs:subClassOf>");
 		return false;
 	}
 
-    //public static void extractMetadata(String filename, String outputfile) {
-
-	public static void extractMetadata(String filename, String outputfile, Vector excludedProperties) {
-		extractMetadata(filename, outputfile);
+	public void extractMetadata(String filename, String outputfile, Vector excludedProperties) {
+		extractMetadata(Utils.readFile(filename), outputfile);
+		/*
 		OWLClassLoader loader = new OWLClassLoader(outputfile);
 		HashMap classDataHashMap = loader.getClassDataHashMap();
 		Vector classIdVec = loader.getClassIdVec();
+		*/
+
+		/*
 		Vector w = new Vector();
 		w.addAll(getStartStmts("Annotation properties"));
 		for (int i=0; i<classIdVec.size(); i++) {
@@ -552,8 +512,12 @@ w.add("        </rdfs:subClassOf>");
 			if (!excludedProperties.contains(id)) {
 				w.addAll((Vector) classDataHashMap.get(id));
 			}
+			if (StringUtils.isNCItCode(id)) {
+				break;
+			}
 		}
 		Utils.saveToFile(outputfile, w);
+		*/
 	}
 
 	//oboInOwl:hasDbXref
@@ -577,8 +541,6 @@ w.add("        </rdfs:subClassOf>");
 			int n1 = line.indexOf(">");
 			int n2 = line.lastIndexOf("<");
 			value = line.substring(n1+1, n2);
-			//System.out.println(line);
-			//System.out.println(value);
 			char c = value.charAt(0);
 			if (Character.isDigit(c)) {
 				line0 = line0.replace(value, "UBERON:" + value);
@@ -629,7 +591,6 @@ w.add("        </rdfs:subClassOf>");
 				Vector w1 = AxiomParser.line2AxiomStatements(line);
 				w.addAll(w1);
 			}
-
 		}
 		return w;
 	}
@@ -678,6 +639,8 @@ w.add("        </rdfs:subClassOf>");
 		}
 		System.out.println("" + total + " out of " + total + " completed.");
 		//w.addAll(Utils.readFile(SCRUBBED_ANNOTATIONS_FILE));
+
+		w.add("\n\n");
 		w.addAll(Utils.readFile(ANNOTATIONS_FILE));
 		w.add("</rdf:RDF>");
 		w.add("\n");
@@ -697,18 +660,20 @@ w.add("        </rdfs:subClassOf>");
 		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
+	public void test(String code) {
+		Vector classData = (Vector) classDataHashMap.get(code);
+		Utils.dumpVector("Asserted_" + code, classData);
+
+		classData = appendInheritedRestrictions(code, classData);
+		Utils.dumpVector("Inferred_" + code, classData);
+	}
+
 	public static void main(String[] args) {
 		String owlfile = args[0];
 		InferredFileGenerator generator = new InferredFileGenerator(owlfile);
+		String code = "C9128";
 		generator.run(owlfile);
 	}
-/*
-    public static void main(String[] args) {
-		String owlfile = args[0];
-		Vector classData = Utils.readFile(owlfile);
-		Vector w1 = OWLScanner.extractSimpleOWLRestrictions(classData);
-		Utils.dumpVector(owlfile, w1);
-	}
-*/
+
 }
 
