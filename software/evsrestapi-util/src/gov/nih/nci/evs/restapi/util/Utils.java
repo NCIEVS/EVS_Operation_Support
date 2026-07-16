@@ -961,4 +961,13 @@ public class Utils {
 		return w;
 	}
 
+	public static HashMap vector2HashMap(Vector v, int keyCol, int valueCol) {
+		HashMap hmap = new HashMap();
+	    for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			hmap.put((String) u.elementAt(keyCol), (String) u.elementAt(valueCol));
+		}
+		return hmap;
+	}
 }

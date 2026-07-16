@@ -37,32 +37,79 @@ public class InheritanceAnalyzer {
 	HierarchyHelper hh = null;
 	SimpleReasoner reasoner = null;
 	HashMap roleMap = null;
-	HashMap id2SuperclassMap = null;
+
+	static HashMap MATCH_PATTERN = null;
+	Vector owl_vec = null;
+	OWLScanner owlscanner = null;
+
+	static {
+	    MATCH_PATTERN = new HashMap();
+		MATCH_PATTERN.put(SUBCLASSOF, Integer.valueOf(1));
+        MATCH_PATTERN.put("CECICI", Integer.valueOf(2));
+	}
 
 	public InheritanceAnalyzer(String owlfile) {
 		this.owlfile = owlfile;
 		initialize();
 	}
 
+
 	public void initialize() {
 		long ms = System.currentTimeMillis();
 
-		reasoner = new SimpleReasoner(owlfile);
-		roleMap = reasoner.getRoleMap();
+        System.out.println("Instantiating reasoner ");
+        this.owl_vec = Utils.readFile(owlfile);
 
+		reasoner = new SimpleReasoner(this.owl_vec);
+		roleMap = reasoner.getRoleMap();
+		System.out.println("reasoner instantiated. ");
+
+		owlscanner = reasoner.getOWLScanner();
+
+		parent_child_vec = owlscanner.extractHierarchicalRelationships(owlscanner.get_owl_vec());
+		parent_child_vec = HTMLDecoder.run(parent_child_vec);
+		System.out.println("parent_child_vec: " + parent_child_vec.size());
+
+		System.out.println("Instantiating HierarchyHelper ");
+		hh = new HierarchyHelper(parent_child_vec);
+		System.out.println("HierarchyHelper instantiated.");
+
+        System.out.println("extractEquivalenceClasses ");
+		Vector equiv_classes = owlscanner.extractEquivalenceClasses();
+		equiv_classes = DelimitedDataExtractor.extract(equiv_classes, "0", '|');
+		equiv_class_set = Utils.vector2HashSet(equiv_classes);
+		System.out.println("EquivalenceClasses done.");
+
+        System.out.println("Instantiating OWLClassLoader ");
 		loader = new OWLClassLoader(owlfile);
 		classDataHashMap = loader.getClassDataHashMap();
 		classIdVec = loader.getClassIdVec();
-		Vector equiv_classes = extractEquivalenceClasses(owlfile);
-		equiv_class_set = Utils.vector2HashSet(equiv_classes);
-        System.out.println("classIdVec.size(): " + classIdVec.size());
-        System.out.println("classDataHashMap.size(): " + classDataHashMap.keySet().size());
+		System.out.println("OWLClassLoader instantiated.");
 
-		OWLScanner owlscanner = new OWLScanner(owlfile);
-		parent_child_vec = owlscanner.extractHierarchicalRelationships(owlscanner.get_owl_vec());
-		parent_child_vec = HTMLDecoder.run(parent_child_vec);
-		hh = new HierarchyHelper(parent_child_vec);
+		reasoner.get_owl_vec().clear();
+
         System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
+	public SimpleReasoner getSimpleReasoner() {
+		return reasoner;
+	}
+
+	public Vector get_parent_child_vec() {
+		return parent_child_vec;
+	}
+
+	public void clear() {
+		parent_child_vec.clear();
+		classDataHashMap.clear();
+		classIdVec.clear();
+		equiv_class_set.clear();
+		roleMap.clear();
+	}
+
+    public void deleteTemporaryFiles() {
+		FileUtils.deleteFile("classIds.txt");
+		//FileUtils.deleteFile("equivalentClasses.txt");
 	}
 
 
@@ -114,21 +161,6 @@ public class InheritanceAnalyzer {
 
 	public Vector getClassVec(String code) {
 		return (Vector) classDataHashMap.get(code);
-	}
-
-    public static Vector getDistinctNodesOnPaths(Vector paths, int pos) {
-		HashSet hset = new HashSet();
-		for (int i=0; i<paths.size(); i++) {
-			String path = (String) paths.elementAt(i);
-			Vector u = StringUtils.parseData(path, '|');
-			if (u.size() >= pos) {
-				String code = (String) u.elementAt(pos);
-				if (!hset.contains(code)) {
-					hset.add(code);
-				}
-			}
-		}
-        return Utils.hashSet2Vector(hset);
 	}
 
     public static Vector getNodesOnPaths(Vector paths, int pos) {
@@ -195,17 +227,18 @@ public class InheritanceAnalyzer {
 		return equiv_class_set.contains(code);
 	}
 
-	public static Vector extractEquivalenceClasses(String owlfile) {
+/*
+	public Vector extractEquivalenceClasses(String owlfile) {
 		long ms = System.currentTimeMillis();
 		OWLScanner owlscanner = new OWLScanner(owlfile);
 		Vector w = owlscanner.extractEquivalenceClasses();
 		owlscanner.clear();
 		System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
-		Utils.saveToFile("equivalentClasses.txt", w);
+		//Utils.saveToFile("equivalentClasses.txt", w);
 		w = DelimitedDataExtractor.extract(w, "0", '|');
 		return w;
 	}
-
+*/
 
     public String extractClassId(String t) {
 		int n = t.lastIndexOf("#");
@@ -352,98 +385,16 @@ public class InheritanceAnalyzer {
 		return w;
 	}
 
-   	public Vector searchRelationships(HashMap code2RelationshipMap, String relationship) {
-		Vector u = StringUtils.parseData(relationship, '\t');
-		String rel = (String) u.elementAt(1);
-        Vector w = new Vector();
-        Iterator it = code2RelationshipMap.keySet().iterator();
-        while (it.hasNext()) {
-			String code = (String) it.next();
-			HashMap hmap = (HashMap) code2RelationshipMap.get(code);
-			Iterator it2 = hmap.keySet().iterator();
-			while (it2.hasNext()) {
-				String key = (String) it2.next();
-				Vector values = (Vector) hmap.get(key);
-                if (values.contains(rel)) {
-					w.add(code + "\t" + key);
-				}
-			}
-		}
- 		return w;
-	}
-
-	public Vector searchRelationships(HashMap code2RelationshipMap, Vector relationships) {
-        Vector w = new Vector();
-        for (int i=0; i<relationships.size(); i++) {
-			String relationship = (String) relationships.elementAt(i);
-			Vector w1 = searchRelationships(code2RelationshipMap, relationship);
-			if (w1 != null && w1.size() > 0) {
-				w.addAll(w1);
-			}
-		}
-		return w;
-	}
-
-
-	public HashMap searchForEquivClassExpressionsInSuperclasses(String code) {
-		HashMap map = new HashMap();
-        Vector superclasses = getSuperclassCodes(code);
-        for (int i=0; i<superclasses.size(); i++) {
-			String superclass = (String) superclasses.elementAt(i);
-			if (isDefined(superclass)) {
-				HashMap hmap = getRelationshipHashMap(superclass);
-				map.put(superclass, hmap);
-			}
-		}
-		return map;
-	}
-
-
-    public static boolean checkRelationshipConditions(HashMap hmap, int minNumParents) {
-		boolean bool = true;
-		Vector sups = (Vector) hmap.get(SUBCLASSOF);
-		if (sups == null) {
-			System.out.println("sups == null -- return false.");
-			return false;
-		}
-
-		// SUBCLASSOF only
-		if (hmap.keySet().size() == 1) {
-			return false;
-		}
-
-		if (sups.size() < minNumParents) {
-			System.out.println("sups.size() < minNumParents -- return false.");
-			return false;
-		}
-		Iterator it = hmap.keySet().iterator();
-		while (it.hasNext()) {
-			String key = (String) it.next();
-			if (!RELATIONSHIP_KEY_LIST.contains(key)) {
-				System.out.println("!RELATIONSHIP_KEY_LIST.contains " + key + " -- return false.");
-				bool = false;
-				break;
-			}
-		}
-		System.out.println("checkRelationshipConditions returns " + bool);
-		return bool;
-	}
-
-/*
-extractRelationships:
-	(1) C3177|subClassOf|C3172
-	(2) C3177|R107|C13271 CECICI
-	(3) C3177|R107|C28452 CECICI
-	(4) C3177|R89|C36712 CECICI
-	(5) C3177|R89|C36713 CECICI
-	(6) C3177|R89|C36714 CECICI
-*/
-
     public Vector matchAncestorRelations() {
-		return matchAncestorRelations(this.classIdVec);
+		boolean debug = true;
+		return matchAncestorRelations(this.classIdVec, debug);
 	}
 
-    public Vector matchAncestorRelations(Vector codes) {
+    public Vector matchAncestorRelations(boolean debug) {
+		return matchAncestorRelations(this.classIdVec, debug);
+	}
+
+    public Vector matchAncestorRelations(Vector codes, boolean debug) {
 		Vector w = new Vector();
 		int lcv = 1;
 		int total = codes.size();
@@ -454,7 +405,9 @@ extractRelationships:
 		for (int i=0; i<codes.size(); i++) {
 			int j = i+1;
 			if (lcv == increment) {
-				System.out.println("" + j + " out of " + total + " completed.");
+				if (debug) {
+					System.out.println("" + j + " out of " + total + " completed.");
+				}
 				lcv = 0;
 			}
 			lcv++;
@@ -475,38 +428,39 @@ extractRelationships:
 					boolean matched = matchRelationshipConditions(sup_hmap);
 					if (matched) {
 						w.add(code + "|" + ancestor);
+                        if (debug) {
+							sup_class_vec = (Vector) classDataHashMap.get(ancestor);
+							w.add("\nAsserted " + ancestor + ":" );
+							w.addAll(sup_class_vec);
 
-						sup_class_vec = (Vector) classDataHashMap.get(ancestor);
-                        w.add("\nAsserted " + ancestor + ":" );
-                        w.addAll(sup_class_vec);
+							w.add("\nAnonymous class to be inherited by it's subclasses: ");
+							//w.addAll(Utils.outputMultiValuedHashMap(ancestor, sup_hmap));
 
-						w.add("\nAnonymous class to be inherited by it's subclasses: ");
-						//w.addAll(Utils.outputMultiValuedHashMap(ancestor, sup_hmap));
+							w.addAll(generateInheritedSubClassOfStmts(sup_hmap));
 
-						w.addAll(generateInheritedSubClassOfStmts(sup_hmap));
+							w.add("\nAsserted " + code + ":" );
+							w.addAll(class_vec);
 
-                        w.add("\nAsserted " + code + ":" );
-                        w.addAll(class_vec);
-
-                        w.add("\nInferred " + code + ":" );
-						Vector inferredOWL = composeInferredOWLClass(code, sup_hmap);
-						w.addAll(inferredOWL);
-
+							w.add("\nInferred " + code + ":" );
+							Vector inferredOWL = composeInferredOWLClass(code, sup_hmap);
+							w.addAll(inferredOWL);
+						}
 						break;
 					}
 				}
 			}
 		}
-		System.out.println("" + total + " out of " + total + " completed.");
+		if (debug) {
+			System.out.println("" + total + " out of " + total + " completed.");
+	    }
 		return w;
 	}
 
 	public boolean matchRelationshipConditions(HashMap hmap) {
-		HashMap map = new HashMap();
-		map.put(SUBCLASSOF, Integer.valueOf(1));
-        map.put("CECICI", Integer.valueOf(2));
-		return matchRelationshipConditions(map, hmap);
+		return matchRelationshipConditions(MATCH_PATTERN, hmap);
 	}
+
+
 
 	public boolean matchRelationshipConditions(HashMap map, HashMap hmap) {
 		if (map.keySet().size() != hmap.keySet().size()) {
@@ -601,16 +555,10 @@ w.add("        </rdfs:subClassOf>");
 		long ms = System.currentTimeMillis();
 		String owlfile = args[0];
 		System.out.println("OWL File: " + owlfile);
-		InheritanceAnalyzer parser = new InheritanceAnalyzer(owlfile);
+		InheritanceAnalyzer analyzer = new InheritanceAnalyzer(owlfile);
 
-		String code = args[1];
-        System.out.println("code: " + code);
-
-		//Vector w = parser.searchForInheritedAnonymousSuperclasses();
-		//Utils.saveToFile("searchForInheritedAnonymousSuperclasses.txt", w);
-		//Vector w = parser.checkSuperclassRelationships(code);
-		//Utils.saveToFile(code + "_" + "checkAncestorRelationships.txt", w);
-
+        Vector w = analyzer.matchAncestorRelations();
+        Utils.saveToFile("analyzer_results.txt", w);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }

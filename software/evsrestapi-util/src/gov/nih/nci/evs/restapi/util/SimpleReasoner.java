@@ -7,20 +7,31 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class SimpleReasoner {
+	OWLScanner owlscanner = null;
 	HierarchyHelper hh = null;
 	HashMap roleMap = null;
 	String assertedOWL = null;
 	Vector parent_child_vec = null;
 	Vector role_vec = null;
+	Vector owl_vec = null;
 
+/*
 	public SimpleReasoner(String assertedOWL) {
 		this.assertedOWL = assertedOWL;
+		this.owl_vec = Utils.readFile(assertedOWL);
+		initialize();
+	}
+*/
+
+	public SimpleReasoner(Vector owl_vec) {
+		//this.assertedOWL = null;
+		this.owl_vec = owl_vec;
 		initialize();
 	}
 
     public void initialize() {
 		long ms = System.currentTimeMillis();
-		OWLScanner owlscanner = new OWLScanner(assertedOWL);
+		owlscanner = new OWLScanner(owl_vec);
 		parent_child_vec = owlscanner.extractHierarchicalRelationships(owlscanner.get_owl_vec());
 		hh = new HierarchyHelper(parent_child_vec);
 		role_vec = owlscanner.extractOWLRestrictions(owlscanner.get_owl_vec());
@@ -28,8 +39,16 @@ public class SimpleReasoner {
 		System.out.println("\tTotal initialization run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
+	public OWLScanner getOWLScanner() {
+		return owlscanner;
+	}
+
 	public HashMap getRoleMap() {
 		return roleMap;
+	}
+
+	public Vector get_owl_vec() {
+		return owl_vec;
 	}
 
 	public Vector get_parent_child_vec() {
@@ -204,7 +223,8 @@ public class SimpleReasoner {
 
 	public static void main(String[] args) {
 		String assertedOWL = args[0];
-		SimpleReasoner reasoner = new SimpleReasoner(assertedOWL);
+		Vector v = Utils.readFile(assertedOWL);
+		SimpleReasoner reasoner = new SimpleReasoner(v);
 		long ms = System.currentTimeMillis();
 		String code = args[1];
 

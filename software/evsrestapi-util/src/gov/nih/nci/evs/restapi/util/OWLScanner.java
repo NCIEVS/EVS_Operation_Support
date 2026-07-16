@@ -104,7 +104,7 @@ public class OWLScanner {
 
     public OWLScanner(String owlfile) {
         this.owlfile = owlfile;
-        this.owl_vec = readFile(owlfile);
+        this.owl_vec = Utils.readFile(owlfile);
         Vector label_data = extractRDFSLabels(owl_vec);
         code2LabelMap = new HashMap();
         for (int i=0; i<label_data.size(); i++) {
@@ -180,6 +180,7 @@ public class OWLScanner {
 		return hmap;
 	}
 
+/*
 	public static Vector readFile(String filename)
 	{
 		Vector v = new Vector();
@@ -197,6 +198,7 @@ public class OWLScanner {
 		}
 		return v;
 	}
+*/
 
     public static void dumpVector(String label, Vector v) {
 		System.out.println("\n" + label + ":");

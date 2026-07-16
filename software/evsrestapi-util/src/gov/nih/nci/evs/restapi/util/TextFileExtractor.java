@@ -74,7 +74,13 @@ public class TextFileExtractor {
 	}
 
 	public static void extractLinesFromFile(String filename, int istart, int iend, String outputfile) {
-		Vector w = extractLinesFromFile(filename, istart, iend);
+		Vector w = Utils.readFile(filename);
+		extractLines(w, istart, iend, outputfile);
+		Utils.saveToFile(outputfile, w);
+	}
+
+	public static void extractLines(Vector w, int istart, int iend, String outputfile) {
+		w = extractLines(w, istart, iend);
 		Utils.saveToFile(outputfile, w);
 	}
 
