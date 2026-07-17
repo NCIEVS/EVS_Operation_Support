@@ -225,6 +225,8 @@ public class NCItDownload {
 			String zipFilePath = currentWorkingDirectory + "/" + NCIT_ZIP_FILE;
 			unzip(zipFilePath, currentWorkingDirectory);
 
+			FileUtils.deleteFile(NCIT_ZIP_FILE);
+
 			Vector files = listFilesInDirectory();
 			Utils.dumpVector("listFilesInDirectory", files);
 
