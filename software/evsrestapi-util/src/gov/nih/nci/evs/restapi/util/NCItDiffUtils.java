@@ -56,7 +56,7 @@ public class NCItDiffUtils {
 		//loader2.clear();
 	}
 
-	public static Vector compareHierarchies(String owlfile1, String owlfile2) {
+	public Vector compareHierarchies() {
 		Vector v1 = Utils.readFile(owlfile1);
 		OWLScanner scanner1 = new OWLScanner(v1);
 		Vector parent_child_vec1 = scanner1.extractHierarchicalRelationships(v1);
@@ -84,9 +84,7 @@ public class NCItDiffUtils {
         return w;
 	}
 
-	public static Vector compareProperties(String owlfile1, String owlfile2) {
-		System.out.println(owlfile1);
-		System.out.println(owlfile2);
+	public Vector compareProperties() {
 		long ms = System.currentTimeMillis();
 		OWLClassLoader loader1 = new OWLClassLoader(owlfile1);
 		HashMap classDataHashMap1 = loader1.getClassDataHashMap();
@@ -151,44 +149,6 @@ public class NCItDiffUtils {
 		loader2.clear();
 		w.clear();
 		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
-		return diff_vec;
-	}
-
-	public Vector compareProperties() {
-		Vector diff_codes = new Vector();
-		if (classIdVec1.size() != classIdVec2.size()) {
-			System.out.println("WARNING: Number of classes - " + classIdVec1.size() + " versus " + classIdVec2.size());
-		}
-        Vector w = new Vector();
-        Vector diff_vec = new Vector();
-		int lcv = 0;
-		int increment = 10000;
-		int total = classIdVec1.size();
-		for (int i=0; i<classIdVec1.size(); i++) {
-			int j = i;
-			if (lcv == increment) {
-				if (j > 0) {
-					System.out.println("" + j + " out of " + total + " completed.");
-				}
-				lcv = 0;
-			}
-			lcv++;
-			String id = (String) classIdVec1.elementAt(i);
-			if (classIdVec2.contains(id)) {
-				Vector v1 = (Vector) classDataHashMap1.get(id);
-				Vector v2 = (Vector) classDataHashMap2.get(id);
-				OWLScanner scanner1 = new OWLScanner(v1);
-				Vector prop_vec1 = scanner1.extractProperties(v1);
-				OWLScanner scanner2 = new OWLScanner(v2);
-				Vector prop_vec2 = scanner2.extractProperties(v2);
- 				if (prop_vec1.size() != prop_vec2.size()) {
-					w.add(id + "\t" + prop_vec1.size() + "\t" + prop_vec2.size());
-					diff_vec.add(id);
-				}
-			}
-		}
-		System.out.println("" + total + " out of " + total + " completed.");
-		Utils.saveToFile("diff_properties.txt", w);
 		return diff_vec;
 	}
 
@@ -449,33 +409,62 @@ public class NCItDiffUtils {
 		return w;
 	}
 
-	public static void main(String[] args) {
+	static int TYPE_CLASS = 1;
+	static int TYPE_PROPERTY = 2;
+	static int TYPE_RESTRICTION = 3;
+	static int TYPE_HIERARCHY = 4;
+
+
+	public static void run(String[] args) {
 		long ms = System.currentTimeMillis();
 		String owlfile1 = args[0];
 		String owlfile2 = args[1];
-
+		String type_str = args[2];
+		System.out.println(owlfile1);
+		System.out.println(owlfile2);
+		int type = Integer.parseInt(type_str);
 		NCItDiffUtils test = new NCItDiffUtils(owlfile1, owlfile2);
-		//test.compareProperties();
-
-		System.out.println("Calling compareRestrictions ...");
-
-		Vector w = test.compareRestrictions();
-		Utils.saveToFile("diff_roles_codes.txt", w);
-		/*
-		Vector w = test.compareClasses();
-		String codefile = "diff_codes.txt";
-		Utils.saveToFile(codefile, w);
-		w = checkCodesStatus(owlfile1, codefile);
-		Utils.saveToFile("status_" + codefile, w);
-
-        //Vector w = compareHierarchies(owlfile1, owlfile2);
-        */
-        //Vector w = compareProperties(owlfile1, owlfile2);
-        //Utils.saveToFile("code_diff_properties.txt", w);
+		Vector w = null;
+        switch (type) {
+            case 1://TYPE_CLASS:
+				w = test.compareClasses();
+				System.out.println("Calling compareClasses ...");
+				String codefile = "diff_codes.txt";
+				Utils.saveToFile(codefile, w);
+				w = checkCodesStatus(owlfile1, codefile);
+				Utils.saveToFile("status_" + codefile, w);
+                break;
+            case 2://TYPE_PROPERTY:
+				System.out.println("Calling compareRestrictions ...");
+				w = test.compareRestrictions();
+				Utils.saveToFile("diff_roles_codes.txt", w);
+                break;
+            case 3://TYPE_RESTRICTION:
+				System.out.println("Calling compareRestrictions ...");
+				w = test.compareRestrictions();
+				Utils.saveToFile("diff_roles_codes.txt", w);
+                break;
+            case 4://TYPE_HIERARCHY:
+				System.out.println("Calling compareHierarchies ...");
+				w = test.compareHierarchies();
+				Utils.saveToFile("diff_hierarchies_codes.txt", w);
+                break;
+            default:
+                System.out.println("Invalid type. Please enter a value between 1 and 4.");
+                System.out.println("\tCompare Classes: 1");
+                System.out.println("\tCompare Properties: 2");
+                System.out.println("\tCompare Restrictions: 3");
+                System.out.println("\tCompare Hierarchies: 4");
+        }
 
         //Vector w = sampling(owlfile1, owlfile2, 100);
         //Utils.saveToFile("sample_classes.txt", w);
+        System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
+	}
 
+	public static void main(String[] args) {
+		long ms = System.currentTimeMillis();
+		run(args);
         System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
