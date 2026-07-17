@@ -1,11 +1,10 @@
 package gov.nih.nci.evs.restapi.util;
 import gov.nih.nci.evs.restapi.bean.*;
-import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.util.*;
 
 public class InferredFileGenerator {
-	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
+	static String NCIT_OWL = "ThesaurusInferred_forTS.owl";
 
     public static String METADATA = "metadata.owl";
     public static String CLASSDATA = "classdata.owl";
@@ -40,6 +39,12 @@ public class InferredFileGenerator {
 		EXCLUDED_PROPERTIES.add("P365");
 		EXCLUDED_PROPERTIES.add("P205");
 		EXCLUDED_PROPERTIES.add("P320");  // (Not at FTP)
+
+		File f = new File(NCIT_OWL);
+		if (!f.exists()) {
+			NCItDownload.download();
+		}
+
 	}
 
 	//Remove P325 P325|LITERAL along with Axiom
@@ -103,6 +108,11 @@ public class InferredFileGenerator {
 		extractClassData(this.owl_vec, CLASSDATA);
 
 		System.out.println("Step 1: Run OWLScrubber " + SCRUBBED_PROPERTIES_FILE);
+		File f = new File(SCRUBBED_PROPERTIES_FILE);
+		if (!f.exists()) {
+			Vector w = NCItMetadataUtils.generateScrubbedProperties(assertedOWL);
+			Utils.saveToFile(SCRUBBED_PROPERTIES_FILE, w);
+		}
         Vector propVec = Utils.readFile(SCRUBBED_PROPERTIES_FILE);
         Utils.dumpVector("SCRUBBED_PROPERTIES_FILE", propVec);
 
@@ -290,8 +300,8 @@ w.add("                        <owl:intersectionOf rdf:parseType=\"Collection\">
 			for (int j=0; j<roles.size(); j++) {
 				String line = (String) roles.elementAt(j);
 				Vector u = StringUtils.parseData(line, '|');
-				String roleCode = (String) u.elementAt(0);
-				String targetCode = (String) u.elementAt(1);
+				String roleCode = (String) u.elementAt(1);
+				String targetCode = (String) u.elementAt(2);
 	w.add("                            <owl:Restriction>");
 	w.add("                                <owl:onProperty rdf:resource=\"http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#" + roleCode + "\"/>");
 	w.add("                                <owl:someValuesFrom rdf:resource=\"http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#" + targetCode + "\"/>");
