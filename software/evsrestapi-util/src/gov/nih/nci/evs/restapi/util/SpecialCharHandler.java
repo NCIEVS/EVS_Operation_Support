@@ -106,14 +106,6 @@ public class SpecialCharHandler {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-
-		Vector w = new Vector();
-		w.add(text);
-		w.add(replace);
-		w.add(by);
-		w.add(s);
-		Utils.saveToFile("test.txt", w);
-
 		return s;
 	}
 }

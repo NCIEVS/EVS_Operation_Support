@@ -504,7 +504,6 @@ public class Utils {
 		}
 		return null;
     }
-*/
 
 	public static Vector readFile(String filename) {
 		Vector v = new Vector();
@@ -524,7 +523,24 @@ public class Utils {
 		}
 		return v;
 	}
+*/
 
+    public static Vector readFile(String filePath) {
+        Vector w = new Vector();
+        String line;
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8))) {
+
+            while ((line = reader.readLine()) != null) {
+                w.add(line);
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return w;
+    }
 
     private static Vector handleFile(File file, Charset encoding) throws IOException {
         try (InputStream in = new FileInputStream(file);
