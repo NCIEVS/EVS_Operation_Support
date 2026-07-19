@@ -542,24 +542,26 @@ public class Utils {
     }
 */
 
-    public static Vector readFile(String src_file) {
+    public static Vector readFile(String filename) {
 		Vector w = new Vector();
-    	InputStream inStream = null;
-    	try{
-    	    File afile =new File(src_file);
-    	    inStream = new FileInputStream(afile);
-    	    byte[] buffer = new byte[1024];
-    	    int length;
-    	    while ((length = inStream.read(buffer)) > 0) {
-				String s = new String(buffer, StandardCharsets.UTF_8);
-          	    w.add(s);
-    	    }
-    	    inStream.close();
-    	} catch(IOException e){
-    		e.printStackTrace();
-    	}
-    	return w;
-    }
+        java.nio.file.Path filePath = java.nio.file.Paths.get(filename);
+        if (!Files.exists(filePath)) {
+            System.err.println("Error: File not found - " + filePath.toAbsolutePath());
+            return null;
+        }
+
+        try (BufferedReader reader = Files.newBufferedReader(filePath, StandardCharsets.UTF_8)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                w.add(line);
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+            return null;
+        }
+        return w;
+	}
+
 
     private static Vector handleFile(File file, Charset encoding) throws IOException {
         try (InputStream in = new FileInputStream(file);
