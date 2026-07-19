@@ -523,7 +523,6 @@ public class Utils {
 		}
 		return v;
 	}
-*/
 
     public static Vector readFile(String filePath) {
         Vector w = new Vector();
@@ -540,6 +539,26 @@ public class Utils {
             e.printStackTrace();
         }
         return w;
+    }
+*/
+
+    public static Vector readFile(String src_file) {
+		Vector w = new Vector();
+    	InputStream inStream = null;
+    	try{
+    	    File afile =new File(src_file);
+    	    inStream = new FileInputStream(afile);
+    	    byte[] buffer = new byte[1024];
+    	    int length;
+    	    while ((length = inStream.read(buffer)) > 0) {
+				String s = new String(buffer, StandardCharsets.UTF_8);
+          	    w.add(s);
+    	    }
+    	    inStream.close();
+    	} catch(IOException e){
+    		e.printStackTrace();
+    	}
+    	return w;
     }
 
     private static Vector handleFile(File file, Charset encoding) throws IOException {
