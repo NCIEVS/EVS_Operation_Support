@@ -1032,4 +1032,27 @@ public class Utils {
 		}
 		return hmap;
 	}
+
+    public static void saveToFile(String filePath, Vector w, String standard) {
+        // Ensure the charset is supported
+        if (!Charset.isSupported(standard)) {
+            System.err.println(standard + " encoding is not supported on this platform.");
+            return;
+        }
+        // Write to file using try-with-resources for automatic closing
+        try (BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(
+                        new FileOutputStream(filePath), Charset.forName(standard)))) {
+            for (int i=0; i<w.size(); i++) {
+				String line = (String) w.elementAt(i);
+				writer.write(line);
+			}
+			System.out.println("File written successfully in ISO-8859-7 encoding.");
+
+        } catch (IOException e) {
+            System.err.println("Error writing file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 }
