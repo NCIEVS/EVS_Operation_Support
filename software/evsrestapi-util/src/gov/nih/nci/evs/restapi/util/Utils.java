@@ -493,100 +493,9 @@ public class Utils {
         }
     }
 
-/*
     public static Vector readFile(String filename) {
-        Charset encoding = Charset.defaultCharset();
-		File file = new File(filename);
-		try {
-			return handleFile(file, encoding);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return null;
-    }
-
-	public static Vector readFile(String filename) {
-		Vector v = new Vector();
-		BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(filename));
-			String line = reader.readLine();
-			while (line != null) {
-				if (line != null) {
-					v.add(line);
-				}
-				line = reader.readLine();
-			}
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return v;
+		return SpecialCharReadWrite.readFile(filename);
 	}
-
-    public static Vector readFile(String filePath) {
-        Vector w = new Vector();
-        String line;
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8))) {
-
-            while ((line = reader.readLine()) != null) {
-                w.add(line);
-            }
-
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return w;
-    }
-*/
-	public static Vector read_file(String filename) {
-		Vector v = new Vector();
-		BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(filename));
-			String line = reader.readLine();
-			while (line != null) {
-				if (line != null) {
-					v.add(line);
-				}
-				line = reader.readLine();
-			}
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return v;
-	}
-
-    public static Vector readFile(String filename) {
-		return readFile(filename, true);
-	}
-
-    public static Vector readFile(String filename, boolean utf8) {
-		if (!utf8) {
-			return read_file(filename);
-		}
-		Vector w = new Vector();
-        java.nio.file.Path filePath = java.nio.file.Paths.get(filename);
-        if (!Files.exists(filePath)) {
-            System.err.println("Error: File not found - " + filePath.toAbsolutePath());
-            return null;
-        }
-
-        try (BufferedReader reader = Files.newBufferedReader(filePath, StandardCharsets.UTF_8)) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                w.add(line);
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
-            return null;
-        }
-        return w;
-	}
-
 
     private static Vector handleFile(File file, Charset encoding) throws IOException {
         try (InputStream in = new FileInputStream(file);
@@ -627,21 +536,8 @@ public class Utils {
     }
 
     public static void saveToFile(String target_file, Vector w) {
-	    OutputStream outStream = null;
-    	try{
-    	    File bfile =new File(target_file);
-    	    outStream = new FileOutputStream(bfile);
-    	    for (int i=0; i<w.size(); i++) {
-				String line = (String) w.elementAt(i) + "\n";
-				byte[] buffer = line.getBytes();
-    	    	outStream.write(buffer, 0, buffer.length);
-    	    }
-    	    outStream.close();
-    	    System.out.println("File " + target_file + " generated.");
-    	}catch(IOException e){
-    		e.printStackTrace();
-    	}
-    }
+		SpecialCharReadWrite.saveToFile(target_file, w);
+	}
 
     public static void copyFile(String filename) {
 		Vector v = readFile(filename);

@@ -140,7 +140,7 @@ public class NCItAsciiApiUtils {
 		}
 		Vector w = new Vector();
 		w.add("Line Number\tNCIt Code\tValue");
-		Vector v = Utils.readFile(filename, false);
+		Vector v = Utils.readFile(filename);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			if (line.startsWith("?")) {
