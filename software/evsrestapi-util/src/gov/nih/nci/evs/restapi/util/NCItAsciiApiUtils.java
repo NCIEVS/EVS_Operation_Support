@@ -105,13 +105,7 @@ public class NCItAsciiApiUtils {
 			if (t.indexOf(NAMESPACE_TARGET) != -1 && t.endsWith("-->")) {
 				classId = extractClassId(t);
 			}
-
 			String t3 = t.trim();
-			if (t3.startsWith("<rdfs:label>") && t3.endsWith("</rdfs:label>")) {
-				int n = t3.lastIndexOf("</rdfs:label>");
-				label = t3.substring("<rdfs:label>".length(), n);
-		    }
-
             boolean bool = false;
 			try {
 				byte[] utf8Bytes = line.getBytes("UTF-8");
@@ -119,7 +113,7 @@ public class NCItAsciiApiUtils {
 					Byte b = utf8Bytes[j];
 					if (!(b >=0 && b<=127)) {
 						int k = i+1;
-						w.add("" + k + "|" + classId + "|" + t3);
+						w.add("" + k + "\t" + classId + "\t" + t3);
 						break;
 					}
 				}
@@ -130,10 +124,49 @@ public class NCItAsciiApiUtils {
 		return w;
 	}
 
-    public static void main(String[] args) {
-		String owlfile = args[0];
+	public static Vector getLinesWithNonidentifiableChars(String filename) {
+		return ASCIITable.getLinesWithNonidentifiableChars(filename);
+	}
+
+	public static Vector getLinesWithNonidentifiableChars(Vector v) {
+		return ASCIITable.getLinesWithNonidentifiableChars(v);
+	}
+
+    public static Vector findLinesWithNonidentifiableChars(String filename) {
+		File f = new File(filename);
+		if (!f.exists()) {
+			System.out.println("File " + filename + " not found.");
+			return null;
+		}
+		Vector w = new Vector();
+		w.add("Line Number\tNCIt Code\tValue");
+		Vector v = Utils.readFile(filename, false);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (line.startsWith("?")) {
+				String t = (String) v.elementAt(i-1);
+				w.add(t);
+			}
+		}
+		return w;
+	}
+
+    public static void generateReports(String owlfile) {
 		Vector w = scan(Utils.readFile(owlfile));
 		int n = owlfile.lastIndexOf(".");
-		Utils.saveToFile("nonascii_" + owlfile.substring(0, n) + ".txt", w);
+		String outputfile = "nonascii_" + owlfile.substring(0, n) + "_v1.txt";
+		Utils.saveToFile(outputfile, w);
+		w = getLinesWithNonidentifiableChars(w);
+		outputfile = "nonascii_" + owlfile.substring(0, n) + "_v2.txt";
+		Utils.saveToFile(outputfile, w);
+		w = findLinesWithNonidentifiableChars(outputfile);
+		outputfile = "nonascii_" + owlfile.substring(0, n) + "_v3.txt";
+		Utils.saveToFile(outputfile, w);
+		Text2Excel.generateExcel(outputfile, '\t');
 	}
+
+    public static void main(String[] args) {
+		String owlfile = args[0];
+		generateReports(owlfile);
+    }
 }

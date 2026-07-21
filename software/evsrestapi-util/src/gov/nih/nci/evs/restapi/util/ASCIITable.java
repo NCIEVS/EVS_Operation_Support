@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.nio.file.*;
 import java.nio.file.Files;
+import java.nio.charset.Charset;
 
 public class ASCIITable {
 
@@ -62,36 +63,27 @@ public class ASCIITable {
 		return w;
     }
 
-    public static void encoding(String str) {
-         try {
-            // Encode the string to UTF-8 bytes
-            byte[] utf8Bytes = str.getBytes("UTF-8");
-            System.out.println("UTF-8 bytes length: " + utf8Bytes.length);
-
-            // Encode the string to ISO-8859-1 bytes
-            byte[] isoBytes = str.getBytes("ISO-8859-1");
-            System.out.println("ISO-8859-1 bytes length: " + isoBytes.length);
+    public static String encode(String str, String standard) {
+        try {
+            byte[] bytes = str.getBytes(standard);
+            return bytes.toString();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     //"UTF-8"
     //"ISO-8859-1"
 
-    public static String encoding(String str, String standard) {
-         try {
-            // Encode the string to UTF-8 bytes
-            byte[] bytes = str.getBytes(standard);
-            System.out.println("bytes length: " + bytes.length);
-            return bytes.toString();
-
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    public static String decodeISO88597(String text) {
+        // Example byte array representing "Ελλάδα" in ISO 8859-7
+        byte[] bytes = text2BytesInUTF8(text);
+        Charset iso88597 = Charset.forName("ISO-8859-1");
+        String s = new String(bytes, iso88597);
+        return s;
     }
+
 
 	public static Vector extractNonASCIIChars(String text) {
 		Vector w = new Vector();
@@ -121,48 +113,6 @@ public class ASCIITable {
 		return w;
 	}
 
-	public static Vector readfile(String filename) {
-		Vector v = new Vector();
-		BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(filename));
-			String line = reader.readLine();
-			while (line != null) {
-				if (line != null) {
-					v.add(line);
-				}
-				line = reader.readLine();
-			}
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return v;
-	}
-
-    public static Vector readFile(String filename) {
-		Vector w = new Vector();
-        java.nio.file.Path filePath = java.nio.file.Paths.get(filename);
-        if (!Files.exists(filePath)) {
-            System.err.println("Error: File not found - " + filePath.toAbsolutePath());
-            return null;
-        }
-
-        try (BufferedReader reader = Files.newBufferedReader(filePath, StandardCharsets.UTF_8)) {
-			//ISO-8859-1
-            String line;
-            while ((line = reader.readLine()) != null) {
-                w.add(line);
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
-            e.printStackTrace();
-
-            return null;
-        }
-        return w;
-	}
-
     public static void dumpASCIITable() {
         System.out.println("ASCII Table (0 - 127):");
         System.out.println("-----------------------");
@@ -175,13 +125,44 @@ public class ASCIITable {
         }
     }
 
-    public static void main(String[] args) {
-		String filename = args[0];
-		System.out.println(filename);
-		Vector w = readfile(filename);
-		System.out.println("w: " + w.size());
-		w = extractNonASCIIChars(w);
-		Utils.saveToFile("ncit_nonascii_chars.txt", w);
+    public static String fixEncoding(String wrong) {
+        String fixed = new String(wrong.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        //String fixed = new String(wrong.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
+        return fixed;
+    }
+
+    public static String decodeSymbol(String s) {
+		byte[] bytes = text2BytesInUTF8(s);
+		String t = decodeISO88597(s);
+		return t;
 	}
 
+	public static Vector getLinesWithNonidentifiableChars(Vector lines) {
+		Vector w = new Vector();
+		for (int i=0; i<lines.size(); i++) {
+			String line = (String) lines.elementAt(i);
+			Vector v = extractNonASCIIChars(line);
+			if (v != null && v.size() == 1) {
+				w.add(line);
+				w.addAll(v);
+				/*
+				String s = (String) v.elementAt(0);
+				String t = decodeSymbol(s);
+				System.out.println(s + " --> " + t);
+				*/
+			}
+		}
+		return w;
+    }
+
+ 	public static Vector getLinesWithNonidentifiableChars(String filename) {
+		Vector lines = Utils.readFile(filename);
+		return getLinesWithNonidentifiableChars(lines);
+	}
+
+	public static String toASCII(String text) {
+		byte[] bytes = text2BytesInUTF8(text);
+		String asciiEncodedString = new String(bytes, StandardCharsets.US_ASCII);
+		return asciiEncodedString;
+	}
 }
