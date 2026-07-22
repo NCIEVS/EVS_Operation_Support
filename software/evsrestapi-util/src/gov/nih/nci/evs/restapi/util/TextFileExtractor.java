@@ -84,6 +84,25 @@ public class TextFileExtractor {
 		Utils.saveToFile(outputfile, w);
 	}
 
+	public static Vector extractDistinctColumnValues(String filename, int col) {
+        return extractDistinctColumnValues(filename, col, '\t');
+	}
+
+	public static Vector extractDistinctColumnValues(String filename, int col, char delim) {
+		HashSet hset = new HashSet();
+		Vector v = Utils.readFile(filename);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			String value = (String) u.elementAt(col);
+			if (!hset.contains(value)) {
+				hset.add(value);
+			}
+		}
+		Vector w = Utils.hashSet2Vector(hset);
+		return new SortUtils().quickSort(w);
+	}
+
 	public static int findLineNumber(String filename, String target) {
 		Vector v = Utils.readFile(filename);
 		Vector w = new Vector();
