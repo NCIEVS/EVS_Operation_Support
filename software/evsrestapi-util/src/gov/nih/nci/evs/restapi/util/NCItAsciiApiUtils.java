@@ -5,6 +5,10 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.charset.Charset;
+
 /**
  * <!-- LICENSE_TEXT_START -->
  * Copyright 2022 Guidehouse. This software was developed in conjunction
@@ -60,6 +64,14 @@ public class NCItAsciiApiUtils {
     static String NAMESPACE = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
     static String NAMESPACE_TARGET = "<!-- " + NAMESPACE;
     static String OWL_CLS_TARGET = NAMESPACE_TARGET + "C";
+
+	static String[] STANDARD_CHARSETS = new String[] {"StandardCharsets.UTF-8",
+		"StandardCharsets.UTF-16",
+		"StandardCharsets.UTF-16BE",
+		"StandardCharsets.UTF-16LE",
+		"StandardCharsets.ISO_8859_1",
+		"StandardCharsets.US-ASCII"};
+
 
     public static String extractClassId(String line) {
         String t = line;
@@ -140,7 +152,7 @@ public class NCItAsciiApiUtils {
 		}
 		Vector w = new Vector();
 		w.add("Line Number\tNCIt Code\tValue");
-		Vector v = SpecialCharDetector.readFile(filename, false);
+		Vector v = SpecialCharReadWrite.readFromFile(filename, false);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			if (line.startsWith("?")) {
@@ -151,8 +163,39 @@ public class NCItAsciiApiUtils {
 		return w;
 	}
 
+	 public static void saveToFile(String filePath, Vector w) {
+		 SpecialCharReadWrite.writeToFile(filePath, w);
+	 }
+
+    public static void saveToFile(String filePath, Vector w, String standard) {
+        // Ensure the charset is supported
+        standard = standard.replace("StandardCharsets.", "");
+        if (!Charset.isSupported(standard)) {
+            System.err.println(standard + " encoding is not supported on this platform.");
+            return;
+        } else {
+			System.out.println(standard + " is supported on this platform.");
+		}
+
+        // Write to file using try-with-resources for automatic closing
+        try (BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(
+                        new FileOutputStream(filePath), Charset.forName(standard)))) {
+            for (int i=0; i<w.size(); i++) {
+				String line = (String) w.elementAt(i);
+				writer.write(line + "\n");
+			}
+
+        } catch (IOException e) {
+            System.err.println("Error writing file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+/*
     public static void generateReports(String owlfile) {
-		Vector w = scan(SpecialCharDetector.readFile(owlfile));
+		//Vector w = scan(SpecialCharReadWrite.readFile(owlfile));
+		Vector w = scan(SpecialCharReadWrite.readFile(owlfile));
 		int n = owlfile.lastIndexOf(".");
 		String outputfile = "nonascii_" + owlfile.substring(0, n) + "_v1.txt";
 		Utils.saveToFile(outputfile, w);
@@ -164,6 +207,29 @@ public class NCItAsciiApiUtils {
 		Utils.saveToFile(outputfile, w);
 		Text2Excel.generateExcel(outputfile, '\t');
 	}
+*/
+
+    public static void generateReports(String owlfile) {
+		Vector w = scan(SpecialCharReadWrite.readFromFile(owlfile, true));
+		//Vector w = scan(SpecialCharDetector.readFile(owlfile, false));
+		int n = owlfile.lastIndexOf(".");
+		String outputfile = "nonascii_" + owlfile.substring(0, n) + "_v1.txt";
+		//Utils.saveToFile(outputfile, w);
+		saveToFile(outputfile, w);//, "StandardCharsets.UTF-8");
+
+		//saveToFile(outputfile, w, "StandardCharsets.ISO_8859_1");
+		w = getLinesWithNonidentifiableChars(w);
+		outputfile = "nonascii_" + owlfile.substring(0, n) + "_v2.txt";
+		//Utils.saveToFile(outputfile, w);
+		saveToFile(outputfile, w, "StandardCharsets.UTF-8");
+		w = findLinesWithNonidentifiableChars(outputfile);
+		outputfile = "nonascii_" + owlfile.substring(0, n) + "_v3.txt";
+
+		//Utils.saveToFile(outputfile, w);
+		saveToFile(outputfile, w, "StandardCharsets.UTF-8");
+		Text2Excel.generateExcel(outputfile, '\t');
+	}
+
 
     public static void main(String[] args) {
 		String owlfile = args[0];
