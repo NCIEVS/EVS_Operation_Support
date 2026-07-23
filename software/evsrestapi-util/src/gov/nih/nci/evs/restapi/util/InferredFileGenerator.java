@@ -1,10 +1,11 @@
-package gov.nih.nci.evs.restapi.util;
+import gov.nih.nci.evs.restapi.util.*;
 import gov.nih.nci.evs.restapi.bean.*;
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.util.*;
 
 public class InferredFileGenerator {
-	static String NCIT_OWL = "ThesaurusInferred_forTS.owl";
+	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
 
     public static String METADATA = "metadata.owl";
     public static String CLASSDATA = "classdata.owl";
@@ -39,12 +40,6 @@ public class InferredFileGenerator {
 		EXCLUDED_PROPERTIES.add("P365");
 		EXCLUDED_PROPERTIES.add("P205");
 		EXCLUDED_PROPERTIES.add("P320");  // (Not at FTP)
-
-		File f = new File(NCIT_OWL);
-		if (!f.exists()) {
-			NCItDownload.download();
-		}
-
 	}
 
 	//Remove P325 P325|LITERAL along with Axiom
@@ -89,63 +84,64 @@ public class InferredFileGenerator {
 
 	public void initialize() {
 		long ms = System.currentTimeMillis();
+		System.out.println("Instantiating InferredFileGenerator ... ");
 		System.out.println("OWL File: " + assertedOWL);
-		InheritanceAnalyzer analyzer = new InheritanceAnalyzer(assertedOWL);
-		System.out.println("InheritanceAnalyzer findConceptsWithInheritedAnonymousSuperClasses ...");
-
-        conceptsWithInheritedAnonymousSuperClasses = analyzer.matchAncestorRelations(false);
-	    conceptsWithInheritedAnonymousSuperClassesMap = Utils.vector2HashMap(
-			conceptsWithInheritedAnonymousSuperClasses, 0, 1);
-		Utils.dumpHashMap("conceptsWithInheritedAnonymousSuperClasses", conceptsWithInheritedAnonymousSuperClassesMap);
-		//analyzer.deleteTemporaryFiles();
-
-		Vector parent_child_vec = analyzer.get_parent_child_vec();
-		parent_child_vec = HTMLDecoder.run(parent_child_vec);
-		hh = new HierarchyHelper(parent_child_vec);
-
-        this.owl_vec = Utils.readFile(assertedOWL);
-        System.out.println("extractClassData...");
-		extractClassData(this.owl_vec, CLASSDATA);
-
-		System.out.println("Step 1: Run OWLScrubber " + SCRUBBED_PROPERTIES_FILE);
 		File f = new File(SCRUBBED_PROPERTIES_FILE);
 		if (!f.exists()) {
 			Vector w = NCItMetadataUtils.generateScrubbedProperties(assertedOWL);
 			Utils.saveToFile(SCRUBBED_PROPERTIES_FILE, w);
 		}
         Vector propVec = Utils.readFile(SCRUBBED_PROPERTIES_FILE);
-        Utils.dumpVector("SCRUBBED_PROPERTIES_FILE", propVec);
+        Utils.dumpVector("Scrubbed properties", propVec);
+		System.out.println("Instantiating InheritanceAnalyzer ... ");
+		InheritanceAnalyzer analyzer = new InheritanceAnalyzer(assertedOWL);
+		System.out.println("InheritanceAnalyzer instantiated. ");
+        System.out.println("Finding concepts with inherited anonymous superClasses...");
+        conceptsWithInheritedAnonymousSuperClasses = analyzer.matchAncestorRelations(false);
+	    conceptsWithInheritedAnonymousSuperClassesMap = Utils.vector2HashMap(conceptsWithInheritedAnonymousSuperClasses, 0, 1);
+		Utils.dumpHashMap("Concepts with inherited anonymous superClasses", conceptsWithInheritedAnonymousSuperClassesMap);
+		System.out.println("Searching for parent-child (hierarchical) relationships ...");
+		Vector parent_child_vec = analyzer.get_parent_child_vec();
+		parent_child_vec = HTMLDecoder.run(parent_child_vec);
+		hh = new HierarchyHelper(parent_child_vec);
+        System.out.println("parent-child (distance-1 hierarchical) relationships generated.");
+        System.out.println("Loading " + assertedOWL + " ...");
+        this.owl_vec = Utils.readFile(assertedOWL);
+ 		System.out.println("Extracting Ontology Info...");
+		extractOntologyInfo(this.owl_vec);
+		System.out.println("Ontology Info instantiated.");
 
+		System.out.println("Extracting metadata (annotaion properties, datatype properties, and object properties) ...");
+	    metadata_vec = NCItMetadataUtils.getFilteredMetadata(assertedOWL, propVec);
+	    Utils.saveToFile(METADATA, metadata_vec);
+	    System.out.println("Metadata extracted.");
+
+        System.out.println("Extracting annotations...");
+		extractAnnotations(this.owl_vec, ANNOTATIONS_FILE);
+		System.out.println("Annotations extracted.");
+
+        System.out.println("Extracting class data...");
+		extractClassData(this.owl_vec, CLASSDATA);
+		System.out.println("Class data extracted.");
+
+		System.out.println("\nStep 1: Running OWLScrubber " + SCRUBBED_PROPERTIES_FILE);
         Vector v = Utils.readFile(CLASSDATA);
 		v = OWLScrubber.run(v, propVec);
 
 		Utils.saveToFile(SCRUBBED_CLASSDATA_FILE, v);
 		System.out.println(SCRUBBED_CLASSDATA_FILE + " generated.");
 
-		System.out.println("Step 2: OWLClassLoader " + SCRUBBED_CLASSDATA_FILE);
+		System.out.println("\nStep 2: OWLClassLoader " + SCRUBBED_CLASSDATA_FILE);
 		loader = new OWLClassLoader(SCRUBBED_CLASSDATA_FILE);
 
 		classDataHashMap = loader.getClassDataHashMap();
 		classIdVec = loader.getClassIdVec();
 
-		Vector equiv_classes = Utils.readFile("equivalentClasses.txt");
+        Vector equiv_classes = extractEquivalenceClasses(this.owl_vec);
 		equiv_class_set = Utils.vector2HashSet(equiv_classes);
+		reasoner = analyzer.getSimpleReasoner();
 
-		System.out.println("Instantiating reasoner...");
-		reasoner = analyzer.getSimpleReasoner();//new SimpleReasoner(this.owl_vec);
-
-		System.out.println("extractOntologyInfo...");
-		extractOntologyInfo(this.owl_vec );
-
-		System.out.println("extractMetadata...");
-		extractMetadata(NCIT_OWL, METADATA, EXCLUDED_PROPERTIES);
-		metadata_vec = Utils.readFile(METADATA);
-
-        System.out.println("extractAnnotations...");
-		System.out.println("extractAnnotations: this.owl_vec " + this.owl_vec.size());
-		extractAnnotations(this.owl_vec, ANNOTATIONS_FILE);
-
-		System.out.println("\tTotal InferredFileGenerator initializaion run time (ms): " + (System.currentTimeMillis() - ms));
+		System.out.println("Total InferredFileGenerator initializaion run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 	public boolean isDefined(String code) {
@@ -224,16 +220,9 @@ public class InferredFileGenerator {
 	    String target = "// Annotations";
 	    Vector v = Utils.readFile(filename);
 	    extractAnnotations(v, outputfile);
-	    /*
-	    int istart = TextFileExtractor.findLineNumber(v, target) - 3;
-	    target = "</rdf:RDF>";
-	    int iend = TextFileExtractor.reverseFindLineNumber(v, target);
-	    TextFileExtractor.extractLinesFromFile(filename, istart, iend, outputfile);
-	    */
 	}
 
 	public static void extractAnnotations(Vector v, String outputfile) {
-		System.out.println("v: " + v.size());
 	    String target = "// Annotations";
 	    int istart = TextFileExtractor.findLineNumber(v, target) - 3;
 	    target = "</rdf:RDF>";
@@ -508,26 +497,6 @@ w.add("        </rdfs:subClassOf>");
 
 	public void extractMetadata(String filename, String outputfile, Vector excludedProperties) {
 		extractMetadata(Utils.readFile(filename), outputfile);
-		/*
-		OWLClassLoader loader = new OWLClassLoader(outputfile);
-		HashMap classDataHashMap = loader.getClassDataHashMap();
-		Vector classIdVec = loader.getClassIdVec();
-		*/
-
-		/*
-		Vector w = new Vector();
-		w.addAll(getStartStmts("Annotation properties"));
-		for (int i=0; i<classIdVec.size(); i++) {
-			String id = (String) classIdVec.elementAt(i);
-			if (!excludedProperties.contains(id)) {
-				w.addAll((Vector) classDataHashMap.get(id));
-			}
-			if (StringUtils.isNCItCode(id)) {
-				break;
-			}
-		}
-		Utils.saveToFile(outputfile, w);
-		*/
 	}
 
 	//oboInOwl:hasDbXref
@@ -611,11 +580,14 @@ w.add("        </rdfs:subClassOf>");
 
 	public void run(String assertedOWL) {
 		long ms = System.currentTimeMillis();
+		System.out.println("Start processsing ...");
 		Vector deprecated = new Vector();
 		Vector removed_concepts = new Vector();
 
 		Vector w = new Vector();
+		System.out.println("Updating OntologyInfo ...");
 		Vector ontologyInfo = updateOntologyInfo(ONTOLOGY_INFO_FILE);
+		System.out.println("OntologyInfo updated.");
 		w.addAll(ontologyInfo);
 		w.addAll(get_metadata_vec());
 		w.addAll(getClassesStartStmts());
@@ -625,7 +597,7 @@ w.add("        </rdfs:subClassOf>");
 		int increment = 10000;
 		int total = classIdVec.size();
 
-		System.out.println("Step 3: Apply reasoner (owl:Restriction inheritance) ... ");
+        System.out.println("\nStep 3: Computing inheritance (generating inherited relationships) ...");
 		for (int i=0; i<classIdVec.size(); i++) {
 			int j = i+1;
 			if (lcv == increment) {
@@ -648,8 +620,6 @@ w.add("        </rdfs:subClassOf>");
 			}
 		}
 		System.out.println("" + total + " out of " + total + " completed.");
-		//w.addAll(Utils.readFile(SCRUBBED_ANNOTATIONS_FILE));
-
 		w.add("\n\n");
 		w.addAll(Utils.readFile(ANNOTATIONS_FILE));
 		w.add("</rdf:RDF>");
@@ -660,30 +630,29 @@ w.add("        </rdfs:subClassOf>");
 		System.out.println("" + total + " out of " + total + " completed.");
 		Utils.dumpVector("Removed Concepts", removed_concepts);
 
-        System.out.println("Step 4: Building inferred NCI Thesaurus OWL ... ");
+        System.out.println("\nStep 4: Composing inferred NCI Thesaurus OWL ... ");
 		String inferredFileName = "ThesaurusInferred_forTS_" + StringUtils.getToday() + ".owl";
 		System.out.println("Generating " + inferredFileName + ". (This may take a few minutes. Please wait...)");
 		Utils.saveToFile(inferredFileName, w);
 
-		System.out.println("Step 5: Remove temporary files ... ");
+		System.out.println("\nStep 5: Remove temporary files ... ");
 		removeTemporaryFiles();
-		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
+		System.out.println("\tTotal processing run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 	public void test(String code) {
 		Vector classData = (Vector) classDataHashMap.get(code);
 		Utils.dumpVector("Asserted_" + code, classData);
-
 		classData = appendInheritedRestrictions(code, classData);
 		Utils.dumpVector("Inferred_" + code, classData);
 	}
 
 	public static void main(String[] args) {
+		long ms = System.currentTimeMillis();
 		String owlfile = args[0];
 		InferredFileGenerator generator = new InferredFileGenerator(owlfile);
 		String code = "C9128";
 		generator.run(owlfile);
+		System.out.println("\tTotal run run time (ms): " + (System.currentTimeMillis() - ms));
 	}
-
 }
-

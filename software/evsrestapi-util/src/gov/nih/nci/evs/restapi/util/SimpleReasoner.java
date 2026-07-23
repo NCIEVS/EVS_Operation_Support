@@ -15,28 +15,17 @@ public class SimpleReasoner {
 	Vector role_vec = null;
 	Vector owl_vec = null;
 
-/*
-	public SimpleReasoner(String assertedOWL) {
-		this.assertedOWL = assertedOWL;
-		this.owl_vec = Utils.readFile(assertedOWL);
-		initialize();
-	}
-*/
-
 	public SimpleReasoner(Vector owl_vec) {
-		//this.assertedOWL = null;
 		this.owl_vec = owl_vec;
 		initialize();
 	}
 
     public void initialize() {
-		long ms = System.currentTimeMillis();
 		owlscanner = new OWLScanner(owl_vec);
 		parent_child_vec = owlscanner.extractHierarchicalRelationships(owlscanner.get_owl_vec());
 		hh = new HierarchyHelper(parent_child_vec);
 		role_vec = owlscanner.extractOWLRestrictions(owlscanner.get_owl_vec());
 		roleMap = createRoleMap(role_vec);
-		System.out.println("\tTotal initialization run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 	public OWLScanner getOWLScanner() {
