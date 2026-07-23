@@ -41,8 +41,11 @@ public class SpecialCharReadWrite {
      * Reads a string from a file using UTF-8 encoding.
      */
 
-    public static Vector readFile(String filePath) {
-		return readFromFile(filePath);
+    public static Vector readFromFile(String filePath, boolean utf8) {
+		if (utf8) {
+			return readFromFile(filePath);
+		}
+		return readFile(filePath);
 	}
 
     public static Vector readFromFile(String filePath) {
@@ -52,15 +55,33 @@ public class SpecialCharReadWrite {
                 new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                //content.append(line).append(System.lineSeparator());
                 w.add(line);
             }
-            return w;//content.toString().trim();
+            return w;
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
             return null;
         }
     }
+
+	public static Vector readFile(String filename) {
+		Vector v = new Vector();
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(filename));
+			String line = reader.readLine();
+			while (line != null) {
+				if (line != null) {
+					v.add(line);
+				}
+				line = reader.readLine();
+			}
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return v;
+	}
 
 }
 

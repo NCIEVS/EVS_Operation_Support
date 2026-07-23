@@ -455,7 +455,7 @@ public class Utils {
 
     public static void generate_construct_statement(String method_name, String params, String filename) {
 		Vector w = create_construct_statement(method_name, params, filename);
-		StringUtils.dumpVector(w);
+		dumpVector(method_name, w);
 	}
 
     public static Vector create_construct_statement(String method_name, String params, String filename) {
@@ -473,6 +473,7 @@ public class Utils {
 				t = StringUtils.escapeDoubleQuotes(t);
 				t = "\"" + t + "\"";
 				t = "buf.append(" + t + ").append(\"\\n\");";
+
 				w.add("\t" + t);
 			}
 		}
@@ -483,19 +484,68 @@ public class Utils {
 
     public static boolean deleteFile(String filename) {
         File file = new File(filename);
-        if(file.delete())
-        {
+        if(file.delete()) {
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
 
-    public static Vector readFile(String filename) {
+	public static Vector readFile(String filename) {
 		return SpecialCharReadWrite.readFile(filename);
 	}
+/*
+	public static Vector read_file(String filename) {
+		Vector v = new Vector();
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(filename));
+			String line = reader.readLine();
+			while (line != null) {
+				if (line != null) {
+					v.add(line);
+				}
+				line = reader.readLine();
+			}
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return v;
+	}
+
+    public static Vector readFile(String filename) {
+		//return readFile(filename, true);
+		return read_file(filename);
+	}
+
+    public static Vector readFile(String filename, boolean utf8) {
+		if (!utf8) {
+			return read_file(filename);
+		}
+		Vector w = new Vector();
+        java.nio.file.Path filePath = java.nio.file.Paths.get(filename);
+        if (!Files.exists(filePath)) {
+            System.err.println("Error: File not found - " + filePath.toAbsolutePath());
+            return null;
+        } else {
+			System.out.println("File " + filename + " exists.");
+		}
+
+        try (BufferedReader reader = Files.newBufferedReader(filePath, StandardCharsets.UTF_8)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+				System.out.println(line);
+                w.add(line);
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+            return null;
+        }
+        return w;
+	}
+*/
+
 
     private static Vector handleFile(File file, Charset encoding) throws IOException {
         try (InputStream in = new FileInputStream(file);
@@ -537,7 +587,7 @@ public class Utils {
 
     public static void saveToFile(String target_file, Vector w) {
 		SpecialCharReadWrite.saveToFile(target_file, w);
-	}
+    }
 
     public static void copyFile(String filename) {
 		Vector v = readFile(filename);
@@ -587,7 +637,7 @@ public class Utils {
 		Vector v = readFile(filename);
         String line = (String) v.elementAt(0);
         Vector u = StringUtils.parseData(line, delim);
-        Utils.dumpVector(line, u);
+        dumpVector(line, u);
 	}
 
 	public static Vector extractColumnData(String filename, Vector<Integer> col_vec, char delim) {
@@ -740,8 +790,8 @@ public class Utils {
 	}
 
 	public static String insert(String file1, String file2, String locMarker) {
-		Vector v1 = Utils.readFile(file1);
-		Vector v2 = Utils.readFile(file2);
+		Vector v1 = readFile(file1);
+		Vector v2 = readFile(file2);
 		Vector w = new Vector();
 
 		for (int i=0; i<v1.size(); i++) {
@@ -757,7 +807,7 @@ public class Utils {
 		}
 		int n = file2.lastIndexOf(".");
 		String outputfile = file2.substring(0, n) + ".owl";
-		Utils.saveToFile(outputfile, w);
+		saveToFile(outputfile, w);
 		return outputfile;
 	}
 
@@ -856,7 +906,7 @@ public class Utils {
         if (skipFirstLine) {
 			istart = 1;
 		}
-		Vector v = Utils.readFile(filename);
+		Vector v = readFile(filename);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			line = line.trim();
@@ -943,7 +993,6 @@ public class Utils {
 				String line = (String) w.elementAt(i);
 				writer.write(line);
 			}
-			System.out.println("File written successfully in ISO-8859-7 encoding.");
 
         } catch (IOException e) {
             System.err.println("Error writing file: " + e.getMessage());
