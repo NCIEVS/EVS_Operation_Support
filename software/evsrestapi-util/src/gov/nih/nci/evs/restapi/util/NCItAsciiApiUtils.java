@@ -192,44 +192,19 @@ public class NCItAsciiApiUtils {
         }
     }
 
-/*
     public static void generateReports(String owlfile) {
-		//Vector w = scan(SpecialCharReadWrite.readFile(owlfile));
-		Vector w = scan(SpecialCharReadWrite.readFile(owlfile));
+		Vector w = scan(Utils.readFile(owlfile));
 		int n = owlfile.lastIndexOf(".");
 		String outputfile = "nonascii_" + owlfile.substring(0, n) + "_v1.txt";
-		Utils.saveToFile(outputfile, w);
+		SpecialCharDetector.saveToFile(outputfile, w);
 		w = getLinesWithNonidentifiableChars(w);
 		outputfile = "nonascii_" + owlfile.substring(0, n) + "_v2.txt";
-		Utils.saveToFile(outputfile, w);
+		SpecialCharDetector.saveToFile(outputfile, w);
 		w = findLinesWithNonidentifiableChars(outputfile);
 		outputfile = "nonascii_" + owlfile.substring(0, n) + "_v3.txt";
-		Utils.saveToFile(outputfile, w);
+		SpecialCharDetector.saveToFile(outputfile, w);
 		Text2Excel.generateExcel(outputfile, '\t');
 	}
-*/
-
-    public static void generateReports(String owlfile) {
-		Vector w = scan(SpecialCharReadWrite.readFromFile(owlfile, true));
-		//Vector w = scan(SpecialCharDetector.readFile(owlfile, false));
-		int n = owlfile.lastIndexOf(".");
-		String outputfile = "nonascii_" + owlfile.substring(0, n) + "_v1.txt";
-		//Utils.saveToFile(outputfile, w);
-		saveToFile(outputfile, w);//, "StandardCharsets.UTF-8");
-
-		//saveToFile(outputfile, w, "StandardCharsets.ISO_8859_1");
-		w = getLinesWithNonidentifiableChars(w);
-		outputfile = "nonascii_" + owlfile.substring(0, n) + "_v2.txt";
-		//Utils.saveToFile(outputfile, w);
-		saveToFile(outputfile, w, "StandardCharsets.UTF-8");
-		w = findLinesWithNonidentifiableChars(outputfile);
-		outputfile = "nonascii_" + owlfile.substring(0, n) + "_v3.txt";
-
-		//Utils.saveToFile(outputfile, w);
-		saveToFile(outputfile, w, "StandardCharsets.UTF-8");
-		Text2Excel.generateExcel(outputfile, '\t');
-	}
-
 
     public static void main(String[] args) {
 		String owlfile = args[0];
