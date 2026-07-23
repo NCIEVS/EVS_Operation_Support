@@ -154,7 +154,7 @@ public class NCItAsciiApiUtils {
 					}
 				}
 				String t = b.toString();
-				buf.append(line).append("\t").append(t);
+				buf.append("\t").append(t);
 				t = buf.toString();
 				w.add(t);
 			}
