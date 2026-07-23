@@ -136,12 +136,34 @@ public class NCItAsciiApiUtils {
 		return w;
 	}
 
+	public static Vector getLinesWithNonidentifiableChars(Vector lines) {
+		Vector w = new Vector();
+		w.add("Line Number\tNCIt Code\tValue\tSpecial Character(s)");
+		for (int i=0; i<lines.size(); i++) {
+			String line = (String) lines.elementAt(i);
+			Vector v = ASCIITable.extractNonASCIIChars(line);
+			if (v != null && v.size() == 1) {
+				StringBuffer buf = new StringBuffer();
+				buf.append(line);
+
+				StringBuffer b = new StringBuffer();
+				for (int j=0; j<v.size(); j++) {
+					b.append((String) v.elementAt(j));
+					if (j < v.size()-1) {
+						b.append(",");
+					}
+				}
+				String t = b.toString();
+				buf.append(line).append("\t").append(t);
+				t = buf.toString();
+				w.add(t);
+			}
+		}
+		return w;
+    }
+
 	public static Vector getLinesWithNonidentifiableChars(String filename) {
 		return ASCIITable.getLinesWithNonidentifiableChars(filename);
-	}
-
-	public static Vector getLinesWithNonidentifiableChars(Vector v) {
-		return ASCIITable.getLinesWithNonidentifiableChars(v);
 	}
 
     public static Vector findLinesWithNonidentifiableChars(String filename) {
@@ -173,11 +195,8 @@ public class NCItAsciiApiUtils {
         if (!Charset.isSupported(standard)) {
             System.err.println(standard + " encoding is not supported on this platform.");
             return;
-        } else {
-			System.out.println(standard + " is supported on this platform.");
-		}
+        }
 
-        // Write to file using try-with-resources for automatic closing
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(
                         new FileOutputStream(filePath), Charset.forName(standard)))) {
@@ -200,10 +219,7 @@ public class NCItAsciiApiUtils {
 		w = getLinesWithNonidentifiableChars(w);
 		outputfile = "nonascii_" + owlfile.substring(0, n) + "_v2.txt";
 		SpecialCharDetector.saveToFile(outputfile, w);
-		w = findLinesWithNonidentifiableChars(outputfile);
-		outputfile = "nonascii_" + owlfile.substring(0, n) + "_v3.txt";
-		SpecialCharDetector.saveToFile(outputfile, w);
-		Text2Excel.generateExcel(outputfile, '\t');
+		//Text2Excel.generateExcel(outputfile, '\t');
 	}
 
     public static void main(String[] args) {
