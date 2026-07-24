@@ -127,7 +127,6 @@ public class ASCIITable {
 
     public static String fixEncoding(String wrong) {
         String fixed = new String(wrong.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-        //String fixed = new String(wrong.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
         return fixed;
     }
 
@@ -145,11 +144,6 @@ public class ASCIITable {
 			if (v != null && v.size() == 1) {
 				w.add(line);
 				w.addAll(v);
-				/*
-				String s = (String) v.elementAt(0);
-				String t = decodeSymbol(s);
-				System.out.println(s + " --> " + t);
-				*/
 			}
 		}
 		return w;

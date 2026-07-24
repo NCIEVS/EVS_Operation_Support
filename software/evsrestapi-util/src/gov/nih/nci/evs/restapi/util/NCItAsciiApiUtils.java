@@ -8,6 +8,7 @@ import java.util.*;
 import java.nio.file.*;
 import java.nio.file.Files;
 import java.nio.charset.Charset;
+import java.lang.Character.UnicodeScript;
 
 /**
  * <!-- LICENSE_TEXT_START -->
@@ -136,9 +137,24 @@ public class NCItAsciiApiUtils {
 		return w;
 	}
 
+    public static String getCodePointName(String text) {
+		StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < text.length(); ) {
+            int codePoint = text.codePointAt(i);
+            UnicodeScript script = UnicodeScript.of(codePoint);
+            String scriptName = script.name();
+            buf.append(scriptName);
+            if (i < text.length()-1) {
+				buf.append("|");
+			}
+            i += Character.charCount(codePoint); // Move to next code point
+        }
+        return buf.toString();
+	}
+
 	public static Vector getLinesWithNonidentifiableChars(Vector lines) {
 		Vector w = new Vector();
-		w.add("Line Number\tNCIt Code\tValue\tSpecial Character(s)");
+		w.add("Line Number\tNCIt Code\tValue\tSpecial Character(s)\tUnicode Script Name(s)");
 		for (int i=0; i<lines.size(); i++) {
 			String line = (String) lines.elementAt(i);
 			Vector v = ASCIITable.extractNonASCIIChars(line);
@@ -154,7 +170,8 @@ public class NCItAsciiApiUtils {
 					}
 				}
 				String t = b.toString();
-				buf.append("\t").append(t);
+				String codePointName = getCodePointName(t);
+				buf.append("\t" + t + "\t" + codePointName);
 				t = buf.toString();
 				w.add(t);
 			}
@@ -162,32 +179,9 @@ public class NCItAsciiApiUtils {
 		return w;
     }
 
-	public static Vector getLinesWithNonidentifiableChars(String filename) {
-		return ASCIITable.getLinesWithNonidentifiableChars(filename);
-	}
-
-    public static Vector findLinesWithNonidentifiableChars(String filename) {
-		File f = new File(filename);
-		if (!f.exists()) {
-			System.out.println("File " + filename + " not found.");
-			return null;
-		}
-		Vector w = new Vector();
-		w.add("Line Number\tNCIt Code\tValue");
-		Vector v = SpecialCharReadWrite.readFromFile(filename, false);
-		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			if (line.startsWith("?")) {
-				String t = (String) v.elementAt(i-1);
-				w.add(t);
-			}
-		}
-		return w;
-	}
-
-	 public static void saveToFile(String filePath, Vector w) {
+	public static void saveToFile(String filePath, Vector w) {
 		 SpecialCharReadWrite.writeToFile(filePath, w);
-	 }
+	}
 
     public static void saveToFile(String filePath, Vector w, String standard) {
         // Ensure the charset is supported
@@ -195,8 +189,11 @@ public class NCItAsciiApiUtils {
         if (!Charset.isSupported(standard)) {
             System.err.println(standard + " encoding is not supported on this platform.");
             return;
-        }
+        } else {
+			System.out.println(standard + " is supported on this platform.");
+		}
 
+        // Write to file using try-with-resources for automatic closing
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(
                         new FileOutputStream(filePath), Charset.forName(standard)))) {
@@ -216,10 +213,12 @@ public class NCItAsciiApiUtils {
 		int n = owlfile.lastIndexOf(".");
 		String outputfile = "nonascii_" + owlfile.substring(0, n) + "_v1.txt";
 		SpecialCharDetector.saveToFile(outputfile, w);
+		//testing
+		w = SpecialCharReadWrite.readFromFile(outputfile, true);
 		w = getLinesWithNonidentifiableChars(w);
 		outputfile = "nonascii_" + owlfile.substring(0, n) + "_v2.txt";
-		SpecialCharDetector.saveToFile(outputfile, w);
-		//Text2Excel.generateExcel(outputfile, '\t');
+		SpecialCharReadWrite.saveToFile(outputfile, w);
+		Text2Excel.generateExcel(outputfile, '\t');
 	}
 
     public static void main(String[] args) {
