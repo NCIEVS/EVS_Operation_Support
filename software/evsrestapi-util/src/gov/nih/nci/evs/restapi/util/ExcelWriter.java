@@ -497,7 +497,8 @@ short black_index = ref.getIndex();
 													  black_index, HorizontalAlignment.LEFT, 12, false);
 
 
-				Vector lines = Utils.readFile(datafile);
+				//Vector lines = Utils.readFile(datafile);
+				Vector lines = SpecialCharReadWrite.readFromFile(datafile, true);
 				String line = (String) lines.elementAt(0);
 
 				writeHeading(workbook, sheet, line, delim);
