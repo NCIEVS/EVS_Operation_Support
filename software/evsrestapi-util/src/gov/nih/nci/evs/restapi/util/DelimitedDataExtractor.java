@@ -222,4 +222,24 @@ public class DelimitedDataExtractor {
 		return new SortUtils().quickSort(v);
 	}
 
+	public static Vector removeColumnData(Vector v, int col,char delim) {
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			StringBuffer buf = new StringBuffer();
+			for (int j=0; j<u.size(); j++) {
+				if (j != col) {
+					buf.append((String) u.elementAt(j));
+					if (j < u.size()-1) {
+						buf.append(delim);
+					}
+				}
+			}
+			String t = buf.toString();
+			w.add(t);
+		}
+		return w;
+	}
+
 }
