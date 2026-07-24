@@ -233,7 +233,7 @@ public class HierarchyHelper implements Serializable {
 
 	public void load_parent_child_rel(String filename) {
 		this.rel_vec = Utils.readFile(filename);
-		System.out.println("parent_child_rel size: " + this.rel_vec.size());
+		//System.out.println("parent_child_rel size: " + this.rel_vec.size());
 	}
 
     public void set_rel_vec(Vector rel_vec) {

@@ -53,42 +53,23 @@ public class InheritanceAnalyzer {
 		initialize();
 	}
 
-
 	public void initialize() {
 		long ms = System.currentTimeMillis();
-
-        System.out.println("Instantiating reasoner ");
         this.owl_vec = Utils.readFile(owlfile);
-
 		reasoner = new SimpleReasoner(this.owl_vec);
 		roleMap = reasoner.getRoleMap();
-		System.out.println("reasoner instantiated. ");
-
 		owlscanner = reasoner.getOWLScanner();
-
 		parent_child_vec = owlscanner.extractHierarchicalRelationships(owlscanner.get_owl_vec());
 		parent_child_vec = HTMLDecoder.run(parent_child_vec);
-		System.out.println("parent_child_vec: " + parent_child_vec.size());
-
-		System.out.println("Instantiating HierarchyHelper ");
 		hh = new HierarchyHelper(parent_child_vec);
-		System.out.println("HierarchyHelper instantiated.");
-
-        System.out.println("extractEquivalenceClasses ");
 		Vector equiv_classes = owlscanner.extractEquivalenceClasses();
 		equiv_classes = DelimitedDataExtractor.extract(equiv_classes, "0", '|');
 		equiv_class_set = Utils.vector2HashSet(equiv_classes);
-		System.out.println("EquivalenceClasses done.");
-
-        System.out.println("Instantiating OWLClassLoader ");
 		loader = new OWLClassLoader(owlfile);
 		classDataHashMap = loader.getClassDataHashMap();
 		classIdVec = loader.getClassIdVec();
-		System.out.println("OWLClassLoader instantiated.");
-
 		reasoner.get_owl_vec().clear();
-
-        System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
+        System.out.println("Total InheritanceAnalyzer initialization run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 	public SimpleReasoner getSimpleReasoner() {
