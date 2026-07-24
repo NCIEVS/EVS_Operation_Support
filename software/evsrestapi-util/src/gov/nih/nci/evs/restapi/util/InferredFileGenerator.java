@@ -634,6 +634,8 @@ w.add("        </rdfs:subClassOf>");
 
         System.out.println("\nStep 5: Composing inferred NCI Thesaurus OWL ... ");
 		String inferredFileName = "ThesaurusInferred_forTS_" + StringUtils.getToday() + ".owl";
+
+		System.out.println("(C) Output:");
 		System.out.println("Generating " + inferredFileName + ". (This may take a few minutes. Please wait...)");
 		Utils.saveToFile(inferredFileName, w);
 
