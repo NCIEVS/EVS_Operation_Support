@@ -56,8 +56,10 @@ public class InheritanceAnalyzer {
 	public void initialize() {
 		long ms = System.currentTimeMillis();
         this.owl_vec = Utils.readFile(owlfile);
+
 		reasoner = new SimpleReasoner(this.owl_vec);
 		roleMap = reasoner.getRoleMap();
+
 		owlscanner = reasoner.getOWLScanner();
 		parent_child_vec = owlscanner.extractHierarchicalRelationships(owlscanner.get_owl_vec());
 		parent_child_vec = HTMLDecoder.run(parent_child_vec);
@@ -70,6 +72,14 @@ public class InheritanceAnalyzer {
 		classIdVec = loader.getClassIdVec();
 		reasoner.get_owl_vec().clear();
         System.out.println("Total InheritanceAnalyzer initialization run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+	public static void dumpIntegerValuedHashMap(HashMap hmap) {
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			Integer value = (Integer) hmap.get(key);
+			System.out.println(key + " --> " + value.intValue());
+		}
 	}
 
 	public SimpleReasoner getSimpleReasoner() {
@@ -90,7 +100,6 @@ public class InheritanceAnalyzer {
 
     public void deleteTemporaryFiles() {
 		FileUtils.deleteFile("classIds.txt");
-		//FileUtils.deleteFile("equivalentClasses.txt");
 	}
 
 
@@ -140,6 +149,17 @@ public class InheritanceAnalyzer {
 		return null;
 	}
 
+	public void printPathToRoots(String code) {
+		System.out.println("printPathToRoots " + code);
+		long ms = System.currentTimeMillis();
+		boolean traverseDown = false;
+		Vector ancestors = hh.getTransitiveClosure(code, traverseDown);
+		Utils.dumpVector("ancestors", ancestors);
+		System.out.println("HierarchyHelper.printPathToRoots " + code);
+		HierarchyHelper.printPathToRoots(parent_child_vec, code, null) ;
+		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
 	public Vector getClassVec(String code) {
 		return (Vector) classDataHashMap.get(code);
 	}
@@ -155,22 +175,6 @@ public class InheritanceAnalyzer {
 			}
 		}
         return w;
-	}
-
-	public static HashMap getFrequencyHashMap(Vector v) {
-		HashMap countMap = new HashMap();
-		for (int i=0; i<v.size(); i++) {
-			String node = (String) v.elementAt(i);
-
-			Integer int_obj = Integer.valueOf(0);
-			if (countMap.containsKey(node)) {
-				int_obj = (Integer) countMap.get(node);
-			}
-			int count = int_obj.intValue();
-			int_obj = Integer.valueOf(count+1);
-			countMap.put(node, int_obj);
-		}
-        return countMap;
 	}
 
 	public Vector getSubclassCodes(String code) {
@@ -207,19 +211,6 @@ public class InheritanceAnalyzer {
 	static boolean isDefined(String code) {
 		return equiv_class_set.contains(code);
 	}
-
-/*
-	public Vector extractEquivalenceClasses(String owlfile) {
-		long ms = System.currentTimeMillis();
-		OWLScanner owlscanner = new OWLScanner(owlfile);
-		Vector w = owlscanner.extractEquivalenceClasses();
-		owlscanner.clear();
-		System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
-		//Utils.saveToFile("equivalentClasses.txt", w);
-		w = DelimitedDataExtractor.extract(w, "0", '|');
-		return w;
-	}
-*/
 
     public String extractClassId(String t) {
 		int n = t.lastIndexOf("#");
@@ -366,82 +357,97 @@ public class InheritanceAnalyzer {
 		return w;
 	}
 
-    public Vector matchAncestorRelations() {
-		boolean debug = true;
-		return matchAncestorRelations(this.classIdVec, debug);
+    public Vector matchAncestorRelationships() {
+		return matchAncestorRelationships(this.classIdVec);
 	}
 
-    public Vector matchAncestorRelations(boolean debug) {
-		return matchAncestorRelations(this.classIdVec, debug);
+	public boolean debugger = false;
+	public void setDebugger(boolean bool) {
+		debugger = bool;
 	}
 
-    public Vector matchAncestorRelations(Vector codes, boolean debug) {
+    public Vector matchAncestorRelationships(Vector codes) {
+		if (debugger) {
+			dumpIntegerValuedHashMap(MATCH_PATTERN);
+		}
 		Vector w = new Vector();
 		int lcv = 1;
 		int total = codes.size();
-		int increment = 5;
-		if (total > 1000) {
-		    increment = 1000;
+		int increment = 10;
+		if (total > 2000) {
+		    increment = 2000;
 		}
 		for (int i=0; i<codes.size(); i++) {
 			int j = i+1;
 			if (lcv == increment) {
-				if (debug) {
-					System.out.println("" + j + " out of " + total + " completed.");
-				}
+				if (debugger) System.out.println("" + j + " out of " + total + " completed.");
 				lcv = 0;
 			}
 			lcv++;
 			String code = (String) codes.elementAt(i);
 			int k = i+1;
-			Vector class_vec = (Vector) classDataHashMap.get(code);
-
-			Vector v = ScannerUtils.extractRelationships(class_vec);
-			HashMap hmap = createRelationshipHashMap(v);
-
 			if (isDefined(code)) {
 				Vector ancestors = getAncestorCodes(code);
 				for (int k2=0; k2<ancestors.size(); k2++) {
 					String ancestor = (String) ancestors.elementAt(k2);
-					Vector sup_class_vec = (Vector) classDataHashMap.get(ancestor);
-					v = ScannerUtils.extractRelationships(sup_class_vec);
-					HashMap sup_hmap = createRelationshipHashMap(v);
+					HashMap sup_hmap = createRelationshipHashMap(ancestor);
 					boolean matched = matchRelationshipConditions(sup_hmap);
 					if (matched) {
 						w.add(code + "|" + ancestor);
-                        if (debug) {
-							sup_class_vec = (Vector) classDataHashMap.get(ancestor);
-							w.add("\nAsserted " + ancestor + ":" );
-							w.addAll(sup_class_vec);
-
-							w.add("\nAnonymous class to be inherited by it's subclasses: ");
-							//w.addAll(Utils.outputMultiValuedHashMap(ancestor, sup_hmap));
-
-							w.addAll(generateInheritedSubClassOfStmts(sup_hmap));
-
-							w.add("\nAsserted " + code + ":" );
-							w.addAll(class_vec);
-
-							w.add("\nInferred " + code + ":" );
-							Vector inferredOWL = composeInferredOWLClass(code, sup_hmap);
-							w.addAll(inferredOWL);
-						}
 						break;
 					}
 				}
 			}
 		}
-		if (debug) {
+		if (debugger) {
 			System.out.println("" + total + " out of " + total + " completed.");
-	    }
+		}
+		return w;
+	}
+
+    public Vector traceRelationships(HashMap hmap) {
+		Vector w = new Vector();
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			String value = (String) hmap.get(key);
+			w.add(key + "|" + value);
+		}
+		return traceRelationships(w);
+	}
+
+    public Vector traceRelationships(Vector v) {
+		Vector w0 = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(0);
+			String ancestor = (String) u.elementAt(1);
+			w0.addAll(traceRelationships(code, ancestor));
+		}
+		return w0;
+	}
+
+    public Vector traceRelationships(String code, String ancestor) {
+		Vector w = new Vector();
+		Vector sup_class_vec = (Vector) classDataHashMap.get(ancestor);
+		w.add("\nAsserted " + ancestor + ":" );
+		w.addAll(sup_class_vec);
+		w.add("\nAnonymous class to be inherited by it's subclasses: ");
+		HashMap sup_hmap = createRelationshipHashMap(ancestor);
+		w.addAll(generateInheritedSubClassOfStmts(sup_hmap));
+		w.add("\nAsserted " + code + ":" );
+		Vector class_vec = (Vector) classDataHashMap.get(code);
+		w.addAll(class_vec);
+		w.add("\nInferred " + code + ":" );
+		Vector inferredOWL = composeInferredOWLClass(code, sup_hmap);
+		w.addAll(inferredOWL);
 		return w;
 	}
 
 	public boolean matchRelationshipConditions(HashMap hmap) {
 		return matchRelationshipConditions(MATCH_PATTERN, hmap);
 	}
-
-
 
 	public boolean matchRelationshipConditions(HashMap map, HashMap hmap) {
 		if (map.keySet().size() != hmap.keySet().size()) {
@@ -503,10 +509,14 @@ w.add("        </rdfs:subClassOf>");
          return w;
 	}
 
+    public HashMap createRelationshipHashMap(String code) {
+		Vector class_vec = (Vector) classDataHashMap.get(code);
+		Vector v = ScannerUtils.extractRelationships(class_vec);
+		return createRelationshipHashMap(v);
+	}
+
     public Vector composeInferredOWLClass(String code, String ancestor) {
-		Vector sup_class_vec = (Vector) classDataHashMap.get(ancestor);
-		Vector v = ScannerUtils.extractRelationships(sup_class_vec);
-		HashMap sup_hmap = createRelationshipHashMap(v);
+		HashMap sup_hmap = createRelationshipHashMap(ancestor);
 		return composeInferredOWLClass(code, sup_hmap);
 	}
 
@@ -538,7 +548,7 @@ w.add("        </rdfs:subClassOf>");
 		System.out.println("OWL File: " + owlfile);
 		InheritanceAnalyzer analyzer = new InheritanceAnalyzer(owlfile);
 
-        Vector w = analyzer.matchAncestorRelations();
+        Vector w = analyzer.matchAncestorRelationships();
         Utils.saveToFile("analyzer_results.txt", w);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}

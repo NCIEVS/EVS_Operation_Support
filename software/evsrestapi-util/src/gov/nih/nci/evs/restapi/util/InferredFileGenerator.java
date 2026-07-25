@@ -102,9 +102,12 @@ public class InferredFileGenerator {
 		InheritanceAnalyzer analyzer = new InheritanceAnalyzer(assertedOWL);
 		System.out.println("InheritanceAnalyzer instantiated. ");
         System.out.println("Searching for concepts with inherited anonymous superclasses...");
-        conceptsWithInheritedAnonymousSuperClasses = analyzer.matchAncestorRelations(false);
+        conceptsWithInheritedAnonymousSuperClasses = analyzer.matchAncestorRelationships();
 	    conceptsWithInheritedAnonymousSuperClassesMap = Utils.vector2HashMap(conceptsWithInheritedAnonymousSuperClasses, 0, 1);
-		Utils.dumpHashMap("Concepts with inherited anonymous superClasses", conceptsWithInheritedAnonymousSuperClassesMap);
+		Utils.dumpHashMap("Concepts with inherited anonymous superclasses", conceptsWithInheritedAnonymousSuperClassesMap);
+		Vector trace_vec = analyzer.traceRelationships(conceptsWithInheritedAnonymousSuperClassesMap);
+		Utils.saveToFile("trace.txt", trace_vec);
+		System.out.println("(See inherited anonymous superclasses relationships details in trace.txt.)");
 		System.out.println("Calculating parent-child (hierarchical) relationships ...");
 		Vector parent_child_vec = analyzer.get_parent_child_vec();
 		parent_child_vec = HTMLDecoder.run(parent_child_vec);
@@ -635,7 +638,7 @@ w.add("        </rdfs:subClassOf>");
         System.out.println("\nStep 5: Composing inferred NCI Thesaurus OWL ... ");
 		String inferredFileName = "ThesaurusInferred_forTS_" + StringUtils.getToday() + ".owl";
 
-		System.out.println("(C) Output:");
+        System.out.println("(C) Output:");
 		System.out.println("Generating " + inferredFileName + ". (This may take a few minutes. Please wait...)");
 		Utils.saveToFile(inferredFileName, w);
 
@@ -660,5 +663,74 @@ w.add("        </rdfs:subClassOf>");
 		generator.run(owlfile);
 		System.out.println("\tTotal run run time (ms): " + (System.currentTimeMillis() - ms));
 	}
+
 }
 
+/*
+A. Assumptions/Preprocessing:
+    Special characters in the original asserted version of the OWL file will be fixed before the converting process begins.
+
+B. Inputs:
+    1. Asserted version of NCI Thesaurus OWL (exported from Protégé).
+    2. List of data type and annotation properties to be scrubbed or removed from the NCI Thesaurus OWL; for instance, Editor_Note.
+    3. Business rules for modify or removing some properties and axioms. (for instance, (a) remove concepts: NHC50000 and NHC50001. (b) treatment of oboInOwl:hasDbXref.   (c) removal of P325 with target value being LITERAL and their corresponding property.)
+
+C. Processing:
+    1. Partition the asserted owl file into four segments.
+       a. Ontology definition
+       b. Annotation Properties, Datatype propeties, and Object Properties.
+       c. Classes data
+       d. Annotations.
+
+    2. Load each segment of the OWL into memory.
+    3. Computer hierarchical relationships.
+    4. Identify defined classes (classes with owl:equivalentClass declaration)
+    5. Find (simple) restrictions/roles of each class.
+    6. Develop an inheritance analyser for finding defined classes that do not contain any (simple) restrictions that lie outside of
+       the owl:equivalentClass declaration.
+       Note: There are observational data suggest that the inferencing rules used by OWL reasoners use both simple restrictions and the above
+          mentioned types of defined classes (also referred to as anonymous super classes) to compute the relationships of each class in the inferred version of OWL.
+    7. Develop method for updating the ontology version in the Ontology definition segment mentioned above.
+    8. Develop method for scrubbing properties from the segment property segment of the owl.
+       (Note: The list shown below is for illustration purpose, it is configurable.)
+              (1) NHC3
+              (2) NHC4
+              (3) P202
+              (4) P303
+              (5) P304
+              (6) P318
+              (7) P320
+              (8) P327
+              (9) P328
+              (10) P370
+              (11) P373
+              (12) P374
+              (13) P95
+              (14) P379
+              (15) P380
+              (16) default_on_create_class
+              (17) default_on_edit_class
+              (18) restricted_by
+              (19) TVS_Location-enum
+    9. Develop methods for modifying properties and axioms based on the set of business rules.
+    10. Compute inheritance and add inherited relationships to each class.
+    11. Combined the four new segments of OWL together to form the inferred version of the OWL.
+    12. Perform data QA by the editors.
+
+D. Output:
+   The inferred version of the OWL.
+*/
+
+
+/*
+From: Zhang, Chao (NIH/NCI) [C] <chao.zhang3@nih.gov>
+Sent: Thursday, June 18, 2026 9:51 AM
+To: Ong, Kim (NIH/NCI) [C] <kim.ong@nih.gov>
+Subject: Re: NCI Thesaurus production
+
+https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/upload/
+
+Thesaurus-260526-26.05d.owl  has some characters converted needed for processing
+
+Thesaurus-260526-26.05d.owl.orignal is the raw file.
+*/
