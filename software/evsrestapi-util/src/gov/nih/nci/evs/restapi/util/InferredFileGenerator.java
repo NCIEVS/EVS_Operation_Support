@@ -1,14 +1,10 @@
 package gov.nih.nci.evs.restapi.util;
 import gov.nih.nci.evs.restapi.bean.*;
-import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.util.*;
 
 //https://www.bing.com/search?q=OWL+reasoner+&form=ANNTH1&refig=6a5e04e8de0c4db29d0c755b2534191b&pc=U531
-
 public class InferredFileGenerator {
-	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
-
     public static String METADATA = "metadata.owl";
     public static String CLASSDATA = "classdata.owl";
 	public static String ONTOLOGY_INFO_FILE = "ontology_info.owl";
@@ -35,6 +31,7 @@ public class InferredFileGenerator {
 	static String P325 = "P325";
 	static String LITERAL = "LITERAL";
 	public static String SUBCLASSOF = "subClassOf";
+	static String owlDisjointWith = "owl:disjointWith";
 
     static {
 		EXCLUDED_PROPERTIES = new Vector();
@@ -49,7 +46,6 @@ public class InferredFileGenerator {
 			ONTOLOGY_INFO_FILE,
 			METADATA,
 			CLASSDATA,
-			//CLASSID_FILE,
 			ANNOTATIONS_FILE,
             SCRUBBED_CLASSDATA_FILE};
 
@@ -68,6 +64,7 @@ public class InferredFileGenerator {
 	Vector conceptsWithInheritedAnonymousSuperClasses = null;
 	HashMap conceptsWithInheritedAnonymousSuperClassesMap = null;
 	Vector owl_vec = null;
+	HashMap disjointWithMap = null;
 
 	public InferredFileGenerator(String assertedOWL) {
 		this.assertedOWL = assertedOWL;
@@ -95,7 +92,7 @@ public class InferredFileGenerator {
 		}
         Vector propVec = Utils.readFile(SCRUBBED_PROPERTIES_FILE);
         Utils.dumpVector("(b) Scrubbed properties", propVec);
-
+        System.out.println("(c) Business rules, for example, remove class NHC50000.");
         System.out.println("\n(B) Processing:");
         System.out.println("(a) Step 1: Preprocessing:");
 		System.out.println("Instantiating InheritanceAnalyzer ... ");
@@ -115,6 +112,10 @@ public class InferredFileGenerator {
         System.out.println("parent-child (distance-1 hierarchical) relationships generated.");
         System.out.println("Loading " + assertedOWL + " ...");
         this.owl_vec = Utils.readFile(assertedOWL);
+        System.out.println("Identifying disjointWith classes ...");
+        disjointWithMap = OWLDisjointWithScanner.run(this.owl_vec);
+        System.out.println("Number of disjoint classes: " + disjointWithMap.keySet().size());
+
  		System.out.println("Extracting Ontology Info...");
 		extractOntologyInfo(this.owl_vec);
 		System.out.println("Ontology Info extracted.");
@@ -311,8 +312,46 @@ w.add("        </rdfs:subClassOf>");
          return w;
 	}
 
+	public Vector fixOwlDisjointWith(String code, Vector class_vec) {
+		if (!disjointWithMap.containsKey(code)) return class_vec;
+		class_vec = removeOwlDisjointWith(class_vec);
+		class_vec = addOwlDisjointWith(code, class_vec);
+		return class_vec;
+	}
+
+	public Vector removeOwlDisjointWith(Vector class_vec) {
+		Vector w = new Vector();
+		for (int i=0; i<class_vec.size(); i++) {
+			String line = (String) class_vec.elementAt(i);
+			if (line.indexOf(owlDisjointWith) == -1)
+			    w.add(line);
+		}
+		return w;
+	}
+
+	public Vector addOwlDisjointWith(String code, Vector class_vec) {
+		Vector disjointWitStmts = new Vector();
+		if (disjointWithMap.containsKey(code)) {
+			Vector v = (Vector) disjointWithMap.get(code);
+			for (int i=0; i<v.size(); i++) {
+				String rel_code = (String) v.elementAt(i);
+				disjointWitStmts.add("        <owl:disjointWith rdf:resource=\"http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#" + rel_code + "\"/>");
+			}
+		}
+		Vector w = new Vector();
+		for (int i=0; i<=3; i++) {
+			String line = (String) class_vec.elementAt(i);
+			w.add(line);
+		}
+		w.addAll(disjointWitStmts);
+		for (int i=4; i<class_vec.size(); i++) {
+			String line = (String) class_vec.elementAt(i);
+			w.add(line);
+		}
+		return w;
+	}
+
     public Vector composeInferredOWLClass(String code, HashMap hmap, Vector class_vec) {
-		//Vector class_vec = (Vector) classDataHashMap.get(code);
 		Vector w = new Vector();
 	    String target = "</owl:equivalentClass>";
 	    int iend = TextFileExtractor.reverseFindLineNumber(class_vec, target);
@@ -362,7 +401,6 @@ w.add("        </rdfs:subClassOf>");
 	}
 
 	public Vector appendInheritedRestrictions(String code, Vector classData) {
-
 		if (conceptsWithInheritedAnonymousSuperClassesMap.containsKey(code)) {
 			String ancestor = (String) conceptsWithInheritedAnonymousSuperClassesMap.get(code);
     		classData = composeInferredOWLClass(code, ancestor, classData);
@@ -613,6 +651,9 @@ w.add("        </rdfs:subClassOf>");
 			String code = (String) classIdVec.elementAt(i);
 			if (StringUtils.isNCItCode(code)) {
 				Vector classData = loader.getClassData(code);
+				if (disjointWithMap.containsKey(code)) {
+					classData = fixOwlDisjointWith(code, classData);
+		        }
 				//=========================================================================
 				classData = appendInheritedRestrictions(code, classData);
 				//=========================================================================
@@ -650,7 +691,6 @@ w.add("        </rdfs:subClassOf>");
 	public void test(String code) {
 		Vector classData = (Vector) classDataHashMap.get(code);
 		Utils.dumpVector("Asserted_" + code, classData);
-
 		classData = appendInheritedRestrictions(code, classData);
 		Utils.dumpVector("Inferred_" + code, classData);
 	}
@@ -659,78 +699,8 @@ w.add("        </rdfs:subClassOf>");
 		long ms = System.currentTimeMillis();
 		String owlfile = args[0];
 		InferredFileGenerator generator = new InferredFileGenerator(owlfile);
-		String code = "C9128";
 		generator.run(owlfile);
 		System.out.println("\tTotal run run time (ms): " + (System.currentTimeMillis() - ms));
 	}
-
 }
 
-/*
-A. Assumptions/Preprocessing:
-    Special characters in the original asserted version of the OWL file will be fixed before the converting process begins.
-
-B. Inputs:
-    1. Asserted version of NCI Thesaurus OWL (exported from Protégé).
-    2. List of data type and annotation properties to be scrubbed or removed from the NCI Thesaurus OWL; for instance, Editor_Note.
-    3. Business rules for modify or removing some properties and axioms. (for instance, (a) remove concepts: NHC50000 and NHC50001. (b) treatment of oboInOwl:hasDbXref.   (c) removal of P325 with target value being LITERAL and their corresponding property.)
-
-C. Processing:
-    1. Partition the asserted owl file into four segments.
-       a. Ontology definition
-       b. Annotation Properties, Datatype propeties, and Object Properties.
-       c. Classes data
-       d. Annotations.
-
-    2. Load each segment of the OWL into memory.
-    3. Computer hierarchical relationships.
-    4. Identify defined classes (classes with owl:equivalentClass declaration)
-    5. Find (simple) restrictions/roles of each class.
-    6. Develop an inheritance analyser for finding defined classes that do not contain any (simple) restrictions that lie outside of
-       the owl:equivalentClass declaration.
-       Note: There are observational data suggest that the inferencing rules used by OWL reasoners use both simple restrictions and the above
-          mentioned types of defined classes (also referred to as anonymous super classes) to compute the relationships of each class in the inferred version of OWL.
-    7. Develop method for updating the ontology version in the Ontology definition segment mentioned above.
-    8. Develop method for scrubbing properties from the segment property segment of the owl.
-       (Note: The list shown below is for illustration purpose, it is configurable.)
-              (1) NHC3
-              (2) NHC4
-              (3) P202
-              (4) P303
-              (5) P304
-              (6) P318
-              (7) P320
-              (8) P327
-              (9) P328
-              (10) P370
-              (11) P373
-              (12) P374
-              (13) P95
-              (14) P379
-              (15) P380
-              (16) default_on_create_class
-              (17) default_on_edit_class
-              (18) restricted_by
-              (19) TVS_Location-enum
-    9. Develop methods for modifying properties and axioms based on the set of business rules.
-    10. Compute inheritance and add inherited relationships to each class.
-    11. Combined the four new segments of OWL together to form the inferred version of the OWL.
-    12. Perform data QA by the editors.
-
-D. Output:
-   The inferred version of the OWL.
-*/
-
-
-/*
-From: Zhang, Chao (NIH/NCI) [C] <chao.zhang3@nih.gov>
-Sent: Thursday, June 18, 2026 9:51 AM
-To: Ong, Kim (NIH/NCI) [C] <kim.ong@nih.gov>
-Subject: Re: NCI Thesaurus production
-
-https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/upload/
-
-Thesaurus-260526-26.05d.owl  has some characters converted needed for processing
-
-Thesaurus-260526-26.05d.owl.orignal is the raw file.
-*/

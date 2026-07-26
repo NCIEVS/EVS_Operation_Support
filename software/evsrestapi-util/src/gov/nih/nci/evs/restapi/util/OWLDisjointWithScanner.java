@@ -66,16 +66,6 @@ import java.text.*;
 
 public class OWLDisjointWithScanner {
     static String TARGET = "<!-- http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
-	private String owlfile = null;
-	public Vector classIdVec = null;
-	public HashMap classDataHashMap = null;
-	public static String CLASSID_FILE = "classIds.txt";
-	public Vector owl_vec = null;
-
-	public OWLDisjointWithScanner(String owlfile) {
-		this.owlfile = owlfile;
-	}
-
 	public static String extractClassId(String line) {
 		line = line.trim();
 		int n1 = line.lastIndexOf("#");
@@ -84,8 +74,7 @@ public class OWLDisjointWithScanner {
 		return id;
 	}
 
-	public HashMap loadOWLDisjointWithData() {
-		Vector owl_vec = Utils.readFile(owlfile);
+	public static HashMap loadOWLDisjointWithData(Vector owl_vec) {
 		HashMap disjointHashMap = new HashMap();
 		Vector w = new Vector();
 		String classId = null;
@@ -107,11 +96,10 @@ public class OWLDisjointWithScanner {
 		if (classId != null && w.size() > 0) {
 			disjointHashMap.put(classId, w);
 		}
-		owl_vec.clear();
 		return disjointHashMap;
 	}
 
-	public HashMap fixdOWLDisjointWithData(HashMap hmap) {
+	public static HashMap fixdOWLDisjointWithData(HashMap hmap) {
 		HashMap map = new HashMap();
 		Vector w = new Vector();
 		Iterator it = hmap.keySet().iterator();
@@ -138,27 +126,14 @@ public class OWLDisjointWithScanner {
 		return hmap;
 	}
 
-	public static void run(String owlfile, boolean inferred) {
-		System.out.println("owlfile: " + owlfile);
-		System.out.println("Is inferred? " + inferred);
-		OWLDisjointWithScanner scanner = new OWLDisjointWithScanner(owlfile);
-		HashMap hmap = scanner.loadOWLDisjointWithData();
-		Utils.dumpMultiValuedHashMap("Step 1. loadOWLDisjointWithData", hmap);
-		if (!inferred) {
-			hmap = scanner.fixdOWLDisjointWithData(hmap);
-			Utils.dumpMultiValuedHashMap("Step 2. fixdOWLDisjointWithData", hmap);
-		}
+	public static HashMap run(Vector owl_vec) {
+		HashMap hmap = loadOWLDisjointWithData(owl_vec);
+		return fixdOWLDisjointWithData(hmap);
 	}
 
 	public static void main(String[] args) {
-		String owlfile = args[0];
-		boolean bool = false;
-		if (args.length == 2) {
-			String boolStr = args[1];
-			if (boolStr.compareTo("true") == 0) {
-				bool = true;
-			}
-		}
-		run(owlfile, bool);
+		String owlfile = (String) args[0];
+		HashMap hmap = OWLDisjointWithScanner.run(Utils.readFile(owlfile));
+		Utils.dumpMultiValuedHashMap("disjointWith", hmap);
 	}
 }
