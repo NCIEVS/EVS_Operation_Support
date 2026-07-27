@@ -138,4 +138,78 @@ public class SpecialCharHandler {
 		}
 		return s;
 	}
+
+    public static int hexadecimal2Dec(String hexInput) {
+       // int decimalInput = 2545;
+       // String hexInput = "9F1";
+        // 2. Hexadecimal to Decimal
+        int decimalResult = Integer.parseInt(hexInput, 16);
+        //System.out.println("Hex " + hexInput + " to Decimal: " + decimalResult);
+        // Output: 2545
+        return decimalResult;
+    }
+
+    public static String dec2HexConverter(int decimalInput) {
+        //int decimalInput = 2545;
+        //String hexInput = "9F1";
+
+        // 1. Decimal to Hexadecimal
+        String hexResult = Integer.toHexString(decimalInput);
+        //System.out.println("Decimal " + decimalInput + " to Hex: " + hexResult.toUpperCase());
+        // Output: 9F1
+        return hexResult;
+    }
+
+   public static void generateSpecialCharPage(PrintWriter out, int from, int to) {
+		out.println("<!DOCTYPE html>");
+		out.println("<html>");
+		out.println("<style>");
+		out.println("body {");
+		out.println("  font-size: 20px;");
+		out.println("}");
+		out.println("</style>");
+		out.println("<body>");
+		out.println("");
+
+		out.println("<center>");
+		out.println("<h2>Hexadecimal to Decimal Conversion (" + from + " - "+ to + ") </h2>");
+		out.println("<table style=\"width: 100%;\">");
+		out.println("<tr>");
+		out.println("<th style=\"width: 30%;\">Decimal</th>");
+		out.println("<th style=\"width: 30%;\">Hexadecimal</th>");
+		out.println("<th style=\"width: 40%;\">Symbol</th>");
+		out.println("</tr>");
+		for (int i=from; i<=to; i++) {
+			out.println("<tr>");
+			String hex = dec2HexConverter(i);
+			out.println("<td style=\"text-align: center;\">" + i + "</td>");
+			out.println("<td style=\"text-align: center;\">" + hex + "</td>");
+			out.println("<td style=\"text-align: center;\"><span style='font-size:20px;'>&#" + i + ";</td>");
+			out.println("</tr>");
+		}
+		out.println("</table>");
+		out.println("</center>");
+		out.println("");
+		out.println("</body>");
+		out.println("</html>");
+   }
+
+   public static void generateSpecialCharPage(String outputfile, int from, int to) {
+	    PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(outputfile, "UTF-8");
+            generateSpecialCharPage(pw, from, to);
+		} catch (Exception ex) {
+
+		} finally {
+			try {
+				pw.close();
+				System.out.println("Output file " + outputfile + " generated.");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+
 }
