@@ -66,6 +66,10 @@ public class NCItAsciiApiUtils {
     static String NAMESPACE_TARGET = "<!-- " + NAMESPACE;
     static String OWL_CLS_TARGET = NAMESPACE_TARGET + "C";
 
+    static String WIKIPEDIA_SITE = "https://en.wikipedia.org/wiki/List_of_Unicode_characters";
+	static String WIKI_UNICODE_HTML = "wiki_List_of_Unicode_characters.html";
+	static String UNICODE_LIST = "unicode_list.txt";
+
 	static String[] STANDARD_CHARSETS = new String[] {"StandardCharsets.UTF-8",
 		"StandardCharsets.UTF-16",
 		"StandardCharsets.UTF-16BE",
@@ -219,6 +223,48 @@ public class NCItAsciiApiUtils {
 		outputfile = "nonascii_" + owlfile.substring(0, n) + "_v2.txt";
 		SpecialCharReadWrite.saveToFile(outputfile, w);
 		Text2Excel.generateExcel(outputfile, '\t');
+	}
+
+	public static void generateUnicodeTable() {
+		Vector v = SpecialCharReadWrite.readFromFile(WIKI_UNICODE_HTML, true);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, "</td>");
+			if (u != null) {
+				for (int j=0; j<u.size(); j++) {
+					String line2 = (String) u.elementAt(j);
+					Vector u2 = StringUtils.parseData(line2, "</span>");
+				    w.addAll(u2);
+				}
+			}
+		}
+
+		Vector w0 = new Vector();
+		w0.add("Unicode\tLabel\tSymbol");
+		for (int i=0; i<w.size(); i++) {
+			String line = (String) w.elementAt(i);
+			if (line.indexOf("td") != -1 && line.indexOf("title") != -1) {
+				String t1 =(String) w.elementAt(i+1);
+				if (t1.indexOf(">U+") != -1) {
+					int n = t1.lastIndexOf(">");
+					String s = t1.substring(n+1, t1.length());
+					Vector u = StringUtils.parseData(s, ':');
+					String unicode = (String) u.elementAt(0);
+					String label = (String) u.elementAt(1);
+					label = label.trim();
+					String t6 =(String) w.elementAt(i+6);
+					if (t6.indexOf("<span") != -1) {
+						Vector v2 = ASCIITable.extractNonASCIIChars(t6);
+						if (v2 != null && v2.size() == 1) {
+							w0.add(unicode + "\t" + label + "\t" + (String) v2.elementAt(0));
+						}
+					}
+				}
+			}
+		}
+		SpecialCharReadWrite.saveToFile(UNICODE_LIST, w0);
+		Text2Excel.generateExcel(UNICODE_LIST, '\t');
 	}
 
     public static void main(String[] args) {
