@@ -143,6 +143,10 @@ public class Text2Excel {
 		System.out.println(excelfile + " generated.");
 	}
 
+	public static void generateExcel(String textfile) {
+		generateExcel(textfile, '\t');
+	}
+
 	public static void main(String[] args) {
 		String dir = args[0];
 		System.out.println("working dir: " + dir);
@@ -152,5 +156,4 @@ public class Text2Excel {
 		System.out.println("Calling generateExcel...");
 		generateExcel(dir, excelfile, delim);
 	}
-
 }
