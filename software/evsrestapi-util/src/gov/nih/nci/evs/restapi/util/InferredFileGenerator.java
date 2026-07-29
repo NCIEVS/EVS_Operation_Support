@@ -645,7 +645,8 @@ w.add("        </rdfs:subClassOf>");
 		w.addAll(getClassesStartStmts());
 
         System.out.println("\nStep 4: Computing inheritance (generating inherited relationships) ...");
-        Vector w1 = new ProgressBarMaker(this, classIdVec).run();
+        String progressBarLabel = "  Classification in progress...";
+        Vector w1 = new ProgressBarMaker(this, classIdVec).run(progressBarLabel);
         w.addAll(w1);
 /*
 
