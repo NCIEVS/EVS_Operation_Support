@@ -27,11 +27,14 @@ public class ProgressBarMaker extends JFrame {
 
     public Vector run() {
         // create a frame
-        f = new JFrame("Progress Bar");
+        f = new JFrame("Inference Progress");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLocationRelativeTo(null);
         // create a panel
         JPanel p = new JPanel();
+
+        //JLabel l = new JLabel("Inheritance calculation in progress...");
+        //p.add(l);
 
         // create a progressbar
         b = new JProgressBar();

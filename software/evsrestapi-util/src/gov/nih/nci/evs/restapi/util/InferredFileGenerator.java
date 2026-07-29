@@ -695,12 +695,13 @@ w.add("        </rdfs:subClassOf>");
 		String inferredFileName = "ThesaurusInferred_forTS_" + StringUtils.getToday() + ".owl";
 
         System.out.println("(C) Output:");
-		System.out.println("Generating " + inferredFileName + ". (This may take a few minutes. Please wait...)");
+		System.out.println("Generating " + inferredFileName);
 		Utils.saveToFile(inferredFileName, w);
+		System.out.println("Inferred file generated as " + inferredFileName + ".");
 
 		System.out.println("\nStep 6: Remove temporary files ... ");
 		removeTemporaryFiles();
-		System.out.println("\tTotal processing run time (ms): " + (System.currentTimeMillis() - ms));
+		System.out.println("Total processing run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 	public void test(String code) {
@@ -715,7 +716,7 @@ w.add("        </rdfs:subClassOf>");
 		String owlfile = args[0];
 		InferredFileGenerator generator = new InferredFileGenerator(owlfile);
 		generator.run(owlfile);
-		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 		System.exit(0);
 	}
 }
