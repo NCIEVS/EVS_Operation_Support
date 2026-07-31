@@ -14,10 +14,10 @@ import com.thoughtworks.xstream.XStream;
 public class LogicalExpressionElement {
 
 // Variable declaration
+    private String range;
 	private List<Restriction> roles;
 	private List<RoleUnion> roleUnions;
 	private List<RoleGroup> roleGroups;
-	private String range;
 
 // Default constructor
 	public LogicalExpressionElement() {
@@ -25,49 +25,49 @@ public class LogicalExpressionElement {
 
 // Constructor
 	public LogicalExpressionElement(
+		String range,
 		List<Restriction> roles,
 		List<RoleUnion> roleUnions,
-		List<RoleGroup> roleGroups,
-		String range) {
-
+		List<RoleGroup> roleGroups
+		) {
+		this.range = range;
 		this.roles = roles;
 		this.roleUnions = roleUnions;
 		this.roleGroups = roleGroups;
-		this.range = range;
 	}
 
 // Set methods
-	public void setRoles(List<Restriction> roles) { 
+	public void setRoles(List<Restriction> roles) {
 		this.roles = roles;
 	}
 
-	public void setRoleUnions(List<RoleUnion> roleUnions) { 
+	public void setRoleUnions(List<RoleUnion> roleUnions) {
 		this.roleUnions = roleUnions;
 	}
 
-	public void setRoleGroups(List<RoleGroup> roleGroups) { 
+	public void setRoleGroups(List<RoleGroup> roleGroups) {
 		this.roleGroups = roleGroups;
 	}
 
-	public void setRange(String range) { 
+	public void setRange(String range) {
 		this.range = range;
 	}
 
 
 // Get methods
-	public List<Restriction> getRoles() { 
+	public List<Restriction> getRoles() {
 		return this.roles;
 	}
 
-	public List<RoleUnion> getRoleUnions() { 
+	public List<RoleUnion> getRoleUnions() {
 		return this.roleUnions;
 	}
 
-	public List<RoleGroup> getRoleGroups() { 
+	public List<RoleGroup> getRoleGroups() {
 		return this.roleGroups;
 	}
 
-	public String getRange() { 
+	public String getRange() {
 		return this.range;
 	}
 

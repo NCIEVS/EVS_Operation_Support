@@ -27,6 +27,16 @@ public class Restriction {
 
 // Constructor
 	public Restriction(
+		String roleLabel,
+		String targetCode,
+		String targetLabel) {
+
+		this.roleLabel = roleLabel;
+		this.targetCode = targetCode;
+		this.targetLabel = targetLabel;
+	}
+
+	public Restriction(
 		String sourceCode,
 		String sourceLabel,
 		String roleCode,
@@ -43,53 +53,53 @@ public class Restriction {
 	}
 
 // Set methods
-	public void setSourceCode(String sourceCode) { 
+	public void setSourceCode(String sourceCode) {
 		this.sourceCode = sourceCode;
 	}
 
-	public void setSourceLabel(String sourceLabel) { 
+	public void setSourceLabel(String sourceLabel) {
 		this.sourceLabel = sourceLabel;
 	}
 
-	public void setRoleCode(String roleCode) { 
+	public void setRoleCode(String roleCode) {
 		this.roleCode = roleCode;
 	}
 
-	public void setRoleLabel(String roleLabel) { 
+	public void setRoleLabel(String roleLabel) {
 		this.roleLabel = roleLabel;
 	}
 
-	public void setTargetCode(String targetCode) { 
+	public void setTargetCode(String targetCode) {
 		this.targetCode = targetCode;
 	}
 
-	public void setTargetLabel(String targetLabel) { 
+	public void setTargetLabel(String targetLabel) {
 		this.targetLabel = targetLabel;
 	}
 
 
 // Get methods
-	public String getSourceCode() { 
+	public String getSourceCode() {
 		return this.sourceCode;
 	}
 
-	public String getSourceLabel() { 
+	public String getSourceLabel() {
 		return this.sourceLabel;
 	}
 
-	public String getRoleCode() { 
+	public String getRoleCode() {
 		return this.roleCode;
 	}
 
-	public String getRoleLabel() { 
+	public String getRoleLabel() {
 		return this.roleLabel;
 	}
 
-	public String getTargetCode() { 
+	public String getTargetCode() {
 		return this.targetCode;
 	}
 
-	public String getTargetLabel() { 
+	public String getTargetLabel() {
 		return this.targetLabel;
 	}
 
@@ -108,6 +118,10 @@ public class Restriction {
 		JsonParser parser = new JsonParser();
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(this);
+	}
+
+	public String toString() {
+		return roleLabel + "\t\t" + targetLabel + " (" + targetCode + ")";
 	}
 
 	public String escapeDoubleQuotes(String inputStr) {

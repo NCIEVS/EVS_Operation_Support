@@ -30,6 +30,13 @@ public class TooltipExample {
         LE = new LogicalExpression(serviceUrl, named_graph, username, password);
 	}
 
+    public String run(String named_graph, String code, boolean debug) {
+        HashMap hmap = LE.getLogicalExpressionData(named_graph, code);
+		hmap = LE.formatLogicalExpression(hmap);
+		gov.nih.nci.evs.restapi.bean.LogicalExpression le = LE.constructLogicalExpression(code, hmap);
+		String expression = LE.logicalExpression2String(le);
+		return expression;
+    }
 
     public static void generateMetadata() {
 		OWLScanner owlscanner = new OWLScanner(NCIT_OWL);
@@ -113,7 +120,7 @@ public class TooltipExample {
 		return line;
 	}
 
-	public static void run(PrintWriter out, String textfile) {
+	public void run(PrintWriter out, String textfile) {
 		out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
 		out.println("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
 		out.println("	<head>");
@@ -176,7 +183,7 @@ public class TooltipExample {
 		Vector v = Utils.readFile(textfile);
 		for (int i=0; i<v.size(); i++) {
 			String code = (String) v.elementAt(i);
-			String expression = LE.run(named_graph, code, false);
+			String expression = run(named_graph, code, false);
 			boolean encode = false;
 			expression = flattenExpression(expression, encode);
 			String displayLabel = (String) code2LabelMap.get(code) + " (" + toHyperLink(code) + ")";
@@ -230,7 +237,7 @@ public class TooltipExample {
 		return null;
 	}
 
-	public static void run(String textfile) {
+	public void run(String textfile) {
 		int n = textfile.lastIndexOf(".");
 		String htmlfile = textfile.substring(0, n) + ".html";
 		PrintWriter pw = null;
@@ -282,9 +289,11 @@ public class TooltipExample {
 		return buf.toString();
 	}
 
+/*
 	public static void main(String[] args) {
 		String codefile = args[0];
 		run(codefile);
 	}
+*/
 
 }

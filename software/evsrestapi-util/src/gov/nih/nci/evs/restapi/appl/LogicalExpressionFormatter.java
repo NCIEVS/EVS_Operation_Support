@@ -475,10 +475,10 @@ System.out.println("********************** 	findRangesInLEData 	****************
 		}
 
 		LogicalExpressionElement e = new LogicalExpressionElement(
+			range,
 			simpleRoleList,
 			roleUnion_list,
-			roleGroup_list,
-			range);
+			roleGroup_list);
 
 
 		System.out.println("******************** DEBUG **************\n" + e.toJson());

@@ -30,6 +30,14 @@ public class HTMLReportExample {
         LE = new gov.nih.nci.evs.restapi.appl.LogicalExpression(serviceUrl, named_graph, username, password);
 	}
 
+    public String run(String named_graph, String code, boolean debug) {
+        HashMap hmap = LE.getLogicalExpressionData(named_graph, code);
+		hmap = LE.formatLogicalExpression(hmap);
+		gov.nih.nci.evs.restapi.bean.LogicalExpression le = LE.constructLogicalExpression(code, hmap);
+		String expression = LE.logicalExpression2String(le);
+		return expression;
+    }
+
     public static void generateMetadata() {
 		OWLScanner owlscanner = new OWLScanner(NCIT_OWL);
 		annotationProperties = owlscanner.extractAnnotationProperties(owlscanner.get_owl_vec());
@@ -147,7 +155,7 @@ public class HTMLReportExample {
 	}
 
 
-	public static void run(PrintWriter out, String textfile) {
+	public void run(PrintWriter out, String textfile) {
 		out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
 		out.println("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
 		out.println("	<head>");
@@ -220,7 +228,7 @@ public class HTMLReportExample {
 			String indent = getIndentation(line);
 			String label = (String) code2LabelMap.get(line);
 			out.println(indent + label + " (" + hyperlinkNCItCodes(code) + ")");
-			String expression = LE.run(named_graph, code, false);
+			String expression = run(named_graph, code, false);
 			out.println("<pre>");
 			out.println(expression);
 			out.println("</pre>");
@@ -270,7 +278,7 @@ public class HTMLReportExample {
 		return null;
 	}
 
-	public static void run(String textfile) {
+	public void run(String textfile) {
 		PrintWriter pw = null;
 		try {
 			int n = textfile.lastIndexOf(".");
@@ -290,9 +298,11 @@ public class HTMLReportExample {
 		}
 	}
 
+/*
 	public static void main(String[] args) {
 		String filename = args[0];
 		run(filename);
 	}
+*/
 
 }
