@@ -28,13 +28,13 @@ public class RoleGroup {
 	}
 
 // Set methods
-	public void setRoleSets(List<RoleSet> roleSets) { 
+	public void setRoleSets(List<RoleSet> roleSets) {
 		this.roleSets = roleSets;
 	}
 
 
 // Get methods
-	public List<RoleSet> getRoleSets() { 
+	public List<RoleSet> getRoleSets() {
 		return this.roleSets;
 	}
 
@@ -53,6 +53,26 @@ public class RoleGroup {
 		JsonParser parser = new JsonParser();
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(this);
+	}
+
+    public String toString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("\tRole Group").append("\n");
+		for (int j=0; j<roleSets.size(); j++) {
+			RoleSet rs = (RoleSet) roleSets.get(j);
+			List roles = rs.getRoles();
+			for (int k=0; k<roles.size()/2; k++) {
+				Restriction r1 = (Restriction) roles.get(k*2);
+				Restriction r2 = (Restriction) roles.get(k*2+1);
+				buf.append("\t\t" + r1.toString()).append("\n");
+				buf.append("\t\t" + r2.toString()).append("\n");
+				if (j<roleSets.size()-1) {
+					buf.append("\tor");
+				}
+			}
+			buf.append("\n");
+		}
+		return buf.toString();
 	}
 
 	public String escapeDoubleQuotes(String inputStr) {

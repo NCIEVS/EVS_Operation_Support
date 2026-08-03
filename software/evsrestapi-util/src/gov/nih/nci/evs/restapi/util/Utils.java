@@ -985,9 +985,7 @@ public class Utils {
         if (!Charset.isSupported(standard)) {
             System.err.println(standard + " encoding is not supported on this platform.");
             return;
-        } else {
-			//System.out.println(standard + " is supported on this platform.");
-		}
+        }
 
         // Write to file using try-with-resources for automatic closing
         try (BufferedWriter writer = new BufferedWriter(

@@ -88,6 +88,44 @@ public class LogicalExpressionElement {
         return gson.toJson(this);
 	}
 
+
+	public String toString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getRange()).append("\n");
+        List<Restriction> roles = getRoles();
+        for (int i=0; i<roles.size(); i++) {
+			Restriction r = (Restriction) roles.get(i);
+			buf.append("\t\t" + r.toString()).append("\n");
+		}
+
+        List<RoleUnion> roleUnions = getRoleUnions();
+        if (roleUnions != null && roleUnions.size() > 0) {
+			buf.append("\n");
+			for (int i=0; i<roleUnions.size(); i++) {
+				RoleUnion ru = (RoleUnion) roleUnions.get(i);
+				roles = ru.getRoles();
+				for (int j=0; j<roles.size(); j++) {
+					Restriction r = (Restriction) roles.get(j);
+					buf.append("\t\t" + r.toString()).append("\n");
+					if (j<roles.size()-1) {
+						buf.append("\tor").append("\n");
+					}
+				}
+				buf.append("\n");
+			}
+		}
+
+        List<RoleGroup> roleGroups = getRoleGroups();
+        if (roleGroups != null && roleGroups.size() > 0) {
+			buf.append("\n");
+			for (int i=0; i<roleGroups.size(); i++) {
+				RoleGroup rg = (RoleGroup) roleGroups.get(i);
+				buf.append(rg.toString());
+			}
+		}
+		return buf.toString();
+	}
+
 	public String escapeDoubleQuotes(String inputStr) {
 		char doubleQ = '"';
 		StringBuffer buf = new StringBuffer();

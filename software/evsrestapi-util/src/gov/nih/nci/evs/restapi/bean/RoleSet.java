@@ -28,13 +28,13 @@ public class RoleSet {
 	}
 
 // Set methods
-	public void setRoles(List<Restriction> roles) { 
+	public void setRoles(List<Restriction> roles) {
 		this.roles = roles;
 	}
 
 
 // Get methods
-	public List<Restriction> getRoles() { 
+	public List<Restriction> getRoles() {
 		return this.roles;
 	}
 
@@ -54,6 +54,21 @@ public class RoleSet {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(this);
 	}
+
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		for (int k=0; k<roles.size()/2; k++) {
+			Restriction r1 = (Restriction) roles.get(k*2);
+			Restriction r2 = (Restriction) roles.get(k*2+1);
+			buf.append("\t\t" + r1.toString()).append("\n");
+			buf.append("\t\t" + r2.toString()).append("\n");
+			if (k< roles.size()/2-1) {
+				buf.append("\tor").append("\n");
+			}
+		}
+		return buf.toString();
+	}
+
 
 	public String escapeDoubleQuotes(String inputStr) {
 		char doubleQ = '"';

@@ -459,6 +459,7 @@ public class LogicalExpression {
 		return expressionMap;
 	}
 
+
     public String generateRoleUnionExpression(String role_union_line) {
 		StringBuffer buf2 = new StringBuffer();
 		buf2.append("\n");
@@ -496,7 +497,6 @@ public class LogicalExpression {
 		}
 		return expressionMap;
 	}
-
 
     static String range2RolesHashMap2Expression(HashMap range2RolesHashMap) {
 		StringBuffer buf = new StringBuffer();
@@ -713,7 +713,7 @@ public class LogicalExpression {
 		}
 		gov.nih.nci.evs.restapi.bean.LogicalExpression le = constructLogicalExpression(code, hmap);
 		System.out.println(le.toJson());
-		String expression = logicalExpression2String(le);
+		String expression = le.toString();
 		System.out.println("\n" + expression);
     }
 
@@ -765,53 +765,13 @@ public class LogicalExpression {
 						Restriction r2 = (Restriction) roles.get(k*2+1);
 						buf.append("\t\t" + r1.toString()).append("\n");
 						buf.append("\t\t" + r2.toString()).append("\n");
-						if (j< roles.size()/2-1) {
+						if (k< roles.size()/2-1) {
 							buf.append("\tor").append("\n");
 						}
 					}
 					buf.append("\n");
 				}
 			}
-		}
-		return buf.toString();
-	}
-
-	public String logicalExpression2String(gov.nih.nci.evs.restapi.bean.LogicalExpression le) {
-        StringBuffer buf = new StringBuffer();
-        buf.append("Logical expression of: ").append(le.getLabel()).append(" (" + le.getCode() + ")").append("\n\n");
-
-        List parents = le.getParents();
-        Vector parent_vec = new Vector();
-        Vector w = new Vector();
-
-        if (parents != null && parents.size() > 0) {
-			buf.append("Parent(s)").append("\n");
-			for (int i=0; i<parents.size(); i++) {
-				Concept c = (Concept) parents.get(i);;
-				String line = c.getLabel() + " (" + c.getCode() + ")";
-				parent_vec.add("\t\t" + line);
-			}
-		}
-		parent_vec = new SortUtils().quickSort(parent_vec);
-		for (int i=0; i<parent_vec.size(); i++) {
-			String line = (String) parent_vec.elementAt(i);
-			buf.append(line).append("\n");
-		}
-		buf.append("\n");
-
-		Vector ranges = new Vector();
-		HashMap range2LEEMap = new HashMap();
-		List<LogicalExpressionElement> elements = le.getElements();
-		for (int i=0; i<elements.size(); i++) {
-			LogicalExpressionElement element = (LogicalExpressionElement) elements.get(i);
-			ranges.add(element.getRange());
-			range2LEEMap.put(element.getRange(), element);
-		}
-		ranges = new SortUtils().quickSort(ranges);
-		for (int i=0; i<ranges.size(); i++) {
-			String range = (String) ranges.elementAt(i);
-			LogicalExpressionElement element = (LogicalExpressionElement) range2LEEMap.get(range);
-            buf.append(logicalExpressionElement2String(element)).append("\n");
 		}
 		return buf.toString();
 	}
@@ -1072,6 +1032,13 @@ public class LogicalExpression {
 		System.out.println(r.toJson());
 	}
 
+	public static void run(String serviceUrl, String named_graph, String username, String password, String code, boolean debug) {
+		long ms = System.currentTimeMillis();
+        LogicalExpression test = new LogicalExpression(serviceUrl, named_graph, username, password);
+        test.run(named_graph, code, debug);
+        System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		String serviceUrl = ConfigurationController.serviceUrl;
@@ -1081,11 +1048,6 @@ public class LogicalExpression {
 		String code = args[0];
         LogicalExpression test = new LogicalExpression(serviceUrl, named_graph, username, password);
         test.run(named_graph, code, true);
-/*
-        String label = test.getLabelByCode(named_graph, code);
-        System.out.println("Logical expression of: " + label + " (" + code + ")");
-        System.out.println(expression);
-*/
-
+        System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }

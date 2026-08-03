@@ -34,7 +34,7 @@ public class TooltipExample {
         HashMap hmap = LE.getLogicalExpressionData(named_graph, code);
 		hmap = LE.formatLogicalExpression(hmap);
 		gov.nih.nci.evs.restapi.bean.LogicalExpression le = LE.constructLogicalExpression(code, hmap);
-		String expression = LE.logicalExpression2String(le);
+		String expression = le.toString();//LE.logicalExpression2String(le);
 		return expression;
     }
 
