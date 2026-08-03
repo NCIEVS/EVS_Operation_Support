@@ -328,8 +328,15 @@ public class LogicalExpressionGenerator {
         return hmap;
 	}
 
+/*
     public String getLogicalExpression(String named_graph, String code) {
         String expression = formatter.run(le, named_graph, code);
+        return expression;
+	}
+*/
+    public String getLogicalExpression(String named_graph, String code) {
+		gov.nih.nci.evs.restapi.bean.LogicalExpression logicalExpre = le.getLogicalExpression(named_graph, code, false);
+        String expression = logicalExpre.toString();
         return expression;
 	}
 
