@@ -114,4 +114,17 @@ public class TextFileExtractor {
 		}
 		return -1;
 	}
+
+	public Vector removeDuplicates(Vector v) {
+		HashSet hset = new HashSet();
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String t = (String) v.elementAt(i);
+			if (!hset.contains(t)) {
+				hset.add(t);
+				w.add(t);
+			}
+		}
+		return w;
+	}
 }

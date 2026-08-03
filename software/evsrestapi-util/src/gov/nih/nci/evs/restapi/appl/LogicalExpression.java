@@ -557,34 +557,35 @@ public class LogicalExpression {
 
         if (v == null) {
 			System.out.println("ERROR: parent == null)");
-			return null;
+		} else {
+			for (int i=0; i<v.size(); i++) {
+				String line = (String) v.elementAt(i);
+				Vector u = StringUtils.parseData(line, '|');
+				String code = (String) u.elementAt(0);
+				String label = (String) u.elementAt(1);
+				w.add(label + " (" + code + ")");
+			}
+			w = new SortUtils().quickSort(w);
+			map.put("PARENT", w);
 		}
-		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String code = (String) u.elementAt(0);
-            String label = (String) u.elementAt(1);
-            w.add(label + " (" + code + ")");
-		}
-		w = new SortUtils().quickSort(w);
-		map.put("PARENT", w);
 
         //buf.append("select distinct ?x_code ?x_label ?e1 ?u1 ?i1 ?rs ?p_label ?p_code ?y_code ?y_label").append("\n");
 		w = new Vector();
 		v = (Vector) hmap.get("ROLE");
-
-		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String roleCode = (String) u.elementAt(5);
-			String roleTargetCode = (String) u.elementAt(6);
-			String roleName = (String) u.elementAt(4);
-			String roleTargetName = (String) u.elementAt(7);
-			String range = (String) roleCode2RangeNameMap.get(roleCode);
-			w.add(roleName + "\t\t" + roleTargetName + " (" + roleTargetCode + ")" + "|" + range);
+        if (v != null && v.size() > 0) {
+			for (int i=0; i<v.size(); i++) {
+				String line = (String) v.elementAt(i);
+				Vector u = StringUtils.parseData(line, '|');
+				String roleCode = (String) u.elementAt(5);
+				String roleTargetCode = (String) u.elementAt(6);
+				String roleName = (String) u.elementAt(4);
+				String roleTargetName = (String) u.elementAt(7);
+				String range = (String) roleCode2RangeNameMap.get(roleCode);
+				w.add(roleName + "\t\t" + roleTargetName + " (" + roleTargetCode + ")" + "|" + range);
+			}
+			w = new SortUtils().quickSort(w);
+			map.put("ROLE", w);
 		}
-		w = new SortUtils().quickSort(w);
-		map.put("ROLE", w);
 
         //buf.append("select distinct ?x_code ?x_label ?c1 ?rs ?p_label ?p_code ?y_code ?y_label").append("\n");
 		w = new Vector();
