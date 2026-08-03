@@ -936,7 +936,9 @@ public class LogicalExpression {
 		}
 		// Find all ranges
 		Vector ranges = findRangesInLEData(hmap);
-		ranges.add(RANGE_UNSPECIFIED);
+		if (!ranges.contains(RANGE_UNSPECIFIED)) {
+			ranges.add(RANGE_UNSPECIFIED);
+		}
 		List<gov.nih.nci.evs.restapi.bean.LogicalExpressionElement> elements = new ArrayList();
 		for (int i=0; i<ranges.size(); i++) {
 			String range = (String) ranges.elementAt(i);
