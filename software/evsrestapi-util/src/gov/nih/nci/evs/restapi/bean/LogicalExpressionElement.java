@@ -91,7 +91,11 @@ public class LogicalExpressionElement {
 
 	public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append(getRange()).append("\n");
+        if (range.compareTo("[Range Unspecified]") == 0) {
+			buf.append("").append("\n");
+		} else {
+        	buf.append(range).append("\n");
+		}
         List<Restriction> roles = getRoles();
         for (int i=0; i<roles.size(); i++) {
 			Restriction r = (Restriction) roles.get(i);
@@ -120,8 +124,31 @@ public class LogicalExpressionElement {
 			buf.append("\n");
 			for (int i=0; i<roleGroups.size(); i++) {
 				RoleGroup rg = (RoleGroup) roleGroups.get(i);
-				buf.append(rg.toString());
+                if (range.compareTo("[Range Unspecified]") == 0) {
+					buf.append(rg2String(rg));
+				} else {
+					buf.append(rg.toString());
+				}
 			}
+		}
+		return buf.toString();
+	}
+
+    public String rg2String(RoleGroup rg) {
+		StringBuffer buf = new StringBuffer();
+		buf.append("Role Group").append("\n");
+		List<RoleSet> roleSets = rg.getRoleSets();
+		for (int j=0; j<roleSets.size(); j++) {
+			RoleSet rs = (RoleSet) roleSets.get(j);
+			List roles = rs.getRoles();
+			for (int k=0; k<roles.size(); k++) {
+				Restriction r = (Restriction) roles.get(k);
+				buf.append("\t\t" + r.toString()).append("\n");
+			}
+			if (j<roleSets.size()-1) {
+				buf.append("\tor");
+			}
+			buf.append("\n");
 		}
 		return buf.toString();
 	}

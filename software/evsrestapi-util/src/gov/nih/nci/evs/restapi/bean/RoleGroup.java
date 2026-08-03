@@ -61,14 +61,12 @@ public class RoleGroup {
 		for (int j=0; j<roleSets.size(); j++) {
 			RoleSet rs = (RoleSet) roleSets.get(j);
 			List roles = rs.getRoles();
-			for (int k=0; k<roles.size()/2; k++) {
-				Restriction r1 = (Restriction) roles.get(k*2);
-				Restriction r2 = (Restriction) roles.get(k*2+1);
-				buf.append("\t\t" + r1.toString()).append("\n");
-				buf.append("\t\t" + r2.toString()).append("\n");
-				if (j<roleSets.size()-1) {
-					buf.append("\tor");
-				}
+			for (int k=0; k<roles.size(); k++) {
+				Restriction r = (Restriction) roles.get(k);
+				buf.append("\t\t" + r.toString()).append("\n");
+			}
+			if (j<roleSets.size()-1) {
+				buf.append("\tor");
 			}
 			buf.append("\n");
 		}
