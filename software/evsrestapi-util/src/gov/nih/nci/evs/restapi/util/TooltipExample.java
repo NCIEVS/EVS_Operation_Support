@@ -1,4 +1,4 @@
-import gov.nih.nci.evs.restapi.util.*;
+package gov.nih.nci.evs.restapi.util;
 import gov.nih.nci.evs.restapi.appl.*;
 import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
@@ -26,7 +26,6 @@ public class TooltipExample {
 		System.out.println("NCIT_OWL: " + NCIT_OWL);
 		code2LabelMap = createCode2LabelMap();
 		System.out.println("code2LabelMap: " + code2LabelMap.keySet().size());
-		//generateMetadata();
         LE = new LogicalExpression(serviceUrl, named_graph, username, password);
 	}
 
@@ -34,7 +33,7 @@ public class TooltipExample {
         HashMap hmap = LE.getLogicalExpressionData(named_graph, code);
 		hmap = LE.formatLogicalExpression(hmap);
 		gov.nih.nci.evs.restapi.bean.LogicalExpression le = LE.constructLogicalExpression(code, hmap);
-		String expression = le.toString();//LE.logicalExpression2String(le);
+		String expression = le.toString();
 		return expression;
     }
 
@@ -187,7 +186,6 @@ public class TooltipExample {
 			boolean encode = false;
 			expression = flattenExpression(expression, encode);
 			String displayLabel = (String) code2LabelMap.get(code) + " (" + toHyperLink(code) + ")";
-			//String t = toTooltip(code, expression);
 			String t = toTooltip(displayLabel, expression);
 			out.println(t);
 			out.println("<p></p>");
@@ -242,7 +240,6 @@ public class TooltipExample {
 		String htmlfile = textfile.substring(0, n) + ".html";
 		PrintWriter pw = null;
 		try {
-
 			pw = new PrintWriter(htmlfile);
 		    run(pw, textfile);
 		} catch (Exception ex) {
@@ -289,11 +286,16 @@ public class TooltipExample {
 		return buf.toString();
 	}
 
-/*
 	public static void main(String[] args) {
+		/*
 		String codefile = args[0];
-		run(codefile);
+		new TooltipExample().run(codefile);
+		*/
+		String code = "C7164";
+		Vector w = new Vector();
+		w.add(code);
+		Utils.saveToFile("codes.txt", w);
+		new TooltipExample().run("codes.txt");
 	}
-*/
 
 }
