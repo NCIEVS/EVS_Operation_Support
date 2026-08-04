@@ -57,7 +57,7 @@ public class RoleGroup {
 
     public String toString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("\tRole Group").append("\n");
+		buf.append("\tRole Group(s)").append("\n");
 		for (int j=0; j<roleSets.size(); j++) {
 			RoleSet rs = (RoleSet) roleSets.get(j);
 			List roles = rs.getRoles();

@@ -136,7 +136,7 @@ public class LogicalExpressionElement {
 
     public String rg2String(RoleGroup rg) {
 		StringBuffer buf = new StringBuffer();
-		buf.append("Role Group").append("\n");
+		buf.append("Role Group(s)").append("\n");
 		List<RoleSet> roleSets = rg.getRoleSets();
 		for (int j=0; j<roleSets.size(); j++) {
 			RoleSet rs = (RoleSet) roleSets.get(j);
