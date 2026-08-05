@@ -462,9 +462,119 @@ public class NCItDiffUtils {
         System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
+//    <!-- http://ncicb.nci.nih.gov/xml/owl/EVS/ctcae5.owl#ALT_DEFINITION -->
+
+    public static String getSectionLabel(String line) {
+		line = line.trim();
+		if (line.startsWith("//") && line.length() > 2 && line.length() < 80) {
+			int n = line.indexOf(" ");
+			String t = line.substring(n+1, line.length());
+			return t;
+		}
+		return null;
+	}
+
+//    // Annotation properties
+    public static Vector extractSectionLabels(String owlfile) {
+		Vector v = Utils.readFile(owlfile);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.trim();
+			if (line.startsWith("//") && line.length() > 2 && line.length() < 80) {
+				int n = line.indexOf(" ");
+				String t = line.substring(n+1, line.length());
+				w.add(t);
+			}
+		}
+		return w;
+	}
+
+	public String getEntityNamespace(String line) {
+		if (line.indexOf("<!-- http:") != -1) {
+			int n1 = line.indexOf("http:");
+			int n2 = line.lastIndexOf("#");
+			String ns = line.substring(n1, n2);
+			return ns;
+		}
+		return null;
+	}
+
+    public static String getNameSpace(String line) {
+		String ns = null;
+		if (line.indexOf("<!-- http:") != -1) {
+			int n1 = line.indexOf("http:");
+			int n2 = line.lastIndexOf("#");
+			ns = line.substring(n1, n2);
+		}
+		return ns;
+	}
+
+//    <!-- http://ncicb.nci.nih.gov/xml/owl/EVS/ctcae5.owl#term-source -->
+
+    public static String getEntityId(String line) {
+		int n1 = line.lastIndexOf("#");
+		int n2 = line.lastIndexOf(" ");
+		if (n1 != -1 && n2 != -1 && n2 > n1) {
+			return line.substring(n1+1, n2);
+		}
+		return null;
+	}
+
+    public static Vector extractEntityNamespaces(String owlfile) {
+		Vector v = Utils.readFile(owlfile);
+		HashSet hset = new HashSet();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			String ns = getNameSpace(line);
+			if (ns != null) {
+				if (!hset.contains(ns)) {
+					hset.add(ns);
+				}
+			}
+		}
+		return Utils.hashSet2Vector(hset);
+	}
+
+    public static Vector extractEntityNamespaces(String owlfile, String sectionLabel) {
+		Vector v = Utils.readFile(owlfile);
+		String section = null;
+		Vector w = new Vector();
+		w.add("Propety Type\tProperty Label/Code\tNamespace");
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			line = line.trim();
+			if (line.startsWith("//")) {
+				String sec = getSectionLabel(line);
+				if (sec != null) {
+					section = sec;
+				}
+			}
+			String ns = getNameSpace(line);
+			String id = getEntityId(line);
+			if (ns != null && id != null) {
+				if (section != null && section.compareTo(sectionLabel) == 0) {
+					w.add(sectionLabel + "\t" + id + "\t" + ns);
+				}
+			}
+		}
+        return w;
+	}
+
+
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
-		run(args);
+		//run(args);
+
+		String owlfile1 = args[0];
+		String owlfile2 = args[1];
+
+		Vector w1 = extractEntityNamespaces(owlfile1, "Annotation properties");
+		Utils.saveToFile(owlfile1 + "_Annotation_properties.txt", w1);
+
+		Vector w2 = extractEntityNamespaces(owlfile2, "Annotation properties");
+		Utils.saveToFile(owlfile2 + "_Annotation_properties.txt", w2);
+
         System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
