@@ -12,6 +12,15 @@ import java.nio.file.*;
 import java.nio.charset.Charset;
 import org.apache.commons.text.*;
 
+import java.text.DateFormatSymbols;
+import java.time.DayOfWeek;
+import java.time.format.TextStyle;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 /**
  * <!-- LICENSE_TEXT_START -->
  * Copyright 2022 Guidehouse. This software was developed in conjunction
@@ -1024,4 +1033,26 @@ public class StringUtils {
 	public static String get_NCI_LOGO_URL() {
 		return "https://www.cancer.gov/sites/www/files/ncids_header/logos/Logo_NCI.svg";
 	}
+
+	public static int getCurrentMonth() {
+		 return Calendar.getInstance().get(Calendar.MONTH) + 1;
+	}
+
+	public static int getCurrentYear() {
+		 return Calendar.getInstance().get(Calendar.YEAR);
+	}
+
+	public static int getDayOfMonth() {
+		return LocalDate.now().getDayOfMonth();
+	}
+
+	public static String getCurrDate() {
+		int year = getCurrentYear();
+		int month = getCurrentMonth();
+		int day = getDayOfMonth();
+        LocalDate date = LocalDate.of(year, month, day);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+        String formattedDate = date.format(formatter);
+        return formattedDate;
+    }
 }

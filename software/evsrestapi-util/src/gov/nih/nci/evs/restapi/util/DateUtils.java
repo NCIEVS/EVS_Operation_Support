@@ -1,5 +1,6 @@
 package gov.nih.nci.evs.restapi.util;
 import java.io.*;
+import java.util.*;
 import java.net.URI;
 import java.text.*;
 import java.text.DateFormatSymbols;
@@ -9,7 +10,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
 import java.time.ZoneId;
-import java.util.*;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -124,9 +124,17 @@ public class DateUtils {
 		return LocalDate.now().getDayOfMonth();
 	}
 
+	public static int getCurrentMonth() {
+		 return Calendar.getInstance().get(Calendar.MONTH) + 1;
+	}
+
+	public static int getCurrentYear() {
+		 return Calendar.getInstance().get(Calendar.YEAR);
+	}
+
 	public static String getCurrDate() {
-		int year = DateUtils.getCurrentYear();
-		int month = DateUtils.getCurrentMonth();
+		int year = getCurrentYear();
+		int month = getCurrentMonth();
 		int day = getDayOfMonth();
         LocalDate date = LocalDate.of(year, month, day);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
@@ -202,13 +210,7 @@ public class DateUtils {
 		return NCI_THESAURUS_URI + "_" + version + ".owl";
 	}
 
-	public static int getCurrentMonth() {
-		 return Calendar.getInstance().get(Calendar.MONTH) + 1;
-	}
 
-	public static int getCurrentYear() {
-		 return Calendar.getInstance().get(Calendar.YEAR);
-	}
 
 	public static Vector getNCItReleaseSchedule(int year) {
 		Vector w = new Vector();
