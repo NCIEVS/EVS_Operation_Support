@@ -1,14 +1,10 @@
 package gov.nih.nci.evs.restapi.util;
-import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.ui.*;
+import gov.nih.nci.evs.restapi.bean.*;
 import java.io.*;
 import java.util.*;
 
-//https://www.bing.com/search?q=OWL+reasoner+&form=ANNTH1&refig=6a5e04e8de0c4db29d0c755b2534191b&pc=U531
-
 public class InferredFileGenerator {
-	//static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
-
     public static String METADATA = "metadata.owl";
     public static String CLASSDATA = "classdata.owl";
 	public static String ONTOLOGY_INFO_FILE = "ontology_info.owl";
@@ -51,7 +47,6 @@ public class InferredFileGenerator {
 			ONTOLOGY_INFO_FILE,
 			METADATA,
 			CLASSDATA,
-			//CLASSID_FILE,
 			ANNOTATIONS_FILE,
             SCRUBBED_CLASSDATA_FILE};
 
@@ -64,9 +59,9 @@ public class InferredFileGenerator {
 	HierarchyHelper hh = null;
 	HashSet equiv_class_set = null;
 
-	OWLClassLoader loader = null;//new OWLClassLoader(outputfile);
-	HashMap classDataHashMap = null;//loader.getClassDataHashMap();
-	public Vector classIdVec = null;//loader.getClassIdVec();
+	OWLClassLoader loader = null;
+	HashMap classDataHashMap = null;
+	public Vector classIdVec = null;
 	Vector conceptsWithInheritedAnonymousSuperClasses = null;
 	HashMap conceptsWithInheritedAnonymousSuperClassesMap = null;
 	Vector owl_vec = null;
@@ -95,11 +90,6 @@ public class InferredFileGenerator {
 		long ms = System.currentTimeMillis();
 		System.out.println("(A) Input Data:");
 		System.out.println("(a) OWL File: " + assertedOWL);
-		File f = new File(SCRUBBED_PROPERTIES_FILE);
-		if (!f.exists()) {
-			Vector w = NCItMetadataUtils.generateScrubbedProperties(assertedOWL);
-			Utils.saveToFile(SCRUBBED_PROPERTIES_FILE, w);
-		}
         Vector propVec = Utils.readFile(SCRUBBED_PROPERTIES_FILE);
         Utils.dumpVector("(b) Scrubbed properties", propVec);
         System.out.println("(c) Business rules (for example, remove class NHC50000.)");
@@ -418,10 +408,8 @@ w.add("        </rdfs:subClassOf>");
 		Vector w = new Vector();
 		Vector ancestor_roles = null;
         Vector w1 = OWLScanner.extractSimpleOWLRestrictions(classData);
-        //Utils.dumpVector("asserted_roles_" + code, w1);
         w1 = removeRestrictionSourceCode(w1);
 		Vector w2 = reasoner.get_ancestor_roles(code);
-		//Utils.dumpVector("(1) asserted_ancestor_roles_" + code, w2);
 		ancestor_roles = new Vector();
 		if (w1 == null) {
 			ancestor_roles = w2;
@@ -475,7 +463,7 @@ w.add("        </rdfs:subClassOf>");
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			if (line.indexOf("<dc:date>") != -1) {
-				line = "        <dc:date>" + DateUtils.getCurrDate() + "</dc:date>";
+				line = "        <dc:date>" + StringUtils.getCurrDate() + "</dc:date>";
 			}
 			w.add(line);
 		}
@@ -563,7 +551,6 @@ w.add("        </rdfs:subClassOf>");
 		return w;
 	}
 
-
 	public static String addPrefix2PropertyValue(String line, String propCode) {
 		if (line.indexOf("<" + propCode + ">") == -1) return line;
 		String line0 = line;
@@ -581,11 +568,6 @@ w.add("        </rdfs:subClassOf>");
 			}
 		}
 		return line0;
-
-	}
-
-    public static Vector line2AxiomStatements(String line) {
-		return AxiomParser.line2AxiomStatements(line);
 	}
 
     public static Vector extract_axioms(Vector data_vec) {
@@ -595,8 +577,7 @@ w.add("        </rdfs:subClassOf>");
 
 	public static Vector extractOwlClassStatements(Vector class_vec) {
 	    String target = "</owl:Class>";
-	    int istart = 0;//TextFileExtractor.findLineNumber(class_vec, target) - 3;
-	    //target = "</rdf:RDF>";
+	    int istart = 0;
 	    int iend = TextFileExtractor.reverseFindLineNumber(class_vec, target)+1;
 	    return TextFileExtractor.extractLines(class_vec, istart, iend);
 	}
@@ -620,15 +601,64 @@ w.add("        </rdfs:subClassOf>");
 			String prop_code = (String) u.elementAt(1);
 			String annotationTarget = (String) u.elementAt(2);
 			if (!(prop_code.compareTo(propCode) == 0 && target.compareTo(annotationTarget) == 0)) {
-				Vector w1 = AxiomParser.line2AxiomStatements(line);
+				Vector w1 = line2AxiomStatements(line);
 				w.addAll(w1);
 			}
 		}
 		return w;
 	}
 
+    public static Vector line2AxiomStatements(String line) {
+		Vector w = new Vector();
+		Vector u = StringUtils.parseData(line, '|');
+		String code = (String) u.elementAt(0);
+		String propCode = (String) u.elementAt(1);
+		String target = (String) u.elementAt(2);
+		w.add("    <owl:Axiom>");
+		w.add("        <owl:annotatedSource rdf:resource=\"http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#" + code + "\"/>");
+		w.add("        <owl:annotatedProperty rdf:resource=\"http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#" + propCode + "\"/>");
+		w.add("        <owl:annotatedTarget>" + target + "</owl:annotatedTarget>");
+
+		for (int i=3; i<u.size(); i++) {
+			String qualifier = (String) u.elementAt(i);
+			Vector u2 = StringUtils.parseData(qualifier, '$');
+			String qualifierCode = (String) u2.elementAt(0);
+			String qualifierValue = (String) u2.elementAt(1);
+			w.add("        <" + qualifierCode + ">" + qualifierValue + "</" + qualifierCode + ">");
+	    }
+		w.add("    </owl:Axiom>");
+		return w;
+	}
+
 	public void setOWLClassLoader(OWLClassLoader loader) {
 		this.loader = loader;
+	}
+
+	public void saveScrubbedOWL(Vector w, String outputfile) {
+		int lcv = 1;
+		int increment = 10000;
+		int k = -1;
+
+		for (int i=0; i<classIdVec.size(); i++) {
+			String code = (String) classIdVec.elementAt(i);
+			if (StringUtils.isNCItCode(code)) {
+				Vector classData = getOWLClassLoader().getClassData(code);
+				if (disjointWithMap.containsKey(code)) {
+					classData = fixOwlDisjointWith(code, classData);
+		        }
+				classData = remove_axioms(classData, P325, LITERAL);
+				classData = addPrefix2PropertyValue(classData, HASDBXREF);
+				w.add("\n\n");
+				w.addAll(classData);
+			}
+		}
+
+		w.add("\n\n");
+		w.addAll(Utils.readFile(ANNOTATIONS_FILE));
+		w.add("</rdf:RDF>");
+		w.add("\n");
+		w.add("<!-- Generated by the OWL API (version 5.1.6) https://github.com/owlcs/owlapi/ -->");
+		Utils.saveToFile(outputfile, w);
 	}
 
 	public void run(String assertedOWL) {
@@ -640,46 +670,22 @@ w.add("        </rdfs:subClassOf>");
 		System.out.println("\nStep 3: Updating OntologyInfo ...");
 		Vector ontologyInfo = updateOntologyInfo(ONTOLOGY_INFO_FILE);
 		System.out.println("OntologyInfo updated.");
+
 		w.addAll(ontologyInfo);
 		w.addAll(get_metadata_vec());
 		w.addAll(getClassesStartStmts());
 
+
+		Vector cloned_w = (Vector) w.clone();
+		String scrubbedOWL = "scrubbed_" + assertedOWL;
+		System.out.println("\nStep 3a: Save scrubbed OWL as " + scrubbedOWL);
+		saveScrubbedOWL(cloned_w, scrubbedOWL);
+		cloned_w.clear();
+
         System.out.println("\nStep 4: Computing inheritance (generating inherited relationships) ...");
-        String progressBarLabel = "  Classification in progress...";
-        Vector w1 = new ProgressBarMaker(this, classIdVec).run(progressBarLabel);
+        Vector w1 = new ProgressBarMaker(this, classIdVec).run();
         w.addAll(w1);
-/*
 
-		Vector classIdVec = loader.getClassIdVec();
-		int lcv = 1;
-		int increment = 10000;
-		int total = classIdVec.size();
-
-		for (int i=0; i<classIdVec.size(); i++) {
-			int j = i+1;
-			if (lcv == increment) {
-				System.out.println("" + j + " out of " + total + " completed.");
-				lcv = 0;
-			}
-			lcv++;
-			String code = (String) classIdVec.elementAt(i);
-			if (StringUtils.isNCItCode(code)) {
-				Vector classData = loader.getClassData(code);
-				if (disjointWithMap.containsKey(code)) {
-					classData = fixOwlDisjointWith(code, classData);
-		        }
-				//=========================================================================
-				classData = appendInheritedRestrictions(code, classData);
-				//=========================================================================
-				classData = remove_axioms(classData, P325, LITERAL);
-				classData = addPrefix2PropertyValue(classData, HASDBXREF);
-				w.add("\n\n");
-				w.addAll(classData);
-			} else {
-				removed_concepts.add(code);
-			}
-		}
-*/
         int total = classIdVec.size();
 		System.out.println("" + total + " out of " + total + " completed.");
 		w.add("\n\n");
@@ -689,27 +695,18 @@ w.add("        </rdfs:subClassOf>");
 		w.add("<!-- Generated by the OWL API (version 5.1.6) https://github.com/owlcs/owlapi/ -->");
 		w.add("<!-- Modified by InferredFileGenerator (version 1.0) on " + StringUtils.getToday("MM-dd-yyyy") + " -->");
 
-		//System.out.println("" + total + " out of " + total + " completed.");
 		Utils.dumpVector("Removed Concepts", removed_concepts);
 
         System.out.println("\nStep 5: Composing inferred NCI Thesaurus OWL ... ");
 		String inferredFileName = "ThesaurusInferred_forTS_" + StringUtils.getToday() + ".owl";
 
         System.out.println("(C) Output:");
-		System.out.println("Generating " + inferredFileName);
+		System.out.println("Generating " + inferredFileName + ". (This may take a few minutes. Please wait...)");
 		Utils.saveToFile(inferredFileName, w);
-		System.out.println("Inferred file generated as " + inferredFileName + ".");
 
 		System.out.println("\nStep 6: Remove temporary files ... ");
 		removeTemporaryFiles();
-		System.out.println("Total processing run time (ms): " + (System.currentTimeMillis() - ms));
-	}
-
-	public void test(String code) {
-		Vector classData = (Vector) classDataHashMap.get(code);
-		Utils.dumpVector("Asserted_" + code, classData);
-		classData = appendInheritedRestrictions(code, classData);
-		Utils.dumpVector("Inferred_" + code, classData);
+		System.out.println("\tTotal processing run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 	public static void main(String[] args) {
@@ -717,7 +714,7 @@ w.add("        </rdfs:subClassOf>");
 		String owlfile = args[0];
 		InferredFileGenerator generator = new InferredFileGenerator(owlfile);
 		generator.run(owlfile);
-		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
 		System.exit(0);
 	}
 }

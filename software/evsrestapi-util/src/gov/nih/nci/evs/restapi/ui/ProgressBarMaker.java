@@ -1,13 +1,11 @@
 package gov.nih.nci.evs.restapi.ui;
-import gov.nih.nci.evs.restapi.util.*;
-
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
-
+import gov.nih.nci.evs.restapi.util.*;
 
 public class ProgressBarMaker extends JFrame {
     // create a frame
@@ -25,17 +23,13 @@ public class ProgressBarMaker extends JFrame {
 		this.classIdVec = classIdVec;
 	}
 
-    public Vector run(String label) {
+    public Vector run() {
         // create a frame
-        f = new JFrame("Progress Status");
+        f = new JFrame("Progress Bar");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLocationRelativeTo(null);
         // create a panel
         JPanel p = new JPanel();
-        p.setLayout(new BorderLayout());
-
-        JLabel l = new JLabel(label);
-        p.add(l, BorderLayout.NORTH);
 
         // create a progressbar
         b = new JProgressBar();
@@ -44,10 +38,11 @@ public class ProgressBarMaker extends JFrame {
 
         // set initial value
         b.setValue(0);
+
         b.setStringPainted(true);
 
         // add progressbar
-        p.add(b, BorderLayout.SOUTH);
+        p.add(b);
 
         // add panel
         f.add(p);
