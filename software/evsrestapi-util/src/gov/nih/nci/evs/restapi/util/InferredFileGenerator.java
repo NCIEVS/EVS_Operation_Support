@@ -119,7 +119,7 @@ public class InferredFileGenerator {
  		System.out.println("Extracting Ontology Info...");
 		extractOntologyInfo(this.owl_vec);
 		System.out.println("Ontology Info extracted.");
-		System.out.println("Extracting metadata (annotaion properties, datatype properties, and object properties) ...");
+		System.out.println("Extracting metadata (annotation properties, datatype properties, and object properties) ...");
 	    metadata_vec = NCItMetadataUtils.getFilteredMetadata(assertedOWL, propVec);
 	    Utils.saveToFile(METADATA, metadata_vec);
 	    System.out.println("Metadata extracted.");
