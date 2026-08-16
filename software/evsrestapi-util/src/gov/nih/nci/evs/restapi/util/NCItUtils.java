@@ -16,10 +16,10 @@ public class NCItUtils {
 	public static String ANNOTATION_PROPERTIES_FILE = "supported_properties.txt";
 
 	public static String SEMANTIC_TYPE_FILE = "P106.txt";
-	public static String AXIOM_FILE = "axiom_ThesaurusInferred_forTS.txt";
+	public static String AXIOM_FILE = "axioms.txt";
 	public static String ASSOCIATION_FILE = "associations.txt";
 	public static String VS_FILE = "A8.txt";
-	public static String DATATYPE_FILE = "datatype.txt";
+	public static String DATATYPE_FILE = "datatypes.txt";
 
 	public static void generateReports() {
 		String owlfile = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
@@ -91,12 +91,7 @@ public class NCItUtils {
 		Vector w = ScannerUtils.extractAxioms(owlscanner.get_owl_vec());
 		String outputfile = outputDir + File.separator + AXIOM_FILE;
 		Utils.saveToFile(outputfile, w);
-
-		System.out.println("BEFORE HTMLDecoder outputfile: " + outputfile + " :" + w.size());
-
 		HTMLDecoder.run(outputfile);
-		System.out.println("AFTER HTMLDecoder outputfile: " + outputfile + " :" + w.size());
-
 		long size = getFileSize(outputfile);
 		System.out.println(outputfile + " generated. (Number of lines: " + w.size() + ", File size: " + size + ")");
 
