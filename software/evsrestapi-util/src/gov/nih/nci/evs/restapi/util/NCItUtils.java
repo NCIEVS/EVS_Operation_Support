@@ -79,14 +79,16 @@ public class NCItUtils {
 		}
 
 		long ms = System.currentTimeMillis();
-		deleteFile(outputDir);
-		createDirectory(outputDir);
+		try {
+			deleteFile(outputDir);
+			createDirectory(outputDir);
+		} catch (Exception ex) {
+
+		}
 
         OWLScanner owlscanner = new OWLScanner(owlfile);
         // Axiom file
-		//Vector w = owlscanner.extractAxiomData(null);
-		Vector w = ScannerUtils.extractAxioms(Utils.readFile(owlfile));
-
+		Vector w = ScannerUtils.extractAxioms(owlscanner.get_owl_vec());
 		String outputfile = outputDir + File.separator + AXIOM_FILE;
 		Utils.saveToFile(outputfile, w);
 
