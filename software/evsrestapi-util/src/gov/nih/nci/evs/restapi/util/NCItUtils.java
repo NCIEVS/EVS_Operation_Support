@@ -19,6 +19,7 @@ public class NCItUtils {
 	public static String AXIOM_FILE = "axiom_ThesaurusInferred_forTS.txt";
 	public static String ASSOCIATION_FILE = "associations.txt";
 	public static String VS_FILE = "A8.txt";
+	public static String DATATYPE_FILE = "datatype.txt";
 
 	public static void generateReports() {
 		String owlfile = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
@@ -147,6 +148,13 @@ public class NCItUtils {
 		outputfile = outputDir + File.separator + ANNOTATION_PROPERTIES_FILE;
 		Utils.saveToFile(outputfile, w);
 		HTMLDecoder.run(outputfile);
+		size = getFileSize(outputfile);
+		System.out.println(outputfile + " generated. (Number of lines: " + w.size() + ", File size: " + size + ")");
+
+        // Datatype file
+        w = owlscanner.extractEnumDataTypes(owlscanner.get_owl_vec());
+        outputfile = outputDir + File.separator + DATATYPE_FILE;
+        Utils.saveToFile(outputfile, w);
 		size = getFileSize(outputfile);
 		System.out.println(outputfile + " generated. (Number of lines: " + w.size() + ", File size: " + size + ")");
 
