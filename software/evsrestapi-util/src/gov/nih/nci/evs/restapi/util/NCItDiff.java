@@ -90,6 +90,7 @@ public class NCItDiff {
 		System.out.println("\t" + pathname2);
 
 		Vector w = new Vector();
+		w.add("Data Type\tEdit Action\tData Value");
 		Vector v1 = Utils.readFile(pathname1);
 		Vector v2 = Utils.readFile(pathname2);
 		HashSet set1 = Utils.vector2HashSet(v1);
