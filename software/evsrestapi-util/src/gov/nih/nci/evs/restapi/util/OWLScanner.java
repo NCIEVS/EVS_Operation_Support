@@ -66,11 +66,11 @@ import java.util.*;
 public class OWLScanner {
     String owlfile = null;
     Vector owl_vec = null;
-    static String NAMESPACE = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
-    static String NAMESPACE_TARGET = "<!-- " + NAMESPACE;
-    static String OWL_CLS_TARGET = NAMESPACE_TARGET + "C";
-    static String OWL_PROPERTY_TARGET = NAMESPACE_TARGET + "P";
-    static String OWL_ANNOTATION_PROPERTY_TARGET = NAMESPACE_TARGET + "A";
+    public static String NAMESPACE = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
+    public static String NAMESPACE_TARGET = "<!-- " + NAMESPACE;
+    public static String OWL_CLS_TARGET = NAMESPACE_TARGET + "C";
+    public static String OWL_PROPERTY_TARGET = NAMESPACE_TARGET + "P";
+    public static String OWL_ANNOTATION_PROPERTY_TARGET = NAMESPACE_TARGET + "A";
 
 	static String open_tag = "<owl:Axiom>";
 	static String close_tag = "</owl:Axiom>";
@@ -2523,19 +2523,11 @@ C4910|<NHC0>C4910</NHC0>
 			String t = (String) class_vec.elementAt(i);
 
 			if (t.indexOf("General axioms") != -1) break;
-			while (!t.endsWith(">") && i < class_vec.size()-1) {
-				i++;
-				String nextLine = (String) class_vec.elementAt(i);
-				nextLine = nextLine.trim();
-				t = t + " " + nextLine;
-			}
-
 		    if (t.indexOf("// Annotations") != -1) {
 				break;
 			}
 
-
-			if (t.indexOf(NAMESPACE_TARGET + type + " -->") != -1) {
+			if (t.indexOf(NAMESPACE_TARGET + type + "-enum") != -1) {
 				istart = true;
 			}
 			if (istart && t.indexOf("</rdfs:Datatype>") != -1) {
