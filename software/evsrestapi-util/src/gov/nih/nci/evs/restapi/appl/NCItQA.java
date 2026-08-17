@@ -1,6 +1,5 @@
 package gov.nih.nci.evs.restapi.appl;
 import gov.nih.nci.evs.restapi.bean.*;
-import gov.nih.nci.evs.restapi.model.*;
 import gov.nih.nci.evs.restapi.util.*;
 import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
@@ -70,28 +69,32 @@ import java.util.regex.*;
  *
  */
 public class NCItQA {
-    //ThesaurusInferred_forTS
-    //public static String NCIT_OWL = "ThesaurusInferred_forTS.owl";
-    static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
-	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
-	static String RESTRICTION_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.rolefile; //"roles.txt";
-	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
-	static String PROPERTY_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.propertyfile;
-    //public static String SEMANTIC_TYPE_URL = "https://metamap.nlm.nih.gov/Docs/SemanticTypes_2018AB.txt";
-    //public static String UMLS_SEMANTIC_TYPE_URL = "https://www.nlm.nih.gov/research/umls/META3_current_semantic_types.html";
+	static boolean debugOn = false;
+    static String NAMESPACE = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
+    static String NAMESPACE_TARGET = "<!-- " + NAMESPACE;
 
-    //public static String PROPERTY_FILE = "properties.txt";
-    public static String ROLE_FILE = RESTRICTION_FILE;//"roles.txt";
-    //public static String SEMANTIC_TYPE_FILE = "semantictypes.txt";
-    public static String FULLSYN_FILE = generateFULLSYN_FILE();//"FULLSYN.txt";
-
-    public static String OBJECT_PROPERTY_FILE = "objectProperties.txt";
-    public static String DEPRECATED_FILE = "deprecated.txt";
-    public static String ANNOTATION_PROPERTY_FILE = "annotationProperties.txt";
+    static String[] TEMPORARY_FILES = new String[] {
+			"deprecated.txt",
+			"annotationProperties.txt",
+			"FULLSYN.txt",
+			"semantic_types.txt"};
 
     public static String SEMANTIC_TYPE_PROP_CODE = "P106";
     public static String PREFERRED_NAME_PROP_CODE = "P108";
     public static String CONCEPT_STATUS_PROP_CODE = "P310";
+
+	String DATA_DIRECTORY = null;
+	String cwd = System.getProperty("user.dir");
+	String NCIT_OWL = null;
+	String PARENT_CHILD_FILE = null;
+	String RESTRICTION_FILE = null;
+	String AXIOM_FILE = null;
+	String PROPERTY_FILE = null;
+	String ROLE_FILE = null;
+	String OBJECT_PROPERTY_FILE = null;
+	String FULLSYN_FILE = null;
+	String DEPRECATED_FILE = null;
+	String ANNOTATION_PROPERTY_FILE = null;
 
     public Vector semantic_types = null;
     Vector objectProperties = null;
@@ -100,162 +103,64 @@ public class NCItQA {
     Vector deprecated_vec = null;
     Vector property_vec = null;
     Vector role_vec = null;
+
     private PrintWriter pw = null;
 
     HashMap code2LabelMap = null;//getCode2LabelMap
     HashMap roleCode2LabelMap = null;
 
-    //public static String AXIOM_FILE = "axioms.txt";
-
-    public HashMap concept_status_map = null;
-    public String owlfile = null;
+    HashMap concept_status_map = null;
+    String owlfile = null;
     OWLScanner owlScanner = null;
     List<gov.nih.nci.evs.restapi.bean.Synonym> full_syn_list = null;
     List<gov.nih.nci.evs.restapi.bean.Synonym> active_full_syn_list = null;
 
     Vector annotationProperties = null;
-    public boolean saveOption = false;
-
-/*
-    public NCItQA() {
-
-	}
-*/
+    boolean saveOption = false;
 
 	public NCItQA(String owlfile) {
 		this.owlfile = owlfile;
-		//initialize();
+		initialize();
 	}
-
-/*
-Recombinant Amphiregulin|C1000|P90|CRDGF|P383$AB|P384$NCI
-Recombinant Amphiregulin|C1000|P90|KAF|P383$AB|P384$NCI
-*/
-	public static String generateFULLSYN_FILE() {
-		Vector v = Utils.readFile(AXIOM_FILE);
-		Vector w = new Vector();
-		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String propCode = (String) u.elementAt(2);
-			if (propCode.compareTo("P90") == 0) {
-				w.add(line);
-			}
-		}
-		String fullsynfile = "FULLSYN.txt";
-		Utils.saveToFile(fullsynfile, w);
-		return fullsynfile;
-	}
-
-	public void setSaveOption(boolean saveOption) {
-		this.saveOption = saveOption;
-	}
-
-/*
-Recombinant Amphiregulin|C1000|P90|AMPHIREGULIN|P383$PT|P384$FDA|P385$7MGE0HPM2H|P386$UNII
-Recombinant Amphiregulin|C1000|P90|AR|P383$AB|P384$NCI
-Recombinant Amphiregulin|C1000|P90|CRDGF|P383$AB|P384$NCI
-Recombinant Amphiregulin|C1000|P90|KAF|P383$AB|P384$NCI
-Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
-*/
-
-    public List getSynonyms(Vector axiom_data) {
-		if (axiom_data == null) return null;
-		List syn_list = new ArrayList();
-		HashMap hmap = new HashMap();
-		for (int i=0; i<axiom_data.size(); i++) {
-			String t = (String) axiom_data.elementAt(i);
-			gov.nih.nci.evs.restapi.bean.Synonym syn = AxiomParser.line2Synonym(t);// {
-			syn_list.add(syn);
-		}
-		/*
-			/*
-			Vector u = StringUtils.parseData(t, '|');
-			String axiom_id = (String) u.elementAt(0); //bnode_21e4bb1f_2fc9_480b_bbdb_0d116398d610_2156686
-			String label = (String) u.elementAt(1);
-			String code = (String) u.elementAt(2);
-			String propertyName = (String) u.elementAt(3); // FULL_SYN
-			//String propertyCode = (String) u.elementAt(4); // P90
-			String term_name = (String) u.elementAt(4); //P90
-			String qualifier_name = (String) u.elementAt(5);
-			//String qualifier_code = (String) u.elementAt(7);
-			String qualifier_value = (String) u.elementAt(6);
-
-			String key = axiom_id + "$" + code;
-
-            Synonym syn = (Synonym) hmap.get(key);
-            if (syn == null) {
-				syn = new Synonym(
-							code,
-							label,
-							term_name,
-							null, //termGroup,
-							null, //termSource,
-							null, //sourceCode,
-							null, //subSourceName,
-		                    null); //subSourceCode
-			}
-			if (qualifier_name.compareTo("Term Type") == 0 ||
-			           qualifier_name.compareTo("tem-type") == 0 ||
-			           qualifier_name.compareTo("P383") == 0) {
-				syn.setTermGroup(qualifier_value);
-			} else if (qualifier_name.compareTo("Term Source") == 0 ||
-			           qualifier_name.compareTo("tem-source") == 0 ||
-			           qualifier_name.compareTo("P384") == 0) {
-				syn.setTermSource(qualifier_value);
-			} else if (qualifier_name.compareTo("Source Code") == 0 ||
-			           qualifier_name.compareTo("source-code") == 0 ||
-			           qualifier_name.compareTo("P385") == 0) {
-				syn.setSourceCode(qualifier_value);
-			} else if (qualifier_name.compareTo("Subsource Name") == 0 ||
-			           qualifier_name.compareTo("subsource-name") == 0 ||
-			           qualifier_name.compareTo("P386") == 0) {
-				syn.setSubSourceName(qualifier_value);
-			} else if (qualifier_name.compareTo("Subsource Code") == 0 ||
-			           qualifier_name.compareTo("subsource-name") == 0) {
-				syn.setSubSourceCode(qualifier_value);
-			}
-			hmap.put(key, syn);
-		}
-		List syn_list = new ArrayList();
-		Iterator it = hmap.keySet().iterator();
-		while (it.hasNext()) {
-			String key = (String) it.next();
-			Synonym syn = (Synonym) hmap.get(key);
-			syn_list.add(syn);
-		}
-		*/
-		return syn_list;
-	}
-
 
 	public void initialize() {
-		/*
-		if (owlfile == null) {
-			if (FileUtils.fileExists(NCIT_OWL)) {
-				System.out.println(NCIT_OWL + " exists.");
-			} else {
-				System.out.println(NCIT_OWL + " does not exist.");
-				NCItDownload.download();
-				Vector files = NCItDownload.listFilesInDirectory();
-				Utils.dumpVector("listFilesInDirectory", files);
-			}
-			this.owlfile = NCIT_OWL;
-	    }
+        long ms = System.currentTimeMillis();
+		DATA_DIRECTORY = "DataDir";
+		File f = new File(DATA_DIRECTORY);
+		if (!f.exists()) {
+			f.mkdir();
+			NCItUtils.generateReports(owlfile, DATA_DIRECTORY);
+		}
+		listFilesInDirectory(DATA_DIRECTORY);
 
-		owlScanner = new OWLScanner(NCIT_OWL);
-		*/
+		cwd = System.getProperty("user.dir");
+		NCIT_OWL = owlfile;
+		PARENT_CHILD_FILE = cwd + File.separator + DATA_DIRECTORY + File.separator + NCItUtils.HIER_FILE;
+		RESTRICTION_FILE = cwd + File.separator + DATA_DIRECTORY + File.separator + NCItUtils.ROLE_FILE;
+		AXIOM_FILE = cwd + File.separator + DATA_DIRECTORY + File.separator + NCItUtils.AXIOM_FILE;
+		PROPERTY_FILE = cwd + File.separator + DATA_DIRECTORY + File.separator + NCItUtils.PROPERTY_FILE;
+		ROLE_FILE = cwd + File.separator + DATA_DIRECTORY + File.separator + NCItUtils.ROLE_FILE;
+		OBJECT_PROPERTY_FILE = cwd + File.separator + DATA_DIRECTORY + File.separator + NCItUtils.OBJECT_PROPERTY_FILE;
+
+		FULLSYN_FILE = "FULLSYN.txt"; //generateFULLSYN_FILE();
+		DEPRECATED_FILE = "deprecated.txt";
+		ANNOTATION_PROPERTY_FILE = "annotationProperties.txt";
+
 		owlScanner = new OWLScanner(owlfile);
-		if (FileUtils.fileExists(FULLSYN_FILE)) {
+		f = new File(FULLSYN_FILE);
+		//if (FileUtils.fileExists(FULLSYN_FILE)) {
+	    if (f.exists()) {
 			System.out.println(FULLSYN_FILE + " exists.");
 			Vector w = Utils.readFile(FULLSYN_FILE);
-            //full_syn_list = new AxiomUtils().getSynonyms(w);
             full_syn_list = getSynonyms(w);
 		} else {
+			System.out.println(FULLSYN_FILE + " does not exists.");
 		    full_syn_list = extractFULLSyns();
 		}
 
-		semantic_types = owlScanner.extractSemanticTypes(owlScanner.get_owl_vec());
+		//semantic_types = owlScanner.extractSemanticTypes(owlScanner.get_owl_vec());
+		semantic_types = extractEnum(owlScanner.get_owl_vec(), "Semantic_Type");
+		Utils.saveToFile("semantic_types.txt", semantic_types);
 
 		property_vec = null;
 		if (!FileUtils.fileExists(PROPERTY_FILE)) {
@@ -324,16 +229,67 @@ Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
 				concept_status_map.put(value, v);
 			}
 		}
-		Iterator it = concept_status_map.keySet().iterator();
-		while (it.hasNext()) {
-			String key = (String) it.next();
-			Vector v = (Vector) concept_status_map.get(key);
-			System.out.println(key + ": " + v.size());
-		}
 
 		code2LabelMap = owlScanner.getCode2LabelMap();
 		active_full_syn_list = removeDeprecated(full_syn_list);
-		System.out.println("OWLScanner instantiated.");
+		System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
+    public static Vector listFilesInDirectory(String dirName) {
+		Vector v = new Vector();
+		if (dirName == null) {
+			dirName = System.getProperty("user.dir");;
+		}
+        File f = new File(dirName);
+        String[] pathnames = f.list();
+        for (String pathname : pathnames) {
+            v.add(pathname);
+        }
+        return v;
+	}
+
+/*
+Recombinant Amphiregulin|C1000|P90|CRDGF|P383$AB|P384$NCI
+Recombinant Amphiregulin|C1000|P90|KAF|P383$AB|P384$NCI
+*/
+	public String generateFULLSYN_FILE() {
+		Vector v = Utils.readFile(AXIOM_FILE);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String propCode = (String) u.elementAt(2);
+			if (propCode.compareTo("P90") == 0) {
+				w.add(line);
+			}
+		}
+		String fullsynfile = "FULLSYN.txt";
+		Utils.saveToFile(fullsynfile, w);
+		return fullsynfile;
+	}
+
+	public void setSaveOption(boolean saveOption) {
+		this.saveOption = saveOption;
+	}
+
+/*
+Recombinant Amphiregulin|C1000|P90|AMPHIREGULIN|P383$PT|P384$FDA|P385$7MGE0HPM2H|P386$UNII
+Recombinant Amphiregulin|C1000|P90|AR|P383$AB|P384$NCI
+Recombinant Amphiregulin|C1000|P90|CRDGF|P383$AB|P384$NCI
+Recombinant Amphiregulin|C1000|P90|KAF|P383$AB|P384$NCI
+Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
+*/
+
+    public List getSynonyms(Vector axiom_data) {
+		if (axiom_data == null) return null;
+		List syn_list = new ArrayList();
+		HashMap hmap = new HashMap();
+		for (int i=0; i<axiom_data.size(); i++) {
+			String t = (String) axiom_data.elementAt(i);
+			gov.nih.nci.evs.restapi.bean.Synonym syn = AxiomParser.line2Synonym(t);// {
+			syn_list.add(syn);
+		}
+		return syn_list;
 	}
 
     public String getOutputFileName() {
@@ -341,8 +297,8 @@ Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
 		System.out.println("version: " + version);
 		String t = this.owlfile;
 		int n = t.lastIndexOf(".");
-		//String outputfile = t.substring(0, n) + "_" + version + "_" + StringUtils.getToday() + "_QA.txt";
-		String outputfile = ConfigurationController.owlfile + "_" + version + "_" + StringUtils.getToday() + "_QA.txt";
+		String outputfile = t.substring(0, n) + "_" + version + "_" + StringUtils.getToday() + "_QA.txt";
+		//String outputfile =.owlfile + "_" + version + "_" + StringUtils.getToday() + "_QA.txt";
 		return outputfile;
 	}
 
@@ -432,44 +388,10 @@ Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
 	}
 
     public String getConceptStatus(String code) {
-		Iterator it = concept_status_map.keySet().iterator();
-		while (it.hasNext()) {
-			String key = (String) it.next();
-			Vector v = (Vector) concept_status_map.get(key);
-			if (v.contains(code)) {
-				return key;
-			}
-		}
-		return null;
+		Vector v = (Vector) concept_status_map.get(code);
+		if (v == null || v.size() == 0) return null;
+		return (String) v.elementAt(0);
 	}
-
-/*
-{
-  "code": "C108040",
-  "label": "Lafayette County, FL",
-  "termName": "FL067",
-  "termGroup": "PT",
-  "termSource": "FDA",
-  "subSourceName": "ICSR"
-}
-
-    public static void verifySynonyms(String axiom_data_file) {
-        Vector axiom_data  = Utils.readFile(axiom_data_file);
-        List list = new AxiomUtils().getSynonyms(axiom_data);
-		int n = list.size();
-		for (int i=0; i<list.size(); i++) {
-			gov.nih.nci.evs.restapi.bean.Synonym syn = (gov.nih.nci.evs.restapi.bean.Synonym) list.get(i);
-			System.out.println(syn.toJson());
-		}
-	}
-
-  "code": "C108035",
-  "label": "Hillsborough County, FL",
-  "termName": "FL057",
-  "termGroup": "PT",
-  "termSource": "FDA",
-  "subSourceName": "ICSR"
-  */
 
     public HashMap createSynonymKeys2CodeHashMap(Vector keys, Vector axiom_data) {
 		HashMap hmap = new HashMap();
@@ -523,7 +445,7 @@ Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
 		for (int i=0; i<axiom_data.size(); i++) {
 			String t = (String) axiom_data.elementAt(i);
 			Vector u = StringUtils.parseData(t, '|');
-		    String propertyCode = (String) u.elementAt(3); // P90
+		    String propertyCode = (String) u.elementAt(1); // P90
 		    if (propertyCode.compareTo(prop_code) == 0) {
 				w.add(t);
 			}
@@ -532,14 +454,17 @@ Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
 	}
 
     public List extractFULLSyns() {
-		Vector w = owlScanner.scanAxioms();
-		if (saveOption)  Utils.saveToFile("owlAxioms.txt", w);
-		w = filterAxiomData(w, "P90");
-        if (saveOption)  Utils.saveToFile("FULLSYN.txt", w);
-		List list = new AxiomUtils().getSynonyms(w);
+		Vector v = Utils.readFile(AXIOM_FILE);
+		System.out.println("v: " + v.size());
+		Vector w = filterAxiomData(v, "P90");
+		System.out.println("w: " + w.size());
+		//if (saveOption) Utils.saveToFile("owlAxioms.txt", w);
+		//w = filterAxiomData(w, "P90");
+        if (saveOption) Utils.saveToFile("FULLSYN.txt", w);
+		//List list = new AxiomUtils().getSynonyms(w);
+		List list = getSynonyms(w);
 		return list;
 	}
-
 
     public void QA_PreferredNames(PrintWriter pw) {
 		pw.println("\n1.	Preferred name not unique to single concept.");
@@ -550,6 +475,11 @@ Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
 			Vector u = StringUtils.parseData(t, '|');
 			String code = (String) u.elementAt(0);
 			String pt_code = (String) u.elementAt(1);
+
+			if (debugOn && i < 10) {
+				System.out.println("QA_PreferredNames " + t);
+			}
+
 			if (pt_code.compareTo(PREFERRED_NAME_PROP_CODE) == 0) {
 				String name = (String) u.elementAt(2);
 				Vector v = new Vector();
@@ -575,6 +505,11 @@ Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
 		HashMap hmap = new HashMap();
 		for (int i=0; i<active_full_syn_list.size(); i++) {
 			gov.nih.nci.evs.restapi.bean.Synonym syn = (gov.nih.nci.evs.restapi.bean.Synonym) active_full_syn_list.get(i);
+
+			if (debugOn && i < 10) {
+				System.out.println(" QA_NCIPT " + syn.toJson());
+			}
+
 			String key = null;
 			if (syn.getTermSource() != null && syn.getTermSource() .compareTo("NCI") == 0 &&
 			    syn.getTermGroup() != null && syn.getTermGroup() .compareTo("PT") == 0
@@ -626,6 +561,11 @@ Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
 		HashMap hmap = new HashMap();
 		for (int i=0; i<active_full_syn_list.size(); i++) {
 			gov.nih.nci.evs.restapi.bean.Synonym syn = (gov.nih.nci.evs.restapi.bean.Synonym) active_full_syn_list.get(i);
+
+			if (debugOn && i < 10) {
+				System.out.println("QA_DuplicatedAtoms " + syn.toJson());
+			}
+
 			String key = null;
 			if (syn.getTermName() != null && syn.getTermGroup() != null && syn.getTermSource() != null
 			    && syn.getSourceCode() != null && syn.getSourceCode().length() > 0) {
@@ -643,11 +583,9 @@ Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
 
 				Vector v = new Vector();
 				if (hmap.containsKey(key)) {
-
-pw.println("JSON: " + syn.toJson());
-
-System.out.println("KEY: " + key);
-pw.println("KEY: " + key);
+					pw.println("JSON: " + syn.toJson());
+					System.out.println("KEY: " + key);
+					pw.println("KEY: " + key);
 
 					v = (Vector) hmap.get(key);
 					num_errors++;
@@ -673,6 +611,11 @@ pw.println("KEY: " + key);
 		HashMap hmap = new HashMap();
 		for (int i=0; i<active_full_syn_list.size(); i++) {
 			gov.nih.nci.evs.restapi.bean.Synonym syn = (gov.nih.nci.evs.restapi.bean.Synonym) active_full_syn_list.get(i);
+
+			if (debugOn && i < 10) {
+				System.out.println("QA_DuplicatedAtomsInDifferentConcepts " + syn.toJson());
+			}
+
 			String key = null;
 			if (syn.getTermName() != null && syn.getTermGroup() != null && syn.getTermSource() != null
 				&& syn.getSourceCode() != null && syn.getSourceCode().length() > 0) {
@@ -715,6 +658,11 @@ pw.println("KEY: " + key);
 		int num_errors = 0;
 		for (int i=0; i<property_vec.size(); i++) {
 			String line = (String) property_vec.elementAt(i);
+
+			if (debugOn && i < 10) {
+				System.out.println("QA_blankPropertyValues " + line);
+			}
+
 			Vector u = StringUtils.parseData(line, '|');
 			String value = (String) u.elementAt(2);
 			if (value.length() == 0) {
@@ -734,6 +682,11 @@ pw.println("KEY: " + key);
 		HashSet hset = new HashSet();
 		for (int i=0; i<property_vec.size(); i++) {
 			String line = (String) property_vec.elementAt(i);
+
+			if (debugOn && i < 10) {
+				System.out.println("QA_duplicated_properties " + line);
+			}
+
 			if (hset.contains(line)) {
 				pw.println(line);
 				num_errors++;
@@ -813,6 +766,12 @@ pw.println("KEY: " + key);
         int number_of_errors = 0;
         for (int i=0; i<property_vec.size(); i++) {
 			String t = (String) property_vec.elementAt(i);
+
+			if (debugOn && i < 10) {
+				System.out.println("QA_SemanticTypes " + t);
+			}
+
+
 			Vector u = StringUtils.parseData(t, '|');
 			String concept_code = (String) u.elementAt(0);
 			if (!isDeprecated(concept_code)) {
@@ -840,6 +799,11 @@ pw.println("KEY: " + key);
 		int num_errors = 0;
 		for (int i=0; i<property_vec.size(); i++) {
 			String line = (String) property_vec.elementAt(i);
+
+			if (debugOn && i < 10) {
+				System.out.println("QA_pipe_characters " + line);
+			}
+
 			Vector u = StringUtils.parseData(line, '|');
 			if (u.size() != 3) {
 				String concept_code = (String) u.elementAt(0);
@@ -860,6 +824,11 @@ pw.println("KEY: " + key);
 		int num_errors = 0;
 		for (int i=0; i<property_vec.size(); i++) {
 			String line = (String) property_vec.elementAt(i);
+
+			if (debugOn && i < 10) {
+				System.out.println("QA_special_characters " + line);
+			}
+
 			Vector u = StringUtils.parseData(line, '|');
 			String concept_code = (String) u.elementAt(0);
 			if (line.indexOf(c) != -1) {
@@ -898,6 +867,11 @@ pw.println("KEY: " + key);
 		int num_errors = 0;
 		for (int i=0; i<deprecated_vec.size(); i++) {
 			String line = (String) deprecated_vec.elementAt(i);
+
+			if (debugOn && i < 10) {
+				System.out.println("QA_obsolete_objects " + line);
+			}
+
 			if (line.startsWith(c)) {
 				pw.println(line);
 				num_errors++;
@@ -940,6 +914,12 @@ pw.println("KEY: " + key);
 		int num_errors = 0;
 		for (int i=0; i<role_vec.size(); i++) {
 			String line = (String) role_vec.elementAt(i);
+
+			if (debugOn && i < 10) {
+				System.out.println("QA_self_referential_relationships " + line);
+			}
+
+
             Vector u = StringUtils.parseData(line, '|');
             String source_code = (String) u.elementAt(0);
             String target_code = (String) u.elementAt(2);
@@ -989,6 +969,11 @@ pw.println("KEY: " + key);
 		HashSet hset = new HashSet();
 		for (int i=0; i<role_vec.size(); i++) {
 			String line = (String) role_vec.elementAt(i);
+
+			if (debugOn && i < 10) {
+				System.out.println("QA_conflicting_RELAs " + line);
+			}
+
 			Vector u = StringUtils.parseData(line, '|');
 			String roleCode = (String) u.elementAt(1);
 			if (roleCode.compareTo("R116") != 0 && roleCode.compareTo("R126") != 0) {
@@ -1048,7 +1033,56 @@ pw.println("KEY: " + key);
 		System.out.println("\t" + methodName + " -- number of potential violations detected: " + count);
 	}
 
+
+
+
+    public Vector extractEnum(Vector class_vec, String type) {
+        Vector w = new Vector();
+        boolean istart = false;
+        String classId = null;
+
+        for (int i=0; i<class_vec.size(); i++) {
+			String t = (String) class_vec.elementAt(i);
+
+			if (t.indexOf("General axioms") != -1) break;
+		    if (t.indexOf("// Annotations") != -1) {
+				break;
+			}
+
+			if (t.indexOf(NAMESPACE_TARGET + type + "-enum") != -1) {
+				istart = true;
+			}
+			if (istart && t.indexOf("</rdfs:Datatype>") != -1) {
+				istart = false;
+				break;
+			}
+			if (istart && t.indexOf("<rdf:first>") != -1) {
+				t = t.trim();
+				int n = t.lastIndexOf("</rdf:first>");
+				t = t.substring("<rdf:first>".length(), n);
+				w.add(t);
+			}
+		}
+		return new SortUtils().quickSort(w);
+	}
+
+
+	public static Vector removeTemporaryFiles() {
+		Vector filenames = new Vector();
+		try {
+			String currentPath = new java.io.File(".").getCanonicalPath();
+			for (int i=0; i<TEMPORARY_FILES.length; i++) {
+				String filename = currentPath + File.separator + TEMPORARY_FILES[i];
+				FileUtils.deleteFile(filename);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return filenames;
+	}
+
 	public static void main(String[] args) {
+		long ms = System.currentTimeMillis();
 		String owlfile = null;
 		boolean saveOption = false;
 		if (args.length > 0) {
@@ -1064,6 +1098,8 @@ pw.println("KEY: " + key);
 		ncitQA.setSaveOption(saveOption);
 		ncitQA.initialize();
         ncitQA.runQA();
+        //removeTemporaryFiles();
+        System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
 
