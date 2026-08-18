@@ -2669,7 +2669,7 @@ C4910|<NHC0>C4910</NHC0>
 		return version;
 	}
 
-	public String extractTagValue(String line, String tag) {
+	public static String extractTagValue(String line, String tag) {
 		String t = line;
 		t = t.trim();
 		int n = t.indexOf(tag);
@@ -3925,6 +3925,21 @@ C4910|<NHC0>C4910</NHC0>
 		}
 		return w;
 	}
+
+    public static Vector extractDistinctTermSources(Vector owl_vec) {
+		Vector w = new Vector();
+		for (int i=0; i<owl_vec.size(); i++) {
+			String t = (String) owl_vec.elementAt(i);
+			if (t.indexOf("<P384>") != -1) {
+				String s = extractTagValue(t, "P384");
+				if (!w.contains(s)) {
+					w.add(s);
+				}
+			}
+		}
+		return new SortUtils().quickSort(w);
+	}
+
 }
 
 
