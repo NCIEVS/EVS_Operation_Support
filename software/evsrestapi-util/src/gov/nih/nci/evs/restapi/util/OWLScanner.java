@@ -139,7 +139,6 @@ public class OWLScanner {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			hmap.put((String) u.elementAt(1), (String) u.elementAt(0));
-
 		}
 		return hmap;
 	}
@@ -1127,7 +1126,6 @@ C4910|<NHC0>C4910</NHC0>
 	}
 
     public Vector extractSuperclasses(Vector class_vec) {
-		System.out.println("extractSuperclasses " + class_vec.size());
         Vector w = new Vector();
         boolean istart = false;
         boolean istart0 = false;
@@ -3940,6 +3938,43 @@ C4910|<NHC0>C4910</NHC0>
 		return new SortUtils().quickSort(w);
 	}
 
+	public HashMap createObjectPropertyCode2NameMap() {
+		Vector v = extractObjectProperties(get_owl_vec());
+		HashMap hmap = new HashMap();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			hmap.put((String) u.elementAt(0), (String) u.elementAt(1));
+		}
+		return hmap;
+	}
+
+	public HashMap createObectValedAnnotationPropertyCode2NameMap() {
+		Vector v = getAnnotationProperties(get_owl_vec());
+		HashMap hmap = new HashMap();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String propCode = (String) u.elementAt(0);
+			if (propCode.startsWith("A")) {
+				hmap.put((String) u.elementAt(0), (String) u.elementAt(1));
+			}
+		}
+		return hmap;
+	}
+
+	public HashMap createStringValedAnnotationPropertyCode2NameMap() {
+		HashMap propertyCode2LabelHashMap = createPropertyCode2LabelHashMap();
+		HashMap hmap = new HashMap();
+		Iterator it = propertyCode2LabelHashMap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			if (key.startsWith("P")) {
+				hmap.put(key, (String) propertyCode2LabelHashMap.get(key));
+			}
+		}
+		return hmap;
+	}
 }
 
 
