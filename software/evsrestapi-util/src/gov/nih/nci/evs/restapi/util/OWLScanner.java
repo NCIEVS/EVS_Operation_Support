@@ -3949,7 +3949,7 @@ C4910|<NHC0>C4910</NHC0>
 		return hmap;
 	}
 
-	public HashMap createObectValedAnnotationPropertyCode2NameMap() {
+	public HashMap createObjectValuedAnnotationPropertyCode2NameMap() {
 		Vector v = getAnnotationProperties(get_owl_vec());
 		HashMap hmap = new HashMap();
 		for (int i=0; i<v.size(); i++) {
@@ -3963,7 +3963,7 @@ C4910|<NHC0>C4910</NHC0>
 		return hmap;
 	}
 
-	public HashMap createStringValedAnnotationPropertyCode2NameMap() {
+	public HashMap createStringValuedAnnotationPropertyCode2NameMap() {
 		HashMap propertyCode2LabelHashMap = createPropertyCode2LabelHashMap();
 		HashMap hmap = new HashMap();
 		Iterator it = propertyCode2LabelHashMap.keySet().iterator();
