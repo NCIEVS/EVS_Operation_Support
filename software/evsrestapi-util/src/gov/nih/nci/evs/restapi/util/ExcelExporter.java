@@ -13,6 +13,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.*;
 import java.text.*;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
@@ -130,15 +131,17 @@ public class ExcelExporter {
         try {
 			XSSFWorkbook workbook = new XSSFWorkbook(new File(excelfile));
 			XSSFSheet sheet = workbook.getSheetAt(sheetNum); // Get the first sheet
-			FileWriter writer = new FileWriter(textfile);
+
+		    BufferedWriter writer = new BufferedWriter(
+				   new OutputStreamWriter(new FileOutputStream(textfile), StandardCharsets.UTF_8));
 			for (Row row : sheet) {
 				for (Cell cell : row) {
 					String cellValue = cell.toString();
-					writer.write(cellValue + "\t"); // Use tab as delimiter
+					writer.write(cellValue + "\t");
 				}
 				writer.write("\n");
 			}
-			writer.close();
+			writer.flush();
 			workbook.close();
 			return textfile;
     	} catch (Exception ex) {
@@ -156,15 +159,17 @@ public class ExcelExporter {
         try {
 			XSSFWorkbook workbook = new XSSFWorkbook(new File(excelfile));
 			XSSFSheet sheet = workbook.getSheetAt(sheetNum); // Get the first sheet
-			FileWriter writer = new FileWriter(textfile);
+
+		    BufferedWriter writer = new BufferedWriter(
+				   new OutputStreamWriter(new FileOutputStream(textfile), StandardCharsets.UTF_8));
 			for (Row row : sheet) {
 				for (Cell cell : row) {
 					String cellValue = cell.toString();
-					writer.write(cellValue + "\t"); // Use tab as delimiter
+					writer.write(cellValue + "\t");
 				}
 				writer.write("\n");
 			}
-			writer.close();
+			writer.flush();
 			workbook.close();
 			return textfile;
     	} catch (Exception ex) {
@@ -194,23 +199,6 @@ public class ExcelExporter {
 		return null;
     }
 
-
-/*
-	public static void main(String[] args) {
-		String excelfile = args[0];
-		String sheetNumStr = args[1];
-	    int sheet_number = Integer.parseInt(sheetNumStr);
-		System.out.println("excelfile: " + excelfile);
-		Vector data = excel2Text(excelfile, sheet_number);
-        //generateTemplate(excelfile, 0);
-        //write("template_" + excelfile, "v2_" + excelfile, 0, data, '\t');
-        //String target_file = clone(excelfile);
-
-	}
-
-
-*/
-
     public static void exportExcelSheets(String excelfile, String outputDir) {
         Vector w = getSheetNames(excelfile);
         Utils.dumpVector(excelfile, w);
@@ -239,4 +227,5 @@ public class ExcelExporter {
         System.out.println(textfile + " generated.");
 	}
 }
+
 
