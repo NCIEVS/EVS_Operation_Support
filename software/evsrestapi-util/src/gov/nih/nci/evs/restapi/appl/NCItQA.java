@@ -130,11 +130,13 @@ public class NCItQA {
 		if (!f.exists()) {
 			f.mkdir();
 			NCItUtils.generateReports(owlfile, DATA_DIRECTORY);
-		}
+		} else {
+			System.out.println("Data directory exists");
+      	}
 		listFilesInDirectory(DATA_DIRECTORY);
-
 		cwd = System.getProperty("user.dir");
 		NCIT_OWL = owlfile;
+		owlScanner = new OWLScanner(owlfile);
 		PARENT_CHILD_FILE = cwd + File.separator + DATA_DIRECTORY + File.separator + NCItUtils.HIER_FILE;
 		RESTRICTION_FILE = cwd + File.separator + DATA_DIRECTORY + File.separator + NCItUtils.ROLE_FILE;
 		AXIOM_FILE = cwd + File.separator + DATA_DIRECTORY + File.separator + NCItUtils.AXIOM_FILE;
@@ -142,22 +144,10 @@ public class NCItQA {
 		ROLE_FILE = cwd + File.separator + DATA_DIRECTORY + File.separator + NCItUtils.ROLE_FILE;
 		OBJECT_PROPERTY_FILE = cwd + File.separator + DATA_DIRECTORY + File.separator + NCItUtils.OBJECT_PROPERTY_FILE;
 
-		FULLSYN_FILE = "FULLSYN.txt"; //generateFULLSYN_FILE();
 		DEPRECATED_FILE = "deprecated.txt";
 		ANNOTATION_PROPERTY_FILE = "annotationProperties.txt";
-
-		owlScanner = new OWLScanner(owlfile);
-		f = new File(FULLSYN_FILE);
-		//if (FileUtils.fileExists(FULLSYN_FILE)) {
-	    if (f.exists()) {
-			System.out.println(FULLSYN_FILE + " exists.");
-			Vector w = Utils.readFile(FULLSYN_FILE);
-            full_syn_list = getSynonyms(w);
-		} else {
-			System.out.println(FULLSYN_FILE + " does not exists.");
-		    full_syn_list = extractFULLSyns();
-		}
-
+		Vector w = owlScanner.extractAxiomData("P90"); //extractFULLSyns();
+		full_syn_list = getSynonyms(w);
 		//semantic_types = owlScanner.extractSemanticTypes(owlScanner.get_owl_vec());
 		semantic_types = extractEnum(owlScanner.get_owl_vec(), "Semantic_Type");
 		Utils.saveToFile("semantic_types.txt", semantic_types);
@@ -170,7 +160,6 @@ public class NCItQA {
 			property_vec = Utils.readFile(PROPERTY_FILE);
 		}
 
-		Vector w = null;
 		if (!FileUtils.fileExists(ROLE_FILE)) {
 			role_vec = owlScanner.extractOWLRestrictions(owlScanner.get_owl_vec());
 			if (saveOption)  Utils.saveToFile(ROLE_FILE, role_vec);
@@ -248,37 +237,9 @@ public class NCItQA {
         return v;
 	}
 
-/*
-Recombinant Amphiregulin|C1000|P90|CRDGF|P383$AB|P384$NCI
-Recombinant Amphiregulin|C1000|P90|KAF|P383$AB|P384$NCI
-*/
-	public String generateFULLSYN_FILE() {
-		Vector v = Utils.readFile(AXIOM_FILE);
-		Vector w = new Vector();
-		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String propCode = (String) u.elementAt(2);
-			if (propCode.compareTo("P90") == 0) {
-				w.add(line);
-			}
-		}
-		String fullsynfile = "FULLSYN.txt";
-		Utils.saveToFile(fullsynfile, w);
-		return fullsynfile;
-	}
-
 	public void setSaveOption(boolean saveOption) {
 		this.saveOption = saveOption;
 	}
-
-/*
-Recombinant Amphiregulin|C1000|P90|AMPHIREGULIN|P383$PT|P384$FDA|P385$7MGE0HPM2H|P386$UNII
-Recombinant Amphiregulin|C1000|P90|AR|P383$AB|P384$NCI
-Recombinant Amphiregulin|C1000|P90|CRDGF|P383$AB|P384$NCI
-Recombinant Amphiregulin|C1000|P90|KAF|P383$AB|P384$NCI
-Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
-*/
 
     public List getSynonyms(Vector axiom_data) {
 		if (axiom_data == null) return null;
@@ -1066,7 +1027,6 @@ Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
 		return new SortUtils().quickSort(w);
 	}
 
-
 	public static Vector removeTemporaryFiles() {
 		Vector filenames = new Vector();
 		try {
@@ -1080,7 +1040,7 @@ Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
 		}
 		return filenames;
 	}
-
+/*
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		String owlfile = null;
@@ -1101,5 +1061,6 @@ Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
         //removeTemporaryFiles();
         System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
+	*/
 }
 
