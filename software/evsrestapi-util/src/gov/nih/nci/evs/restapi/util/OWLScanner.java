@@ -88,6 +88,9 @@ public class OWLScanner {
 	private HashMap associationMap = null;
 	HashMap propertyCode2LabelHashMap = null;
 
+    public static String PREMERGED_CONCEPT_CODE = "NHC50000";
+    public static String PRERETIRED_CONCEPT_CODE = "NHC50001";
+
     public OWLScanner() {
 
     }
@@ -3916,7 +3919,7 @@ C4910|<NHC0>C4910</NHC0>
 			}
 			if (t.indexOf(NAMESPACE_TARGET) != -1 && t.endsWith("-->")) {
 				classId = extractClassId(t);
-				if (StringUtils.isNCItCode(classId)) {
+				if (StringUtils.isNCItCode(classId) || classId.equals(PREMERGED_CONCEPT_CODE) || classId.equals(PRERETIRED_CONCEPT_CODE)) {
 					w.add(classId);
 				}
 			}
