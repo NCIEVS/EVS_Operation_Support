@@ -3909,18 +3909,27 @@ C4910|<NHC0>C4910</NHC0>
 	}
 
     public static Vector extractClassIDs(Vector owl_vec) {
+		String target = "// Classes";
+		boolean istart = false;
 		Vector w = new Vector();
 		String classId = null;
 		String label = null;
 		for (int i=0; i<owl_vec.size(); i++) {
 			String t = (String) owl_vec.elementAt(i);
+			if (!istart) {
+				if (t.indexOf(target) != -1) {
+					istart = true;
+				}
+			}
 		    if (t.indexOf("// Annotations") != -1) {
 				break;
 			}
-			if (t.indexOf(NAMESPACE_TARGET) != -1 && t.endsWith("-->")) {
-				classId = extractClassId(t);
-				if (StringUtils.isNCItCode(classId) || classId.equals(PREMERGED_CONCEPT_CODE) || classId.equals(PRERETIRED_CONCEPT_CODE)) {
-					w.add(classId);
+			if (istart) {
+				if (t.indexOf(NAMESPACE_TARGET) != -1 && t.endsWith("-->")) {
+					classId = extractClassId(t);
+					if (StringUtils.isNCItCode(classId) || classId.equals(PREMERGED_CONCEPT_CODE) || classId.equals(PRERETIRED_CONCEPT_CODE)) {
+						w.add(classId);
+					}
 				}
 			}
 		}
