@@ -255,12 +255,21 @@ public class FileUtils
 		}
 	}
 
+	public static boolean deleteDirectory(File file) {
+		File[] allContents = file.listFiles();
+		if (allContents != null) {
+			for (File f : allContents) {
+				deleteDirectory(f);
+			}
+		}
+		return file.delete();
+	}
+
 	public static void deleteDirectory(String dirName) {
 		Vector subdir = listSubdirectories();
 		for (int i=0; i<subdir.size(); i++) {
 			String sub = (String) subdir.elementAt(i);
 			String targetDir = sub + File.separator + dirName;
-			System.out.println("Delete directory" + targetDir);
 			deleteDir(targetDir);
 		}
 	}
