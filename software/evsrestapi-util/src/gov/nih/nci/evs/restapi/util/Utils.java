@@ -1002,5 +1002,28 @@ public class Utils {
         }
     }
 
+//////////////////////////////////////////////////////////////////////////////////////
+    public static HashSet setDifference(HashSet set1, HashSet set2) {
+		set1.removeAll(set2);
+		return set1;
+	}
 
+    public static HashSet setDifference(Vector v1, Vector v2) {
+		HashSet set1 = Utils.vector2HashSet(v1);
+		HashSet set2 = Utils.vector2HashSet(v2);
+        return setDifference(set1, set2);
+	}
+
+	public static Vector dumpHashSet(String label, String action, HashSet set) {
+		Vector w = new Vector();
+		Iterator it = set.iterator();
+		while (it.hasNext()) {
+			String t = (String) it.next();
+			String s = label + "\t" + action + "\t" + t;
+			w.add(s);
+		}
+		return w;
+	}
+
+//////////////////////////////////////////////////////////////////////////////////////
 }

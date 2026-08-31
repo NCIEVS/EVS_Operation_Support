@@ -168,12 +168,12 @@ public class FileUtils
 	}
 
 
-	public static void copyDirectory(String sourceDirectoryLocation, String destinationDirectoryLocation)
+	public static void copyDirectory(String srcDirPath, String targetDirPath)
 		throws IOException {
-		File target_dir = new File(destinationDirectoryLocation);
+		File target_dir = new File(targetDirPath);
 
-		Files.walk(Paths.get(sourceDirectoryLocation)).forEach(source -> {
-		Path destination = Paths.get(destinationDirectoryLocation, source.toString().substring(sourceDirectoryLocation.length()));
+		Files.walk(Paths.get(srcDirPath)).forEach(source -> {
+		Path destination = Paths.get(targetDirPath, source.toString().substring(srcDirPath.length()));
 		try {
 			Files.copy(source, destination);
 		} catch (IOException e) {
@@ -555,4 +555,15 @@ public class FileUtils
 		}
 		return -1;
 	}
+
+	public static Vector getFilesInDirectory(String path) {
+		Vector w = new Vector();
+		Vector v = FileUtils.listFiles(path);
+		for (int i=0; i<v.size(); i++) {
+			File file = (File) v.elementAt(i);
+			w.add(file.getAbsolutePath());
+		}
+		return w;
+	}
+
 }
