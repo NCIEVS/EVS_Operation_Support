@@ -82,23 +82,24 @@ public class AxiomParser {
     String username = null;
     String password = null;
     OWLSPARQLUtils owlSPARQLUtils = null;
-
-    public AxiomParser() {
-
-	}
-
+    HashMap code2LabelMap = null;
     public AxiomParser(String serviceUrl, String named_graph, String username, String password) {
     	this.named_graph = named_graph;
         this.owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
         this.owlSPARQLUtils.set_named_graph(named_graph);
+        this.code2LabelMap = owlSPARQLUtils.createCode2LabelMap();
     }
 
     public OWLSPARQLUtils getOWLSPARQLUtils() {
 		return this.owlSPARQLUtils;
 	}
 
+	public String getLabel(String code) {
+		return (String) code2LabelMap.get(code);
+	}
 
-	public static HashSet getDistinctAxiomIds(Vector v) {
+
+	public HashSet getDistinctAxiomIds(Vector v) {
 		HashSet hset = new HashSet();
 		for (int i=0; i<v.size(); i++) {
 			String t = (String) v.elementAt(i);
@@ -111,7 +112,7 @@ public class AxiomParser {
 		return hset;
 	}
 
-	public static Vector getAxiomsById(Vector v, String id) {
+	public Vector getAxiomsById(Vector v, String id) {
 		Vector w = new Vector();
 		for (int i=0; i<v.size(); i++) {
 			String t = (String) v.elementAt(i);
@@ -125,7 +126,7 @@ public class AxiomParser {
 	}
 
 
-	public static Vector getHashSetKeys(HashSet hset) {
+	public Vector getHashSetKeys(HashSet hset) {
         Vector keys = new Vector();
         if (hset == null) {
 			return new Vector();
@@ -138,43 +139,43 @@ public class AxiomParser {
 		return keys;
 	}
 
-	public static String getAxiomAnnotatedSourceCode(Vector w) {
+	public String getAxiomAnnotatedSourceCode(Vector w) {
 		return getAxiomAnnotatedSourceCode((String) w.elementAt(0));
 	}
 
-	public static String getAxiomAnnotatedSourceCode(String axiom_line) {
+	public String getAxiomAnnotatedSourceCode(String axiom_line) {
 		Vector u = StringUtils.parseData(axiom_line, '|');
 		return (String) u.elementAt(1);
 	}
 
-	public static String getAxiomAnnotatedSourceLabel(Vector w) {
+	public String getAxiomAnnotatedSourceLabel(Vector w) {
 		return getAxiomAnnotatedSourceLabel((String) w.elementAt(0));
 	}
 
-	public static String getAxiomAnnotatedSourceLabel(String axiom_line) {
+	public String getAxiomAnnotatedSourceLabel(String axiom_line) {
 		Vector u = StringUtils.parseData(axiom_line, '|');
 		return (String) u.elementAt(2);
 	}
 
-	public static String getAxiomAnnotatedProperty(Vector w) {
+	public String getAxiomAnnotatedProperty(Vector w) {
 		return getAxiomAnnotatedProperty((String) w.elementAt(0));
 	}
 
-	public static String getAxiomAnnotatedProperty(String axiom_line) {
+	public String getAxiomAnnotatedProperty(String axiom_line) {
 		Vector u = StringUtils.parseData(axiom_line, '|');
 		return (String) u.elementAt(4);	}
 
-	public static String getAxiomAnnotatedTarget(Vector w) {
+	public String getAxiomAnnotatedTarget(Vector w) {
 		return getAxiomAnnotatedTarget((String) w.elementAt(0));
 	}
 
-	public static String getAxiomAnnotatedTarget(String axiom_line) {
+	public String getAxiomAnnotatedTarget(String axiom_line) {
 		Vector u = StringUtils.parseData(axiom_line, '|');
 		Utils.dumpVector(axiom_line, u);
 		return (String) u.elementAt(4);
 	}
 
-	public static HashMap getAxiomQualifiers(Vector w) {
+	public HashMap getAxiomQualifiers(Vector w) {
 		HashMap hmap = new HashMap();
 //	(2) bnode_f2caede0_a728_4542_84bd_b5c447ff981a_8862453|C12345|Ciliary Body|P325|ALT_DEFINITION|Circumferential tissue located behind the iris and composed of muscle and epithelium.|P378|Definition Source|CDISC
 		for (int i=0; i<w.size(); i++) {
@@ -193,7 +194,7 @@ public class AxiomParser {
 		return hmap;
 	}
 
-	public static Object axiomData2Object(Vector w) {
+	public Object axiomData2Object(Vector w) {
     	String type = getAxiomAnnotatedProperty(w);
 	    String code = getAxiomAnnotatedSourceCode(w);
 	    String label = getAxiomAnnotatedSourceLabel(w);
@@ -323,7 +324,7 @@ public class AxiomParser {
         return null;
 	}
 
-    public static void printAxiomObject(Object obj) {
+    public void printAxiomObject(Object obj) {
 		if (obj != null) {
 			if (obj instanceof Synonym) {
 				Synonym syn = (Synonym) obj;
@@ -344,7 +345,7 @@ public class AxiomParser {
 		}
 	}
 
-	public static HashMap getAxiomId2DataHashMap(Vector v) {
+	public HashMap getAxiomId2DataHashMap(Vector v) {
 		HashMap hmap = new HashMap();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
@@ -380,7 +381,7 @@ public class AxiomParser {
 		return owlSPARQLUtils.get_axioms_by_code(named_graph, code);
 	}
 
-	public static Object line2Object(String line) {
+	public Object line2Object(String line) {
 		Vector u = StringUtils.parseData(line, '|');
 		String type = (String) u.elementAt(2);
 		if (type.compareTo("P90") == 0) {
@@ -397,14 +398,17 @@ public class AxiomParser {
 		return null;
 	}
 
-
-    public static Synonym line2Synonym(String line) {
+/*
+    public Synonym line2Synonym(String line) {
 		line = line.trim();
 		if (line.length() == 0) return null;
 		Vector u = StringUtils.parseData(line, '|');
-		String code = (String) u.elementAt(1);
-		String label = (String) u.elementAt(0);
-		String termName = (String) u.elementAt(3);
+
+//C107239|P90|FACT Complex-targeting Curaxin CBL0137|P383$DN|P384$CTRP
+
+		String code = (String) u.elementAt(0);
+		String label = (String) u.elementAt(2);
+		String termName = (String) u.elementAt(2);
 		String termGroup = null;
 		String termSource = null;
 		String sourceCode = null;
@@ -436,7 +440,211 @@ public class AxiomParser {
 			subSourceCode);
 	}
 
-    public static Definition line2Definition(String line) {
+*/
+
+    public Synonym line2Synonym(String line) {
+		line = line.trim();
+		if (line.length() == 0) return null;
+		Vector u = StringUtils.parseData(line, '|');
+//C107239|P90|FACT Complex-targeting Curaxin CBL0137|P383$DN|P384$CTRP
+		String code = (String) u.elementAt(0);
+		String label = getLabel(code);
+		String termName = (String) u.elementAt(2);
+		String termGroup = null;
+		String termSource = null;
+		String sourceCode = null;
+		String subSourceName = null;
+		String subSourceCode = null;
+		for (int i=3; i<u.size(); i++) {
+			String t = (String) u.elementAt(i);
+			Vector u2 = StringUtils.parseData(t, '$');
+			String s1 = (String) u2.elementAt(0);
+			String s2 = (String) u2.elementAt(1);
+			if (s1.compareTo("P383") == 0) {
+				termGroup = s2;
+			} else if (s1.compareTo("P384") == 0) {
+				termSource = s2;
+			} else if (s1.compareTo("P385") == 0) {
+				sourceCode = s2;
+			} else if (s1.compareTo("P386") == 0) {
+				subSourceName = s2;
+			}
+		}
+        return new Synonym(
+			code,
+			label,
+			termName,
+			termGroup,
+			termSource,
+			sourceCode,
+			subSourceName,
+			subSourceCode);
+	}
+
+    public Definition line2Definition(String line) {
+		line = line.trim();
+		if (line.length() == 0) return null;
+		Vector u = StringUtils.parseData(line, '|');
+		String code = (String) u.elementAt(0);
+		String label = getLabel(code);
+		String description = (String) u.elementAt(2);
+
+		//String code = (String) u.elementAt(1);
+		//String label = (String) u.elementAt(0);
+		//String description = (String) u.elementAt(3);
+
+		String attribution = "";
+		String source = "";
+
+		for (int i=3; i<u.size(); i++) {
+			String t = (String) u.elementAt(i);
+			Vector u2 = StringUtils.parseData(t, '$');
+			String s1 = (String) u2.elementAt(0);
+			String s2 = (String) u2.elementAt(1);
+			if (s1.compareTo("P381") == 0) {
+				attribution = s2;
+			} else if (s1.compareTo("P378") == 0) {
+				source = s2;
+			}
+		}
+		return new Definition(
+			code,
+			label,
+			description,
+			attribution,
+			source);
+	}
+
+    public AltDefinition line2AltDefinition(String line) {
+		line = line.trim();
+		if (line.length() == 0) return null;
+		Vector u = StringUtils.parseData(line, '|');
+
+		String code = (String) u.elementAt(0);
+		String label = getLabel(code);
+
+		//String code = (String) u.elementAt(1);
+		//String label = (String) u.elementAt(0);
+		//String description = (String) u.elementAt(3);
+
+		String prop_code = (String) u.elementAt(1);
+		String description = (String) u.elementAt(2);
+		String attribution = "";
+		String source = "";
+
+		for (int i=3; i<u.size(); i++) {
+			String t = (String) u.elementAt(i);
+			Vector u2 = StringUtils.parseData(t, '$');
+			String s1 = (String) u2.elementAt(0);
+			String s2 = (String) u2.elementAt(1);
+			if (s1.compareTo("P381") == 0) {
+				attribution = s2;
+			} else if (s1.compareTo("P378") == 0) {
+				source = s2;
+			}
+		}
+		return new AltDefinition(
+			code,
+			label,
+			description,
+			attribution,
+			source);
+	}
+
+    public GoAnnotation line2GoAnnotation(String line) {
+		line = line.trim();
+		if (line.length() == 0) return null;
+		Vector u = StringUtils.parseData(line, '|');
+		//String code = (String) u.elementAt(1);
+		//String label = (String) u.elementAt(0);
+
+		String code = (String) u.elementAt(0);
+		String label = getLabel(code);
+
+		String prop_code = (String) u.elementAt(1);
+		String annotation = (String) u.elementAt(2);
+
+		String goEvi = "";
+		String goId = "";
+		String goSource = "";
+		String sourceDate = "";
+
+		for (int i=3; i<u.size(); i++) {
+			String t = (String) u.elementAt(i);
+			Vector u2 = StringUtils.parseData(t, '$');
+			String s1 = (String) u2.elementAt(0);
+			String s2 = (String) u2.elementAt(1);
+			if (s1.compareTo("P389") == 0) {
+				goEvi = s2;
+			} else if (s1.compareTo("P387") == 0) {
+				goId = s2;
+			} else if (s1.compareTo("P390") == 0) {
+				goSource = s2;
+			} else if (s1.compareTo("P391") == 0) {
+				sourceDate = s2;
+			}
+		}
+
+		return new GoAnnotation(
+			code,
+			label,
+			annotation,
+			goEvi,
+			goId,
+			goSource,
+			sourceDate
+		);
+	}
+
+    public MapToEntry line2MapToEntry(String line) {
+		line = line.trim();
+		if (line.length() == 0) return null;
+		Vector u = StringUtils.parseData(line, '|');
+		//String code = (String) u.elementAt(1);
+		//String label = (String) u.elementAt(0);
+
+		String code = (String) u.elementAt(0);
+		String label = getLabel(code);
+
+		String prop_code = (String) u.elementAt(1);
+
+		String targetTerm = (String) u.elementAt(2);
+		String targetCode = "";
+		String targetTermType = "";
+		String targetTerminology = "";
+		String targetTerminologyVersion = "";
+		String relationshipToTarget = "";
+
+		for (int i=3; i<u.size(); i++) {
+			String t = (String) u.elementAt(i);
+			Vector u2 = StringUtils.parseData(t, '$');
+			String s1 = (String) u2.elementAt(0);
+			String s2 = (String) u2.elementAt(1);
+			if (s1.compareTo("P393") == 0) {
+				relationshipToTarget = s2;
+			} else if (s1.compareTo("P394") == 0) {
+				targetTermType = s2;
+			} else if (s1.compareTo("P395") == 0) {
+				targetCode = s2;
+			} else if (s1.compareTo("P396") == 0) {
+				targetTerminology = s2;
+			} else if (s1.compareTo("P397") == 0) {
+				targetTerminologyVersion = s2;
+			}
+		}
+		return new MapToEntry(
+		 code,
+		 label,
+		 relationshipToTarget,
+		 targetCode,
+		 targetTerm,
+		 targetTermType,
+		 targetTerminology,
+		 targetTerminologyVersion);
+	}
+
+/*
+    public Definition line2Definition(String line) {
 		line = line.trim();
 		if (line.length() == 0) return null;
 		Vector u = StringUtils.parseData(line, '|');
@@ -465,7 +673,7 @@ public class AxiomParser {
 			source);
 	}
 
-    public static AltDefinition line2AltDefinition(String line) {
+    public AltDefinition line2AltDefinition(String line) {
 		line = line.trim();
 		if (line.length() == 0) return null;
 		Vector u = StringUtils.parseData(line, '|');
@@ -496,7 +704,7 @@ public class AxiomParser {
 			source);
 	}
 
-    public static GoAnnotation line2GoAnnotation(String line) {
+    public GoAnnotation line2GoAnnotation(String line) {
 		line = line.trim();
 		if (line.length() == 0) return null;
 		Vector u = StringUtils.parseData(line, '|');
@@ -536,7 +744,7 @@ public class AxiomParser {
 		);
 	}
 
-    public static MapToEntry line2MapToEntry(String line) {
+    public MapToEntry line2MapToEntry(String line) {
 		line = line.trim();
 		if (line.length() == 0) return null;
 		Vector u = StringUtils.parseData(line, '|');
@@ -578,29 +786,60 @@ public class AxiomParser {
 		 targetTerminology,
 		 targetTerminologyVersion);
 	}
+*/
 
-    public static HashMap loadSynonyms(String filename) {
+    public HashMap loadSynonyms(String filename) {
 		HashMap hmap = new HashMap();
+		int knt = 0;
 		Vector v = Utils.readFile(filename);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String type = (String) u.elementAt(2);
-			if (type.compareTo("P90") == 0) {
-				Synonym syn = line2Synonym(line);
-				String code = syn.getCode();
-				Vector w = new Vector();
-				if (hmap.containsKey(code)) {
-					w = (Vector) hmap.get(code);
+			String code = (String) u.elementAt(0);
+
+
+			if (StringUtils.isNCItCode(code)) {
+				//System.out.println(code);
+
+				String type = (String) u.elementAt(1);
+				//System.out.println(type);
+
+				if (type.compareTo("P90") == 0) {
+					knt++;
+					//System.out.println(code);
+
+					Synonym syn = line2Synonym(line);
+					//System.out.println(syn.toJson());
+					//String code = syn.getCode();
+					Vector w = new Vector();
+					if (hmap.containsKey(code)) {
+						w = (Vector) hmap.get(code);
+					}
+					w.add(syn);
+					//System.out.println("hmap put " + code);
+					hmap.put(code, w);
 				}
-				w.add(syn);
-				hmap.put(code, w);
 			}
 		}
+		//System.out.println("KNT: " + knt);
+/*
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			System.out.println("KEY: " + key);
+		}
+*/
+		System.out.println("*********************** synonymMap: " + hmap.keySet().size());
+/*
+KNT: 1098660
+KEY: C199909
+KEY: C112100
+*/
+
 		return hmap;
 	}
 
-	public static String getCode(Object obj){
+	public String getCode(Object obj){
 		if (obj instanceof Synonym) {
 			Synonym syn = (Synonym) obj;
 			return syn.getCode();
@@ -620,7 +859,7 @@ public class AxiomParser {
 		return null;
 	}
 
-	public static HashMap loadAxioms(Vector v) {
+	public HashMap loadAxioms(Vector v) {
 		HashMap hmap = new HashMap();
 		v = new SortUtils().quickSort(v);
 		Vector w = new Vector();
@@ -642,7 +881,7 @@ public class AxiomParser {
 	}
 
 
-	public static HashMap createAxiomHashMap(Vector v) {
+	public HashMap createAxiomHashMap(Vector v) {
 		HashMap axiomHashMap = new HashMap();
 		int colNum = 2;
 		char delim = '|';
@@ -651,14 +890,14 @@ public class AxiomParser {
 		for (int i=0; i<propCodes.size(); i++) {
 			String propCode = (String) propCodes.elementAt(i);
 			Vector w = DelimitedDataExtractor.retrieveColumnData(v, colNum, propCode, delim);
-			HashMap hmap = AxiomParser.loadAxioms(w);
+			HashMap hmap = loadAxioms(w);
 			Iterator it = hmap.keySet().iterator();
 			while (it.hasNext()) {
 				String key = (String) it.next();
 				List list = (List) hmap.get(key);
 				for (int j=0; j<list.size(); j++) {
 					Object obj = list.get(j);
-					AxiomParser.printAxiomObject(obj);
+					printAxiomObject(obj);
 				}
 			}
 			axiomHashMap.put(propCode, hmap);
@@ -666,7 +905,7 @@ public class AxiomParser {
 		return axiomHashMap;
 	}
 
-	public static void dumpAxiomHashMap(HashMap axiomHashMap) {
+	public void dumpAxiomHashMap(HashMap axiomHashMap) {
 		Iterator it = axiomHashMap.keySet().iterator();
 		while (it.hasNext()) {
 			String propCode = (String) it.next();
@@ -677,13 +916,13 @@ public class AxiomParser {
 				List list = (List) hmap.get(key);
 				for (int j=0; j<list.size(); j++) {
 					Object obj = list.get(j);
-					AxiomParser.printAxiomObject(obj);
+					printAxiomObject(obj);
 				}
 			}
 		}
 	}
 
-    public static Vector line2AxiomStatements(String line) {
+    public Vector line2AxiomStatements(String line) {
 		Vector w = new Vector();
 		Vector u = StringUtils.parseData(line, '|');
 		String code = (String) u.elementAt(0);
@@ -705,21 +944,8 @@ public class AxiomParser {
 		return w;
 	}
 
-    public static void main(String[] args) {
+    public void main(String[] args) {
 		long ms = System.currentTimeMillis();
-		/*
-		String serviceUrl = args[0];
-		String named_graph = args[1];
-		String username = args[2];
-		String password = args[3];
-        AxiomParser test = new AxiomParser(serviceUrl, named_graph, username, password);
-        String code = "C12345";
-        Vector w = test.getAxioms(named_graph, code);
-        for (int i=0; i<w.size(); i++) {
-			Object obj = w.elementAt(i);
-			printAxiomObject(obj);
-		}
-		*/
         String filename = args[0];
 		HashMap hmap = loadAxioms(Utils.readFile(filename));
 		System.out.println(hmap.keySet().size());

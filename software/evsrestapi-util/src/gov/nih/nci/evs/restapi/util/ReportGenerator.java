@@ -94,7 +94,7 @@ public class ReportGenerator {
 		}
 
 		subset_hmap = create_subset_hmap();
-		synonymMap = AxiomParser.loadSynonyms(AXIOM_FILE);
+		synonymMap = AxiomReader.loadSynonyms(AXIOM_FILE);
 		System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 

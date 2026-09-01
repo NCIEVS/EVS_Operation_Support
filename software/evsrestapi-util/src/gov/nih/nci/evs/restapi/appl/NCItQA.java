@@ -247,7 +247,7 @@ public class NCItQA {
 		HashMap hmap = new HashMap();
 		for (int i=0; i<axiom_data.size(); i++) {
 			String t = (String) axiom_data.elementAt(i);
-			gov.nih.nci.evs.restapi.bean.Synonym syn = AxiomParser.line2Synonym(t);// {
+			gov.nih.nci.evs.restapi.bean.Synonym syn = AxiomReader.line2Synonym(t);// {
 			syn_list.add(syn);
 		}
 		return syn_list;

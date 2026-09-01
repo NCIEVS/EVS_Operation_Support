@@ -64,7 +64,7 @@ public class CDISCSubsetReportQA {
 		this.heading = (String) reportData.elementAt(0);
 		this.cols = StringUtils.parseData(this.heading, '\t');
 		this.reportData.remove(0);
-		synonymMap = AxiomParser.loadSynonyms(AXIOM_FILE);
+		synonymMap = AxiomReader.loadSynonyms(AXIOM_FILE);
 
 		this.req_data_vec = new Vector();
 		String sourcePT = "P90|P384$" + sourceName + "|P383$PT";

@@ -95,6 +95,8 @@ public class PediatricSubsetsGenerator {
 	public static String HEADING = "NCI Subset Name\tNCI Subset Code\tNCI Code\tNCI Preferred Name\tNCI Synonyms\tNCI DEFINITION\tNeoplastic_Status";
     public String ncit_version = null;
     public Vector role_data = null;
+    OWLSPARQLUtils owlSPARQLUtils = null;
+    public AxiomParser axiomParser = null;//(String serviceUrl, String named_graph, String username, String password) {
 
     BasicQueryUtils basicQueryUtils = null;
 
@@ -108,11 +110,20 @@ public class PediatricSubsetsGenerator {
     }
 
     public void initialize() {
+		axiomParser = new AxiomParser(serviceUrl, named_graph, username, password);
 		basicQueryUtils = new BasicQueryUtils(serviceUrl, named_graph, username, password);
 		axiomfile = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE;
 		System.out.println(axiomfile);
-		synonymMap = AxiomParser.loadSynonyms(axiomfile);
-		System.out.println("synonymMap: " + synonymMap.keySet().size());
+		Vector axiom_vec = Utils.readFile(axiomfile);
+		System.out.println("axiom_vec: " + axiom_vec.size());
+
+        this.owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
+        this.owlSPARQLUtils.set_named_graph(named_graph);
+        this.code2LabelMap = owlSPARQLUtils.createCode2LabelMap();
+
+		synonymMap = axiomParser.loadSynonyms(axiomfile);
+		System.out.println("*********************** synonymMap: " + synonymMap.keySet().size());
+
         Vector v = null;
         String line = null;
         Vector u = null;
@@ -205,20 +216,6 @@ public class PediatricSubsetsGenerator {
 		}
 		return statusMap;
 	}
-
-/*
-    public static HashMap createCode2LabelMap() {
-        Vector w = Utils.readFile(hierfile);
-        HashMap code2LabelMap = new HashMap();
-        for (int i=0; i<w.size(); i++) {
-			String line = (String) w.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			code2LabelMap.put((String) u.elementAt(1), (String) u.elementAt(0));
-			code2LabelMap.put((String) u.elementAt(3), (String) u.elementAt(2));
-		}
-		return code2LabelMap;
-	}
-*/
 
     public HashMap createCode2LabelMap(Vector w) {
 		//Advanced Childhood Malignant Solid Neoplasm|C187210|Disease_Has_Finding|Childhood Lesion|C60644

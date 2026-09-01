@@ -1053,7 +1053,7 @@ public Vector getPropertyValues(String named_graph, String propertyName) {
 	        Vector u = StringUtils.parseData(line, '|');
 	        String propcode = (String) u.elementAt(2);
 	        if (propcode.compareTo("P90") == 0) {
-				Synonym syn = AxiomParser.line2Synonym(line);
+				Synonym syn = AxiomReader.line2Synonym(line);
 				w.add(syn.getLabel() + "|" + syn.getCode() + "|" + syn.getTermName() + "|" + syn.getTermSource() + "|" + syn.getTermGroup());
 			}
 		}

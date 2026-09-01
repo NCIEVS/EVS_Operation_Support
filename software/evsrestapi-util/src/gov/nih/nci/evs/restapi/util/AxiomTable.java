@@ -44,7 +44,7 @@ public class AxiomTable {
 
         String line = (String) w.elementAt(0);
 
-		Object obj = AxiomParser.line2Object(line);
+		Object obj = AxiomReader.line2Object(line);
         ReflectionUtils utils = new ReflectionUtils(obj);
 
         String classname = utils.getClassName();
@@ -61,7 +61,7 @@ public class AxiomTable {
         Vector v = new Vector();
 		for (int i=0; i<w.size(); i++) {
 			line = (String) w.elementAt(i);
-			obj = AxiomParser.line2Object(line);
+			obj = AxiomReader.line2Object(line);
 			ReflectionUtils ru = new ReflectionUtils(obj);
 			HashMap hmap = ru.getFieldValues();
 			StringBuffer buf = new StringBuffer();

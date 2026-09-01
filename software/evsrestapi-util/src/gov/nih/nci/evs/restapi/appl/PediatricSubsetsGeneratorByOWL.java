@@ -153,7 +153,7 @@ public class PediatricSubsetsGeneratorByOWL {
 
 		axiomfile = AXIOM_FILE;
 		System.out.println(axiomfile);
-		synonymMap = AxiomParser.loadSynonyms(axiomfile);
+		synonymMap = AxiomReader.loadSynonyms(axiomfile);
 		System.out.println("synonymMap: " + synonymMap.keySet().size());
 
         Vector v = null;

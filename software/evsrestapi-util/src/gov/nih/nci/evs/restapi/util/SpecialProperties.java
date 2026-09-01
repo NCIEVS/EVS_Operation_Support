@@ -14,7 +14,7 @@ public class SpecialProperties {
 	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
     static HashMap synonymMap = null;
     static {
-		synonymMap = AxiomParser.loadSynonyms(AXIOM_FILE);
+		synonymMap = AxiomReader.loadSynonyms(AXIOM_FILE);
 	}
 
 	SpecialProperties() {

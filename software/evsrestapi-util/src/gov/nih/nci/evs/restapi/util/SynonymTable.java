@@ -40,7 +40,7 @@ public class SynonymTable {
 		HashMap synMap = new HashMap();
 		for (int i=0; i<w.size(); i++) {
 			String line = (String) w.elementAt(i);
-			Synonym syn = AxiomParser.line2Synonym(line);
+			Synonym syn = AxiomReader.line2Synonym(line);
 			String key = syn.getLabel() + "\t" + syn.getCode();
 			Vector w1 = new Vector();
 			if (synMap.containsKey(key)) {
@@ -156,7 +156,7 @@ public class SynonymTable {
 		HashMap synMap = new HashMap();
 		for (int i=0; i<w.size(); i++) {
 			String line = (String) w.elementAt(i);
-			Synonym syn = AxiomParser.line2Synonym(line);
+			Synonym syn = AxiomReader.line2Synonym(line);
 			String key = syn.getLabel() + "\t" + syn.getCode();
 			Vector w1 = new Vector();
 			if (synMap.containsKey(key)) {

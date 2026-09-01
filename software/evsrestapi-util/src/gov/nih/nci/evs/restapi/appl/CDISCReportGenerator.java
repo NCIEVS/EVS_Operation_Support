@@ -54,7 +54,7 @@ public class CDISCReportGenerator {
 		hh = new HierarchyHelper(Utils.readFile(PARENT_CHILD_FILE));
 		scanner = new OWLScanner(NCIT_OWL);
 
-		synonymMap = AxiomParser.loadSynonyms(AXIOM_FILE);
+		synonymMap = AxiomReader.loadSynonyms(AXIOM_FILE);
 
     	associationMap = scanner.getAssociationMap();
 
@@ -85,7 +85,7 @@ public class CDISCReportGenerator {
 			}
 		}
 
-		synonymMap = AxiomParser.loadSynonyms(AXIOM_FILE);
+		synonymMap = AxiomReader.loadSynonyms(AXIOM_FILE);
 		createSupportedPropertyMaps();
 	}
 
