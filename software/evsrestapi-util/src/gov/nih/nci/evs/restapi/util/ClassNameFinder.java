@@ -73,7 +73,8 @@ public class ClassNameFinder {
 		excluded.add("JsonParser");
 		excluded.add("DomDriver");
 		excluded.add("JSONObject");
-
+        excluded.add("Arrays");
+        excluded.add("System");
 	}
 
     public static String removePackageName(String t) {
@@ -97,10 +98,76 @@ public class ClassNameFinder {
 		v = CommentLineUtils.removeCommentLines(v);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
+			if (line.indexOf("=") != -1) {
+				line = line.trim();
+				int n = line.indexOf("=");
+					String s0 = line.substring(n+1, line.length());
+					if (line.indexOf(".") != -1) {
+						Vector u0 = StringUtils.parseData(s0, '.');
+						s0 = (String) u0.elementAt(0);
+						s0 = s0.trim();
+						if (s0.indexOf(" ") == -1) {
+							char c = s0.charAt(0);
+							if (Character.isAlphabetic(c)) {
+								String firstChar = "" + s0.charAt(0);
+								String uc_firstChar = firstChar.toUpperCase();
+								if (firstChar.equals(uc_firstChar)) {
+									if (!containsCaseSensitive(excluded, s0)) {
+                                        if (s0.length() > 0) {
+											hset.add(s0);
+										}
+									}
+								}
+							}
+						}
+					}
+
+			}
+
+
+			if (line.indexOf("new ") != -1) {
+				line = line.trim();
+				int n = line.indexOf("(");
+				if (n != -1) {
+					String s0 = line.substring(0, n);
+					Vector u0 = StringUtils.parseData(s0, ' ');
+					s0 = (String) u0.elementAt(u0.size()-1);
+					if (!containsCaseSensitive(excluded, s0)) {
+						hset.add(s0);
+					}
+				} else {
+					n = line.indexOf("[");
+					if (n != -1) {
+						String s0 = line.substring(0, n);
+						Vector u0 = StringUtils.parseData(s0, ' ');
+						s0 = (String) u0.elementAt(u0.size()-1);
+						if (!containsCaseSensitive(excluded, s0)) {
+							hset.add(s0);
+						}
+					}
+				}
+			}
+
 			line = line.trim();
 			line = line.replace("final","");
 			if (line.indexOf("new ") != -1 && line.indexOf("return") == -1 && line.indexOf("throw") == -1
 			    && line.indexOf("//") == -1 && line.indexOf("List<") == -1 && line.indexOf("Vector<") == -1) {
+
+				String s1 = line.replace("(", " ");
+				Vector u0 = StringUtils.parseData(s1, ' ');
+				for (int k=0; k<u0.size(); k++) {
+					String t0 = (String) u0.elementAt(k);
+					if (t0.equals("new")) {
+						String t1 = (String) u0.elementAt(k+1);
+						if (!containsCaseSensitive(excluded, t1)) {
+							if (t0.indexOf("gov.nih.nci.evs.restapi") == -1
+							    && t0.indexOf("[") == -1 && t0.compareTo("new") != 0) {
+								hset.add(t0);
+							}
+						}
+					}
+				}
+
 				Vector u = StringUtils.parseData(line, ' ');
 				String t = (String) u.elementAt(0);
 				if (!containsCaseSensitive(excluded, t)) {
@@ -205,6 +272,24 @@ public class ClassNameFinder {
         return w;
 	}
 
+    public static Vector getSourceFileNames(String foldername) {
+		if (foldername == null) {
+			String currentDir = System.getProperty("user.dir");
+			foldername = currentDir + File.separator + "src";
+		}
+		Vector srcfiles = new Vector();
+		List list = FileUtils.listFilesInDirectory(foldername);
+        Vector w = new Vector();
+		for (int i=0; i<list.size(); i++) {
+			String filepath = (String) list.get(i);
+			if (filepath.endsWith("java")) {
+				srcfiles.add(filepath);
+			}
+		}
+		srcfiles = new SortUtils().quickSort(srcfiles);
+        return w;
+	}
+
     public static Vector getClassNames(String foldername) {
 		if (foldername == null) {
 			Vector srcfiles = new Vector();
@@ -237,20 +322,36 @@ public class ClassNameFinder {
 			t = t.substring(0, n);
 		}
 		return t;
+	}
 
+	public static Vector findClassNames(String foldername) {
+		Vector w = new Vector();
+		if (foldername == null) {
+			w = run();
+		} else {
+			w = run(foldername);
+		}
+		Vector w1 = getClassNames(foldername);
+		w.removeElement("");
+		w.addAll(w1);
+		w = removeDuplicates(w);
+		w = new SortUtils().quickSort(w);
+		return w;
 	}
 
 	public static void main(String args[]) {
 		String foldername = null;
-		Vector w = new Vector();
-		if (args.length == 0) {
-			w = run();
-		} else {
+        if (args.length > 0) {
 			foldername = args[0];
-			w = run(foldername);
 		}
-		Vector w1 = getClassNames(foldername);
-		w.addAll(w1);
+		//Vector srcFiles = getSourceFileNames(foldername);
+		//Utils.dumpVector("srcFiles", srcFiles);
+
+		//Vector w = run(foldername);
+		//Vector w1 = findClassNames(foldername);
+
+		//w.addAll(w1);
+		Vector w = findClassNames(foldername);
 		w = removeDuplicates(w);
 		w = new SortUtils().quickSort(w);
 		Utils.dumpVector("classNames", w);

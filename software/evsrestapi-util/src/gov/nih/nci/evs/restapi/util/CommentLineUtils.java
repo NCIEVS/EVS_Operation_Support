@@ -82,7 +82,7 @@ public class CommentLineUtils {
         return w;
 	}
 
-	public static void removeCommentLinesInDirectory(String dirPath){
+	public static void removeCommentLinesInDirectory(String dirPath) {
 		Vector v = FileUtils.getFilesInDirectory(dirPath);
 		for (int i=0; i<v.size(); i++) {
 			String filepath = (String) v.elementAt(i);
@@ -91,7 +91,7 @@ public class CommentLineUtils {
 		}
 	}
 
-	public static Vector extractCommentLinesInDirectory(String dirPath){
+	public static Vector extractCommentLinesInDirectory(String dirPath) {
 		Vector w = new Vector();
 		Vector v = FileUtils.getFilesInDirectory(dirPath);
 		for (int i=0; i<v.size(); i++) {
@@ -154,16 +154,23 @@ public class CommentLineUtils {
 	public static void run(String srcDir, String targetDir, boolean oneJarAppl) {
 		String path1 = srcDir;
 		Vector w = FileUtils.getFilesInDirectory(path1);
-		String path2 = FileUtils.getCurrentWorkingDirectory() + File.separator + targetDir;
+		Utils.dumpVector(path1, w);
+		String path2 = targetDir;
 		File f = new File(path2);
 		if (f.exists()) {
+			System.out.println("Delete " + path2);
 			deleteDirectory(f);
 		}
+
 		try {
+			System.out.println("Backing up " + path1 + "...");
 			FileUtils.copyDirectory(path1, path2);
+
+			System.out.println("removeCommentLinesInDirectory " + path2 + "...");
 			CommentLineUtils.removeCommentLinesInDirectory(path2);
 
 			if (oneJarAppl) {
+				System.out.println("oneJarAppl? " + oneJarAppl);
 				String mainClass = CommentLineUtils.fileMainClassInPackage(path2);
 				System.out.println("main class: " + mainClass);
 				CommentLineUtils.addOnJarCopyRightStmts(mainClass);
