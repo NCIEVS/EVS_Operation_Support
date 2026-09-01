@@ -1238,6 +1238,8 @@ public class PediatricSubsetsGenerator {
 
 	public String findSynonym(String code, String source, HashSet hset) {
 		List list = (List) synonymMap.get(code);
+		//KLO 08312026
+		if (list == null || list.size() == 0) return "";
 		StringBuffer b = new StringBuffer();
 		for (int i=0; i<list.size(); i++) {
 			Synonym syn = (Synonym) list.get(i);

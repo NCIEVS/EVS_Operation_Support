@@ -442,14 +442,7 @@ public class SourceReader {
 	public static void main(String[] args) {
 		String dirName = args[0];
 		String ext = args[1];
-        //deleteDirectory(dirName);
-        //updateJar(args);
-
-        //Vector v = listFileNames();
-        //Utils.dumpVector("files", v);
         String outputfile = readRegularFiles(dirName, ext);
         System.out.println(outputfile + " generated.");
-
-
 	}
 }
