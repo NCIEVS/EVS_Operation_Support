@@ -81,6 +81,11 @@ public class LogicalExpressionFormatter {
 	static String RANGE_RESULT = "range_results.txt";
 	static String RANGE_UNSPECIFIED = "[Range Unspecified]";
 
+	public LogicalExpressionFormatter() {
+		this.roleName2RangeNameMap = getRoleName2RangeNameMap();
+		this.roleCode2RangeNameMap = getRoleCode2RangeNameMap();
+	}
+
 	public LogicalExpressionFormatter(HashMap roleCode2RangeNameMap, HashMap roleName2RangeNameMap) {
 		this.roleName2RangeNameMap = roleName2RangeNameMap;
 		this.roleCode2RangeNameMap = roleCode2RangeNameMap;
@@ -172,7 +177,7 @@ public class LogicalExpressionFormatter {
 				}
 				RoleUnion ru = new RoleUnion(list);
 
-				System.out.println(ru.toJson());
+				//System.out.println(ru.toJson());
 
 				w.add(ru);
 			}
@@ -198,7 +203,7 @@ public class LogicalExpressionFormatter {
 			List<RoleSet> list = new ArrayList();
 			for (int i=0; i<ids.size(); i++) {
 				String id = (String) ids.elementAt(i);
-				System.out.println(id);
+				//System.out.println(id);
 
 				List<Restriction> restrictions = new ArrayList();
 				for (int j=0; j<rolegroups.size(); j++) {
@@ -208,19 +213,19 @@ public class LogicalExpressionFormatter {
 					String line_id = (String) u.elementAt(2) + "|" + (String) u.elementAt(3);
 
 					if (line_id.compareTo(id) == 0) {
-						System.out.println("lineID: " + line_id);
+						//System.out.println("lineID: " + line_id);
 						Restriction r = line2Restriction(line);
-						System.out.println(r.toJson());
+						//System.out.println(r.toJson());
 						restrictions.add(r);
 					}
 				}
 				RoleSet set = new RoleSet(restrictions);
-				System.out.println(set.toJson());
+				//System.out.println(set.toJson());
 
 				list.add(set);
 			}
 			RoleGroup rg = new RoleGroup(list);
-			System.out.println(rg.toJson());
+			//System.out.println(rg.toJson());
 
 			w.add(rg);
 ///////////////////////////////////////////////////////////////////////////////
@@ -231,9 +236,6 @@ public class LogicalExpressionFormatter {
 	}
 
 	public Vector findRangesInLEData(HashMap hmap) {
-
-System.out.println("********************** 	findRangesInLEData 	**********************");
-
 		Vector ranges = new Vector();
 
 		Vector roles = (Vector) hmap.get("ROLE");
@@ -242,7 +244,7 @@ System.out.println("********************** 	findRangesInLEData 	****************
 
 		for (int i=0; i<roles.size(); i++) {
 			Restriction r = (Restriction) roles.elementAt(i);
-			System.out.println(r.toJson());
+			//System.out.println(r.toJson());
 			if (r == null) {
 				System.out.println("ERROR r = null???");
 			}
@@ -255,11 +257,11 @@ System.out.println("********************** 	findRangesInLEData 	****************
 		if (roleUnions != null && roleUnions.size() > 0) {
 			for (int i=0; i<roleUnions.size(); i++) {
 				RoleUnion ru = (RoleUnion) roleUnions.elementAt(i);
-				System.out.println(ru.toJson());
+				//System.out.println(ru.toJson());
 				List<Restriction> restrictions = ru.getRoles();
 				for (int j=0; j<restrictions.size(); j++) {
 					Restriction r = (Restriction) restrictions.get(j);
-					System.out.println(r.toJson());
+					//System.out.println(r.toJson());
 					String label = (String) r.getRoleLabel();
 					String range = (String) roleName2RangeNameMap.get(label);
 					if (!ranges.contains(range)) {
@@ -305,9 +307,6 @@ System.out.println("********************** 	findRangesInLEData 	****************
 */
 
 		if (roleGroups != null && roleGroups.size() > 0) {
-
-			System.out.println("roleGroups.size(): " + roleGroups.size());
-
 			for (int i=0; i<roleGroups.size(); i++) {
 				RoleGroup rg = (RoleGroup) roleGroups.elementAt(i);
 				List<RoleSet> roleSets = rg.getRoleSets();
@@ -318,7 +317,7 @@ System.out.println("********************** 	findRangesInLEData 	****************
 						Restriction r1 = (Restriction) list.get(m);
 						String label = (String) r1.getRoleLabel();
 						String range = (String) roleName2RangeNameMap.get(label);
-						System.out.println(range);
+						//System.out.println(range);
 						if (!ranges.contains(range)) {
 							ranges.add(range);
 						}
@@ -470,7 +469,7 @@ System.out.println("********************** 	findRangesInLEData 	****************
 		}
 
 		if (simpleRoleList.size() == 0 && roleUnion_list.size() == 0 && roleGroup_list.size() == 0) {
-			System.out.println("INFO getLogicalExpressionElement " + range + " returns null.");
+			//System.out.println("INFO getLogicalExpressionElement " + range + " returns null.");
 			return null;
 		}
 
@@ -481,7 +480,7 @@ System.out.println("********************** 	findRangesInLEData 	****************
 			roleGroup_list);
 
 
-		System.out.println("******************** DEBUG **************\n" + e.toJson());
+		//System.out.println("******************** DEBUG **************\n" + e.toJson());
 		if (simpleRoleList.size() == 0 && roleUnion_list.size() == 0 && roleGroup_list.size() == 0) {
 			System.out.println("INFON getLogicalExpressionElement " + range + " returns null.");
 			return null;
@@ -489,7 +488,7 @@ System.out.println("********************** 	findRangesInLEData 	****************
 		return e;
 	}
 
-	public String getLogicalExpression(HashMap hmap) {
+	public String getLogicalExpression(String code, String label, HashMap hmap) {
 		/*
 		Vector w = (Vector) hmap.get("ROLE");
 		if (w == null) w = (Vector) hmap.get("ROLE GROUP");
@@ -523,6 +522,8 @@ System.out.println("********************** 	findRangesInLEData 	****************
 			= new gov.nih.nci.evs.restapi.bean.LogicalExpression(
 				  code, label, parents, elements, null); // null: expression not populated yet
 		System.out.println(logicalExpression.toJson());
+        //System.out.println("\n\n");
+		//System.out.println(logicalExpression.toXML());
 
 		String expression = null;
 		StringBuffer buf = new StringBuffer();
@@ -784,8 +785,9 @@ System.out.println("********************** 	findRangesInLEData 	****************
 		String named_graph =  ConfigurationController.namedGraph;
 		String username =  ConfigurationController.username;
 		String password =  ConfigurationController.password;
-
 		String expression = null;
+/*
+
 		if (rawdatafile != null) {
         	//LogicalExpressionFormatter formatter = new LogicalExpressionFormatter(getRoleCode2RangeNameMap(), getRoleName2RangeNameMap());
 			HashMap hmap = loadRawLogicalExpressionData(rawdatafile);
@@ -796,6 +798,10 @@ System.out.println("********************** 	findRangesInLEData 	****************
 		    gov.nih.nci.evs.restapi.appl.LogicalExpression le = new gov.nih.nci.evs.restapi.appl.LogicalExpression(serviceUrl, named_graph, username, password);
 		    expression = run(le, named_graph, code);
 		}
+*/
+		gov.nih.nci.evs.restapi.appl.LogicalExpression le = new gov.nih.nci.evs.restapi.appl.LogicalExpression(serviceUrl, named_graph, username, password);
+		expression = run(le, named_graph, code);
+
 		return expression;
 	}
 
@@ -827,7 +833,13 @@ System.out.println("********************** 	findRangesInLEData 	****************
     public static void main(String[] args) {
 		String code = args[0];
 		String label = args[1];
-		LogicalExpressionFormatter formatter = new LogicalExpressionFormatter(getRoleCode2RangeNameMap(), getRoleName2RangeNameMap());
+
+		System.out.println("code: " + code);
+		System.out.println("label: " + label);
+
+		System.out.println("Instaitiating LogicalExpressionFormatter ...");
+
+		LogicalExpressionFormatter formatter = new LogicalExpressionFormatter();//getRoleCode2RangeNameMap(), getRoleName2RangeNameMap());
 		formatter.setCode(code);
 		formatter.setLabel(label);
 		String expression = formatter.run();

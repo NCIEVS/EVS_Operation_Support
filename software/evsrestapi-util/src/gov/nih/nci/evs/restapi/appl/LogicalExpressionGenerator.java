@@ -1,6 +1,8 @@
 package gov.nih.nci.evs.restapi.appl;
 import gov.nih.nci.evs.restapi.util.*;
+import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.config.*;
+
 
 import java.io.*;
 import java.io.BufferedReader;
@@ -72,21 +74,11 @@ public class LogicalExpressionGenerator {
 	HashMap rangeHashMap = null;
 	gov.nih.nci.evs.restapi.appl.LogicalExpression le = null;
 	HashMap code2LabelMap = null;
-
-
-	//HashMap roleName2RangeNameMap = null;
-	//HashMap roleCode2RangeNameMap = null;
-
-	Vector roleDomanAndRange_vec = null;
-	HashMap roleCode2RangeNameMap = null;
-	HashMap roleCode2RoleNameMap = null;
-	HashMap roleName2RoleCodeMap = null;
 	HashMap roleName2RangeNameMap = null;
-
+	HashMap roleCode2RangeNameMap = null;
 	Vector PATHS = null;
 	HashMap range2ExpressionMap = null;
 	LogicalExpressionFormatter formatter = null;
-	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
 
 	private void initialize() {
 		String serviceUrl = ConfigurationController.serviceUrl;
@@ -94,62 +86,13 @@ public class LogicalExpressionGenerator {
 		String username = ConfigurationController.username;
 		String password = ConfigurationController.password;
 
-        boolean success = false;
 		try {
 			code2LabelMap = generateLabelHashMap(named_graph);//loadOrGenerateLabelHashMap(named_graph);
 			le = new gov.nih.nci.evs.restapi.appl.LogicalExpression(serviceUrl, named_graph, username, password);
 			roleCode2RangeNameMap = le.getRoleCode2RangeNameMap();
 			roleName2RangeNameMap = le.getRoleName2RangeNameMap();
-			success = true;
-
 		} catch (Exception ex) {
 			ex.printStackTrace();
-		}
-
-
-
-		if (code2LabelMap == null) {
-
-			System.out.println("================= code2LabelMap == null ================= ");
-			long ms0 = System.currentTimeMillis();
-			roleDomanAndRange_vec = OWLScanner.extractRoleDomainAndRange(NCIT_OWL);
-			Utils.dumpVector("roleDomanAndRange_vec", roleDomanAndRange_vec);
-
-//output_vec.add(roleCode + "|" + roleLabel + "|" + domainCode + "|" + rangeCode);
-
-			OWLScanner owlScanner = new OWLScanner(NCIT_OWL);
-			code2LabelMap = owlScanner.getCode2LabelMap();
-			System.out.println("code2LabelMap: " + code2LabelMap.keySet().size());
-
-			roleCode2RangeNameMap = new HashMap();
-			roleCode2RoleNameMap  = new HashMap();
-			roleName2RoleCodeMap = new HashMap();
-			roleName2RangeNameMap = new HashMap();
-			for (int i=0; i<roleDomanAndRange_vec.size(); i++) {
-				String line = (String) roleDomanAndRange_vec.elementAt(i);
-				Vector u = StringUtils.parseData(line, '|');
-				String roleCode = (String) u.elementAt(0);
-				String roleName = (String) u.elementAt(1);
-				String rangeCode = (String) u.elementAt(3);
-				String rangeName = (String) code2LabelMap.get(rangeCode);
-
-				roleCode2RangeNameMap.put(roleCode, rangeName);
-				roleCode2RoleNameMap.put(roleCode, roleName);
-				roleName2RoleCodeMap.put(roleName, roleCode);
-    			roleName2RangeNameMap.put(roleName, rangeName);
-			}
-			Vector v = owlScanner.scanSubproperties(owlScanner.get_owl_vec());
-			for (int i=0; i<v.size(); i++) {
-				String line = (String) v.elementAt(i);
-				Vector u = StringUtils.parseData(line, '|');
-				String parentCode = (String) u.elementAt(0);
-				String childCode = (String) u.elementAt(1);
-				String rangeName = (String) roleCode2RangeNameMap.get(parentCode);
-				roleCode2RangeNameMap.put(childCode, rangeName);
-			}
-			long ms = System.currentTimeMillis();
-			System.out.println("Total initialization run time (ms): " + (ms - ms0));
-			//ex.printStackTrace();
 		}
         PATHS = new Vector();
         PATHS.add("E|I|O|C");
@@ -157,7 +100,7 @@ public class LogicalExpressionGenerator {
         PATHS.add("E|I|O|U|O|R");
         PATHS.add("E|I|O|U|O|I|O|R");
 
-        formatter = new LogicalExpressionFormatter(roleCode2RangeNameMap, roleName2RangeNameMap);
+        formatter = new LogicalExpressionFormatter();
         //formatter.setRangeMaps(roleName2RangeNameMap, roleCode2RangeNameMap);
         //formatter.setpaths(PATHS);
 	}
@@ -198,7 +141,17 @@ public class LogicalExpressionGenerator {
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public HashMap getLogicalExpressionData(String named_graph, String code) {
+        HashMap hmap = le.getLogicalExpressionData(named_graph, code);
+        return hmap;
+	}
 
+    public String getLogicalExpression(String named_graph, String code) {
+        HashMap hmap = getLogicalExpressionData(named_graph, code);
+        String label = (String) code2LabelMap.get(code);
+        String expression = formatter.getLogicalExpression(code, label, hmap);
+        return expression;
+	}
 
 	public static String construct_get_label(String prefixes, String named_graph) {
         StringBuffer buf = new StringBuffer();
@@ -313,6 +266,11 @@ public class LogicalExpressionGenerator {
 			int j = i+1;
 			String code = (String) codes.elementAt(i);
 			String label = (String) code2LabelMap.get(code);
+
+			System.out.println("code: " + code);
+			System.out.println("label: " + code);
+
+
 			System.out.println("(" + j + ") Logical expression of " + label + " (" + code + ")");
 			w.add("\n(" + j + ") Logical expression of " + label + " (" + code + ")");
 			String expression = getLogicalExpression(named_graph, code);
@@ -323,22 +281,6 @@ public class LogicalExpressionGenerator {
 		return w;
 	}
 
-    public HashMap getLogicalExpressionData(String named_graph, String code) {
-        HashMap hmap = le.getLogicalExpressionData(named_graph, code);
-        return hmap;
-	}
-
-/*
-    public String getLogicalExpression(String named_graph, String code) {
-        String expression = formatter.run(le, named_graph, code);
-        return expression;
-	}
-*/
-    public String getLogicalExpression(String named_graph, String code) {
-		gov.nih.nci.evs.restapi.bean.LogicalExpression logicalExpre = le.getLogicalExpression(named_graph, code, false);
-        String expression = logicalExpre.toString();
-        return expression;
-	}
 
 	public void run(String code) {
 		String named_graph = ConfigurationController.namedGraph;
@@ -354,53 +296,27 @@ public class LogicalExpressionGenerator {
 		Utils.saveToFile(outputfile, w);
 	}
 
-	public void appendRangeToFile(String filename) {
-		Vector v = Utils.readFile(filename);
-		Vector w = new Vector();
-		for (int i=0; i<v.size(); i++) {
-			String line0 = (String) v.elementAt(i);
-			String line = line0;
-			line = line.trim();
-			Vector u = StringUtils.parseData(line, '\t');
-			//Utils.dumpVector(line0, u);
-			if (u.size() > 1) {
-				String roleName = (String) u.elementAt(0);
-				String range = (String) roleName2RangeNameMap.get(roleName);
-				line0 = line0 + "\t\t(Range: " + range + ")";
-			}
-			w.add(line0);
-		}
-		int n = filename.lastIndexOf(".");
-		String outputfile = filename.substring(0, n) + "_with_ranges.txt";
-		Utils.saveToFile(outputfile, w);
-	}
-
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
-		LogicalExpressionGenerator test = new LogicalExpressionGenerator();
 		String filename = args[0];
-
-		test.appendRangeToFile(filename);
-
-		/*
         Vector codes = Utils.readFile(filename);
         System.out.println("codes: " + codes.size());
+        /*
 		String firstLn = (String) codes.elementAt(0);
 		if (firstLn.indexOf("\t") != -1) {
 			codes = extract_column_data(filename, 5, '\t');
 		} else if (firstLn.indexOf("|") != -1) {
 			codes = extract_column_data(filename, 0, '|');
 		}
-		codes = removeDuplicats(codes, false);
+		*/
 
+		codes = removeDuplicats(codes, false);
+        LogicalExpressionGenerator test = new LogicalExpressionGenerator();
         Vector w = test.run(codes);
         int n = filename.lastIndexOf(".");
         String name = filename.substring(0, n);
         Utils.saveToFile("logical_expression_" + name + "_" + StringUtils.getToday() + ".txt", w);
-        //test.appendRangeToFile(filename);
-        */
-
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }
