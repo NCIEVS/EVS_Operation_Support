@@ -155,11 +155,7 @@ public class EVSStatisticsByOWL {
 		INV_ANNOTATED_TARGET_HASHMAP.put("P211", "P388");
 		INV_ANNOTATED_TARGET_HASHMAP.put("P375", "P392");
 
-        if (ReportSubmitter.getOWLScanner() != null) {
-			scanner = ReportSubmitter.getOWLScanner();
-		} else {
-			scanner = new OWLScanner(NCIT_OWL);
-		}
+		scanner = new OWLScanner(NCIT_OWL);
 
 		File file = new File(RESTRICTION_FILE);
 		Vector roles = null;

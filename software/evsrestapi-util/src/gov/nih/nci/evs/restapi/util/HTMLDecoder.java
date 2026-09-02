@@ -9,7 +9,7 @@ public class HTMLDecoder {
 		Vector w = new Vector();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
-			String new_line = HTMLDecoder.decode(line);
+			String new_line = decode(line);
 			w.add(new_line);
 		}
 		return w;
@@ -17,13 +17,13 @@ public class HTMLDecoder {
 
 	public static void run(String filename) {
 		Vector w = new Vector();
-		Vector v = Utils.readFile(filename);
+		Vector v = SpecialCharReadWrite.readFile(filename);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
-			String new_line = HTMLDecoder.decode(line);
+			String new_line = decode(line);
 			w.add(new_line);
 		}
-		Utils.saveToFile(filename, w);
+		SpecialCharReadWrite.saveToFile(filename, w);
 	}
 
 	public static String replace(String input) {
@@ -34,7 +34,6 @@ public class HTMLDecoder {
 	}
 
 	public static String decode(String input) {
-
         StringWriter writer = null;
         int len = input.length();
         int i = 1;

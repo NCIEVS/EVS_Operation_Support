@@ -146,12 +146,29 @@ public class SortUtils {
 		return values;
 	}
 
+    public static Vector parseData(String line, char delimiter) {
+		if(line == null) return null;
+		Vector w = new Vector();
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<line.length(); i++) {
+			char c = line.charAt(i);
+			if (c == delimiter) {
+				w.add(buf.toString());
+				buf = new StringBuffer();
+			} else {
+				buf.append(c);
+			}
+		}
+		w.add(buf.toString());
+		return w;
+	}
+
 	public static Vector sortBy(Vector v, int column) {
 		HashMap hmap = new HashMap();
 		Vector keys = new Vector();
         for (int i=0; i<v.size(); i++) {
 			String str = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(str, '|');
+			Vector u = parseData(str, '|');
 			String key = (String) u.elementAt(column);
 			keys.add(key);
 			hmap.put(key, str);
@@ -170,7 +187,7 @@ public class SortUtils {
 		Vector keys = new Vector();
         for (int i=0; i<v.size(); i++) {
 			String str = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(str, '|');
+			Vector u = parseData(str, '|');
 			String key = (String) u.elementAt(column);
 			if (!keys.contains(key)) {
 				keys.add(key);

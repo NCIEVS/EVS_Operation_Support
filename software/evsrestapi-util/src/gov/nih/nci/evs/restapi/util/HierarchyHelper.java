@@ -85,6 +85,8 @@ public class HierarchyHelper implements Serializable {
 
     private String INDENT = "";
 
+    private HashSet visitedNodes = null;
+
     public HierarchyHelper() {
 	}
 
@@ -471,6 +473,7 @@ public class HierarchyHelper implements Serializable {
 	}
 
 	public void printTree() {
+		visitedNodes = new HashSet();
 		if (roots == null) {
 			findRootAndLeafNodes();
 		}
@@ -480,7 +483,16 @@ public class HierarchyHelper implements Serializable {
 		}
 	}
 
+
+
 	public void printTree(String code, int level) {
+		if (!visitedNodes.contains(code)) {
+			visitedNodes.add(code);
+		} else {
+			System.out.println("WARNING: Repetitive visit to the same node encountered: " + getLabel(code) + " (" + code + ")");
+			return;
+		}
+
 		String indent = INDENT;
 		for (int i=0; i<level; i++) {
 			indent = indent + "\t";
@@ -492,6 +504,51 @@ public class HierarchyHelper implements Serializable {
 			for (int i=0; i<child_codes.size(); i++) {
 				String child_code = (String) child_codes.elementAt(i);
 				printTree(child_code, level+1);
+			}
+		}
+	}
+
+	public void printPath() {
+		visitedNodes = new HashSet();
+		if (roots == null) {
+			findRootAndLeafNodes();
+		}
+		for (int i=0; i<roots.size(); i++) {
+			String root = (String) roots.elementAt(i);
+			printPath(root, 0);
+		}
+	}
+
+	public void dumpNodes(String label, Vector nodes) {
+		System.out.println(label);
+		for (int i=0; i<nodes.size(); i++) {
+			String node = (String) nodes.elementAt(i);
+			System.out.println(getLabel(node) + " (" + node + ")");
+		}
+	}
+
+	public void printPath(String path, int level) {
+		Vector u = StringUtils.parseData(path, '|');
+		String code = (String) u.elementAt(u.size()-1);
+		String ele = (String) u.remove(u.size()-1);
+		if (u.contains(code)) {
+			System.out.println("WARNING: Repetitive visit to the same node encountered: " + getLabel(code) + " (" + code + ")");
+			Vector u2 = StringUtils.parseData(path, '|');
+			dumpNodes(path, u2);
+			return;
+		}
+
+		String indent = INDENT;
+		for (int i=0; i<level; i++) {
+			indent = indent + "\t";
+		}
+		String label = getLabel(code);
+		System.out.println(indent + label + " (" + code + ")");
+		Vector child_codes = getSubclassCodes(code);
+		if (child_codes != null && child_codes.size() > 0) {
+			for (int i=0; i<child_codes.size(); i++) {
+				String child_code = (String) child_codes.elementAt(i);
+				printPath(path+ "|" + child_code, level+1);
 			}
 		}
 	}
@@ -1148,6 +1205,54 @@ public class HierarchyHelper implements Serializable {
 				ex.printStackTrace();
 			}
 		}
+	}
+
+	public static boolean valiateTree(Vector parent_child_vec) {
+		HierarchyHelper hh = new HierarchyHelper(parent_child_vec);
+		HashSet nodes = new HashSet();
+
+		for (int i=0; i<parent_child_vec.size(); i++) {
+			String line = (String) parent_child_vec.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String parent = (String) u.elementAt(1);
+			String child = (String) u.elementAt(3);
+			if (!nodes.contains(parent)) {
+				nodes.add(parent);
+			}
+			if (!nodes.contains(child)) {
+				nodes.add(child);
+			}
+		}
+
+		Iterator it = nodes.iterator();
+		while (it.hasNext()) {
+			String node = (String) it.next();
+            Vector parents = hh.getSuperclassCodes(node);
+            if (parents != null && parents.contains(node)) {
+				Utils.dumpVector(hh.getLabel(node) + " (" + node + ")", parents);
+				return false;
+			}
+		}
+
+		it = nodes.iterator();
+		while (it.hasNext()) {
+			String node = (String) it.next();
+            Vector children = hh.getSubclassCodes(node);
+            if (children != null && children.contains(node)) {
+				Utils.dumpVector(hh.getLabel(node) + " (" + node + ")", children);
+				return false;
+			}
+		}
+
+		Vector roots = hh.getRoots();
+		Utils.dumpVector("roots", roots);
+
+		Vector leaves = hh.getLeaves();
+		Utils.dumpVector("leaves", leaves);
+
+		hh.printPath();
+
+		return true;
 	}
 
     public static void main(String[] args) {
