@@ -486,13 +486,6 @@ public class HierarchyHelper implements Serializable {
 
 
 	public void printTree(String code, int level) {
-		if (!visitedNodes.contains(code)) {
-			visitedNodes.add(code);
-		} else {
-			System.out.println("WARNING: Repetitive visit to the same node encountered: " + getLabel(code) + " (" + code + ")");
-			return;
-		}
-
 		String indent = INDENT;
 		for (int i=0; i<level; i++) {
 			indent = indent + "\t";
