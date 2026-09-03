@@ -87,6 +87,15 @@ public class Concept
 		this.code = code;
 		}
 
+	public Concept(
+		int idx,
+		String label,
+		String code) {
+		this.idx = idx;
+		this.label = label;
+		this.code = code;
+		}
+
 /*
 	public Concept(
 		String label,

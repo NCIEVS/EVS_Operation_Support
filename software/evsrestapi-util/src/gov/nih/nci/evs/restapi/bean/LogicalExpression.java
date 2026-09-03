@@ -34,7 +34,17 @@ public class LogicalExpression {
 
 		this.code = code;
 		this.label = label;
-		this.parents = parents;
+
+		this.parents = new ArrayList();
+		if (parents != null && parents.size() > 0) {
+			for (int i=0; i<parents.size(); i++) {
+				int idx = i;
+				Concept concept = (Concept) parents.get(i);
+				Concept c = new Concept(i, concept.getLabel(), concept.getCode());
+				this.parents.add(c);
+			}
+		}
+
 		this.elements = elements;
 		this.expression = expression;
 	}
