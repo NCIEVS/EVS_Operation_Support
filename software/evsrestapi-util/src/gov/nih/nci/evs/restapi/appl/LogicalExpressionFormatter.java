@@ -488,20 +488,25 @@ public class LogicalExpressionFormatter {
 		return e;
 	}
 
-	public String getLogicalExpression(String code, String label, HashMap hmap) {
-		/*
-		Vector w = (Vector) hmap.get("ROLE");
-		if (w == null) w = (Vector) hmap.get("ROLE GROUP");
-		if (w == null) w = (Vector) hmap.get("ROLE UNION");
-		if (w == null) {
-			System.out.println("Please add code and label to the HashMap.");
-			return null;
+	public static void saveLogicalExpression(gov.nih.nci.evs.restapi.bean.LogicalExpression logicalExpression) {
+		Vector w = new Vector();
+		w.add(logicalExpression.toJson());
+		try {
+			Utils.saveToFile(logicalExpression.getCode() + ".json", w);
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
-		*/
 
-		//Vector u = StringUtils.parseData((String) w.elementAt(0), '|');
-		//String code = (String) u.elementAt(0);
-		//String label = (String) u.elementAt(1);
+		w = new Vector();
+		w.add(logicalExpression.toXML());
+		try {
+			Utils.saveToFile(logicalExpression.getCode() + ".xml", w);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public String getLogicalExpression(String code, String label, HashMap hmap) {
 		hmap = parseLogicalExpressionData(hmap);
 		Vector ranges = findRangesInLEData(hmap);
 		ranges.add(RANGE_UNSPECIFIED);
@@ -515,15 +520,15 @@ public class LogicalExpressionFormatter {
 			}
 		}
 
-		//String label = le.getLabelByCode(named_graph, code);
 		List parents = (List) hmap.get("PARENT");
 
 		gov.nih.nci.evs.restapi.bean.LogicalExpression logicalExpression
 			= new gov.nih.nci.evs.restapi.bean.LogicalExpression(
 				  code, label, parents, elements, null); // null: expression not populated yet
+
 		System.out.println(logicalExpression.toJson());
-        //System.out.println("\n\n");
-		//System.out.println(logicalExpression.toXML());
+
+		saveLogicalExpression(logicalExpression);
 
 		String expression = null;
 		StringBuffer buf = new StringBuffer();
