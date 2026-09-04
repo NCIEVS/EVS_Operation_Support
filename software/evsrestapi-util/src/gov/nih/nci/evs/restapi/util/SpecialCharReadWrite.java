@@ -8,29 +8,37 @@ public class SpecialCharReadWrite {
     /**
      * Writes a string to a file using UTF-8 encoding.
      */
+
     public static boolean writeToFile(String filePath, String content) {
-        try (Writer writer = new OutputStreamWriter(
-                new FileOutputStream(filePath), StandardCharsets.UTF_8)) {
+
+        // Write to file in UTF-8 encoding
+        try (BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(
+                        new FileOutputStream(filePath), StandardCharsets.UTF_8))) {
+
             writer.write(content);
-            return true;
         } catch (IOException e) {
-            System.err.println("Error writing file: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
+        return true;
     }
 
     public static boolean writeToFile(String filePath, Vector v) {
-        try (Writer writer = new OutputStreamWriter(
-                new FileOutputStream(filePath), StandardCharsets.UTF_8)) {
+
+        try (BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(
+                        new FileOutputStream(filePath), StandardCharsets.UTF_8))) {
 			for (int i=0; i<v.size(); i++) {
 				String line = (String) v.elementAt(i);
             	writer.write(line + System.lineSeparator());
 			}
-            return true;
+
         } catch (IOException e) {
-            System.err.println("Error writing file: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
+        return true;
     }
 
     public static boolean saveToFile(String filePath, Vector v) {

@@ -120,6 +120,17 @@ public class OWLScanner {
 		propertyCode2LabelHashMap = createPropertyCode2LabelHashMap();
     }
 
+    public void saveCode2LabelMapData(String outputfile) {
+		Vector w = new Vector();
+		Iterator it = code2LabelMap.keySet().iterator();
+		while (it.hasNext()) {
+			String code = (String) it.next();
+			String label = (String) code2LabelMap.get(code);
+			w.add(code + "|" + label);
+		}
+		SpecialCharReadWrite.writeToFile(outputfile, w);
+	}
+
     public OWLScanner(Vector owl_vec) {
         this.owl_vec = owl_vec;
         Vector label_data = extractRDFSLabels(owl_vec);
