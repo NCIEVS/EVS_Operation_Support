@@ -492,7 +492,7 @@ public class Utils {
     }
 
 	public static Vector readFile(String filename) {
-		return SpecialCharReadWrite.readFile(filename);
+		return SpecialCharReadWrite.readFromFile(filename);
 	}
 /*
 	public static Vector read_file(String filename) {
