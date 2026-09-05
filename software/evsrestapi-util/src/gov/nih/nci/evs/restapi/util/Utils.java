@@ -492,60 +492,8 @@ public class Utils {
     }
 
 	public static Vector readFile(String filename) {
-		return SpecialCharReadWrite.readFromFile(filename);
+		return SpecialCharReadWrite.readFromFile(filename, true);
 	}
-/*
-	public static Vector read_file(String filename) {
-		Vector v = new Vector();
-		BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(filename));
-			String line = reader.readLine();
-			while (line != null) {
-				if (line != null) {
-					v.add(line);
-				}
-				line = reader.readLine();
-			}
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return v;
-	}
-
-    public static Vector readFile(String filename) {
-		//return readFile(filename, true);
-		return read_file(filename);
-	}
-
-    public static Vector readFile(String filename, boolean utf8) {
-		if (!utf8) {
-			return read_file(filename);
-		}
-		Vector w = new Vector();
-        java.nio.file.Path filePath = java.nio.file.Paths.get(filename);
-        if (!Files.exists(filePath)) {
-            System.err.println("Error: File not found - " + filePath.toAbsolutePath());
-            return null;
-        } else {
-			System.out.println("File " + filename + " exists.");
-		}
-
-        try (BufferedReader reader = Files.newBufferedReader(filePath, StandardCharsets.UTF_8)) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-				System.out.println(line);
-                w.add(line);
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
-            return null;
-        }
-        return w;
-	}
-*/
-
 
     private static Vector handleFile(File file, Charset encoding) throws IOException {
         try (InputStream in = new FileInputStream(file);
@@ -1023,6 +971,15 @@ public class Utils {
 			w.add(s);
 		}
 		return w;
+	}
+
+	public static void dumpHashSet(String label, HashSet set) {
+		System.out.println(label);
+		Iterator it = set.iterator();
+		while (it.hasNext()) {
+			String t = (String) it.next();
+			System.out.println(t);
+		}
 	}
 
 //////////////////////////////////////////////////////////////////////////////////////

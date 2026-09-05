@@ -57,13 +57,13 @@ public class SpecialCharReadWrite {
 	}
 
     public static Vector readFromFile(String filePath) {
-		Vector w = new Vector();
-        StringBuilder content = new StringBuilder();
+        // Try-with-resources ensures the stream is closed automatically
+        Vector w = new Vector();
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8))) {
-            String line;
+            String line = null;
             while ((line = reader.readLine()) != null) {
-                w.add(line);
+				w.add(line);
             }
             return w;
         } catch (IOException e) {

@@ -452,6 +452,9 @@ public class HierarchyHelper implements Serializable {
 	}
 
   	public Vector getTransitiveClosure(String code, boolean traverseDown) {
+		if (!code2LabelMap.containsKey(code)) {
+			return new Vector();
+		}
 		Vector w = new Vector();
 		w.add(code);
 		Vector v = new Vector();
@@ -755,6 +758,9 @@ public class HierarchyHelper implements Serializable {
 	}
 
     public int get_transitive_closure(String code) {
+		if (!code2LabelMap.containsKey(code)) {
+			return 0;
+		}
 		int count = 0;
 		Vector v = null;
 		Stack stack = new Stack();
@@ -773,34 +779,10 @@ public class HierarchyHelper implements Serializable {
 		return count;
 	}
 
-/*
-    public int get_transitive_closure_v2(String code) {
-		int count = 0;
-		Vector v = null;
-		Stack stack = new Stack();
-		stack.push(code);
-		HashSet hset = new HashSet();
-
-		while (!stack.isEmpty()) {
-			String next_code = (String) stack.pop();
-			if (!hset.contains(next_code)) {
-				hset.add(next_code);
-				count++;
-			}
-			v = getSubclassCodes(next_code);
-			if (v != null) {
-				for (int i=0; i<v.size(); i++) {
-					String child_code = (String) v.elementAt(i);
-					stack.push(child_code);
-				}
-			}
-		}
-		hset.clear();
-		return count;
-	}
-*/
-
     public Vector get_transitive_closure_v2(String code) {
+		if (!code2LabelMap.containsKey(code)) {
+			return new Vector();
+		}
 		Vector w = new Vector();
 		Vector v = null;
 		Stack stack = new Stack();
@@ -829,6 +811,9 @@ public class HierarchyHelper implements Serializable {
 	}
 
     public Vector get_transitive_closure_v3(String code) {
+		if (!code2LabelMap.containsKey(code)) {
+			return new Vector();
+		}
 		Vector w = new Vector();
 		Vector v = null;
 		Stack stack = new Stack();
@@ -853,6 +838,9 @@ public class HierarchyHelper implements Serializable {
 	}
 
     public Vector get_transitive_closure_v4(String code) {
+		if (!code2LabelMap.containsKey(code)) {
+			return new Vector();
+		}
 		Vector w = new Vector();
 		Vector v = null;
 		Stack stack = new Stack();
@@ -943,6 +931,7 @@ public class HierarchyHelper implements Serializable {
 
     public void printTree(String root) {
 		Vector v = get_transitive_closure_v4(root);
+		if (v.size() == 0) return;
 		HierarchyHelper hh = new HierarchyHelper(v);
 		PrintWriter pw = null;
 		String outputfile = root + "_tree.txt";
