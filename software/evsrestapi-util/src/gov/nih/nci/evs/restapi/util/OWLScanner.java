@@ -91,6 +91,9 @@ public class OWLScanner {
     public static String PREMERGED_CONCEPT_CODE = "NHC50000";
     public static String PRERETIRED_CONCEPT_CODE = "NHC50001";
 
+    public static String CONCEPT_STATUS_CODE = "P310";
+    public static String RETIRED_CONCEPT_ROOT = "C28428";
+
     public OWLScanner() {
 
     }
@@ -3210,21 +3213,6 @@ C4910|<NHC0>C4910</NHC0>
         return w;
     }
 
-    public HashSet createRetiredConceptSet() {
-        HashSet hset = new HashSet();
-		Vector v = extractProperties(get_owl_vec(), "P310");
-		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String status = (String) u.elementAt(2);
-			if (status.compareTo("Retired_Concept") == 0) {
-				String code = (String) u.elementAt(0);
-				hset.add(code);
-			}
-		}
-		return hset;
-    }
-
 	public String getMatchedTagValue(String line, List codeList) {
 		line = line.trim();
 		for (int i=0; i<codeList.size(); i++) {
@@ -3997,6 +3985,71 @@ C4910|<NHC0>C4910</NHC0>
 			}
 		}
 		return hmap;
+	}
+
+	public static String extractID(String line) {
+		int n = line.lastIndexOf("#");
+		String s = line.substring(n+1, line.length());
+		n = s.lastIndexOf(" ");
+		return s.substring(0, n);
+	}
+
+	static String DEPRECATED = "<owl:deprecated rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">true</owl:deprecated>";
+
+	public Vector extractDeprecatedConcepts() {
+		Vector v = Utils.readFile(owlfile);
+		Vector w = new Vector();
+		String id = null;
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (line.indexOf("<!-- http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#") != -1 && line.endsWith("-->")) {
+				id = extractID(line);
+			}
+			if (line.indexOf(DEPRECATED) != -1) {
+				if (id != null) {
+					w.add(id);
+					id = null;
+				}
+			}
+		}
+		return w;
+	}
+
+	public Vector extractPropertyValues(String propCode) {
+		Vector v = Utils.readFile(owlfile);
+		Vector w = new Vector();
+		String id = null;
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (line.indexOf("<!-- http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#") != -1 && line.endsWith("-->")) {
+				id = extractID(line);
+			}
+			if (line.indexOf("<" + propCode + ">") != -1 && line.indexOf("</" + propCode + ">") != -1) {
+				if (id != null) {
+					int n1 = line.indexOf(">");
+					int n2 = line.lastIndexOf("<");
+					String propValue = line.substring(n1+1, n2);
+					w.add(id + "|" + propCode + "|" + propValue);
+				}
+			}
+		}
+		return w;
+	}
+
+	public HashSet createRetiredConceptSet() {
+		String propCode = CONCEPT_STATUS_CODE;
+		Vector w = extractPropertyValues(propCode);
+		HashSet hset = new HashSet();
+		for (int i=0; i<w.size(); i++) {
+			String line = (String) w.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(0);
+			String status = (String) u.elementAt(2);
+			if (status.compareTo("Retired_Concept") == 0) {
+				hset.add(code);
+			}
+		}
+		return hset;
 	}
 }
 
