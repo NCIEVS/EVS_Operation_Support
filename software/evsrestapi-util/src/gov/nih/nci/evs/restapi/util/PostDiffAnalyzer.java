@@ -26,6 +26,9 @@ public class PostDiffAnalyzer {
         initialize();
 	}
 
+//properties	Delete	C206569|oboInOwl:hasDbXref|F29
+//properties	Add	C206569|oboInOwl:hasDbXref|IMDRF:F29
+
 	public void initialize() {
 		long ms = System.currentTimeMillis();
 		System.out.println("Setting up baseline (asserted OWL).");
@@ -114,6 +117,49 @@ A8	Delete	C171322|A8|C116977
 		Utils.dumpVector("class_vec_1", class_vec_1);
 		Vector class_vec_2 = ldr2.getClassData(code);
 		Utils.dumpVector("class_vec_2", class_vec_2);
+	}
+
+
+	public HashMap analyze(String filename) {
+		String cwd = System.getProperty("user.dir");
+		String dir = cwd + File.separator + outputDir;
+		String filepath = dir + File.separator + filename;
+		Vector v = Utils.readFile(filepath);
+		HashMap hmap = new HashMap();
+		for (int i=1; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '\t');
+			String type = (String) u.elementAt(0);
+			String action = (String) u.elementAt(1);
+			String data = (String) u.elementAt(2);
+			Vector u2 = StringUtils.parseData(data, '|');
+			String propCode = (String) u2.elementAt(1);
+			String key = type + "|" + action + "|" + propCode;
+			Vector w = new Vector();
+			if (hmap.containsKey(key)) {
+				w = (Vector) hmap.get(key);
+			}
+			w.add(data);
+			hmap.put(key, w);
+		}
+		return hmap;
+	}
+
+//P370 Project name
+    public static void saveMultiValuedHashMap(String filename, HashMap hmap) {
+		String outputfile = "analysis_" + filename;
+		Vector w = new Vector();
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			w.add(key);
+			Vector v = (Vector) hmap.get(key);
+			for (int j=0; j<v.size(); j++) {
+				String value = (String) v.elementAt(j);
+				w.add("\t" + value);
+			}
+		}
+		Utils.saveToFile(outputfile, w);
 	}
 
 //java -Xms1024m -Xmx8g -classpath %CLASSPATH% PostDiffAnalyzer ThesaurusInferred-26.05d-ftp.owl ThesaurusInferred_forTS_09-05-2026.owl Thesaurus-260526-26.05d.owl
