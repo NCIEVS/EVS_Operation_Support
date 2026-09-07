@@ -1,5 +1,4 @@
 package gov.nih.nci.evs.restapi.util;
-import gov.nih.nci.evs.restapi.config.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import java.io.*;
 import java.util.*;
@@ -62,6 +61,10 @@ public class InheritanceAnalyzer {
 
 		owlscanner = reasoner.getOWLScanner();
 		parent_child_vec = owlscanner.extractHierarchicalRelationships(owlscanner.get_owl_vec());
+
+		String outputfile = "hier.txt";
+		Utils.saveToFile(outputfile, parent_child_vec);
+
 		parent_child_vec = HTMLDecoder.run(parent_child_vec);
 		hh = new HierarchyHelper(parent_child_vec);
 		Vector equiv_classes = owlscanner.extractEquivalenceClasses();
@@ -542,6 +545,24 @@ w.add("        </rdfs:subClassOf>");
 		return w;
 	}
 
+/*
+	public static HashMap getFrequencyHashMap(Vector v) {
+		HashMap countMap = new HashMap();
+		for (int i=0; i<v.size(); i++) {
+			String node = (String) v.elementAt(i);
+
+			Integer int_obj = Integer.valueOf(0);
+			if (countMap.containsKey(node)) {
+				int_obj = (Integer) countMap.get(node);
+			}
+			int count = int_obj.intValue();
+			int_obj = Integer.valueOf(count+1);
+			countMap.put(node, int_obj);
+		}
+        return countMap;
+	}
+*/
+
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
 		String owlfile = args[0];
@@ -549,7 +570,7 @@ w.add("        </rdfs:subClassOf>");
 		InheritanceAnalyzer analyzer = new InheritanceAnalyzer(owlfile);
 
         Vector w = analyzer.matchAncestorRelationships();
-        Utils.saveToFile("analyzer_results.txt", w);
+        SpecialCharReadWrite.saveToFile("analyzer_results.txt", w);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 }

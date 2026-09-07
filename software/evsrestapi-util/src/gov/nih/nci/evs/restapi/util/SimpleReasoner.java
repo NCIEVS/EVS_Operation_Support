@@ -1,5 +1,6 @@
 package gov.nih.nci.evs.restapi.util;
-import gov.nih.nci.evs.restapi.config.*;
+import gov.nih.nci.evs.restapi.bean.*;
+import gov.nih.nci.evs.restapi.common.*;
 import java.io.*;
 import java.util.*;
 import java.io.BufferedReader;
@@ -23,6 +24,9 @@ public class SimpleReasoner {
     public void initialize() {
 		owlscanner = new OWLScanner(owl_vec);
 		parent_child_vec = owlscanner.extractHierarchicalRelationships(owlscanner.get_owl_vec());
+
+		SpecialCharReadWrite.saveToFile("reasoner_hier.txt", parent_child_vec);
+
 		hh = new HierarchyHelper(parent_child_vec);
 		role_vec = owlscanner.extractOWLRestrictions(owlscanner.get_owl_vec());
 		roleMap = createRoleMap(role_vec);

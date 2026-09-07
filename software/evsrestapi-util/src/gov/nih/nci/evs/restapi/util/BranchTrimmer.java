@@ -13,36 +13,40 @@ public class BranchTrimmer {
     HierarchyHelper hh = null;
     HashSet retired_concepts = null;
 
+    public static int BY_CONCEPT_STATUS_PROPERY = 1;
+    public static int BY_BRANCH = 2;
+
     public BranchTrimmer(String owlfile) {
 		this.owlfile = owlfile;
-		initialize();
 	}
 
 	public void initialize() {
-		long ms = System.currentTimeMillis();
-		System.out.println("owlfile: " + owlfile);
-		owlscanner = new OWLScanner(owlfile);
-
 		Vector parent_child_vec = owlscanner.extractHierarchicalRelationships(owlscanner.get_owl_vec());
 		hh = new HierarchyHelper(parent_child_vec);
-		Vector retired_branch_codes = getRetiredBranchCodes();
-		Utils.saveToFile("retired.txt", retired_branch_codes);
-		retired_concepts = Utils.vector2HashSet(retired_branch_codes);
-
-		System.out.println("Total initializaion run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 	public HashSet get_retired_concepts() {
-		return retired_concepts;
+		int option = BY_CONCEPT_STATUS_PROPERY;
+		return get_retired_concepts(option);
 	}
 
-	public boolean isRetired(String code) {
-		return retired_concepts.contains(code);
+
+	public HashSet get_retired_concepts(int option) {
+		if (retired_concepts != null) {
+			return retired_concepts;
+		}
+		owlscanner = new OWLScanner(owlfile);
+		if (option == BY_BRANCH) {
+			Vector retired_branch_codes = getRetiredBranchCodes();
+			retired_concepts = Utils.vector2HashSet(retired_branch_codes);
+		} else {
+			retired_concepts = owlscanner.createRetiredConceptSet();
+		}
+		return retired_concepts;
 	}
 
 	public Vector getRetiredBranchCodes() {
 		Vector v = get_transitive_closure(RETIRED_CONCEPT_ROOT);
-		System.out.println("getRetiredBranchCodes returns " + v.size());
 		v.removeElement(0);
 		return v;
 	}
@@ -58,6 +62,10 @@ public class BranchTrimmer {
 		return s.substring(0, n);
 	}
 
+	public boolean isRetired(String code) {
+		return retired_concepts.contains(code);
+	}
+
 /*
     <!--
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -67,8 +75,16 @@ public class BranchTrimmer {
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 */
-
 	public Vector trim(HashSet nodes) {
+		int option = BY_CONCEPT_STATUS_PROPERY;
+		return trim(nodes, option);
+	}
+
+	public Vector trim(HashSet nodes, int option) {
+		if (retired_concepts == null) {
+			retired_concepts = get_retired_concepts(option);
+		}
+
 		Vector v = owlscanner.get_owl_vec();
 		Vector w = new Vector();
 		String id = null;
@@ -120,7 +136,8 @@ public class BranchTrimmer {
 	public static void main(String args[]) {
 		String owlfile = args[0];
 		BranchTrimmer test = new BranchTrimmer(owlfile);
-		Vector w = test.trim(test.get_retired_concepts());
+		HashSet nodes = test.get_retired_concepts();
+		Vector w = test.trim(nodes);
 		Utils.saveToFile("trimmed_" + owlfile, w);
 	}
 }

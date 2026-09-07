@@ -1,5 +1,4 @@
 package gov.nih.nci.evs.restapi.util;
-import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.util.*;
 import java.io.BufferedReader;
@@ -9,17 +8,29 @@ import java.io.IOException;
 public class OWLScrubber {
 
 	public static Vector run(Vector v, String target) {
+		boolean ignore_rule = false;
 		int num_lines = 0;
 		int k = 0;
 		long ms = System.currentTimeMillis();
 		Vector w = new Vector();
-		target = "<" + target + ">";
+		String target2 = "</" + target + ">";
 		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			if (line.indexOf(target) == -1) {
-				w.add(line);
+			String line0 = (String) v.elementAt(i);
+			String line = line0;
+			line = line.trim();
+
+			if (line.indexOf("// Annotations") != -1) {
+				ignore_rule = true;
+			}
+
+			if (line.indexOf(target) != -1 && line.indexOf(target2) != -1) {
+				if (!ignore_rule) {
+					k++;
+				} else {
+					w.add(line0);
+				}
 			} else {
-				k++;
+				w.add(line0);
 			}
 		}
 		System.out.println("\tNumber of lines: " + v.size());
@@ -39,27 +50,13 @@ public class OWLScrubber {
 		return v;
 	}
 
-/*
-	public static Vector run(String dataVec, String scrubbedProperties) {
-		Vector v = load(dataVec);
-		Vector propVec = Utils.readFile(scrubbedProperties);
-		for (int i=0; i<propVec.size(); i++) {
-			String propCode = (String) propVec.elementAt(i);
-			int k = i+1;
-			System.out.println("(" + k + ") " + propCode);
-			v = run(v, propCode);
-		}
-		System.out.println("Post scrub: " + v.size());
-		return v;
-	}
-
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
-		String owlClassData = args[0];
+		String owlfile = args[0];
 		String scrubbedProperties = args[1];
-		Vector v = run(owlClassData, scrubbedProperties);
-		Utils.saveToFile("scrubbed_data.txt", v);
+		Utils.dumpVector("scrubbedProperties", Utils.readFile(scrubbedProperties));
+		Vector v = run(Utils.readFile(owlfile), Utils.readFile(scrubbedProperties));
+		Utils.saveToFile("scrubbed_" + owlfile, v);
 		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
 	}
-*/
 }

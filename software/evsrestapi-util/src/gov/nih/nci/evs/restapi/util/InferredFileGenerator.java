@@ -47,8 +47,8 @@ public class InferredFileGenerator {
 			ONTOLOGY_INFO_FILE,
 			METADATA,
 			CLASSDATA,
-			ANNOTATIONS_FILE,
-            SCRUBBED_CLASSDATA_FILE};
+			ANNOTATIONS_FILE};
+            //SCRUBBED_CLASSDATA_FILE};
 
 	String assertedOWL = null;
 	SimpleReasoner reasoner = null;
@@ -86,12 +86,39 @@ public class InferredFileGenerator {
 		return hmap;
 	}
 
+/*
+	public static void backUp(String filename) {
+		Vector v5 = Utils.readFile(filename);
+		SpecialCharReadWrite.saveToFile("copyOf_" + filename, v5);
+		//v5.clear();
+	}
+
+	public static void backUp(Vector v5, String outputfile) {
+		SpecialCharReadWrite.saveToFile("copyOf_" + outputfile, v5);
+	}
+*/
+
 	public void initialize() {
 		long ms = System.currentTimeMillis();
 		System.out.println("(A) Input Data:");
 		System.out.println("(a) OWL File: " + assertedOWL);
+		Vector v = Utils.readFile(assertedOWL);
+ 		System.out.println("\n(b) Step 1: Running OWLScrubber " + SCRUBBED_PROPERTIES_FILE);
         Vector propVec = Utils.readFile(SCRUBBED_PROPERTIES_FILE);
-        Utils.dumpVector("(b) Scrubbed properties", propVec);
+        Utils.dumpVector("Scrubbed properties", propVec);
+   		v = OWLScrubber.run(v, propVec);
+   		String scrubbedOWL = "scrubbed_" + assertedOWL;
+  		SpecialCharReadWrite.saveToFile(scrubbedOWL, v);
+ 		System.out.println(scrubbedOWL + " generated.");
+
+ 		boolean test_mode = false;
+ 		if (test_mode){
+			System.exit(0);
+		}
+
+  		System.out.println("\nStep 2: OWLClassLoader ");
+		loader = new OWLClassLoader(scrubbedOWL);
+
         System.out.println("(c) Business rules (for example, remove class NHC50000.)");
         System.out.println("\n(B) Processing:");
         System.out.println("(a) Step 1: Preprocessing:");
@@ -103,15 +130,17 @@ public class InferredFileGenerator {
 	    conceptsWithInheritedAnonymousSuperClassesMap = Utils.vector2HashMap(conceptsWithInheritedAnonymousSuperClasses, 0, 1);
 		Utils.dumpHashMap("Concepts with inherited anonymous superclasses", conceptsWithInheritedAnonymousSuperClassesMap);
 		Vector trace_vec = analyzer.traceRelationships(conceptsWithInheritedAnonymousSuperClassesMap);
-		Utils.saveToFile("trace.txt", trace_vec);
+		SpecialCharReadWrite.saveToFile("trace.txt", trace_vec);
 		System.out.println("(See inherited anonymous superclasses relationships details in trace.txt.)");
 		System.out.println("Calculating parent-child (hierarchical) relationships ...");
 		Vector parent_child_vec = analyzer.get_parent_child_vec();
+
 		parent_child_vec = HTMLDecoder.run(parent_child_vec);
 		hh = new HierarchyHelper(parent_child_vec);
+
         System.out.println("parent-child (distance-1 hierarchical) relationships generated.");
-        System.out.println("Loading " + assertedOWL + " ...");
-        this.owl_vec = Utils.readFile(assertedOWL);
+        System.out.println("Loading " + scrubbedOWL + " ...");
+        this.owl_vec = Utils.readFile(scrubbedOWL);
         System.out.println("Identifying disjointWith classes ...");
         disjointWithMap = OWLDisjointWithScanner.run(this.owl_vec);
         System.out.println("Number of disjoint classes: " + disjointWithMap.keySet().size());
@@ -120,8 +149,8 @@ public class InferredFileGenerator {
 		extractOntologyInfo(this.owl_vec);
 		System.out.println("Ontology Info extracted.");
 		System.out.println("Extracting metadata (annotation properties, datatype properties, and object properties) ...");
-	    metadata_vec = NCItMetadataUtils.getFilteredMetadata(assertedOWL, propVec);
-	    Utils.saveToFile(METADATA, metadata_vec);
+	    metadata_vec = NCItMetadataUtils.getFilteredMetadata(scrubbedOWL, propVec);
+	    SpecialCharReadWrite.saveToFile(METADATA, metadata_vec);
 	    System.out.println("Metadata extracted.");
 
         System.out.println("Extracting annotations...");
@@ -132,19 +161,20 @@ public class InferredFileGenerator {
 		extractClassData(this.owl_vec, CLASSDATA);
 		System.out.println("Class data extracted.");
 
+/*
 		System.out.println("\n(b) Step 2: Running OWLScrubber " + SCRUBBED_PROPERTIES_FILE);
         Vector v = Utils.readFile(CLASSDATA);
-		v = OWLScrubber.run(v, propVec);
+		v = gov.nih.nci.evs.restapi.appl.OWLScrubber.run(v, propVec);
 
-		Utils.saveToFile(SCRUBBED_CLASSDATA_FILE, v);
+		SpecialCharReadWrite.saveToFile(SCRUBBED_CLASSDATA_FILE, v);
 		System.out.println(SCRUBBED_CLASSDATA_FILE + " generated.");
 
 		System.out.println("\nStep 2: OWLClassLoader " + SCRUBBED_CLASSDATA_FILE);
 		loader = new OWLClassLoader(SCRUBBED_CLASSDATA_FILE);
+*/
 
 		classDataHashMap = loader.getClassDataHashMap();
 		classIdVec = loader.getClassIdVec();
-
         Vector equiv_classes = extractEquivalenceClasses(this.owl_vec);
 		equiv_class_set = Utils.vector2HashSet(equiv_classes);
 		reasoner = analyzer.getSimpleReasoner();
@@ -220,7 +250,7 @@ public class InferredFileGenerator {
 	    int iend = TextFileExtractor.findLineNumber(v, target) + 3;
 	    String outputfile = ONTOLOGY_INFO_FILE;
 	    Vector w = TextFileExtractor.extractLines(v, istart, iend);
-	    Utils.saveToFile(ONTOLOGY_INFO_FILE, w);
+	    SpecialCharReadWrite.saveToFile(ONTOLOGY_INFO_FILE, w);
 	}
 
 	public static void extractAnnotations(String filename, String outputfile) {
@@ -235,7 +265,7 @@ public class InferredFileGenerator {
 	    target = "</rdf:RDF>";
 	    int iend = TextFileExtractor.reverseFindLineNumber(v, target);
 	    Vector w = TextFileExtractor.extractLines(v, istart, iend);
-	    Utils.saveToFile(outputfile, w);
+	    SpecialCharReadWrite.saveToFile(outputfile, w);
 	}
 
 	public void extractClassData(Vector v, String outputfile) {
@@ -244,7 +274,7 @@ public class InferredFileGenerator {
 	    target = "// Annotations";
 	    int iend = TextFileExtractor.findLineNumber(v, target) - 3;
 	    Vector w = TextFileExtractor.extractLines(v, istart, iend);
-	    Utils.saveToFile(outputfile, w);
+	    SpecialCharReadWrite.saveToFile(outputfile, w);
 	}
 
 	public static void extractMetadata(Vector v, String outputfile) {
@@ -253,7 +283,7 @@ public class InferredFileGenerator {
 	    target = "// Classes";
 	    int iend = TextFileExtractor.reverseFindLineNumber(v, target) - 3;
 	    Vector w = TextFileExtractor.extractLines(v, istart, iend);
-	    Utils.saveToFile(outputfile, w);
+	    SpecialCharReadWrite.saveToFile(outputfile, w);
 	}
 
 	public Vector extractEquivalenceClasses(Vector owl_vec) {
@@ -262,7 +292,7 @@ public class InferredFileGenerator {
 		Vector w = owlscanner.extractEquivalenceClasses();
 		owlscanner.clear();
 		System.out.println("Total initialization run time (ms): " + (System.currentTimeMillis() - ms));
-		Utils.saveToFile("equivalentClasses.txt", w);
+		SpecialCharReadWrite.saveToFile("equivalentClasses.txt", w);
 		w = DelimitedDataExtractor.extract(w, "0", '|');
 		return w;
 	}
@@ -635,10 +665,6 @@ w.add("        </rdfs:subClassOf>");
 	}
 
 	public void saveScrubbedOWL(Vector w, String outputfile) {
-		int lcv = 1;
-		int increment = 10000;
-		int k = -1;
-
 		for (int i=0; i<classIdVec.size(); i++) {
 			String code = (String) classIdVec.elementAt(i);
 			if (StringUtils.isNCItCode(code)) {
@@ -658,10 +684,10 @@ w.add("        </rdfs:subClassOf>");
 		w.add("</rdf:RDF>");
 		w.add("\n");
 		w.add("<!-- Generated by the OWL API (version 5.1.6) https://github.com/owlcs/owlapi/ -->");
-		Utils.saveToFile(outputfile, w);
+		SpecialCharReadWrite.saveToFile(outputfile, w);
 	}
 
-	public void run(String assertedOWL) {
+	public void run() {
 		long ms = System.currentTimeMillis();
 		Vector deprecated = new Vector();
 		removed_concepts = new Vector();
@@ -674,14 +700,13 @@ w.add("        </rdfs:subClassOf>");
 		w.addAll(ontologyInfo);
 		w.addAll(get_metadata_vec());
 		w.addAll(getClassesStartStmts());
-
-
+/*
 		Vector cloned_w = (Vector) w.clone();
 		String scrubbedOWL = "scrubbed_" + assertedOWL;
 		System.out.println("\nStep 3a: Save scrubbed OWL as " + scrubbedOWL);
 		saveScrubbedOWL(cloned_w, scrubbedOWL);
 		cloned_w.clear();
-
+*/
         System.out.println("\nStep 4: Computing inheritance (generating inherited relationships) ...");
         Vector w1 = new ProgressBarMaker(this, classIdVec).run();
         w.addAll(w1);
@@ -702,7 +727,7 @@ w.add("        </rdfs:subClassOf>");
 
         System.out.println("(C) Output:");
 		System.out.println("Generating " + inferredFileName + ". (This may take a few minutes. Please wait...)");
-		Utils.saveToFile(inferredFileName, w);
+		SpecialCharReadWrite.saveToFile(inferredFileName, w);
 
 		System.out.println("\nStep 6: Remove temporary files ... ");
 		removeTemporaryFiles();
@@ -713,7 +738,7 @@ w.add("        </rdfs:subClassOf>");
 		long ms = System.currentTimeMillis();
 		String owlfile = args[0];
 		InferredFileGenerator generator = new InferredFileGenerator(owlfile);
-		generator.run(owlfile);
+		generator.run();
 		System.out.println("\tTotal run time (ms): " + (System.currentTimeMillis() - ms));
 		System.exit(0);
 	}
