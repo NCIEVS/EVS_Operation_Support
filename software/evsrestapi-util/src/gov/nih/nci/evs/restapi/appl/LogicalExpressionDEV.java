@@ -67,8 +67,22 @@ import org.json.*;
  *
  */
 
+
 public class LogicalExpressionDEV {
+/*
+    static String NCIT_OWL = ConfigurationController.owlfile;
+	static HashMap code2LabelMap = new HashMap();
+    static Vector annotationProperties = null;
+    static Vector objectProperties = null;
+	public static HashMap annotationPropertyCode2LabelMap = null;
+	public static HashMap annotationPropertyLabel2CodeMap = null;
+	public static HashMap objectPropertyCode2LabelMap = null;
+	public static HashMap objectPropertyLabel2CodeMap = null;
+*/
+    //HashMap roleCode2RangeNameMap = null;
     HashMap roleName2RangeNameMap = null;
+    //HashMap roleCode2RoleNameMap = null;
+
 	LogicalExpression le = null;
 	String serviceUrl = null;
 	String named_graph = null;
@@ -77,6 +91,34 @@ public class LogicalExpressionDEV {
 	OWLSPARQLUtils owlSPARQLUtils = null;
 	OWLClassLoader loader = null;
 
+/*
+	static {
+		generateMetadata();
+	}
+
+    public static void generateMetadata() {
+		OWLScanner owlscanner = new OWLScanner(NCIT_OWL);
+		annotationProperties = owlscanner.extractAnnotationProperties(owlscanner.get_owl_vec());
+		annotationPropertyCode2LabelMap = new HashMap();
+		annotationPropertyLabel2CodeMap = new HashMap();
+		for (int i=0; i<annotationProperties.size(); i++) {
+			String line = (String) annotationProperties.elementAt(i);
+			Vector u = gov.nih.nci.evs.restapi.util.StringUtils.parseData(line, '|');
+			annotationPropertyCode2LabelMap.put((String) u.elementAt(0),(String) u.elementAt(1));
+			annotationPropertyLabel2CodeMap.put((String) u.elementAt(1),(String) u.elementAt(0));
+		}
+
+		objectProperties = owlscanner.extractObjectProperties(owlscanner.get_owl_vec());
+		objectPropertyCode2LabelMap = new HashMap();
+		objectPropertyLabel2CodeMap = new HashMap();
+		for (int i=0; i<objectProperties.size(); i++) {
+			String line = (String) objectProperties.elementAt(i);
+			Vector u = gov.nih.nci.evs.restapi.util.StringUtils.parseData(line, '|');
+			objectPropertyCode2LabelMap.put((String) u.elementAt(0),(String) u.elementAt(1));
+			objectPropertyLabel2CodeMap.put((String) u.elementAt(1),(String) u.elementAt(0));
+		}
+	}
+*/
 	public LogicalExpressionDEV(String serviceUrl, String named_graph, String username, String password) {
 		this.serviceUrl = serviceUrl;
 		this.named_graph = named_graph;
@@ -89,7 +131,9 @@ public class LogicalExpressionDEV {
 		long ms = System.currentTimeMillis();
 		owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
 		owlSPARQLUtils.set_named_graph(named_graph);
+		//le = new gov.nih.nci.evs.restapi.appl.LogicalExpression(serviceUrl, named_graph, username, password);
 		le = new LogicalExpression(serviceUrl, named_graph, username, password);
+
 		roleName2RangeNameMap = le.getRoleName2RangeNameMap();
 
 		String ncit_owl = ConfigurationController.owlfile;
@@ -179,6 +223,7 @@ public class LogicalExpressionDEV {
 
 	public Vector run(Vector codes) {
 		Vector w = new Vector();
+		Vector json_vec = new Vector();
 		try {
 			for (int i=0; i<codes.size(); i++) {
 				int j = i+1;
@@ -189,6 +234,8 @@ public class LogicalExpressionDEV {
 				gov.nih.nci.evs.restapi.bean.LogicalExpression e = getLogicalExpression(code);
 				w.add("(" + j + ") " + code);
 				w.add(e.toJson());
+				Vector u = StringUtils.parseData(e.toJson(), '\n');
+				json_vec.add(JSONParser.flatten(u));
 				w.add("\n");
 				w.add(e.toString());
 				w.add("\n");
@@ -197,6 +244,7 @@ public class LogicalExpressionDEV {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+		Utils.saveToFile("jsons.txt", json_vec);
 		return w;
 	}
 
@@ -265,8 +313,10 @@ public class LogicalExpressionDEV {
 		Utils.saveToFile("roleGroup.txt", w);
 
 		Vector codes = dev.getTestCases();
+		Utils.saveToFile("test_cases.txt", codes);
+
 		w = dev.run(codes);
-		Utils.saveToFile("cd_dev.txt", w);
+		Utils.saveToFile("LE_dev" + StringUtils.getToday() + ".txt", w);
 
 	}
 }
