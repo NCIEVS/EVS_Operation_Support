@@ -1,4 +1,5 @@
 package gov.nih.nci.evs.restapi.util;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -392,4 +393,16 @@ public class JSONParser {
 		Utils.saveToFile(outputifle, w1);
 		return outputifle;
 	}
+
+	public static String prettify(String jsonString) throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		// Convert JSON string to a formatted (pretty-printed) string
+		String prettyJson = objectMapper
+		.writerWithDefaultPrettyPrinter()
+		.writeValueAsString(objectMapper.readValue(jsonString, Object.class));
+
+		return prettyJson;
+	}
+
 }

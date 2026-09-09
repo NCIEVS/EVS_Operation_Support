@@ -1,6 +1,7 @@
 package gov.nih.nci.evs.restapi.util;
 import gov.nih.nci.evs.restapi.bean.*;
 import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
 import java.net.URI;
@@ -19,6 +20,15 @@ public class HyperlinkJSON {
 		}
 		return false;
 	}
+
+    public static LogicalExpression toObject(String json) {
+        Gson gson = new Gson();
+        LogicalExpression le = gson.fromJson(json, LogicalExpression.class);
+        if (le == null) {
+			System.out.println("le is null???");
+		}
+        return le;
+    }
 
     public static Vector hyperlinkJSON(Vector unflattened_json_vec) {
 		Vector w = new Vector();
@@ -88,12 +98,12 @@ public class HyperlinkJSON {
 		int n = jsonfile.lastIndexOf(".");
 		String htmlfile = jsonfile.substring(0, n) + ".html";
 		Vector unflattened_json_vec = Utils.readFile(jsonfile);
-
 		Vector w = hyperlinkJSON(unflattened_json_vec);
 		run(title, htmlfile, w);
 	}
 
-	public static void run(String jsonfile) {
+	public static void main2(String args[]) {
+		String jsonfile = args[0];
 		Vector json_lines = Utils.readFile(jsonfile);
 		String title = null;
 		try {
@@ -108,20 +118,100 @@ public class HyperlinkJSON {
 		generateHTML(title, jsonfile);
 	}
 
-    public static LogicalExpression toObject(String json) {
-        Gson gson = new Gson();
-        LogicalExpression le = gson.fromJson(json, LogicalExpression.class);
-        if (le == null) {
-			System.out.println("le is null???");
+    public static void runBatch(String htmlfile, Vector json_lines) {
+        long ms = System.currentTimeMillis();
+		PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(htmlfile, "UTF-8");
+            run(pw, json_lines);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			try {
+				pw.close();
+				System.out.println("Output file " + htmlfile + " generated.");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
-        System.out.println(le.toJson());
-        return le;
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
     }
+
+
+
+	public static String prettify(String jsonString) throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		// Convert JSON string to a formatted (pretty-printed) string
+		String prettyJson = objectMapper
+		.writerWithDefaultPrettyPrinter()
+		.writeValueAsString(objectMapper.readValue(jsonString, Object.class));
+
+		return prettyJson;
+	}
+
+
+	public static void run(PrintWriter out, Vector json_lines) {
+		out.println("<!doctype HTML>");
+		out.println("<html>");
+		out.println("  <head>");
+		out.println("    <title>" + "Logical Expression" + "</title>");
+		out.println("    <meta charset=\"utf-8\" />");
+    	out.println("  </head>");
+		out.println("  <body>");
+		for (int i=0; i<json_lines.size(); i++) {
+			String json_line = (String) json_lines.elementAt(i);
+		    Vector u = StringUtils.parseData(json_line, '|');
+		    String label = (String) u.elementAt(0);
+		    String code = (String) u.elementAt(1);
+		    String json = (String) u.elementAt(2);
+		    String title = label + " (" + code + ")";
+		    int j = i+1;
+		    System.out.println("(" + j + ") " + title);
+
+			out.println("<p></p><h2><center>" + title + "</center></h2>");
+			out.println("<pre>");
+			String str = json;
+            try {
+				str = prettify(json);
+				//Vector hyperlinkJSON(Vector unflattened_json_vec)
+				u = StringUtils.parseData(str, '\n');
+				u = hyperlinkJSON(u);
+				for (int k=0; k<u.size(); k++) {
+					String s = (String) u.elementAt(k);
+			        out.println(s);
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			out.println("</pre>");
+		}
+		out.println("  </body>");
+		out.println("</html>");
+	}
 
 	public static void main(String args[]) {
 		String jsonfile = args[0];
-		run(jsonfile);
+		Vector json_lines = Utils.readFile(jsonfile);
+		String title = null;
+		Vector lines = new Vector();
+		try {
+			for (int i=0; i<json_lines.size(); i++) {
+				String json = (String) json_lines.elementAt(i);
+				LogicalExpression le = toObject(json);
+				String code = le.getCode();
+				String label = le.getLabel();
+				lines.add(label + "|" + code + "|" + json);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		int n = jsonfile.lastIndexOf(".");
+		String htmlfile = jsonfile.substring(0, n) + ".html";
+		runBatch(htmlfile, lines);
 	}
+
 }
 
 
