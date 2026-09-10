@@ -89,8 +89,12 @@ public class OWL2LogicalExpression {
 	static String CONCEPT_FILE = "concepts_with_rolegroups.txt";
 	static String RANGE_UNSPECIFIED = "[Range Unspecified]";
 
+	static OWLClassLoader loader = null;
+
 	static {
 		long ms0 = System.currentTimeMillis();
+		loader = new OWLClassLoader(NCIT_OWL);
+
         roleDomanAndRange_vec = OWLScanner.extractRoleDomainAndRange(NCIT_OWL);
         OWLScanner owlScanner = new OWLScanner(NCIT_OWL);
         code2LabelMap = owlScanner.getCode2LabelMap();
@@ -130,7 +134,8 @@ public class OWL2LogicalExpression {
     }
 
 	public Vector getOWLClassDataByCode(String code) {
-		return owlScanner.getOWLClassDataByCode(code);
+		//return owlScanner.getOWLClassDataByCode(code);
+		return loader.getClassData(code);
 	}
 
 	public String findRoleCode(String line) {
@@ -805,11 +810,162 @@ public class OWL2LogicalExpression {
 
     }
 */
+
+    public Vector dumpClassData(Vector codes) {
+		Vector w = new Vector();
+		for (int i=0; i<codes.size(); i++) {
+			String code = (String) codes.elementAt(i);
+			w.addAll(loader.getClassData(code));
+		}
+		return w;
+	}
+
+
+	public static String extractID(String line) {
+		int n = line.lastIndexOf("#");
+		String s = line.substring(n+1, line.length());
+		n = s.lastIndexOf(" ");
+		return s.substring(0, n);
+	}
+
+//<rdfs:label>Disease_May_Have_Molecular_Abnormality</rdfs:label>
+	public static String extractValue(String line) {
+		int n1 = line.indexOf(">");
+		int n2 = line.lastIndexOf("<");
+		return line.substring(n1+1, n2);
+	}
+
+	public HashMap getId2LabelMap(String owlfile) {
+		OWLScanner scanner = new OWLScanner(owlfile);
+		Vector v = scanner.get_owl_vec();
+		HashMap hmap = new HashMap();
+		String id = null;
+		String label = null;
+		int lcv = 1;
+		int increment = 100000;
+        boolean istart = false;
+
+		for (int i=0; i<v.size(); i++) {
+			int j = i+1;
+			if (lcv == increment) {
+				System.out.println("" + j + " out of " + v.size() + " completed.");
+				lcv = 0;
+			}
+			lcv++;
+			String line = (String) v.elementAt(i);
+			if (line.indexOf("<!-- http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#") != -1 && line.endsWith("-->")) {
+				if (id != null && label != null) {
+					hmap.put(id, label);
+				}
+				id = extractID(line);
+				label = null;
+			}
+
+			if (line.indexOf("<rdfs:label>") != -1 && line.indexOf("</rdfs:label>") != -1) {
+				label = extractValue(line);
+			}
+		}
+		System.out.println("" + v.size() + " out of " + v.size() + " completed.");
+		return hmap;
+	}
+
+
+    public static String extractCCode(String line) {
+		Vector v = StringUtils.parseData(line, ':');
+		String s = (String) v.elementAt(1);
+		s = s.trim();
+		int n = s.lastIndexOf("\"");
+		return s.substring(1, n);
+	}
+
+
+	public Vector extractLEs(String ledevfile) { //e.g., LE_dev.txt geneated by LogicalExpressionDEV.java
+		Vector v = Utils.readFile(ledevfile);
+		Vector w0 = new Vector();
+		Vector w = new Vector();
+		String id = null;
+		boolean istart = false;
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (line.indexOf("<!-- http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#") != -1 && line.endsWith("-->")) {
+				if (w.size() > 0) {
+					w0.addAll(w);
+					w = new Vector();
+					istart = false;
+				}
+				id = extractID(line);
+			}
+			if (line.indexOf("Logical expression of:") != -1) {
+				istart = true;
+			}
+			if (istart) {
+				w.add(line);
+			}
+		}
+		if (w.size() > 0) {
+			w0.addAll(w);
+		}
+		return w0;
+	}
+
+	public static void LEQA(String textfile) {
+		Vector raw_data_vec = Utils.readFile(textfile);
+		HashMap roleName2RangeNameMap = NCItProperties.getRoleName2RangeNameMap();
+
+		HTMLTemplate test = new HTMLTemplate();
+		test.setTooltipWidth(200);
+		test.setTooltipHashMap(roleName2RangeNameMap);
+		Vector data_vec = new Vector();
+		for (int i=0; i<raw_data_vec.size(); i++) {
+			String line = (String) raw_data_vec.elementAt(i);
+			if (line.indexOf("Logical expression of:") != -1) {
+				data_vec.add("<hr></hr><h2><center>" + line + "</center></h2>");
+			} else {
+				String indent = HTMLTemplate.getIndentation(line);
+				Vector u = StringUtils.parseData(line, '\t');
+				for (int j=0; j<u.size(); j++) {
+					String s = (String) u.elementAt(j);
+					if (roleName2RangeNameMap.containsKey(s)) {
+						String toolTipvalue = (String) roleName2RangeNameMap.get(s);
+						line = line.replace(s, test.toTooltip(s));
+					}
+				}
+				if (indent.length() == 0) {
+					data_vec.add("<p></p>" + line);
+				} else {
+					data_vec.add(indent + line);
+				}
+			}
+		}
+
+		int n = textfile.lastIndexOf(".");
+		String outputfile = textfile.substring(0, n) + ".html";
+		String heading = (String) data_vec.elementAt(0);
+		heading = heading.trim();
+		data_vec.remove(0);
+		test.generate(outputfile, heading, data_vec);
+	}
+
+
     public static void main(String[] args) {
 		String codefile = args[0];
 		Vector codes = Utils.readFile(codefile);
-		Vector w = run(codes);
+		OWL2LogicalExpression test = new OWL2LogicalExpression();
+		/*
+		Vector w = test.dumpClassData(codes);
+
+		//Vector w = run(codes);
 		Utils.saveToFile("result_" + codefile, w);
+		HashMap hmap = test.getId2LabelMap("result_" + codefile);
+		Utils.dumpHashMap("getId2LabelMap", hmap);
+		*/
+
+		String ledevfile = "LE_dev09-09-2026.txt";
+		Vector w = test.extractLEs(ledevfile);
+		String textfile = "v2_" + ledevfile;
+		Utils.saveToFile(textfile, w);
+
+		LEQA(textfile);
 	}
 
 }
