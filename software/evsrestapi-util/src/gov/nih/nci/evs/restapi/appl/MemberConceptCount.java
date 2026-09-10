@@ -227,8 +227,8 @@ public class MemberConceptCount {
 	public static String displayName2Code(String displayName) {
 		int n1 = displayName.lastIndexOf("(");
 		int n2 = displayName.lastIndexOf(")");
+		System.out.println("displayName: " + displayName);
 		String code = displayName.substring(n1+1, n2);
-
 		return code;
 	}
 
@@ -274,11 +274,11 @@ public class MemberConceptCount {
 		Vector v2 = Utils.readFile(count_EDQM_HC);
 		Vector v3 = Utils.readFile(count_FDA);
 
-		//dumpVector("count_EDQM-HC", v2);
-		//dumpVector("count_FDA", v3);
+		Utils.dumpVector("count_EDQM-HC", v2);
+		Utils.dumpVector("count_FDA", v3);
 
-		String v2_FDA = MemberConceptCount.formatCounts(count_FDA);
-		String v2_EDQM_HC = MemberConceptCount.formatCounts(count_EDQM_HC);
+		String v2_FDA = formatCounts(count_FDA);
+		String v2_EDQM_HC = formatCounts(count_EDQM_HC);
 
 		HashMap countMap = getCountHashMap(v2_FDA, v2_EDQM_HC);
 
@@ -291,11 +291,15 @@ public class MemberConceptCount {
 		while (it.hasNext()) {
 			String t = (String) it.next();
 			System.out.println("displayName: " + t);
-			String headerCode = displayName2Code(t);
-			System.out.println("displayName2Code: " + headerCode);
-			int count = getCount(hh, countMap, headerCode);
-			System.out.println(t + "\t" + count);
-			w4.add(t + "\t" + count);
+			try {
+				String headerCode = displayName2Code(t);
+				//System.out.println("displayName2Code: " + headerCode);
+				int count = getCount(hh, countMap, headerCode);
+				//System.out.println(t + "\t" + count);
+				w4.add(t + "\t" + count);
+			} catch (Exception ex) {
+
+			}
 		}
 		Utils.saveToFile("final_count.txt", w4);
 		Vector final_vec = new Vector();
