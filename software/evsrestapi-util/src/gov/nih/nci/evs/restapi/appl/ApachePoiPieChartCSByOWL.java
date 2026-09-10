@@ -90,7 +90,7 @@ public class ApachePoiPieChartCSByOWL {
 	static HashMap code2LabelMap = new HashMap();
 	static HashMap contributingSourceMap = new HashMap();
 	static Vector cs_data_vec = null;
-	static String ncit_version = null;
+	public static String ncit_version = null;
 	static String EXCEL_FILENAME = "NCIT_Concept_Stats_By_Contributing_Source.xlsx";
 	static {
 		scanner = new OWLScanner(NCIT_OWL);
