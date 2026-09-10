@@ -214,8 +214,7 @@ public class FileUtils
         }
     }
 
-    public static Vector listSubdirectories() {
-		String currentDir = System.getProperty("user.dir");
+    public static Vector listSubdirectories(String currentDir) {
 		File folder = new File(currentDir);
 		File[] listOfFiles = folder.listFiles();
 		Vector w = new Vector();
@@ -228,6 +227,11 @@ public class FileUtils
 			}
 		}
 		return w;
+	}
+
+    public static Vector listSubdirectories() {
+		String currentDir = getCurrentWorkingDirectory();
+		return listSubdirectories(currentDir);
 	}
 
 	public static void updateFile(String srcDir, String src_file, String targetSubDir) {
@@ -575,4 +579,30 @@ public class FileUtils
 		return w;
 	}
 
+   public static long getFolderSize(File folder) {
+       long length = 0;
+       File[] files = folder.listFiles();
+       if (files != null) {
+           for (File file : files) {
+               if (file.isFile()) {
+                   length += file.length();
+               } else {
+                   length += getFolderSize(file);
+               }
+           }
+       }
+       return length;
+   }
+
+   public static Vector getFolderSize(String rootDir) {
+       Vector v = FileUtils.listSubdirectories(rootDir);
+       Vector w = new Vector();
+       for (int i=0; i<v.size(); i++) {
+		   String pathname = (String) v.elementAt(i);
+		   File folder = new File(pathname);
+		   long size = getFolderSize(folder);
+		   w.add(pathname + "|" + size);
+	   }
+	   return w;
+   }
 }
