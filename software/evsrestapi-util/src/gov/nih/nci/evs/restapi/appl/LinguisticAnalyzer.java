@@ -101,15 +101,16 @@ public class LinguisticAnalyzer {
 		return hmap;
 	}
 
+	//C106221|P90|VTCN1|P383$SY|P384$NCI
     public static HashMap createCode2TermMap(Vector v) {
 		HashMap hmap = new HashMap();
         for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String prop_code = (String) u.elementAt(2);
+			String prop_code = (String) u.elementAt(1);
 			if (prop_code.compareTo("P90") == 0) {
-				String term = (String) u.elementAt(0);
-				String code = (String) u.elementAt(1);
+				String term = (String) u.elementAt(2);
+				String code = (String) u.elementAt(0);
 				hmap.put(code, term);
 			}
 		}
@@ -185,7 +186,7 @@ public class LinguisticAnalyzer {
 			neoplasm_branch_v3 = hh.get_transitive_closure_v3(code);
 			Utils.saveToFile(filename, neoplasm_branch_v3);
 		} else {
-             neoplasm_branch_v3 = Utils.readFile(filename);
+            neoplasm_branch_v3 = Utils.readFile(filename);
 		}
 		Vector w = Utils.readFile(downloadDirectory + File.separator + axiomfile);
 		HashMap code2TermMap = createCode2TermMap(w);
@@ -239,8 +240,6 @@ public class LinguisticAnalyzer {
 		}
 
         Vector w = Utils.readFile(downloadDirectory + File.separator + axiomfile);
-        System.out.println("axiom: " + v.size());
-
         HashMap term2CodeMap = createterm2CodesMap(w);
         HashMap code2TermMap = createCode2TermMap(w);
 
@@ -256,10 +255,9 @@ public class LinguisticAnalyzer {
 			if (is_retired(code)) {
 				System.out.println("(*) " + code + " is retired.");
 			} else {
-				System.out.println("(" + lcv1 + ") " + label + " (" + code + ")");
+				//System.out.println("(" + lcv1 + ") " + label + " (" + code + ")");
 				Vector u1 = StringUtils.parseData(label, ' ');
 				Vector subs = hh.get_transitive_closure_v3(code);
-				System.out.println("subs: " + subs.size());
 				for (int k=0; k<neoplasm_branch_v3.size(); k++) {
 					String c = (String) neoplasm_branch_v3.elementAt(k);
 					if (c.compareTo(code) != 0) {
@@ -294,6 +292,7 @@ public class LinguisticAnalyzer {
         File file = new File(filename);
         Vector v = null;
         if (!file.exists()) {
+			System.out.println("cancer_types.txt NOT FOUND.");
 			v = searchForCancerTypes();
 			Utils.saveToFile("cancer_types.txt", v);
 		} else {
