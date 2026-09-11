@@ -142,35 +142,7 @@ public class ReportSubmitter {
 
 		} else if (report.compareTo("GDC Diff") == 0) {
 			long ms = System.currentTimeMillis();
-			String versions = searchForVersions();
-			Vector u = StringUtils.parseData(versions, '|');
-			String oldVersion = (String) u.elementAt(0);
-			String newVersion = (String) u.elementAt(1);
-			String oldValueFile = searchXLSFile("Value", oldVersion);
-			String newValueFile = searchXLSFile("Value", newVersion);
-			String oldPropertyFile = searchXLSFile("Property", oldVersion);
-			String newPropertyFile = searchXLSFile("Property", newVersion);
-
-			System.out.println("oldValueFile: " + oldValueFile);
-			System.out.println("newValueFile: " + newValueFile);
-			System.out.println("oldPropertyFile: " + oldPropertyFile);
-			System.out.println("newPropertyFile: " + newPropertyFile);
-
-			ExcelExporter.run(oldValueFile);
-			ExcelExporter.run(newValueFile);
-			ExcelExporter.run(oldPropertyFile);
-			ExcelExporter.run(newPropertyFile);
-
-			oldValueFile = oldValueFile.replace(".xls", ".txt");
-			newValueFile = newValueFile.replace(".xls", ".txt");
-			oldPropertyFile = oldPropertyFile.replace(".xls", ".txt");
-			newPropertyFile = newPropertyFile.replace(".xls", ".txt");
-
-			ExcelDiffUtils util = new ExcelDiffUtils(oldValueFile, newValueFile);
-			util.run(oldValueFile, newValueFile);
-			util = new ExcelDiffUtils(oldPropertyFile, newPropertyFile);
-			util.run(oldPropertyFile, newPropertyFile);
-
+			GDCSubmitter.run();
 			System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 			System.out.println("Reports " + report + " generated.");
 
