@@ -2,8 +2,13 @@ package gov.nih.nci.evs.restapi.util;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Vector;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class HTMLDecoder {
+
+	public static String encode(String input) {
+		return StringEscapeUtils.escapeHtml4(input);
+	}
 
 	public static Vector run(Vector v) {
 		Vector w = new Vector();
