@@ -101,6 +101,10 @@ public class NCItProperties {
 		return roleName2RoleCodeMap;
 	}
 
+	public static HashMap getRoleCode2RoleNameMap() {
+		return roleCode2RoleNameMap;
+	}
+
 	public static HashMap getAnnotationPropertyCode2LabelMap() {
 		return annotationPropertyCode2LabelMap;
 	}
