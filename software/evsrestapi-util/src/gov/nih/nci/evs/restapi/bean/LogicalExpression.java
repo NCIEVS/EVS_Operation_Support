@@ -133,17 +133,17 @@ public class LogicalExpression {
 		buf.append("\n");
 
 		Vector ranges = new Vector();
-		HashMap range2LEEMap = new HashMap();
+		HashMap range2LEMap = new HashMap();
 		List<LogicalExpressionElement> elements = getElements();
 		for (int i=0; i<elements.size(); i++) {
 			LogicalExpressionElement element = (LogicalExpressionElement) elements.get(i);
 			ranges.add(element.getRange());
-			range2LEEMap.put(element.getRange(), element);
+			range2LEMap.put(element.getRange(), element);
 		}
 		ranges = new SortUtils().quickSort(ranges);
 		for (int i=0; i<ranges.size(); i++) {
 			String range = (String) ranges.elementAt(i);
-			LogicalExpressionElement element = (LogicalExpressionElement) range2LEEMap.get(range);
+			LogicalExpressionElement element = (LogicalExpressionElement) range2LEMap.get(range);
             buf.append(element.toString()).append("\n");
 		}
 		return buf.toString();

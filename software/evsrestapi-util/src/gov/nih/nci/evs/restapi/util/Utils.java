@@ -982,5 +982,14 @@ public class Utils {
 		}
 	}
 
+	public static List vector2List(Vector v) {
+		List list = new ArrayList();
+		for (int i=0; i<v.size(); i++) {
+			Object obj = v.elementAt(i);
+			list.add(obj);
+		}
+		return list;
+	}
+
 //////////////////////////////////////////////////////////////////////////////////////
 }

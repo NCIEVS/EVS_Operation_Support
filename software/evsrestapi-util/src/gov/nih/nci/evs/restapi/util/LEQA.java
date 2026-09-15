@@ -9,6 +9,7 @@ class LEQA {
 
 	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
+
     String textfile = null;
 	OWLClassLoader loader = null;
 	HierarchyHelper hh = null;
@@ -49,7 +50,6 @@ class LEQA {
 	}
 
 	public void le2HTML(String textfile) {
-		//HashMap roleName2RangeNameMap = NCItProperties.getRoleName2RangeNameMap();
 		Vector raw_data_vec = Utils.readFile(textfile);
         Vector data_vec = new Vector();
 		HTMLTemplate test = null;
@@ -113,13 +113,6 @@ class LEQA {
 		test.generate(outputfile, heading, data_vec);
 	}
 
-/*
-	public Restriction(
-		String roleLabel,
-		String targetCode,
-		String targetLabel) {
-Disease_Mapped_To_Gene	C38184	ALK Gene
-*/
 	public Vector<Restriction> countRestrictions(Vector le_vec) {
 		Vector<Restriction> roles = new Vector();
 		for (int i=0; i<le_vec.size(); i++) {
@@ -231,7 +224,6 @@ Disease_Mapped_To_Gene	C38184	ALK Gene
 				String line_trim = line;
 				line_trim = line_trim.trim();
 				String propCode = extractCode(line_trim);
-				//w.add(path + "|" + code);
 				i++;
 				line = (String) equivClassData.elementAt(i);
 				line_trim = line;
@@ -253,38 +245,6 @@ Disease_Mapped_To_Gene	C38184	ALK Gene
 		}
 		return w;
 	}
-
-/*
-	(1) E|C1|I1|D|C3720
-	(2) E|C1|I1|C2|U1|C3|I2|R1|R114$C27711
-	(3) E|C1|I1|C2|U1|C3|I2|R2|R89$C36706
-	(4) E|C1|I1|C2|U1|C4|I3|R3|R114$C36435
-	(5) E|C1|I1|C2|U1|C4|I3|R4|R89$C36707
-	(6) E|C1|I1|C2|U1|C5|I4|R5|R114$C36436
-	(7) E|C1|I1|C2|U1|C5|I4|R6|R89$C36708
-	(8) E|C1|I1|C2|U1|C6|I5|R7|R114$C36437
-	(9) E|C1|I1|C2|U1|C6|I5|R8|R89$C36711
-	(10) E|C1|I1|C2|U1|C7|I6|R9|R114$C36590
-	(11) E|C1|I1|C2|U1|C7|I6|R10|R89$C37216
-	(12) E|C1|I1|C2|U1|C8|I7|R11|R114$C36591
-	(13) E|C1|I1|C2|U1|C8|I7|R12|R89$C38348
-	(14) E|C1|I1|C2|U1|C9|I8|R13|R114$C45439
-	(15) E|C1|I1|C2|U1|C9|I8|R14|R89$C45442
-	(16) E|C1|I1|C2|U1|C10|I9|R15|R114$C45440
-	(17) E|C1|I1|C2|U1|C10|I9|R16|R89$C45443
-	(18) E|C1|I1|C2|U1|C11|I10|R17|R114$C45441
-	(19) E|C1|I1|C2|U1|C11|I10|R18|R89$C45444
-
-	A role group contains many role sets
-	A role group is identifed by E|C1|I1|C2|U1| (first five segments of a path)
-	A role group is a union of several role sets
-	A role set is the interception of roles
-
-public class RoleSet {
-
-// Variable declaration
-	private List<Restriction> roles;
-	*/
 
 	public static HashMap createRoleGroupMap(Vector w) {
 		HashMap hmap = new HashMap();
@@ -330,35 +290,6 @@ public class RoleSet {
         return hmap;
 	}
 
-	public static Vector dumpRoleUnionMap(String type, HashMap hmap) {
-		return dumpRoleGroupMap(type, hmap);
-	}
-
-	public static Vector dumpRoleGroupMap(String type, HashMap hmap) {
-		Vector w = new Vector();
-		Iterator it = hmap.keySet().iterator();
-		while (it.hasNext()) {
-			String key = (String) it.next();
-			HashMap setId2RolesMap = (HashMap) hmap.get(key);
-			if (setId2RolesMap.keySet().size() > 0) {
-				System.out.println(type + ": " + key);
-				w.add(type + ": " + key);
-				Iterator it2 = setId2RolesMap.keySet().iterator();
-				while (it2.hasNext()) {
-					String setId = (String) it2.next();
-					System.out.println("\tRole set: " + setId);
-					List list = (List) setId2RolesMap.get(setId);
-					for (int j=0; j<list.size(); j++) {
-						String r = (String) list.get(j);
-						System.out.println("\t\tRole: " + r);
-						w.add("\t\tRole: " + r);
-					}
-				}
-			}
-		}
-		return w;
-	}
-
 	public static HashMap createRoleUnionMap(Vector w) {
 		HashMap hmap = new HashMap();
 		for (int i=0; i<w.size(); i++) {
@@ -382,7 +313,6 @@ public class RoleSet {
 				           + (String) u.elementAt(1) + "|"
 				           + (String) u.elementAt(2) + "|"
 				           + (String) u.elementAt(3);
-
 				HashMap setId2RolesMap = new HashMap();
 				if (hmap.containsKey(key)) {
 					setId2RolesMap = (HashMap) hmap.get(key);
@@ -432,41 +362,6 @@ public class RoleSet {
 		return parents;
 	}
 
-/*
-UNION
-paths:
-	(1) E|C1|I1|D|C3029
-	(2) E|C1|I1|D|C3266
-	(3) E|C1|I1|D|C97075
-	(4) E|C1|I1|C2|U1|R1|R176$C18251
-	(5) E|C1|I1|C2|U1|R2|R176$C18252
-
-	(18) E|C1|I1|C2|U1|C11|I10|R17|R114$C45441
-	(19) E|C1|I1|C2|U1|C11|I10|R18|R89$C45444
-*/
-
-/*
-	(20) E|C1|I1|R19|R104$C39687
-	(21) E|C1|I1|R20|R105$C39679
-	(22) E|C1|I1|R21|R106$C37208
-	(23) E|C1|I1|R22|R106$C81946
-	(24) E|C1|I1|R23|R113$C37024
-	(25) E|C1|I1|R24|R113$C37026
-	(26) E|C1|I1|R25|R113$C39680
-	(27) E|C1|I1|R26|R115$C36156
-	(28) E|C1|I1|R27|R115$C39695
-	(29) E|C1|I1|R28|R115$C50764
-	(30) E|C1|I1|R29|R176$C101046
-	(31) E|C1|I1|R30|R176$C101059
-	(32) E|C1|I1|R31|R176$C101075
-	(33) E|C1|I1|R32|R176$C101083
-	(34) E|C1|I1|R33|R176$C101085
-	(35) E|C1|I1|R34|R176$C38184
-	(36) E|C1|I1|R35|R176$C99361
-	(37) E|C1|I1|R36|R176$C99869
-	(38) E|C1|I1|R37|R176$C99873
-*/
-
     public HashMap getLEData(Vector codes) {
 		HashMap map = new HashMap();
 		for (int i=0; i<codes.size(); i++) {
@@ -488,13 +383,22 @@ paths:
 		Vector parents = getParents(w);
 		hmap.put("Parents", parents);
 		HashMap roleGroupMap = createRoleGroupMap(w);
-		hmap.put("Role group", roleGroupMap);
 		HashMap roleUnionMap = createRoleUnionMap(w);
-		hmap.put("Role union", roleUnionMap);
 		Vector roles = getSimpleRestrictions(w);
 		hmap.put("Roles", roles);
+
 		HashMap role2RangeMap = findRoleRange(hmap);
 		hmap.put("role2RangeMap", role2RangeMap);
+
+		Vector roleRanges = findRoleRanges(hmap);
+		hmap.put("roleRanges", roleRanges);
+
+		List roleGroupList = constructRoleGroupList(roleGroupMap);
+		hmap.put("roleGroupList", roleGroupList);
+
+		List roleUnionList = constructRoleUnionList(roleUnionMap);
+		hmap.put("roleUnionList", roleUnionList);
+
 		return hmap;
 	}
 
@@ -511,11 +415,31 @@ paths:
 					String propCode = (String) u2.elementAt(0);
 					String roleName = (String) roleCode2RoleNameMap.get(propCode);
 					String range = (String) roleName2RangeNameMap.get(roleName);
-					role2RangeMap.put(propCode, range);
+					role2RangeMap.put(roleName, range);
 				}
 			}
 		}
 		return role2RangeMap;
+	}
+
+	public Vector findRoleRanges(HashMap hmap) {
+		Vector roleRanges = new Vector();
+		Vector w = (Vector) hmap.get("paths");
+		for (int i=0; i<w.size(); i++) {
+			String line = (String) w.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			if (u.size() > 1) {
+				String role = (String) u.elementAt(u.size()-1);
+				Vector u2 = StringUtils.parseData(role, '$');
+				if (u2.size() > 1) {
+					String propCode = (String) u2.elementAt(0);
+					String roleName = (String) roleCode2RoleNameMap.get(propCode);
+					String range = (String) roleName2RangeNameMap.get(roleName);
+					roleRanges.add(range);
+				}
+			}
+		}
+		return roleRanges;
 	}
 
 	public static void dumpLEData(HashMap hmap) {
@@ -529,17 +453,18 @@ paths:
 	}
 
 	public static void dumpLEData(String displayName, HashMap hmap) {
+		boolean debug = false;
 		System.out.println(displayName);
 		Vector classData = (Vector) hmap.get("classData");
-		Utils.dumpVector("classData", classData);
+		if (debug) Utils.dumpVector("classData", classData);
         Vector paths = (Vector) hmap.get("paths");
-        Utils.dumpVector("Paths", paths);
+        if (debug) Utils.dumpVector("Paths", paths);
 		Vector parents = (Vector) hmap.get("Parents");
-		Utils.dumpVector("Parents", parents);
+		if (debug) Utils.dumpVector("Parents", parents);
         Iterator it = null;
 		HashMap roleGroupMap = (HashMap) hmap.get("Role group");
 		if (roleGroupMap != null && roleGroupMap.keySet().size() > 0) {
-			System.out.println("Role group");
+			if (debug) System.out.println("Role group");
 			it = roleGroupMap.keySet().iterator();
 			while (it.hasNext()) {
 				String key = (String) it.next();
@@ -548,14 +473,14 @@ paths:
 				while (it2.hasNext()) {
 					String key2 = (String) it2.next();
 					List list = (List) map.get(key2);
-				    Utils.dumpList("\t" + key2, list);
+				    if (debug) Utils.dumpList("\t" + key2, list);
 				}
 			}
 		}
 
 		HashMap roleUnionMap = (HashMap) hmap.get("Role union");
 		if (roleUnionMap != null && roleUnionMap.keySet().size() > 0) {
-			System.out.println("Role union");
+			if (debug) System.out.println("Role union");
 			it = roleUnionMap.keySet().iterator();
 			while (it.hasNext()) {
 				String key = (String) it.next();
@@ -564,23 +489,300 @@ paths:
 				while (it2.hasNext()) {
 					String key2 = (String) it2.next();
 					List list = (List) map.get(key2);
-				    Utils.dumpList("\t" + key2, list);
+				    if (debug) Utils.dumpList("\t" + key2, list);
 				}
 			}
 		}
 
 		Vector roles = (Vector) hmap.get("Roles");
 		if (roles != null) {
-			Utils.dumpVector("Roles", roles);
+			if (debug) Utils.dumpVector("Roles", roles);
 		}
 
 		HashMap role2RangeMap = (HashMap) hmap.get("role2RangeMap");
-		Utils.dumpHashMap("role2RangeMap", role2RangeMap);
+		if (debug) Utils.dumpHashMap("role2RangeMap", role2RangeMap);
 	}
 
-	public static void leData2Expression(HashMap hmap) {
+	static String NONE = "none";
+	static String MULTIPLE = "multiple";
+
+	public static String findRange(HashMap role2RangeMap, HashMap roleGroupMap) {
+		if (roleGroupMap != null && roleGroupMap.keySet().size() > 0) {
+			return NONE;
+	    }
+	    String range = null;
+        boolean rg_consistent = true;
+		Iterator it = null;
+		if (roleGroupMap != null && roleGroupMap.keySet().size() > 0) {
+			System.out.println("Role group");
+			it = roleGroupMap.keySet().iterator();
+			while (it.hasNext()) {
+				if (!rg_consistent) break;
+				String key = (String) it.next();
+				HashMap map = (HashMap) roleGroupMap.get(key);
+				Iterator it2 = map.keySet().iterator();
+				while (it2.hasNext()) {
+					String key2 = (String) it2.next();
+					List list = (List) map.get(key2);
+					for (int i=0; i<list.size(); i++) {
+						String line = (String) list.get(i);
+						Vector u = StringUtils.parseData(line, '|');
+						String t = (String) u.elementAt(u.size()-1);
+						Vector u2 = StringUtils.parseData(t, '$');
+						String propCode = (String) u2.elementAt(0);
+						String rangeName = (String) role2RangeMap.get(propCode);
+						if (range == null) {
+							range = rangeName;
+						} else {
+							if (range.compareTo(rangeName) != 0) {
+								rg_consistent = false;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (!rg_consistent) return MULTIPLE;
+		return range;
+	}
+
+	public String findRange(RoleGroup rg) {
+	    String range = null;
+        boolean rg_consistent = true;
+        List<RoleSet> roleSets = rg.getRoleSets();
+        for (int i=0; i<roleSets.size(); i++) {
+			RoleSet rs = roleSets.get(i);
+			List rs_list = rs.getRoles();
+			for (int j=0; j<rs_list.size(); j++) {
+				Restriction r = (Restriction) rs_list.get(j);
+				String roleName = r.getRoleLabel();
+				String rangeName = (String) roleName2RangeNameMap.get(roleName);
+				if (range == null) {
+					range = rangeName;
+				} else {
+					if (range.compareTo(rangeName) != 0) {
+						rg_consistent = false;
+						break;
+					}
+				}
+			}
+			if (!rg_consistent) {
+				break;
+			}
+		}
+		if (!rg_consistent) return MULTIPLE;
+		return range;
+	}
+
+	public String findRange(RoleUnion ru) {
+	    String range = null;
+        boolean ru_consistent = true;
+        List<Restriction> roles = ru.getRoles();
+		for (int j=0; j<roles.size(); j++) {
+			Restriction r = (Restriction) roles.get(j);
+			String roleName = r.getRoleLabel();
+			String rangeName = (String) roleName2RangeNameMap.get(roleName);
+			if (range == null) {
+				range = rangeName;
+			} else {
+				if (range.compareTo(rangeName) != 0) {
+					ru_consistent = false;
+					break;
+				}
+			}
+		}
+		if (!ru_consistent) return MULTIPLE;
+		return range;
+	}
+
+	public static List vector2List(Vector v) {
+		List list = new ArrayList();
+		for (int i=0; i<v.size(); i++) {
+			Object obj = v.elementAt(i);
+			list.add(obj);
+		}
+		return list;
+	}
+
+    public Restriction toRestriction(String s) {
+		Vector u = StringUtils.parseData(s, '$');
+		return new Restriction((String) objectPropertyCode2LabelMap.get((String) u.elementAt(0)),
+		                       (String) u.elementAt(1),
+		                       hh.getLabel((String) u.elementAt(1)));
+	}
+
+    public List constructRoleUnionList(HashMap roleUnionMap) {
+		List list = new ArrayList();
+		Iterator it = roleUnionMap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			HashMap groupSetMap = (HashMap) roleUnionMap.get(key);
+			Iterator it2 = groupSetMap.keySet().iterator();
+			while (it2.hasNext()) {
+				String key2 = (String) it2.next();
+				List groupSet = (List) groupSetMap.get(key2);
+				if (groupSet != null && groupSet.size() > 0) {
+					RoleUnion union = new RoleUnion();
+					List roles = new ArrayList();
+					for (int i=0; i<groupSet.size(); i++) {
+						String s = (String) groupSet.get(i);
+						roles.add(toRestriction(s));
+					}
+					union.setRoles(roles);
+					list.add(union);
+				}
+			}
+		}
+		return list;
+	}
+
+    public List constructRoleGroupList(HashMap roleGroupMap) {
+		List list = new ArrayList();
+		Iterator it = roleGroupMap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			RoleGroup group = new RoleGroup();
+			List roleSets = new ArrayList();
+			HashMap setId2RolesMap = (HashMap) roleGroupMap.get(key);
+			Iterator it2 = setId2RolesMap.keySet().iterator();
+			while (it2.hasNext()) {
+				String setId = (String) it2.next();
+			    List groupSet = (List) setId2RolesMap.get(setId);
+			    List roles = new ArrayList();
+				for (int i=0; i<groupSet.size(); i++) {
+					String s = (String) groupSet.get(i);
+					Restriction r = toRestriction(s);
+					roles.add(r);
+				}
+				RoleSet roleSet = new RoleSet(roles);
+				roleSets.add(roleSet);
+			}
+			group.setRoleSets(roleSets);
+			list.add(group);
+		}
+		return list;
+	}
+
+	public gov.nih.nci.evs.restapi.bean.LogicalExpression leData2Expression(HashMap hmap) {
+		// check for the consistency of ranges of role groups and rolel unions
+		HashMap role2RangeMap = (HashMap) hmap.get("role2RangeMap");
+        List<LogicalExpressionElement> elements = new ArrayList();
+        HashMap range2ElementMap = new HashMap();
+        Iterator it3 = role2RangeMap.keySet().iterator();
+        while (it3.hasNext()) {
+			String key = (String) it3.next();
+			String value = (String) role2RangeMap.get(key);
+			LogicalExpressionElement leElem = new LogicalExpressionElement(value, new ArrayList(), new ArrayList(), new ArrayList());
+			range2ElementMap.put(value, leElem);
+		}
+
+		Vector parents = (Vector) hmap.get("Parents");
+		List parentList = new ArrayList();
+		for (int k=0; k<parents.size(); k++) {
+			String code = (String) parents.elementAt(k);
+			Concept c = new Concept(k, hh.getLabel(code), code);
+			parentList.add(c);
+		}
+
+		Vector roleRanges = (Vector) hmap.get("roleRanges");
+		List roleGroupList = (List) hmap.get("roleGroupList");
+		if (roleGroupList != null && roleGroupList.size() > 0) {
+			for (int i=0; i<roleGroupList.size(); i++) {
+				RoleGroup rg = (RoleGroup) roleGroupList.get(i);
+				String rg_range = findRange(rg);
+				if (!roleRanges.contains(rg_range)) {
+					LogicalExpressionElement leElem = new LogicalExpressionElement("", new ArrayList(), new ArrayList(), new ArrayList());
+					range2ElementMap.put("", leElem);
+					break;
+				}
+			}
+		}
+		List roleUnionList = (List) hmap.get("roleUnionList");
+		if (!range2ElementMap.containsKey("")) {
+			if (roleUnionList != null && roleUnionList.size() > 0) {
+				for (int i=0; i<roleUnionList.size(); i++) {
+					RoleUnion ru = (RoleUnion) roleUnionList.get(i);
+     				String ru_range = findRange(ru);
+					if (!roleRanges.contains(ru_range)) {
+						LogicalExpressionElement leElem = new LogicalExpressionElement("", new ArrayList(), new ArrayList(), new ArrayList());
+						range2ElementMap.put("", leElem);
+						break;
+					}
+				}
+			}
+		}
 
 
+		if (roleGroupList != null && roleGroupList.size() > 0) {
+			for (int i=0; i<roleGroupList.size(); i++) {
+				RoleGroup rg = (RoleGroup) roleGroupList.get(i);
+				String rg_range = findRange(rg);
+				String key = rg_range;
+				if (!roleRanges.contains(rg_range)) {
+					key = "";
+				}
+				LogicalExpressionElement leElem = (LogicalExpressionElement) range2ElementMap.get(key);
+				List list = leElem.getRoleGroups();
+				list.add(rg);
+				leElem.setRoleGroups(list);
+				range2ElementMap.put(key, leElem);
+			}
+		} else {
+			//System.out.println("==================== No group data found. ====================");
+		}
+
+		if (roleUnionList != null && roleUnionList.size() > 0) {
+			for (int i=0; i<roleUnionList.size(); i++) {
+				RoleUnion ru = (RoleUnion) roleUnionList.get(i);
+				String ru_range = findRange(ru);
+				String key = ru_range;
+				if (!roleRanges.contains(ru_range)) {
+					key = "";
+				}
+    			LogicalExpressionElement leElem = (LogicalExpressionElement) range2ElementMap.get(key);
+				List list = leElem.getRoleUnions();
+				list.add(ru);
+				leElem.setRoleUnions(list);
+				range2ElementMap.put(key, leElem);
+			}
+		}
+		Vector roles = (Vector) hmap.get("Roles");
+		if (roles != null && roles.size() > 0) {
+			for (int i=0; i<roles.size(); i++) {
+				String r = (String) roles.elementAt(i);
+				Vector u = StringUtils.parseData(r, '$');
+				String roleCode = (String) u.elementAt(0);
+				String roleName = (String) roleCode2RoleNameMap.get(roleCode);
+				String range = (String) role2RangeMap.get(roleName);
+				LogicalExpressionElement leElem = (LogicalExpressionElement) range2ElementMap.get(range);
+				List list = leElem.getRoles();
+				if (list == null) {
+					list = new ArrayList();
+				}
+				list.add(toRestriction(r));
+				leElem.setRoles(list);
+				range2ElementMap.put(range, leElem);
+			}
+		}
+
+		String label = (String) hmap.get("label");
+		String code = (String) hmap.get("code");
+		elements = new ArrayList();
+		Iterator it0 = range2ElementMap.keySet().iterator();
+		while (it0.hasNext()) {
+			String key0 = (String) it0.next();
+			LogicalExpressionElement leElem = (LogicalExpressionElement) range2ElementMap.get(key0);
+			elements.add(leElem);
+		}
+        gov.nih.nci.evs.restapi.bean.LogicalExpression le = new gov.nih.nci.evs.restapi.bean.LogicalExpression(
+			code,
+			hh.getLabel(code),
+			parentList,
+			elements,
+			null
+			);
+		return le;
 	}
 
 	public static void main(String[] args) {
@@ -599,10 +801,25 @@ paths:
 			System.out.println("Calling le2HTML ...");
 			test.le2HTML(textfile);
 		} else {
-			System.out.println("Calling getLEData ...");
+			//System.out.println("Calling getLEData ...");
 			HashMap hmap = test.getLEData(v);
-			dumpLEData(hmap);
-			//"le_data_" + textfile,
+			//dumpLEData(hmap);
+			Iterator it = hmap.keySet().iterator();
+			while (it.hasNext()) {
+				String key = (String) it.next();
+				HashMap map = (HashMap) hmap.get(key);
+    			gov.nih.nci.evs.restapi.bean.LogicalExpression le = test.leData2Expression(map);
+
+    			try {
+					//test.test(le);
+					System.out.println("==================================================================================================================================");
+    				System.out.println(le.toString());
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+
+
+			}
 		}
 	}
 }

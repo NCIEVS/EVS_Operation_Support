@@ -90,19 +90,27 @@ public class LogicalExpressionElement {
 
 
 	public String toString() {
+		List<Restriction> roles = getRoles();
+		List<RoleUnion> roleUnions = getRoleUnions();
+		List<RoleGroup> roleGroups = getRoleGroups();
         StringBuffer buf = new StringBuffer();
-        if (range.compareTo("[Range Unspecified]") == 0) {
+        if (range.compareTo("[Range Unspecified]") == 0 || range.compareTo("") == 0) {
 			buf.append("").append("\n");
 		} else {
-        	buf.append(range).append("\n");
-		}
-        List<Restriction> roles = getRoles();
-        for (int i=0; i<roles.size(); i++) {
-			Restriction r = (Restriction) roles.get(i);
-			buf.append("\t\t" + r.toString()).append("\n");
+			if ((roles == null || roles.size() == 0) && (roleUnions == null || roleUnions.size() == 0) &&
+			    (roleGroups == null || roleGroups.size() == 0)) {
+			} else {
+        		buf.append(range).append("\n");
+			}
 		}
 
-        List<RoleUnion> roleUnions = getRoleUnions();
+        if (roles != null && roles.size() > 0) {
+			for (int i=0; i<roles.size(); i++) {
+				Restriction r = (Restriction) roles.get(i);
+				buf.append("\t\t" + r.toString()).append("\n");
+			}
+		}
+
         if (roleUnions != null && roleUnions.size() > 0) {
 			buf.append("\n");
 			for (int i=0; i<roleUnions.size(); i++) {
@@ -119,12 +127,11 @@ public class LogicalExpressionElement {
 			}
 		}
 
-        List<RoleGroup> roleGroups = getRoleGroups();
         if (roleGroups != null && roleGroups.size() > 0) {
 			buf.append("\n");
 			for (int i=0; i<roleGroups.size(); i++) {
 				RoleGroup rg = (RoleGroup) roleGroups.get(i);
-                if (range.compareTo("[Range Unspecified]") == 0) {
+                if (range.compareTo("[Range Unspecified]") == 0 || range.compareTo("") == 0) {
 					buf.append(rg2String(rg));
 				} else {
 					buf.append(rg.toString());
@@ -135,9 +142,10 @@ public class LogicalExpressionElement {
 	}
 
     public String rg2String(RoleGroup rg) {
+		List<RoleSet> roleSets = rg.getRoleSets();
+		if (roleSets == null || roleSets.size() == 0) return "";
 		StringBuffer buf = new StringBuffer();
 		buf.append("Role Group(s)").append("\n");
-		List<RoleSet> roleSets = rg.getRoleSets();
 		for (int j=0; j<roleSets.size(); j++) {
 			RoleSet rs = (RoleSet) roleSets.get(j);
 			List roles = rs.getRoles();
