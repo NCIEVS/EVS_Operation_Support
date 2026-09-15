@@ -20,6 +20,7 @@ class LEQA {
 	HashMap roleCode2RoleNameMap = null;
 	HashMap objectPropertyCode2LabelMap = null;
 	HashMap roleName2RangeNameMap = null;
+	Vector equivalentClasses = null;
 
 	public LEQA() {
 		initialize();
@@ -37,8 +38,13 @@ class LEQA {
 			Vector u = gov.nih.nci.evs.restapi.util.StringUtils.parseData(line, '|');
 			objectPropertyCode2LabelMap.put((String) u.elementAt(0),(String) u.elementAt(1));
 		}
-
 		loader = new OWLClassLoader(NCIT_OWL);
+		equivalentClasses = owlscanner.extractEquivalenceClasses();
+		owlscanner.get_owl_vec().clear();
+	}
+
+	public Vector getEquivalentClasses() {
+		return equivalentClasses;
 	}
 
 	public Vector getClassData(String code) {
@@ -157,6 +163,12 @@ class LEQA {
 		}
 		return roles;
 	}
+
+	public String getLabel(String code) {
+		return hh.getLabel(code);
+	}
+
+
 
 	public Vector getEquivVec(Vector classData) {
 		Vector w = new Vector();
@@ -817,8 +829,6 @@ class LEQA {
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
-
-
 			}
 		}
 	}
