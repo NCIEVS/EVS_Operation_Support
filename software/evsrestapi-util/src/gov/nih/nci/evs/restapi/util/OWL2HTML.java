@@ -128,8 +128,8 @@ public class OWL2HTML {
 		StringBuffer buf = new StringBuffer();
 		for (int i=0; i<line.length(); i++) {
 			char c = line.charAt(i);
-			if (c == ' ') {
-				buf.append("&nbsp;");
+			if (c == ' ' || c == '\t') {
+				buf.append("&nbsp;&nbsp;");
 			} else {
 				break;
 			}
@@ -228,7 +228,6 @@ public class OWL2HTML {
 			String line = (String) v.elementAt(i);
 			String indent = getIndentation(line);
 			line = line.trim();
-
 			//<owl:onProperty rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#R176"/>
             if (line.startsWith("<owl:onProperty") && line.indexOf("rdf:resource=") != -1) {
 				int n1 = line.indexOf("#R");
@@ -244,17 +243,17 @@ public class OWL2HTML {
             } else if (line.startsWith("<A") && line.indexOf("rdf:resource=") != -1) {
 				int n1 = line.indexOf(" ");
 				String tag = line.substring(1, n1);
-				//System.out.println(tag);
 				String propLabel = getPropertyLabel(tag);
-				//System.out.println(propLabel);
 				String by = toToolTip(tag, propLabel);
 				line = encode(line);
 				line = hyperlinkNCItCodes(line);
 				line = line.replace(tag, by);
                 out.println(indent + line + "<p></p>");
+
 			} else if (line.startsWith("</")) {
 				line = encode(line);
-				out.println(indent + line + "<p></p>");
+                out.println(indent + line + "<p></p>");
+
 			} else {
 				String tag = null;
 				String value = null;
@@ -269,11 +268,12 @@ public class OWL2HTML {
 
 				if (tag != null && tag.length() > 0 && propLabel != null && propLabel.length() > 0) {
 					line = toToolTipText(tag, propLabel, value);
-					out.println(indent + line + "<p></p>");
+                    out.println(indent + line + "<p></p>");
+
 				} else {
 					line = encode(line);
 					line = hyperlinkNCItCodes(line);
-					out.println(indent + line + "<p></p>");
+                    out.println(indent + line + "<p></p>");
 				}
 			}
 		}
@@ -357,22 +357,6 @@ public class OWL2HTML {
 		String filename = args[0];
 		run(filename);
 
-		/*
-		String t = toToolTipText("P108", "Preferred_Name", "Age in Days at Imaging");
-
-		t = "<P106>Organism Attribute</P106>";
-		String tag = getTagName(t);
-		String value = getTagValue(t);
-		String propLabel = getPropertyLabel(tag);
-
-		System.out.println(t);
-		System.out.println(tag);
-		System.out.println(value);
-		System.out.println(propLabel);
-
-		String line = toToolTipText(tag, propLabel, value);
-		System.out.println(line);
-		*/
 	}
 
 }
