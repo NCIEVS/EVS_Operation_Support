@@ -21,6 +21,7 @@ class LEQA {
 	HashMap objectPropertyCode2LabelMap = null;
 	HashMap roleName2RangeNameMap = null;
 	Vector equivalentClasses = null;
+	static String PATH_FILE = "paths.txt";
 
 	public LEQA() {
 		initialize();
@@ -795,6 +796,63 @@ class LEQA {
 			null
 			);
 		return le;
+	}
+
+
+	public void analyze() {
+		File f = new File(PATH_FILE);
+		if (!f.exists()) {
+			Vector w = parse();
+			Utils.saveToFile(PATH_FILE, w);
+		} else {
+			HashSet hset = new HashSet();
+			Vector w = Utils.readFile(PATH_FILE);
+			for (int i=0; i<w.size(); i++) {
+				String line = (String) w.elementAt(i);
+				if (line.indexOf("$") != -1) {
+					//Vector u = StringUtils.parseData(line, '|');
+					//E|C1|I1|R1|R108$C35983
+					int n = line.lastIndexOf("|R");
+					String path = line.substring(0, n);
+					if (!hset.contains(path)) {
+						hset.add(path);
+					}
+				}
+			}
+			Vector v = Utils.hashSet2Vector(hset);
+			v = new SortUtils().quickSort(v);
+			Utils.dumpVector("paths", v);
+		}
+	}
+
+    public Vector parse() {
+		long ms = System.currentTimeMillis();
+		if (equivalentClasses == null) {
+			equivalentClasses = getEquivalentClasses();
+		}
+		Vector w = new Vector();
+		int lcv = 1;
+		int increment = 1000;
+		int total = equivalentClasses.size();
+		for (int i=0; i<equivalentClasses.size(); i++) {
+			int j = i+1;
+			if (lcv == increment) {
+				System.out.println("" + j + " out of " + total + " completed.");
+				lcv = 0;
+			}
+			lcv++;
+			String line = (String) equivalentClasses.elementAt(i);
+			w.add("(" + j + ") " + line);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(0);
+			Vector classData = getClassData(code);
+			Vector equiv_vec = getEquivVec(classData);
+			Vector paths = restrictionPathFinder(equiv_vec);
+			w.addAll(paths);
+		}
+		System.out.println("" + total + " out of " + total + " completed.");
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		return w;
 	}
 
 	public static void main(String[] args) {
