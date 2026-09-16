@@ -21,6 +21,7 @@ class LEQA {
 	HashMap roleName2RangeNameMap = null;
 	Vector equivalentClasses = null;
 	static String PATH_FILE = "paths.txt";
+	Vector rangeNames = null;
 
 	public LEQA() {
 		initialize();
@@ -28,6 +29,13 @@ class LEQA {
 
 	public void initialize() {
 		roleName2RangeNameMap = NCItProperties.getRoleName2RangeNameMap();
+		rangeNames = new Vector();
+		Iterator it = roleName2RangeNameMap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			String range = (String) roleName2RangeNameMap.get(key);
+			rangeNames.add(range);
+		}
 		roleCode2RoleNameMap = NCItProperties.getRoleCode2RoleNameMap();
 		hh = new HierarchyHelper(Utils.readFile(PARENT_CHILD_FILE));
 		OWLScanner owlscanner = new OWLScanner(NCIT_OWL);
@@ -43,6 +51,10 @@ class LEQA {
 		owlscanner.get_owl_vec().clear();
 	}
 
+	public boolean isRangeName(String t) {
+		return rangeNames.contains(t);
+	}
+
 	public Vector getEquivalentClasses() {
 		return equivalentClasses;
 	}
@@ -53,6 +65,26 @@ class LEQA {
 
 	public static String htmlEncode(String input) {
 		return StringEscapeUtils.escapeHtml4(input);
+	}
+
+    public Vector format(Vector v) {
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '\t');
+			if(u.size() > 1) {
+				line = "\t\t" + line;
+			} else {
+				String t = line;
+				t = t.trim();
+				if (rangeNames.contains(t)) {
+					System.out.println(t);
+					w.add("\t");
+				}
+			}
+			w.add(line);
+		}
+		return w;
 	}
 
 	public void le2HTML(String textfile) {
@@ -78,37 +110,33 @@ class LEQA {
 				String line = (String) raw_data_vec.elementAt(i);
 				String line0 = line;
 				line0 = line0.trim();
-				if (line0.length() > 0) {
-					if (line.indexOf("Logical expression of:") != -1) {
-						Vector u = StringUtils.parseData(line, ':');
-						String displayName = (String) u.elementAt(1);
-						displayName = displayName.trim();
-						int n = displayName.lastIndexOf("(");
-						code = displayName.substring(n+1, displayName.length()-1);
-						label = displayName.substring(0, n-1);
-						data_vec.add("<hr></hr><h2><center>" + label + " (" + code + ")" + "</center></h2>");
-                    } else if (line.indexOf("<!-- http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#") != -1) {
-						data_vec.add("<p></p><hr></hr>");
-					} else {
-						Vector u = StringUtils.parseData(line, '\t');
-						String indent = HTMLTemplate.getIndentation(line);
-                        String line1 = line;
-						for (int j=0; j<u.size(); j++) {
-							String s = (String) u.elementAt(j);
-							if (roleName2RangeNameMap.containsKey(s)) {
-								String toolTipvalue = (String) roleName2RangeNameMap.get(s);
-								line1 = line.replace(s, test.toTooltip(s));
-							}
+				if (line.indexOf("Logical expression of:") != -1) {
+					Vector u = StringUtils.parseData(line, ':');
+					String displayName = (String) u.elementAt(1);
+					displayName = displayName.trim();
+					int n = displayName.lastIndexOf("(");
+					code = displayName.substring(n+1, displayName.length()-1);
+					label = displayName.substring(0, n-1);
+					data_vec.add("<hr></hr><h2><center>" + label + " (" + code + ")" + "</center></h2>");
+				} else if (line.indexOf("<!-- http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#") != -1) {
+					data_vec.add("<p></p><hr></hr>");
+				} else {
+					Vector u = StringUtils.parseData(line, '\t');
+					String indent = HTMLTemplate.getIndentation(line);
+					String line1 = line;
+					for (int j=0; j<u.size(); j++) {
+						String s = (String) u.elementAt(j);
+						if (roleName2RangeNameMap.containsKey(s)) {
+							String toolTipvalue = (String) roleName2RangeNameMap.get(s);
+							line1 = line.replace(s, test.toTooltip(s));
 						}
+					}
 
-						if (line1.compareTo(line) != 0) {
-							data_vec.add(indent + line1);
-						} else {
-							line = htmlEncode(line);
-							//data_vec.add("<pre>");
-							data_vec.add(indent + line);
-							//data_vec.add("</pre>");
-						}
+					if (line1.compareTo(line) != 0) {
+						data_vec.add(indent + line1);
+					} else {
+						line = htmlEncode(line);
+						data_vec.add(indent + line);
 					}
 				}
 			}
