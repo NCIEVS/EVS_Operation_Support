@@ -10,7 +10,6 @@ class LEQA {
 	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
 
-    String textfile = null;
 	OWLClassLoader loader = null;
 	HierarchyHelper hh = null;
 	String code = null;
@@ -57,7 +56,17 @@ class LEQA {
 	}
 
 	public void le2HTML(String textfile) {
+		int n = textfile.lastIndexOf(".");
+		String htmlfile = textfile.substring(0, n) + ".html";
+		le2HTML(textfile, htmlfile);
+	}
+
+	public void le2HTML(String textfile, String htmlfile) {
 		Vector raw_data_vec = Utils.readFile(textfile);
+		le2HTML(raw_data_vec, htmlfile);
+	}
+
+	public void le2HTML(Vector raw_data_vec, String htmlfile) {
         Vector data_vec = new Vector();
 		HTMLTemplate test = null;
 		try {
@@ -107,12 +116,10 @@ class LEQA {
 			ex.printStackTrace();
 		}
 
-		int n = textfile.lastIndexOf(".");
-		String outputfile = textfile.substring(0, n) + ".html";
 		String heading = (String) data_vec.elementAt(0);
 		heading = heading.trim();
 		data_vec.remove(0);
-		test.generate(outputfile, heading, data_vec);
+		test.generate(htmlfile, heading, data_vec);
 	}
 
 	public Vector<Restriction> countRestrictions(Vector le_vec) {
