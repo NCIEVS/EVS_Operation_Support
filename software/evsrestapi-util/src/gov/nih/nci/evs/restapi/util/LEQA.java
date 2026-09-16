@@ -64,47 +64,42 @@ class LEQA {
 			test = new HTMLTemplate();
 			test.setTooltipWidth(200);
 			test.setTooltipHashMap(roleName2RangeNameMap);
+
 			for (int i=0; i<raw_data_vec.size(); i++) {
 				String line = (String) raw_data_vec.elementAt(i);
-				if (line.indexOf("Logical expression of:") != -1) {
-
-					Vector u = StringUtils.parseData(line, ':');
-					String displayName = (String) u.elementAt(1);
-					displayName = displayName.trim();
-					int n = displayName.lastIndexOf("(");
-					code = displayName.substring(n+1, displayName.length()-1);
-					label = displayName.substring(0, n-1);
-					System.out.println("code: " + code);
-					System.out.println("label: " + label);
-
-					data_vec.add("<hr></hr><h2><center>" + label + " (" + code + ")" + "</center></h2>");
-					data_vec.add("<pre>");
-
-					Vector classData = loader.getClassData(code);
-					for (int j=0; j<classData.size(); j++) {
-						String s = (String) classData.elementAt(j);
-						s = htmlEncode(s);
-						String indent = HTMLTemplate.getIndentation(s);
-					    data_vec.add(indent + s);
-					}
-					data_vec.add("</pre>");
-					data_vec.add("<p></p>");
-					data_vec.add("<hr></hr><h2><center>" + line + "</center></h2>");
-
-				} else {
-					Vector u = StringUtils.parseData(line, '\t');
-					String indent = HTMLTemplate.getIndentation(line);
-					for (int j=0; j<u.size(); j++) {
-						String s = (String) u.elementAt(j);
-						if (roleName2RangeNameMap.containsKey(s)) {
-							String toolTipvalue = (String) roleName2RangeNameMap.get(s);
-							line = line.replace(s, test.toTooltip(s));
-						}
-					}
-					if (indent.length() == 0) {
-						data_vec.add("<p></p>" + line);
+				String line0 = line;
+				line0 = line0.trim();
+				if (line0.length() > 0) {
+					if (line.indexOf("Logical expression of:") != -1) {
+						Vector u = StringUtils.parseData(line, ':');
+						String displayName = (String) u.elementAt(1);
+						displayName = displayName.trim();
+						int n = displayName.lastIndexOf("(");
+						code = displayName.substring(n+1, displayName.length()-1);
+						label = displayName.substring(0, n-1);
+						data_vec.add("<hr></hr><h2><center>" + label + " (" + code + ")" + "</center></h2>");
+                    } else if (line.indexOf("<!-- http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#") != -1) {
+						data_vec.add("<p></p><hr></hr>");
 					} else {
-						data_vec.add(indent + line);
+						Vector u = StringUtils.parseData(line, '\t');
+						String indent = HTMLTemplate.getIndentation(line);
+                        String line1 = line;
+						for (int j=0; j<u.size(); j++) {
+							String s = (String) u.elementAt(j);
+							if (roleName2RangeNameMap.containsKey(s)) {
+								String toolTipvalue = (String) roleName2RangeNameMap.get(s);
+								line1 = line.replace(s, test.toTooltip(s));
+							}
+						}
+
+						if (line1.compareTo(line) != 0) {
+							data_vec.add(indent + line1);
+						} else {
+							line = htmlEncode(line);
+							//data_vec.add("<pre>");
+							data_vec.add(indent + line);
+							//data_vec.add("</pre>");
+						}
 					}
 				}
 			}
@@ -868,21 +863,16 @@ class LEQA {
 			}
 		}
 		if (html) {
-			System.out.println("Calling le2HTML ...");
 			test.le2HTML(textfile);
 		} else {
-			//System.out.println("Calling getLEData ...");
 			HashMap hmap = test.getLEData(v);
-			//dumpLEData(hmap);
 			Iterator it = hmap.keySet().iterator();
 			while (it.hasNext()) {
 				String key = (String) it.next();
 				HashMap map = (HashMap) hmap.get(key);
     			gov.nih.nci.evs.restapi.bean.LogicalExpression le = test.leData2Expression(map);
-
     			try {
-					//test.test(le);
-					System.out.println("==================================================================================================================================");
+					System.out.println("==================================================================================================================");
     				System.out.println(le.toString());
 				} catch (Exception ex) {
 					ex.printStackTrace();
