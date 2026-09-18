@@ -29,7 +29,6 @@ class Path2SPARQL {
 
     public String constructQuery(String named_graph, String code, String path) {
         Vector u = StringUtils.parseData(path, '|');
-        //Utils.dumpVector(path, u);
         Queue<String> queue = new LinkedList<>();
         for (int i=0; i<u.size(); i++) {
 			String t = (String) u.elementAt(i);
@@ -42,6 +41,17 @@ class Path2SPARQL {
 		    buf.append("select distinct ?x_code ?p_code ?p_value").append("\n");
 		} else if (u.contains("D")) {
 			buf.append("select distinct ?x_code ?x_label ?y_code ?y_label").append("\n");
+
+	    } else if (u.contains("Z")) {
+			StringBuffer selectBuf = new StringBuffer();
+			selectBuf.append("select distinct ?x_code ?p_code ?z_target ");
+			for (int i=2; i<u.size(); i++) {
+				int j = i-1;
+				selectBuf.append("?q" + j + "_code ?q" + j + "_value ");
+			}
+			String selectBStmt = selectBuf.toString();
+			buf.append(selectBStmt).append("\n");
+
 		} else  {
 			buf.append("select distinct ?x_code ?x_label ?rs ?p_label ?p_code ?y_code ?y_label").append("\n");
 		}
@@ -56,10 +66,41 @@ class Path2SPARQL {
 
 		int c_count = 0;
 		String c_id = null;
+		int z_count = -1;
+		int p_count = 0;
+		int q_count = 0;
+		String p_id = null;
+		String q_id = null;
+		String q_value = null;
+		int s_count = 0; //step count
 
 		while (queue.size() > 0) {
 			String t = (String) queue.poll();
 			String s = (String) queue.peek();
+
+			if (t.startsWith("Z")) { // axiom
+				buf.append("            ?z_axiom a owl:Axiom .").append("\n");
+				buf.append("            ?z_axiom owl:annotatedSource ?x .").append("\n");
+
+			} else if (t.startsWith("P") && s_count == 0) {
+				p_count++;
+				p_id = "?p";
+				buf.append("            ?z_axiom owl:annotatedProperty " + p_id + " .").append("\n");
+				buf.append("            ?z_axiom owl:annotatedTarget ?z_target .").append("\n");
+				buf.append("            " + p_id + " :NHC0 " + p_id + "_code .").append("\n");
+				buf.append("            " + p_id + " :NHC0 \"" + t + "\"^^xsd:string .").append("\n");
+				buf.append("            " + p_id + " rdfs:label " + p_id + "_label .").append("\n");
+				s_count++;
+
+            } else if (t.startsWith("P") && s_count >= 1) {
+				q_count++;
+				q_id = "?q" + q_count;
+				q_value = "?q" + q_count + "_value";
+				buf.append("            " + q_id + " :NHC0 " + q_id + "_code .").append("\n");
+				buf.append("            " + q_id + " :NHC0 \"" + t + "\"^^xsd:string .").append("\n");
+				buf.append("            ?z_axiom " + q_id + " " + q_value + " .").append("\n");
+		    }
+
 			if (t.startsWith("P") || t.startsWith("A")) {
 				buf.append("	    ?p a owl:AnnotationProperty .").append("\n");
 				buf.append("	    ?p :NHC0 ?p_code .").append("\n");
