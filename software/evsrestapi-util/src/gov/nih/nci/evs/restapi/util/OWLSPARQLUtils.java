@@ -5892,59 +5892,15 @@ bnode_07130346_a093_4c67_ad70_efd4d5bc5796_242618|Thorax|C12799|Maps_To|P375|Tho
 		buf.append(prefixes);
 		buf.append("").append("\n");
 		buf.append("SELECT ?y_label ?y_code ?x_label ?x_code ").append("\n");
-		buf.append("{ ").append("\n");
-
-		if (named_graph != null) {
-			buf.append("    graph <" + named_graph + ">").append("\n");
-		}
-
-		buf.append("  { ").append("\n");
-		buf.append("    { ").append("\n");
-		buf.append("      { ").append("\n");
-		buf.append("        ?x a owl:Class . ").append("\n");
-		buf.append("        ?x rdfs:subClassOf ?y . ").append("\n");
-		buf.append("        ?y a owl:Class .").append("\n");
-		buf.append("        ").append("\n");
-		buf.append("    ?x :NHC0 ?x_code .").append("\n");
-		buf.append("    ?x rdfs:label ?x_label .        ").append("\n");
-		buf.append("    ?y :NHC0 ?y_code .").append("\n");
-		buf.append("    ?y rdfs:label ?y_label .        ").append("\n");
-		buf.append("        ").append("\n");
-		buf.append("      } ").append("\n");
-		buf.append("    } ").append("\n");
-		buf.append("    UNION ").append("\n");
-		buf.append("    { ").append("\n");
-		buf.append("      { ").append("\n");
-		buf.append("        ?x a owl:Class . ").append("\n");
-		buf.append("        ?x owl:equivalentClass ?y . ").append("\n");
-		buf.append("        ?y a owl:Class . ").append("\n");
-		buf.append("        ?y owl:intersectionOf ?y2 . ").append("\n");
-		buf.append("        ?y2 rdf:rest*/rdf:first ?y . ").append("\n");
-		buf.append("        ?y a owl:Class . ").append("\n");
-		buf.append("        ").append("\n");
-		buf.append("    ?x :NHC0 ?x_code .").append("\n");
-		buf.append("    ?x rdfs:label ?x_label .        ").append("\n");
-		buf.append("    ?y :NHC0 ?y_code .").append("\n");
-		buf.append("    ?y rdfs:label ?y_label .            ").append("\n");
-		buf.append("      } ").append("\n");
-		buf.append("    } ").append("\n");
-		buf.append("    UNION ").append("\n");
-		buf.append("    { ").append("\n");
-		buf.append("      { ").append("\n");
-		buf.append("        ?x a owl:Class . ").append("\n");
-		buf.append("        ?x rdfs:subClassOf ?y . ").append("\n");
-		buf.append("        ?y a owl:Class . ").append("\n");
-		buf.append("        ?y owl:intersectionOf ?y2 . ").append("\n");
-		buf.append("        ?y2 rdf:rest*/rdf:first ?y . ").append("\n");
-		buf.append("        ?y a owl:Class . ").append("\n");
-		buf.append("        ").append("\n");
-		buf.append("    ?x :NHC0 ?x_code .").append("\n");
-		buf.append("    ?x rdfs:label ?x_label .        ").append("\n");
-		buf.append("    ?y :NHC0 ?y_code .").append("\n");
-		buf.append("    ?y rdfs:label ?y_label .            ").append("\n");
-		buf.append("       } ").append("\n");
-		buf.append("    } ").append("\n");
-		buf.append("  } ").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
+		buf.append("where {").append("\n");
+		buf.append("            ?x a owl:Class .").append("\n");
+		buf.append("            ?x :NHC0 ?x_code .").append("\n");
+		buf.append("            ?x rdfs:label ?x_label .").append("\n");
+		buf.append("            ?y a owl:Class .").append("\n");
+		buf.append("            ?y :NHC0 ?y_code .").append("\n");
+		buf.append("            ?y rdfs:label ?y_label .").append("\n");
+		buf.append("            ?x (rdfs:subClassOf|(owl:equivalentClass/owl:intersectionOf/rdf:rest*/rdf:first)) ?y . ").append("\n");
 		buf.append("}").append("\n");
 		return buf.toString();
 	}

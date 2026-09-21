@@ -37,7 +37,14 @@ class Path2SPARQL {
 		String prefixes = owlSPARQLUtils.getPrefixes();
 		StringBuffer buf = new StringBuffer();
 		buf.append(prefixes);
-		if (u.size() == 1 && (path.startsWith("P") || path.startsWith("A"))) {
+
+		if (path.contains("M")) {
+			buf.append("SELECT distinct ?p_label ?p_code ").append("\n");
+		} else if (u.size() == 1 && path.contains("L")) {
+			buf.append("select distinct ?x_label ?x_code").append("\n");
+		} else if (u.size() == 1 && path.contains("H")) {
+			buf.append("select distinct ?y_label ?y_code ?x_label ?x_code").append("\n");
+		} else if (u.size() == 1 && (path.startsWith("P") || path.startsWith("A"))) {
 		    buf.append("select distinct ?x_code ?p_code ?p_value").append("\n");
 		} else if (u.contains("D")) {
 			buf.append("select distinct ?x_code ?x_label ?y_code ?y_label").append("\n");
@@ -57,11 +64,14 @@ class Path2SPARQL {
 		}
 		buf.append("from <" + named_graph + ">").append("\n");
 		buf.append("where {").append("\n");
-		buf.append("            ?x a owl:Class .").append("\n");
-		buf.append("            ?x :NHC0 ?x_code .").append("\n");
-		buf.append("            ?x rdfs:label ?x_label .").append("\n");
-		if (code != null) {
-			buf.append("            ?x :NHC0 \"" + code + "\"^^xsd:string .").append("\n");
+
+		if (!u.contains("M")) {
+			buf.append("            ?x a owl:Class .").append("\n");
+			buf.append("            ?x :NHC0 ?x_code .").append("\n");
+			buf.append("            ?x rdfs:label ?x_label .").append("\n");
+			if (code != null) {
+				buf.append("            ?x :NHC0 \"" + code + "\"^^xsd:string .").append("\n");
+			}
 		}
 
 		int c_count = 0;
@@ -77,8 +87,25 @@ class Path2SPARQL {
 		while (queue.size() > 0) {
 			String t = (String) queue.poll();
 			String s = (String) queue.peek();
+			if (t.equals("M") && s.equals("A")) {
+				buf.append("            ?p a owl:AnnotationProperty .").append("\n");
+				buf.append("            ?p :NHC0 ?p_code .").append("\n");
+				buf.append("            ?p rdfs:label ?p_label ").append("\n");
+				break;
 
-			if (t.startsWith("Z")) { // axiom
+			} else if (t.equals("M") && s.equals("O")) {
+				buf.append("            ?p a owl:ObjectProperty .").append("\n");
+				buf.append("            ?p :NHC0 ?p_code .").append("\n");
+				buf.append("            ?p rdfs:label ?p_label ").append("\n");
+				break;
+
+			} else if (t.startsWith("H")) { // Hierarchical relationship
+				buf.append("            ?y a owl:Class .").append("\n");
+				buf.append("            ?y :NHC0 ?y_code .").append("\n");
+				buf.append("            ?y rdfs:label ?y_label .").append("\n");
+				buf.append("            ?x (rdfs:subClassOf|(owl:equivalentClass/owl:intersectionOf/rdf:rest*/rdf:first)) ?y . ").append("\n");
+
+			} else if (t.startsWith("Z")) { // axiom
 				buf.append("            ?z_axiom a owl:Axiom .").append("\n");
 				buf.append("            ?z_axiom owl:annotatedSource ?x .").append("\n");
 
@@ -175,7 +202,7 @@ class Path2SPARQL {
 		return new SortUtils().quickSort(v);
 	}
 
-	public static Vector run(Vector paths) {
+	public static Vector run(Vector paths, String code) {
 		Path2SPARQL test = new Path2SPARQL();
 		HashSet hset = new HashSet();
 		Vector w = new Vector();
@@ -183,7 +210,7 @@ class Path2SPARQL {
 		for (int i=0; i<paths.size(); i++) {
 			String path = (String) paths.elementAt(i);
 			System.out.println(path);
-			String query = test.constructQuery(named_graph, null, path);
+			String query = test.constructQuery(named_graph, code, path);
 			System.out.println(query);
 			if (!hset.contains(query)) {
 				hset.add(query);
@@ -196,9 +223,16 @@ class Path2SPARQL {
         return w;
 	}
 
+	public static Vector run(Vector paths) {
+		String code = null;
+		return run(paths, code);
+	}
+
 	public static void main(String[] args) {
 		String filename = args[0];//
+		//String code = args[1];//
 		Vector paths = Utils.readFile(filename);
+		//Vector w = run(paths, code);
 		Vector w = run(paths);
 		Utils.saveToFile("sparql_" + filename, w);
 	}
