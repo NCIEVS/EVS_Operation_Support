@@ -8,7 +8,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import java.util.LinkedList;
 import java.util.Queue;
 
-class Path2SPARQL {
+public class Path2SPARQL {
 
 	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
