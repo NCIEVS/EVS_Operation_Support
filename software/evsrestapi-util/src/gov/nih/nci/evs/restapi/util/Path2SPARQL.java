@@ -38,9 +38,10 @@ public class Path2SPARQL {
 		StringBuffer buf = new StringBuffer();
 		buf.append(prefixes);
 
-		if (path.contains("Q")) {
+		if (path.contains("Q") && u.size() == 1) {
 			buf.append("SELECT distinct ?q_label ?q_code ").append("\n");
-
+		} else if (path.contains("Q") && u.size() == 2) {
+			buf.append("SELECT distinct ?p_label ?p_code ?q_label ?q_code ").append("\n");
 		} else if (path.contains("M")) {
 			buf.append("SELECT distinct ?p_label ?p_code ").append("\n");
 		} else if (u.size() == 1 && path.contains("L")) {
@@ -96,7 +97,13 @@ public class Path2SPARQL {
 				buf.append("?z_axiom a owl:Axiom .").append("\n");
 				buf.append("?z_axiom owl:annotatedSource ?x .").append("\n");
 				buf.append("?z_axiom owl:annotatedProperty ?p .").append("\n");
-				buf.append("?p :NHC0 \"" + s + "\"^^xsd:string .").append("\n");
+				if (s != null) {
+					buf.append("?p :NHC0 \"" + s + "\"^^xsd:string .").append("\n");
+				} else {
+					buf.append("?p rdfs:label ?p_label .").append("\n");
+					buf.append("?p :NHC0 ?p_code .").append("\n");
+				}
+
 				buf.append("?q rdfs:label ?q_label .").append("\n");
 				buf.append("?q :NHC0 ?q_code .").append("\n");
 				buf.append("?z_axiom ?q ?q_value .").append("\n");
