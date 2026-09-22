@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Path2SPARQL {
-
+    static String NS = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl";
 	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
     String serviceUrl = ConfigurationController.serviceUrl;
@@ -17,6 +17,7 @@ public class Path2SPARQL {
     String username = ConfigurationController.username;
     String password = ConfigurationController.password;
     OWLSPARQLUtils owlSPARQLUtils = null;
+    HashMap enumerationMap = null;
 
  	public Path2SPARQL() {
 		initialize();
@@ -25,6 +26,83 @@ public class Path2SPARQL {
 	public void initialize() {
 		owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
 		owlSPARQLUtils.set_named_graph(named_graph);
+		enumerationMap = getEnumerationMap(named_graph);
+	}
+
+	public String construct_get_dt(String named_graph) {
+		String prefixes = owlSPARQLUtils.getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		buf.append("").append("\n");
+		buf.append("select distinct ?dt ?element").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
+		buf.append("where  { ").append("\n");
+		buf.append("     ?dt a rdfs:Datatype .").append("\n");
+		buf.append("     ?dt owl:equivalentClass ?e .").append("\n");
+		buf.append("     ?e owl:oneOf ?y .").append("\n");
+		buf.append("     ?y rdf:first ?element .").append("\n");
+		buf.append("}").append("\n");
+		return buf.toString();
+	}
+
+	public HashMap getEnumerationMap(String named_graph) {
+		String query = construct_get_dt(named_graph);
+		Vector v = owlSPARQLUtils.executeQuery(query);
+		if (v == null) return null;
+		if (v.size() == 0) return null;
+		Vector w = new Vector();
+		HashMap hmap = new HashMap();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			int n = line.lastIndexOf("#");
+			line = line.substring(n+1, line.length());
+			Vector u = StringUtils.parseData(line, '|');
+		    hmap.put((String) u.elementAt(0), (String) u.elementAt(1));
+		}
+		return hmap;
+	}
+
+	public String construct_enumeration_elements_query(String named_graph, String enumeration) {
+		if (!enumeration.endsWith("-enum")) {
+			enumeration = enumeration + "-enum";
+		}
+		String firstElem = (String) enumerationMap.get(enumeration);
+		//Semantic_Type-enum --> Acquired Abnormality
+		String prefixes = owlSPARQLUtils.getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		buf.append("select ?element ").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
+		buf.append("where ").append("\n");
+		buf.append("{ ").append("\n");
+		buf.append("   ?dt a rdfs:Datatype .").append("\n");
+		buf.append("   ?dt ?x ?x_value .").append("\n");
+		buf.append("   ?x_value ?p ?e .").append("\n");
+		buf.append("   ?x_value ?p \"" + firstElem + "\" .").append("\n");
+        buf.append("   ?dt owl:oneOf/rdf:rest*/rdf:first ?element .").append("\n");
+		buf.append("}").append("\n");
+		return buf.toString();
+	}
+
+	public Vector getEnumerationElements(String named_graph, String enumeration) {
+		return submitQuery(construct_enumeration_elements_query(named_graph, enumeration));
+	}
+
+	public String construct_get_datatypes(String named_graph) {
+		String prefixes = owlSPARQLUtils.getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		buf.append("select ?dt ?element ?elementType ").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
+		buf.append("where ").append("\n");
+		buf.append("{ ").append("\n");
+		buf.append("   ?dt a rdfs:Datatype ;").append("\n");
+		buf.append("   owl:oneOf/rdf:rest*/rdf:first ?element .").append("\n");
+		buf.append("   bind(datatype(?element) as ?elementType)").append("\n");
+		buf.append("}").append("\n");
+		buf.append("").append("\n");
+		buf.append("").append("\n");
+		return buf.toString();
 	}
 
     public String constructQuery(String named_graph, String code, String path) {
@@ -42,6 +120,9 @@ public class Path2SPARQL {
 			buf.append("SELECT distinct ?q_label ?q_code ").append("\n");
 		} else if (path.contains("Q") && u.size() == 2) {
 			buf.append("SELECT distinct ?p_label ?p_code ?q_label ?q_code ").append("\n");
+		} else if (path.contains("Q") && u.size() == 3) {
+			buf.append("SELECT distinct ??q_value ").append("\n");
+
 		} else if (path.contains("M")) {
 			buf.append("SELECT distinct ?p_label ?p_code ").append("\n");
 		} else if (u.size() == 1 && path.contains("L")) {
@@ -68,7 +149,6 @@ public class Path2SPARQL {
 		}
 		buf.append("from <" + named_graph + ">").append("\n");
 		buf.append("where {").append("\n");
-
 		if (!u.contains("M") && !u.contains("Q")) {
 			buf.append("            ?x a owl:Class .").append("\n");
 			buf.append("            ?x :NHC0 ?x_code .").append("\n");
@@ -106,6 +186,11 @@ public class Path2SPARQL {
 
 				buf.append("?q rdfs:label ?q_label .").append("\n");
 				buf.append("?q :NHC0 ?q_code .").append("\n");
+
+				if (u.size() == 3) {
+					String q_code = (String) u.elementAt(2);
+					buf.append("?q :NHC0 \"" + q_code + "\"^^xsd:string .").append("\n");
+				}
 				buf.append("?z_axiom ?q ?q_value .").append("\n");
 				break;
 
@@ -219,11 +304,13 @@ public class Path2SPARQL {
 	}
 
 	public Vector submitQuery(String query) {
+		System.out.println(query);
 		Vector v = owlSPARQLUtils.executeQuery(query);
 		if (v == null) return null;
 		if (v.size() == 0) return v;
 		return new SortUtils().quickSort(v);
 	}
+
 
 	public static Vector run(Vector paths, String code) {
 		Path2SPARQL test = new Path2SPARQL();
@@ -252,12 +339,22 @@ public class Path2SPARQL {
 	}
 
 	public static void main(String[] args) {
-		String filename = args[0];//
-		//String code = args[1];//
+		/*
+		String filename = args[0];
+		//String code = args[1];
 		Vector paths = Utils.readFile(filename);
 		//Vector w = run(paths, code);
 		Vector w = run(paths);
 		Utils.saveToFile("sparql_" + filename, w);
+		*/
+		Path2SPARQL path2SPARQL = new Path2SPARQL();
+		String named_graph = ConfigurationController.namedGraph;
+		//Vector v = path2SPARQL.submitQuery(path2SPARQL.construct_get_datatypes(named_graph));
+		//Vector v = path2SPARQL.submitQuery(path2SPARQL.construct_get_semantictypes(named_graph));
+		//HashMap hmap = path2SPARQL.getEnumerationMap(named_graph);
+		//Utils.dumpHashMap("getEnumerations", hmap);
+		Vector v = path2SPARQL.getEnumerationElements(named_graph, "Semantic_Type");
+		Utils.dumpVector("Semantic_Type", v);
 	}
-
 }
+
