@@ -38,7 +38,10 @@ public class Path2SPARQL {
 		StringBuffer buf = new StringBuffer();
 		buf.append(prefixes);
 
-		if (path.contains("M")) {
+		if (path.contains("Q")) {
+			buf.append("SELECT distinct ?q_label ?q_code ").append("\n");
+
+		} else if (path.contains("M")) {
 			buf.append("SELECT distinct ?p_label ?p_code ").append("\n");
 		} else if (u.size() == 1 && path.contains("L")) {
 			buf.append("select distinct ?x_label ?x_code").append("\n");
@@ -65,7 +68,7 @@ public class Path2SPARQL {
 		buf.append("from <" + named_graph + ">").append("\n");
 		buf.append("where {").append("\n");
 
-		if (!u.contains("M")) {
+		if (!u.contains("M") && !u.contains("Q")) {
 			buf.append("            ?x a owl:Class .").append("\n");
 			buf.append("            ?x :NHC0 ?x_code .").append("\n");
 			buf.append("            ?x rdfs:label ?x_label .").append("\n");
@@ -87,7 +90,19 @@ public class Path2SPARQL {
 		while (queue.size() > 0) {
 			String t = (String) queue.poll();
 			String s = (String) queue.peek();
-			if (t.equals("M") && s.equals("A")) {
+
+			if (path.contains("Q")) {
+				buf.append("?x a owl:Class .").append("\n");
+				buf.append("?z_axiom a owl:Axiom .").append("\n");
+				buf.append("?z_axiom owl:annotatedSource ?x .").append("\n");
+				buf.append("?z_axiom owl:annotatedProperty ?p .").append("\n");
+				buf.append("?p :NHC0 \"" + s + "\"^^xsd:string .").append("\n");
+				buf.append("?q rdfs:label ?q_label .").append("\n");
+				buf.append("?q :NHC0 ?q_code .").append("\n");
+				buf.append("?z_axiom ?q ?q_value .").append("\n");
+				break;
+
+			} else if (t.equals("M") && s.equals("A")) {
 				buf.append("            ?p a owl:AnnotationProperty .").append("\n");
 				buf.append("            ?p :NHC0 ?p_code .").append("\n");
 				buf.append("            ?p rdfs:label ?p_label ").append("\n");
