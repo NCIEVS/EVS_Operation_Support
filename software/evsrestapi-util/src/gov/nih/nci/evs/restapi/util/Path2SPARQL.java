@@ -29,6 +29,26 @@ public class Path2SPARQL {
 		enumerationMap = getEnumerationMap(named_graph);
 	}
 
+    public String construct_root_query(String named_graph) {
+        StringBuffer buf = new StringBuffer();
+        String prefixes = owlSPARQLUtils.getPrefixes();
+        buf.append(prefixes);
+        buf.append("select ?s_label ?s_code").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
+		buf.append("where  { ").append("\n");
+        buf.append("?s a owl:Class .").append("\n");
+        buf.append("?s rdfs:label ?s_label .").append("\n");
+        buf.append("?s :NHC0 ?s_code . ").append("\n");
+        buf.append("filter not exists { ?s rdfs:subClassOf|owl:equivalentClass ?o } ").append("\n");
+        buf.append("}").append("\n");
+        return buf.toString();
+    }
+
+	public Vector getRoots(String named_graph) {
+		return submitQuery(construct_root_query(named_graph));
+	}
+
+
 	public String construct_get_dt(String named_graph) {
 		String prefixes = owlSPARQLUtils.getPrefixes();
 		StringBuffer buf = new StringBuffer();
@@ -355,6 +375,9 @@ public class Path2SPARQL {
 		//Utils.dumpHashMap("getEnumerations", hmap);
 		Vector v = path2SPARQL.getEnumerationElements(named_graph, "Semantic_Type");
 		Utils.dumpVector("Semantic_Type", v);
+
+		v = path2SPARQL.getRoots(named_graph);
+		Utils.dumpVector("Roots", v);
 	}
 }
 
