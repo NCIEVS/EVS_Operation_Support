@@ -29,17 +29,66 @@ public class Path2SPARQL {
 		enumerationMap = getEnumerationMap(named_graph);
 	}
 
+	public String construct_get_anno_prop_range_query(String named_graph) {
+		String prefixes = getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		buf.append("SELECT distinct ?p_label ?p_code ?range").append("\n");
+		buf.append("from <" + named_graph + ">").append("\n");
+		buf.append("where {").append("\n");
+		buf.append("   ?p a owl:AnnotationProperty .").append("\n");
+		buf.append("   ?p :NHC0 ?p_code .").append("\n");
+		buf.append("   ?p rdfs:label ?p_label .").append("\n");
+		buf.append("   ?p rdfs:range ?range .").append("\n");
+		buf.append("}").append("\n");
+		return buf.toString();
+	}
+
+    public HashMap creatPropCode2EnumerationMap() {
+		HashMap hmap = new HashMap();
+		String query = construct_get_anno_prop_range_query(named_graph);
+		Vector v = submitQuery(query);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (line.endsWith("-enum")) {
+				Vector u = StringUtils.parseData(line, '|');
+				String t2 = (String) u.elementAt(2);
+				t2 = t2.replace(NS + "#","");
+				hmap.put((String) u.elementAt(1), t2);
+			}
+		}
+        return hmap;
+	}
+
+	public String construct_get_anno_prop_query(String named_graph, boolean obj_valued_only) {
+		String prefixes = owlSPARQLUtils.getPrefixes();
+		StringBuffer buf = new StringBuffer();
+		buf.append(prefixes);
+		buf.append("SELECT distinct ?p_label ?p_code").append("\n");
+		buf.append("from <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus_26.08e.owl>").append("\n");
+		buf.append("where {").append("\n");
+		buf.append("   ?p a owl:AnnotationProperty .").append("\n");
+		buf.append("   ?p :NHC0 ?p_code .").append("\n");
+		buf.append("   ?p rdfs:label ?p_label .").append("\n");
+		if (obj_valued_only) {
+			buf.append("   ?p rdfs:range xsd:anyURI .").append("\n");
+		}
+		buf.append("}").append("\n");
+		return buf.toString();
+	}
+
     public String construct_root_query(String named_graph) {
         StringBuffer buf = new StringBuffer();
         String prefixes = owlSPARQLUtils.getPrefixes();
         buf.append(prefixes);
-        buf.append("select ?s_label ?s_code").append("\n");
+        buf.append("select ?x_label ?x_code").append("\n");
 		buf.append("from <" + named_graph + ">").append("\n");
 		buf.append("where  { ").append("\n");
-        buf.append("?s a owl:Class .").append("\n");
-        buf.append("?s rdfs:label ?s_label .").append("\n");
-        buf.append("?s :NHC0 ?s_code . ").append("\n");
-        buf.append("filter not exists { ?s rdfs:subClassOf|owl:equivalentClass ?o } ").append("\n");
+        buf.append("?x a owl:Class .").append("\n");
+        buf.append("?x rdfs:label ?x_label .").append("\n");
+        buf.append("?x :NHC0 ?x_code . ").append("\n");
+        buf.append("filter not exists { ?x rdfs:subClassOf|owl:equivalentClass ?o } ").append("\n");
         buf.append("}").append("\n");
         return buf.toString();
     }
@@ -314,9 +363,12 @@ public class Path2SPARQL {
 		return buf.toString();
 	}
 
+	public String getPrefixes() {
+	    return owlSPARQLUtils.getPrefixes();
+    }
+
 	public Vector submitQuery(String named_graph, String code, String path) {
 		String query = constructQuery(named_graph, code, path);
-		System.out.println(query);
 		Vector v = owlSPARQLUtils.executeQuery(query);
 		if (v == null) return null;
 		if (v.size() == 0) return v;
@@ -324,7 +376,6 @@ public class Path2SPARQL {
 	}
 
 	public Vector submitQuery(String query) {
-		System.out.println(query);
 		Vector v = owlSPARQLUtils.executeQuery(query);
 		if (v == null) return null;
 		if (v.size() == 0) return v;
@@ -341,7 +392,6 @@ public class Path2SPARQL {
 			String path = (String) paths.elementAt(i);
 			System.out.println(path);
 			String query = test.constructQuery(named_graph, code, path);
-			System.out.println(query);
 			if (!hset.contains(query)) {
 				hset.add(query);
 				w.add("\n#" + path);
@@ -359,14 +409,6 @@ public class Path2SPARQL {
 	}
 
 	public static void main(String[] args) {
-		/*
-		String filename = args[0];
-		//String code = args[1];
-		Vector paths = Utils.readFile(filename);
-		//Vector w = run(paths, code);
-		Vector w = run(paths);
-		Utils.saveToFile("sparql_" + filename, w);
-		*/
 		Path2SPARQL path2SPARQL = new Path2SPARQL();
 		String named_graph = ConfigurationController.namedGraph;
 		//Vector v = path2SPARQL.submitQuery(path2SPARQL.construct_get_datatypes(named_graph));
