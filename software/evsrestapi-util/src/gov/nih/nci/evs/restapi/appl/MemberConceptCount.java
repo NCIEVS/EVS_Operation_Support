@@ -39,6 +39,7 @@ public class MemberConceptCount {
     String username = null;
     String password = null;
     OWLSPARQLUtils owlSPARQLUtils = null;
+    HashMap valueSetCountMap = new HashMap();
 
     public MemberConceptCount(String serviceUrl, String namedGraph, String username, String password) {
 		this.serviceUrl = serviceUrl;
@@ -47,6 +48,8 @@ public class MemberConceptCount {
 		this.password = password;
 	    this.owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
 	    owlSPARQLUtils.set_named_graph(namedGraph);
+	    version = owlSPARQLUtils.getVersion(namedGraph);
+	    valueSetCountMap = new HashMap();
     }
 
 
@@ -61,13 +64,6 @@ public class MemberConceptCount {
         buf.append("                    ?x1 :NHC0 ?x1_code .").append("\n");
         buf.append("                    ?x1 rdfs:label ?x1_label .").append("\n");
         buf.append("").append("\n");
-        /*
-        buf.append("                ?x1 ?p2 ?p2_value .").append("\n");
-        buf.append("                ?p2 rdfs:label ?p2_label .").append("\n");
-        buf.append("                ?p2 rdfs:label \"Publish_Value_Set\"^^xsd:string .").append("\n");
-        //buf.append("                ?x1 ?p2 \"Yes\"^^xsd:string .").append("\n");
-        buf.append("").append("\n");
-        */
         buf.append("                ?x1 ?p3 ?p3_value .").append("\n");
         buf.append("                ?p3 rdfs:label ?p3_label .").append("\n");
         buf.append("                ?p3 rdfs:label \"Contributing_Source\"^^xsd:string .").append("\n");
@@ -88,11 +84,9 @@ public class MemberConceptCount {
 
 	public Vector getValuesetMembers(String named_graph, String source) {
         String query = construct_get_valueset_members(named_graph, source);
-        Vector v = owlSPARQLUtils.executeQuery(query);
+         Vector v = owlSPARQLUtils.executeQuery(query);
         if (v == null) return null;
         if (v.size() == 0) return v;
-        //Utils.dumpVector(source, v);
-        //v = new ParserUtils().getResponseValues(v);
         return new SortUtils().quickSort(v);
 	}
 
@@ -137,7 +131,7 @@ public class MemberConceptCount {
 	}
 
 	//Adverse Event Outcome ICSR Terminology|C54583|23
-	public static String formatCounts(String filename) {
+	public String formatCounts(String filename) {
 		Vector v = Utils.readFile(filename);
 		Vector w = new Vector();
 		w.add("Terminology\tCount");
@@ -146,6 +140,9 @@ public class MemberConceptCount {
 			Vector u = StringUtils.parseData(line, '|');
 			if (u.size() == 3) {
 				w.add((String) u.elementAt(0) + " (" + (String) u.elementAt(1) + ")" + "\t" + (String) u.elementAt(2));
+				Integer count = Integer.valueOf(Integer.parseInt((String) u.elementAt(2)));
+
+				valueSetCountMap.put((String) u.elementAt(0) + " (" + (String) u.elementAt(1) + ")", count);
 			}
 		}
 		String outputfile = "v2_" + filename;
@@ -153,23 +150,12 @@ public class MemberConceptCount {
 		return outputfile;
 	}
 
-    public static void run(String source) {
+    public void run(String source) {
 		long ms = System.currentTimeMillis();
-		String serviceUrl = ConfigurationController.serviceUrl;
-		String namedGraph = ConfigurationController.namedGraph;
-		String username = ConfigurationController.username;
-		String password = ConfigurationController.password;
-
-	    MemberConceptCount test = new MemberConceptCount(serviceUrl, namedGraph, username, password);
-	   	Vector w = test.getValuesetMembers(namedGraph, source);
-
-	   	System.out.println("w: " + w.size());
-
+	   	Vector w = getValuesetMembers(namedGraph, source);
 	   	Utils.saveToFile(source + ".txt", w);
 	   	System.out.println(source + ".txt" + " generated.");
-
-	   	test.getCountsByValueSet(source + ".txt");
-
+	   	getCountsByValueSet(source + ".txt");
 	   	String v2_file = formatCounts(source + ".txt");
 	   	System.out.println(v2_file + " generated.");
 	}
@@ -197,7 +183,6 @@ public class MemberConceptCount {
 				int n1 = displayName.lastIndexOf("(");
 				int n2 = displayName.lastIndexOf(")");
 				String code = displayName.substring(n1+1, n2);
-				//System.out.println(code);
 				String numStr = code.substring(1, code.length());
 				if (isInteger(numStr)) {
 					return true;
@@ -225,10 +210,11 @@ public class MemberConceptCount {
 	}
 
 	public static String displayName2Code(String displayName) {
+		if (!displayName.endsWith(")")) {
+			return null;
+		}
 		int n1 = displayName.lastIndexOf("(");
-		int n2 = displayName.lastIndexOf(")");
-		System.out.println("displayName: " + displayName);
-		String code = displayName.substring(n1+1, n2);
+		String code = displayName.substring(n1+1, displayName.length()-1);
 		return code;
 	}
 
@@ -241,14 +227,6 @@ public class MemberConceptCount {
 		}
 		return count;
 	}
-
-/*
-		axiomfile = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE;
-		//rolefile = ConfigurationController.reportGenerationDirectory + File.separator + ROLE_FILE;
-		//hierfile = ConfigurationController.reportGenerationDirectory + File.separator + HIER_FILE;
-		//subsetfile = ConfigurationController.reportGenerationDirectory + File.separator + SUBSET_FILE;
-		//owlfile = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
-*/
 
 	public static String extractBranches(String root) {
 		String hierfile = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile;
@@ -270,13 +248,9 @@ public class MemberConceptCount {
 		return "parent_child_" + code + ".txt";
 	}
 
-    public static void generateCounts(String count_EDQM_HC, String count_FDA, String root) {
+    public void generateCounts(String count_EDQM_HC, String count_FDA, String root) {
 		Vector v2 = Utils.readFile(count_EDQM_HC);
 		Vector v3 = Utils.readFile(count_FDA);
-
-		Utils.dumpVector("count_EDQM-HC", v2);
-		Utils.dumpVector("count_FDA", v3);
-
 		String v2_FDA = formatCounts(count_FDA);
 		String v2_EDQM_HC = formatCounts(count_EDQM_HC);
 
@@ -290,12 +264,9 @@ public class MemberConceptCount {
 		Vector w4 = new Vector();
 		while (it.hasNext()) {
 			String t = (String) it.next();
-			System.out.println("displayName: " + t);
 			try {
 				String headerCode = displayName2Code(t);
-				//System.out.println("displayName2Code: " + headerCode);
 				int count = getCount(hh, countMap, headerCode);
-				//System.out.println(t + "\t" + count);
 				w4.add(t + "\t" + count);
 			} catch (Exception ex) {
 
@@ -328,21 +299,227 @@ public class MemberConceptCount {
 	}
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    public static void main(String[] args) {
-		run("EDQM-HC");
-		run("FDA");
-        generateCounts("count_EDQM-HC.txt", "count_FDA.txt", "C131123");
-        generateCounts("count_EDQM-HC.txt", "count_FDA.txt", "C148636");
+	public String construct_get_concepts_with_contributing_source(String named_graph, String cs) {
+        String prefixes = owlSPARQLUtils.getPrefixes();
+        StringBuffer buf = new StringBuffer();
+        buf.append(prefixes);
+        buf.append("select distinct ?x1_code ").append("\n");
+        buf.append("from <" + named_graph + ">").append("\n");
+        buf.append("where  { ").append("\n");
+        buf.append("            ?x1 a owl:Class .").append("\n");
+        buf.append("            ?x1 :NHC0 ?x1_code .").append("\n");
+        buf.append("            ?x1 ?p3 ?p3_value .").append("\n");
+        buf.append("            ?p3 rdfs:label ?p3_label .").append("\n");
+        buf.append("            ?p3 rdfs:label \"Contributing_Source\"^^xsd:string .").append("\n");
+        buf.append("            ?x1 ?p3 \"" + cs + "\"^^xsd:string .").append("\n");
+        buf.append("}").append("\n");
+        return buf.toString();
 	}
+
+	public int getConceptsWithContributingSource(String named_graph, String cs) {
+        String query = construct_get_concepts_with_contributing_source(named_graph, cs);
+        Vector v = owlSPARQLUtils.executeQuery(query);
+        if (v == null) return -1;
+        if (v.size() == 0) return 0;
+        return v.size();
+	}
+
+	public String construct_get_valueset_size(String named_graph, String subsetCode) {
+        String prefixes = owlSPARQLUtils.getPrefixes();
+        StringBuffer buf = new StringBuffer();
+        buf.append(prefixes);
+        buf.append("select distinct ?x1_code ").append("\n");
+        buf.append("from <" + named_graph + ">").append("\n");
+        buf.append("where  { ").append("\n");
+        buf.append("            ?x1 a owl:Class .").append("\n");
+        buf.append("            ?x1 :NHC0 ?x1_code .").append("\n");
+        buf.append("            ?y a owl:Class .").append("\n");
+        buf.append("            ?y :NHC0 ?y_code .").append("\n");
+        buf.append("            ?y :NHC0 \"" + subsetCode + "\"^^xsd:string .").append("\n");
+        buf.append("            ?x1 ?p ?y .").append("\n");
+        buf.append("            ?p rdfs:label ?p_label .").append("\n");
+        buf.append("            ?p rdfs:label \"Concept_In_Subset\"^^xsd:string .").append("\n");
+        buf.append("}").append("\n");
+        return buf.toString();
+	}
+
+	public int getValuesetSize(String named_graph, String subsetCode) {
+        String query = construct_get_valueset_size(named_graph, subsetCode);
+        Vector v = owlSPARQLUtils.executeQuery(query);
+        if (v == null) return -1;
+        if (v.size() == 0) return 0;
+        return v.size();
+	}
+
+
+	public String construct_get_valuesets_with_contributing_Source(String named_graph, String cs) {
+        String prefixes = owlSPARQLUtils.getPrefixes();
+        StringBuffer buf = new StringBuffer();
+        buf.append(prefixes);
+        buf.append("select distinct ?x1_label ?x1_code ").append("\n");
+        buf.append("from <" + named_graph + ">").append("\n");
+        buf.append("where  { ").append("\n");
+        buf.append("            ?x1 a owl:Class .").append("\n");
+        buf.append("            ?x1 :NHC0 ?x1_code .").append("\n");
+        buf.append("            ?x1 rdfs:label ?x1_label .").append("\n");
+
+        buf.append("            ?y a owl:Class .").append("\n");
+        //buf.append("            ?y :NHC0 ?y_code .").append("\n");
+
+        buf.append("            ?p rdfs:label ?p_label .").append("\n");
+        buf.append("            ?p rdfs:label \"Concept_In_Subset\"^^xsd:string .").append("\n");
+        buf.append("            ?y ?p ?x1 .").append("\n");
+
+        buf.append("            ?p3 rdfs:label ?p3_label .").append("\n");
+        buf.append("            ?p3 rdfs:label \"Contributing_Source\"^^xsd:string .").append("\n");
+        buf.append("            ?x1 ?p3 \"" + cs + "\"^^xsd:string .").append("\n");
+        buf.append("}").append("\n");
+        return buf.toString();
+	}
+
+	public int getValuesetCountWithContributingSource(String named_graph, String source) {
+        String query = construct_get_valuesets_with_contributing_Source(named_graph, source);
+        Vector v = owlSPARQLUtils.executeQuery(query);
+        if (v == null) return -1;
+        if (v.size() == 0) return 0;
+        return v.size();
+	}
+
+	public Vector getValuesetsWithContributingSource(String named_graph, String source) {
+        String query = construct_get_valuesets_with_contributing_Source(named_graph, source);
+        Vector v = owlSPARQLUtils.executeQuery(query);
+        if (v == null) return null;
+        if (v.size() == 0) return new Vector();
+        return v;
+	}
+
+	public String line2DisplayName(String line) {
+		Vector u = StringUtils.parseData(line, '|');
+		String label = (String) u.elementAt(0);
+		String code = (String) u.elementAt(1);
+		return label + " (" + code + ")";
+	}
+
+	public Vector GenerateReport(boolean qa_mode) {
+		Vector w = new Vector();
+		w.add("Terminology	NCI Thesaurus (" + version + ")");
+		w.add("FDA TERMINOLOGY	" + StringUtils.getToday("MM/dd/YYYY"));
+
+		int fda_count = getConceptsWithContributingSource(namedGraph, "FDA");
+		//w.add("fda_count: " + fda_count);
+		w.add("Total Number of FDA Data Items (Concepts) currently maintained in the NCI Thesaurus  (Contributing Source = FDA)\t" + fda_count);
+
+		int fda_valueset_count = getValuesetCountWithContributingSource(namedGraph, "FDA");
+		//w.add("fda_valueset_count: " + fda_valueset_count);
+		w.add("Number of FDA Data Elements (Value Sets) Currently Being Maintained in the NCI Thesaurus	" + fda_valueset_count);
+        w.add("All the concepts are reviewed every month because we have to post the changes, and in order to find out if there are changes we review the comparisons. We do not keep records on changes, which include amendments  or adjucations.");
+
+		int EDQM_HC_count = getConceptsWithContributingSource(namedGraph, "EDQM-HC");
+		//w.add("EDQM_HC_count: " + EDQM_HC_count);
+
+		int EDQM_valueset_count = getValuesetCountWithContributingSource(namedGraph, "EDQM-HC");
+		//w.add("EDQM_valueset_count: " + EDQM_valueset_count);
+
+		w.add("Total Number of EDQM-HC Data Items (Concepts) currently maintained in the NCI Thesaurus for FDA 	" + EDQM_HC_count);
+		w.add("Number of EDQM-HC Data Elements (Value Sets) Currently Being Maintained in the NCI Thesaurus for FDA 	" + EDQM_valueset_count);
+		w.add("\n");
+
+		Vector fda_valuesets = getValuesetsWithContributingSource(namedGraph, "FDA");
+		for (int i=0; i<fda_valuesets.size(); i++) {
+			String line = (String) fda_valuesets.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(1);
+			int count = getValuesetSize(this.namedGraph, code);
+			String displayName = line2DisplayName(line);
+
+			if (qa_mode) {
+				Integer int_obj = (Integer) valueSetCountMap.get(displayName);
+				int number = int_obj.intValue();
+                String str = Integer.toString(number);
+				w.add(displayName + "\t" + count + "\t" + str);
+			} else {
+				w.add(displayName + "\t" + count);
+			}
+		}
+		w.add("\n");
+
+		Vector EDQM_HC_valuesets = getValuesetsWithContributingSource(namedGraph, "EDQM-HC");
+		for (int i=0; i<EDQM_HC_valuesets.size(); i++) {
+			String line = (String) EDQM_HC_valuesets.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String code = (String) u.elementAt(1);
+			int count = getValuesetSize(this.namedGraph, code);
+			String displayName = line2DisplayName(line);
+
+			if (qa_mode) {
+				Integer int_obj = (Integer) valueSetCountMap.get(displayName);
+				int number = int_obj.intValue();
+                String str = Integer.toString(number);
+				w.add(displayName + "\t" + count + "\t" + str);
+			} else {
+				w.add(displayName + "\t" + count);
+			}
+		}
+        return w;
+	}
+
+    public static void run(String serviceUrl, String named_graph, String username, String password) {
+		MemberConceptCount test = new MemberConceptCount(serviceUrl, named_graph, username, password);
+		test.run("EDQM-HC");
+		test.run("FDA");
+        test.generateCounts("count_EDQM-HC.txt", "count_FDA.txt", "C131123");
+        test.generateCounts("count_EDQM-HC.txt", "count_FDA.txt", "C148636");
+		Vector v = test.GenerateReport(false);
+		Utils.saveToFile("v1_fda_statistics_" + StringUtils.getToday() + ".txt", v);
+	}
+
+	public static void main(String[] args) {
+		String serviceUrl = args[0];
+		String named_graph = args[1];
+		String username = args[2];
+		String password = args[3];
+		run(serviceUrl, named_graph, username, password);
+	}
+
 
 }
 
 
 
+/*
+Terminology	NCI Thesaurus (26.06e)
+FDA TERMINOLOGY	6/29/2026
+Total Number of FDA Data Items (Concepts) currently maintained in the NCI Thesaurus  (Contributing Source = FDA)	33,182
+Number of FDA Data Elements (Value Sets) Currently Being Maintained in the NCI Thesaurus	149
+All the concepts are reviewed every month because we have to post the changes, and in order to find out if there are changes we review the comparisons. We do not keep records on changes, which include amendments  or adjucations.
+Total Number of EDQM-HC Data Items (Concepts) currently maintained in the NCI Thesaurus for FDA 	1433
+Number of EDQM-HC Data Elements (Value Sets) Currently Being Maintained in the NCI Thesaurus for FDA 	17
 
+FDA TERMINOLOGY Value Sets as on 06-29-2026
+FDA CDRH GUDID Terminology (C106039)	135
+FDA Center For Devices and Radiological Health Terminology (C62596)	1885
+CDRH Cause Investigation - Investigation Conclusion Terminology (C91802)	43
+CDRH Cause Investigation - Investigation Findings Terminology (C91801)	160
+CDRH Cause Investigation - Type of Investigation Terminology (C91800)	31
+CDRH Health Effects - Clinical Signs and Syptoms or Conditions Terminology (C54450)	784
+CDRH Health Effects - Health Impact Terminology (C171124)	81
+CDRH Medical Device Component Terminology (C54577)	299
+CDRH Medical Device Problem Terminology (C54451)	487
+FDA Established Names and Unique Ingredient Identifier Codes Terminology (C63923)	24,062
+Geopolitical Entities, Names, and Codes Terminology (C124085)	280
+FDA Individual Case Safety Report Terminology (C54447)	287
+Device Evaluation ICSR Terminology (C99173)	3
+Device Usage ICSR Terminology (C54595)	5
+Dose Denominator Qualifier ICSR Terminology (C94849)	4
+Adverse Event Outcome ICSR Terminology (C54583)	23
+Location of Event Occurrence ICSR Terminology (C54590)	52
+Observation ICSR Terminology (C88088)	48
+Occupation ICSR Terminology (C54585)	39
+Operator of Medical Device ICSR Terminology (C54584)	41
+Patient Military Status ICSR Terminology (C114855)	4
+Product Characteristic ICSR Terminology (C99174)	4
+*/
 
 
 

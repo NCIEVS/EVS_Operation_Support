@@ -148,10 +148,11 @@ public class ReportSubmitter {
 
 		} else if (report.compareTo("FDA Count") == 0) {
 			long ms = System.currentTimeMillis();
-			MemberConceptCount.run("EDQM-HC");
-			MemberConceptCount.run("FDA");
-			MemberConceptCount.generateCounts("count_EDQM-HC.txt", "count_FDA.txt", "C131123");
-			MemberConceptCount.generateCounts("count_EDQM-HC.txt", "count_FDA.txt", "C148636");
+			MemberConceptCount memberConceptCount = new MemberConceptCount(serviceUrl, namedGraph, username, password);
+			memberConceptCount.run("EDQM-HC");
+			memberConceptCount.run("FDA");
+			memberConceptCount.generateCounts("count_EDQM-HC.txt", "count_FDA.txt", "C131123");
+			memberConceptCount.generateCounts("count_EDQM-HC.txt", "count_FDA.txt", "C148636");
 			System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 			System.out.println("Reports " + report + " generated.");
 
