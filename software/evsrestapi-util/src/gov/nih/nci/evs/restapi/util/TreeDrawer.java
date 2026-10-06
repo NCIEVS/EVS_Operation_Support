@@ -24,9 +24,10 @@ public class TreeDrawer {
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
+			//C179412|P97|A worker who cannot feasibly work from home.|P378$NCI
 			if (u.contains("P383$PT") && u.contains("P384$" + source) ) {
 				lcv++;
-				hmap.put((String) u.elementAt(1), (String) u.elementAt(3));
+				hmap.put((String) u.elementAt(0), (String) u.elementAt(2));
 			}
 		}
 		return hmap;
