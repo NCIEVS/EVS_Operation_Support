@@ -177,65 +177,11 @@ public class PediatricSubsetsGeneratorByOWL {
 		}
 
 		System.out.println("Number of retired concepts: " + retired_concepts.size());
-
-		/*
-		for (int i=0; i<retired_concepts.size(); i++) {
-			line = (String) v.elementAt(i);
-			u = StringUtils.parseData(line, '|');
-			//1,2,5,6-Dibenzanthracene|C29789|Concept_Status|Retired_Concept
-			String status = (String) u.elementAt(3);
-			if (status.compareTo("Retired_Concept") == 0) {
-				String code = (String) u.elementAt(1);
-				retired_concepts.add(code);
-			}
-		}
-		*/
-
-
-/*
-        role_source_data = getRoleSourceData();
-        role_data = new Vector();
-        for (int i=0; i<role_source_data.size(); i++) {
-		    line = (String) role_source_data.elementAt(i);
-		    u = StringUtils.parseData(line, '|');
-		    //Stage M0 Childhood Ependymoma by Toronto Guidelines v2|C198489|Disease_Has_Finding|Childhood Lesion|C60644
-            role_data.add((String) u.elementAt(1) + "|" + "R108" + "|" + (String) u.elementAt(4));
-		}
-*/
-
-//        code2LabelMap = createCode2LabelMap(role_source_data);
     }
 
 	public String get_ncit_version() {
 		return ncit_version;
 	}
-
-/*
-    public HashMap createCode2LabelMap(Vector w) {
-		//Advanced Childhood Malignant Solid Neoplasm|C187210|Disease_Has_Finding|Childhood Lesion|C60644
-        //Vector w = Utils.readFile(hierfile);
-        HashMap code2LabelMap = new HashMap();
-        for (int i=0; i<w.size(); i++) {
-			String line = (String) w.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			code2LabelMap.put((String) u.elementAt(1), (String) u.elementAt(0));
-			code2LabelMap.put((String) u.elementAt(4), (String) u.elementAt(3));
-		}
-		return code2LabelMap;
-	}
-*/
-
-	/*
-	NCI Subset Code
-	NCI Subset Name
-	NCI Code
-	NCI PT
-	NCI SY
-	NCI DEF
-	Neoplastic_Status
-	*/
-
-
 
 	public boolean isRetired(String code) {
 		return retired_concepts.contains(code);
@@ -538,17 +484,6 @@ public class PediatricSubsetsGeneratorByOWL {
 		  }
 	      });
 	}
-
-/*
-	public static String encode(String toEncode) {
-		try {
-			return java.net.URLEncoder.encode(toEncode.trim(), "UTF-8");
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return null;
-	}
-*/
 
     public static String generateHyperlink(String name, String propertyName) {
 		String propertyName_0 = propertyName;

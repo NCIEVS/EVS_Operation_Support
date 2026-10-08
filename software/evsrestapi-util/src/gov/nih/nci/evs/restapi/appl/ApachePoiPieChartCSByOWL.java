@@ -83,7 +83,6 @@ public class ApachePoiPieChartCSByOWL {
     static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
 	static String RESTRICTION_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.rolefile; //"roles.txt";
-	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
 	static OWLScanner scanner = null;
 	static HierarchyHelper hh = null;
 	static HashSet retired_concepts = null;
@@ -113,19 +112,6 @@ public class ApachePoiPieChartCSByOWL {
 		System.out.println("Number of retired concepts: " + retired_concepts.size());
 
 		hh = new HierarchyHelper(Utils.readFile(PARENT_CHILD_FILE));
-        /*
-		String prop_code = "rdfs:label";
-		w = scanner.extractPropertyData(prop_code);
-		for (int i=0; i<w.size(); i++) {
-			String line = (String) w.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String code = (String) u.elementAt(0);
-			String label = (String) u.elementAt(1);
-			label = HTMLDecoder.decode(label);
-			code2LabelMap.put(code, label);
-		}
-		*/
-
 		String prop_code = "P322"; //Contributing_Source
 		w = scanner.extractPropertyData(prop_code);
 		Utils.saveToFile("cs_data_0.txt", w);
@@ -165,12 +151,12 @@ public class ApachePoiPieChartCSByOWL {
 				w.add(label + "|" + code + "|Contributing_Source|" + cs);
 			}
 		}
-		w = removedRetired(w);
+		w = removeRetired(w);
 		return new SortUtils().quickSort(w);
 	}
 
 //1,1-Dimethylhydrazine|C1072|Contributing_Source|FDA
-	public static Vector removedRetired(Vector w) {
+	public static Vector removeRetired(Vector w) {
 		Vector v = new Vector();
 		for (int i=0; i<w.size(); i++) {
 			String line = (String) w.elementAt(i);

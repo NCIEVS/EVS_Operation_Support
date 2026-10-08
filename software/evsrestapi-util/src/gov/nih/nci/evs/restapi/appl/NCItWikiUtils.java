@@ -213,7 +213,7 @@ public class NCItWikiUtils {
 */
 
 //Activity|C43431|Contributing_Source|BRIDG
-	public Vector removedRetired(Vector w) {
+	public Vector removeRetired(Vector w) {
 		Vector v = new Vector();
 		for (int i=0; i<w.size(); i++) {
 			String line = (String) w.elementAt(i);
@@ -278,11 +278,11 @@ public class NCItWikiUtils {
 		NCItWikiUtils ncitWikiUtils = new NCItWikiUtils(restURL, namedGraph, username, password);
 
         //Vector w = ncitWikiUtils.getAxiomData(namedGraph);
-        //w = ncitWikiUtils.removedRetired(w);
+        //w = ncitWikiUtils.removeRetired(w);
         //Utils.saveToFile("data.txt", w);
         Vector w = ncitWikiUtils.getContributingSource(namedGraph);
         //Utils.saveToFile("cs_data_0.txt", w);
-        w = ncitWikiUtils.removedRetired(w);
+        w = ncitWikiUtils.removeRetired(w);
         Utils.saveToFile("cs_data.txt", w);
 
         String version = ncitWikiUtils.getVersion();
@@ -305,7 +305,7 @@ public class NCItWikiUtils {
 
 		NCItWikiUtils ncitWikiUtils = new NCItWikiUtils(serviceUrl, namedGraph, username, password);
         Vector w = ncitWikiUtils.getContributingSource(namedGraph);
-        w = ncitWikiUtils.removedRetired(w);
+        w = ncitWikiUtils.removeRetired(w);
         Utils.saveToFile("cs_data.txt", w);
         String version = ncitWikiUtils.getVersion();
 		System.out.println("NCIt version: " + version);

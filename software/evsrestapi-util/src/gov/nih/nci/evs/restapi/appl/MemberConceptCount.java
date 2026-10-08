@@ -481,60 +481,7 @@ public class MemberConceptCount {
 		String password = args[3];
 		run(serviceUrl, named_graph, username, password);
 	}
-
-
 }
-
-
-
-/*
-Terminology	NCI Thesaurus (26.06e)
-FDA TERMINOLOGY	6/29/2026
-Total Number of FDA Data Items (Concepts) currently maintained in the NCI Thesaurus  (Contributing Source = FDA)	33,182
-Number of FDA Data Elements (Value Sets) Currently Being Maintained in the NCI Thesaurus	149
-All the concepts are reviewed every month because we have to post the changes, and in order to find out if there are changes we review the comparisons. We do not keep records on changes, which include amendments  or adjucations.
-Total Number of EDQM-HC Data Items (Concepts) currently maintained in the NCI Thesaurus for FDA 	1433
-Number of EDQM-HC Data Elements (Value Sets) Currently Being Maintained in the NCI Thesaurus for FDA 	17
-
-FDA TERMINOLOGY Value Sets as on 06-29-2026
-FDA CDRH GUDID Terminology (C106039)	135
-FDA Center For Devices and Radiological Health Terminology (C62596)	1885
-CDRH Cause Investigation - Investigation Conclusion Terminology (C91802)	43
-CDRH Cause Investigation - Investigation Findings Terminology (C91801)	160
-CDRH Cause Investigation - Type of Investigation Terminology (C91800)	31
-CDRH Health Effects - Clinical Signs and Syptoms or Conditions Terminology (C54450)	784
-CDRH Health Effects - Health Impact Terminology (C171124)	81
-CDRH Medical Device Component Terminology (C54577)	299
-CDRH Medical Device Problem Terminology (C54451)	487
-FDA Established Names and Unique Ingredient Identifier Codes Terminology (C63923)	24,062
-Geopolitical Entities, Names, and Codes Terminology (C124085)	280
-FDA Individual Case Safety Report Terminology (C54447)	287
-Device Evaluation ICSR Terminology (C99173)	3
-Device Usage ICSR Terminology (C54595)	5
-Dose Denominator Qualifier ICSR Terminology (C94849)	4
-Adverse Event Outcome ICSR Terminology (C54583)	23
-Location of Event Occurrence ICSR Terminology (C54590)	52
-Observation ICSR Terminology (C88088)	48
-Occupation ICSR Terminology (C54585)	39
-Operator of Medical Device ICSR Terminology (C54584)	41
-Patient Military Status ICSR Terminology (C114855)	4
-Product Characteristic ICSR Terminology (C99174)	4
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

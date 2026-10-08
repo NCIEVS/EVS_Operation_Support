@@ -84,14 +84,14 @@ public class LinguisticAnalyzer {
         for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String prop_code = (String) u.elementAt(2);
+			String prop_code = (String) u.elementAt(1);
 			if (prop_code.compareTo("P90") == 0) {
-				String term = (String) u.elementAt(0);
+				String term = (String) u.elementAt(2);
 				Vector w = new Vector();
 				if (hmap.containsKey(term)) {
 					w = (Vector) hmap.get(term);
 				}
-				String code = (String) u.elementAt(1);
+				String code = (String) u.elementAt(0);
 				if (!w.contains(code)) {
 					w.add(code);
 				}
