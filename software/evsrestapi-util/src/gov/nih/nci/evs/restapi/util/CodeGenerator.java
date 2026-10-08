@@ -58,8 +58,20 @@ import javax.servlet.http.*;
  */
 public class CodeGenerator {
     static String BASE_URL = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl";
+    String serviceUrl = null;
+    String namedGraph = null;
+    String username = null;
+    String password = null;
+
+    public CodeGenerator() {
+
+	}
 
     public CodeGenerator(String serviceUrl, String namedGraph, String username, String password) {
+		this.serviceUrl = serviceUrl;
+		this.namedGraph = namedGraph;
+		this.username = username;
+		this.password = password;
 	}
 
     public static Vector generateCode(String queryfile) {

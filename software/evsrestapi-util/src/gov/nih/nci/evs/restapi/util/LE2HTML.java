@@ -4,6 +4,10 @@ import java.util.*;
 
 class LE2HTML {
 
+	public LE2HTML() {
+
+	}
+
 	public static void run(String textfile) {
 		Vector raw_data_vec = Utils.readFile(textfile);
 		HashMap roleName2RangeNameMap = NCItProperties.getRoleName2RangeNameMap();

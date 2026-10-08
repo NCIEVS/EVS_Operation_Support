@@ -83,6 +83,11 @@ public class AxiomParser {
     String password = null;
     OWLSPARQLUtils owlSPARQLUtils = null;
     HashMap code2LabelMap = null;
+
+    public AxiomParser() {
+
+	}
+
     public AxiomParser(String serviceUrl, String named_graph, String username, String password) {
     	this.named_graph = named_graph;
         this.owlSPARQLUtils = new OWLSPARQLUtils(serviceUrl, username, password);
@@ -642,151 +647,6 @@ public class AxiomParser {
 		 targetTerminology,
 		 targetTerminologyVersion);
 	}
-
-/*
-    public Definition line2Definition(String line) {
-		line = line.trim();
-		if (line.length() == 0) return null;
-		Vector u = StringUtils.parseData(line, '|');
-		String code = (String) u.elementAt(1);
-		String label = (String) u.elementAt(0);
-		String description = (String) u.elementAt(3);
-		String attribution = "";
-		String source = "";
-
-		for (int i=4; i<u.size(); i++) {
-			String t = (String) u.elementAt(i);
-			Vector u2 = StringUtils.parseData(t, '$');
-			String s1 = (String) u2.elementAt(0);
-			String s2 = (String) u2.elementAt(1);
-			if (s1.compareTo("P381") == 0) {
-				attribution = s2;
-			} else if (s1.compareTo("P378") == 0) {
-				source = s2;
-			}
-		}
-		return new Definition(
-			code,
-			label,
-			description,
-			attribution,
-			source);
-	}
-
-    public AltDefinition line2AltDefinition(String line) {
-		line = line.trim();
-		if (line.length() == 0) return null;
-		Vector u = StringUtils.parseData(line, '|');
-		String code = (String) u.elementAt(1);
-		String label = (String) u.elementAt(0);
-		String prop_code = (String) u.elementAt(2);
-
-		String description = (String) u.elementAt(3);
-		String attribution = "";
-		String source = "";
-
-		for (int i=4; i<u.size(); i++) {
-			String t = (String) u.elementAt(i);
-			Vector u2 = StringUtils.parseData(t, '$');
-			String s1 = (String) u2.elementAt(0);
-			String s2 = (String) u2.elementAt(1);
-			if (s1.compareTo("P381") == 0) {
-				attribution = s2;
-			} else if (s1.compareTo("P378") == 0) {
-				source = s2;
-			}
-		}
-		return new AltDefinition(
-			code,
-			label,
-			description,
-			attribution,
-			source);
-	}
-
-    public GoAnnotation line2GoAnnotation(String line) {
-		line = line.trim();
-		if (line.length() == 0) return null;
-		Vector u = StringUtils.parseData(line, '|');
-		String code = (String) u.elementAt(1);
-		String label = (String) u.elementAt(0);
-		String prop_code = (String) u.elementAt(2);
-		String annotation = (String) u.elementAt(3);
-		String goEvi = "";
-		String goId = "";
-		String goSource = "";
-		String sourceDate = "";
-
-		for (int i=4; i<u.size(); i++) {
-			String t = (String) u.elementAt(i);
-			Vector u2 = StringUtils.parseData(t, '$');
-			String s1 = (String) u2.elementAt(0);
-			String s2 = (String) u2.elementAt(1);
-			if (s1.compareTo("P389") == 0) {
-				goEvi = s2;
-			} else if (s1.compareTo("P387") == 0) {
-				goId = s2;
-			} else if (s1.compareTo("P390") == 0) {
-				goSource = s2;
-			} else if (s1.compareTo("P391") == 0) {
-				sourceDate = s2;
-			}
-		}
-
-		return new GoAnnotation(
-			code,
-			label,
-			annotation,
-			goEvi,
-			goId,
-			goSource,
-			sourceDate
-		);
-	}
-
-    public MapToEntry line2MapToEntry(String line) {
-		line = line.trim();
-		if (line.length() == 0) return null;
-		Vector u = StringUtils.parseData(line, '|');
-		String code = (String) u.elementAt(1);
-		String label = (String) u.elementAt(0);
-		String prop_code = (String) u.elementAt(2);
-
-		String targetTerm = (String) u.elementAt(3);
-		String targetCode = "";
-		String targetTermType = "";
-		String targetTerminology = "";
-		String targetTerminologyVersion = "";
-		String relationshipToTarget = "";
-
-		for (int i=4; i<u.size(); i++) {
-			String t = (String) u.elementAt(i);
-			Vector u2 = StringUtils.parseData(t, '$');
-			String s1 = (String) u2.elementAt(0);
-			String s2 = (String) u2.elementAt(1);
-			if (s1.compareTo("P393") == 0) {
-				relationshipToTarget = s2;
-			} else if (s1.compareTo("P394") == 0) {
-				targetTermType = s2;
-			} else if (s1.compareTo("P395") == 0) {
-				targetCode = s2;
-			} else if (s1.compareTo("P396") == 0) {
-				targetTerminology = s2;
-			} else if (s1.compareTo("P397") == 0) {
-				targetTerminologyVersion = s2;
-			}
-		}
-		return new MapToEntry(
-		 code,
-		 label,
-		 relationshipToTarget,
-		 targetCode,
-		 targetTerm,
-		 targetTermType,
-		 targetTerminology,
-		 targetTerminologyVersion);
-	}
-*/
 
     public HashMap loadSynonyms(String filename) {
 		HashMap hmap = new HashMap();

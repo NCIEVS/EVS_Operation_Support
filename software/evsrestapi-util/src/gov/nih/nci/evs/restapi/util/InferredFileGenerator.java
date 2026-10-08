@@ -70,6 +70,10 @@ public class InferredFileGenerator {
 	Vector owl_vec = null;
 	public HashMap disjointWithMap = null;
 
+	public InferredFileGenerator() {
+
+	}
+
 	public InferredFileGenerator(String assertedOWL) {
 		this.assertedOWL = assertedOWL;
 		initialize();

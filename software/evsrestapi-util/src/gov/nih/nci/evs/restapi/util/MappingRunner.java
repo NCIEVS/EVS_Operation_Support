@@ -71,10 +71,16 @@ public class MappingRunner {
 	public static HashMap ncitSYMap = null;
 
 	static {
-        Vector required_data = Utils.readFile(requiredDataFile);
- 		DataRetrieval dataRetrieval = new DataRetrieval(NCIT_OWL, required_data);
-        ncitPTMap = dataRetrieval.createCode2ValuesMap("P90|P384$NCI|P383$PT");
-        ncitSYMap = dataRetrieval.createCode2ValuesMap("P90|P384$NCI|P383$SY");
+		if (requiredDataFile == null) {
+			System.out.println("INFO: requiredDataFile == null. Please set ConfigurationController.requiredDataFile properly.");
+
+		} else {
+			File f = new File(requiredDataFile);
+			Vector required_data = Utils.readFile(requiredDataFile);
+			DataRetrieval dataRetrieval = new DataRetrieval(NCIT_OWL, required_data);
+			ncitPTMap = dataRetrieval.createCode2ValuesMap("P90|P384$NCI|P383$PT");
+			ncitSYMap = dataRetrieval.createCode2ValuesMap("P90|P384$NCI|P383$SY");
+		}
 	}
 
 	public static HashMap createCode2LabelMap() {

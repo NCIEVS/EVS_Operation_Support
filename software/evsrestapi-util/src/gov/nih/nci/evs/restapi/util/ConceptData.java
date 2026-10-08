@@ -85,6 +85,10 @@ public class ConceptData {
     MetadataUtils metadataUtils = null;
     AxiomParser axiomParser = null;// (String serviceUrl, String named_graph, String username, String password)
 
+    public ConceptData() {
+
+	}
+
     public ConceptData(String serviceUrl, String named_graph, String username, String password) {
 		this.serviceUrl = serviceUrl;
     	this.named_graph = named_graph;

@@ -1,10 +1,12 @@
 package gov.nih.nci.evs.restapi.util;
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.text.*;
 import java.util.*;
+
 
 /**
  * <!-- LICENSE_TEXT_START -->
@@ -58,6 +60,10 @@ import java.util.*;
  */
 public class KeywordMatching {
 
+	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
+	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
+
+
 	static String TERMFILE = "axiom_data.txt";
 	static Vector TERMDATA = null;
 	static HashMap hmap = null;
@@ -68,12 +74,15 @@ public class KeywordMatching {
     static HashMap code2WordSeqMap = null;
 
 	static {
+		File f = new File(TERMFILE);
+		if (!f.exists()) {
+			TERMFILE = AXIOM_FILE;
+		}
 		TERMDATA = Utils.readFile(TERMFILE);
 		keywords = createKeywordSet();
 		code2TermMap = createCode2TermMap();
 		code2LabelMap = createCode2LabelMap();
         code2NormalizedTermMap = createCode2SynMap(false);
-
 		code2WordSeqMap = new HashMap();
 
         Iterator it = code2NormalizedTermMap.keySet().iterator();
@@ -267,29 +276,7 @@ public class KeywordMatching {
 	}
 
 	public static Vector readFile(String datafile) {
-		Vector v = new Vector();
-        try {
-			File file = new File(datafile);
-			FileInputStream fis = new FileInputStream(file);
-			BufferedInputStream bis = new BufferedInputStream(fis);
-			BufferedReader br = null;
-			try {
-				br = new BufferedReader(new InputStreamReader(bis));
-			} catch (Exception ex) {
-				return null;
-			}
-
-            while (true) {
-                String line = br.readLine();
-				if (line == null) {
-					break;
-				}
-				v.add(line);
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return v;
+		return Utils.readFile(datafile);
 	}
 
 	public static HashSet vector2HashSet(Vector v) {
@@ -634,24 +621,24 @@ public class KeywordMatching {
 	public static HashMap createCode2SynMap(boolean stem) {
 		HashMap hmap = new HashMap();
 		for (int i=0; i<TERMDATA.size(); i++) {
+//C151913|P90|DDX41 Gene|P383$DN|P384$CTRP
 			String line = (String) TERMDATA.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String code = (String) u.elementAt(1);
-			String label = (String) u.elementAt(0);
-			String syn = (String) u.elementAt(3);
-			Vector w = new Vector();
-			if (hmap.containsKey(code)) {
-				w = (Vector) hmap.get(code);
-			} else {
-				w.add(label);
-			}
+			String propCode = (String) (String) u.elementAt(1);
+			if (propCode.compareTo("P90") == 0) {
+				String code = (String) u.elementAt(0);
+				String syn = (String) u.elementAt(2);
 
-			syn = normalize(syn, stem);
-			if (!w.contains(syn)) {
-				w.add(syn);
+				Vector w = new Vector();
+				if (hmap.containsKey(code)) {
+					w = (Vector) hmap.get(code);
+				}
+				syn = normalize(syn, stem);
+				if (!w.contains(syn)) {
+					w.add(syn);
+				}
+				hmap.put(code, w);
 			}
-
-			hmap.put(code, w);
 		}
 		return hmap;
 	}
@@ -661,30 +648,36 @@ public class KeywordMatching {
 		for (int i=0; i<TERMDATA.size(); i++) {
 			String line = (String) TERMDATA.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String code = (String) u.elementAt(1);
-			String label = (String) u.elementAt(0);
-			String syn = (String) u.elementAt(3);
-			Vector w = new Vector();
-			if (hmap.containsKey(code)) {
-				w = (Vector) hmap.get(code);
-			} else {
-				w.add(label);
-			}
-    		if (!w.contains(syn)) {
-				w.add(syn);
-			}
-			hmap.put(code, w);
+			String propCode = (String) (String) u.elementAt(1);
+			if (propCode.compareTo("P90") == 0) {
+				String code = (String) u.elementAt(0);
+				String syn = (String) u.elementAt(2);
+
+				Vector w = new Vector();
+				if (hmap.containsKey(code)) {
+					w = (Vector) hmap.get(code);
+				}
+				if (!w.contains(syn)) {
+					w.add(syn);
+				}
+				hmap.put(code, w);
+		    }
 		}
 		return hmap;
 	}
 
+////1 to 6 Agreement Rating Scale Score|C221053|Agreement Rating Score 6|C148631
     public static HashMap createCode2LabelMap() {
+		Vector v = Utils.readFile(PARENT_CHILD_FILE);
 		HashMap hmap = new HashMap();
-		for (int i=0; i<TERMDATA.size(); i++) {
-			String line = (String) TERMDATA.elementAt(i);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			String code = (String) u.elementAt(1);
 			String label = (String) u.elementAt(0);
+			hmap.put(code, label);
+			code = (String) u.elementAt(3);
+			label = (String) u.elementAt(2);
 			hmap.put(code, label);
 		}
 		return hmap;
@@ -695,7 +688,7 @@ public class KeywordMatching {
         for (int i=0; i<TERMDATA.size(); i++) {
 			String line = (String) TERMDATA.elementAt(i);
 			Vector values = StringUtils.parseData(line, '|');
-			String term = (String) values.elementAt(3);
+			String term = (String) values.elementAt(2);
 			Vector w = tokenize(term);
 			for (int j=0; j<w.size(); j++) {
 				String word = (String) w.elementAt(j);
@@ -704,7 +697,7 @@ public class KeywordMatching {
 				}
 			}
 		}
-		System.out.println("Number of keywords: " + hset.size());
+		//System.out.println("Number of keywords: " + hset.size());
 		return hset;
 	}
 

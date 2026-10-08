@@ -7,7 +7,8 @@ import java.net.*;
 import org.apache.commons.lang3.*;
 
 public class TooltipExample {
-    static String NCIT_OWL = ConfigurationController.owlfile;
+	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
+
 	static HashMap code2LabelMap = new HashMap();
     static Vector annotationProperties = null;
     static Vector objectProperties = null;
@@ -27,6 +28,10 @@ public class TooltipExample {
 		code2LabelMap = createCode2LabelMap();
 		System.out.println("code2LabelMap: " + code2LabelMap.keySet().size());
         LE = new LogicalExpression(serviceUrl, named_graph, username, password);
+	}
+
+	public TooltipExample() {
+
 	}
 
     public String run(String named_graph, String code, boolean debug) {

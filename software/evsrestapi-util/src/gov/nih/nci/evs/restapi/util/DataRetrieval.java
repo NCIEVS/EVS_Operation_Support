@@ -51,6 +51,10 @@ public class DataRetrieval {
 		return w;
 	}
 
+	public DataRetrieval() {
+
+	}
+
     public DataRetrieval(String owlfile, Vector dataVec) {
 		this.owlfile = owlfile;
 		this.dataVec = dataVec;

@@ -10,22 +10,22 @@ class LEAnalyzer {
 	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
 
-    String textfile = null;
-	OWLClassLoader loader = null;
-	HierarchyHelper hh = null;
-	String code = null;
-	String label = null;
-	Vector raw_data_vec = null;
-	Vector classData = null;
-	HashMap roleCode2RoleNameMap = null;
-	HashMap objectPropertyCode2LabelMap = null;
-	HashMap roleName2RangeNameMap = null;
-	Vector rangeNames = null;
-	Vector equivalentClasses = null;
+    public String textfile = null;
+	public OWLClassLoader loader = null;
+	public HierarchyHelper hh = null;
+	public String code = null;
+	public String label = null;
+	public Vector raw_data_vec = null;
+	public Vector classData = null;
+	public HashMap roleCode2RoleNameMap = null;
+	public HashMap objectPropertyCode2LabelMap = null;
+	public HashMap roleName2RangeNameMap = null;
+	public Vector rangeNames = null;
+	public Vector equivalentClasses = null;
 
-	static String PATH_FILE = "paths.txt";
+	public static String PATH_FILE = "paths.txt";
 
-	LEQA leqa = null;
+	public LEQA leqa = null;
 
 	public LEAnalyzer() {
 		initialize();

@@ -302,15 +302,6 @@ public class ConceptDetailsUtils {
         if (named_graph.compareTo("null") == 0) named_graph = null;
 		if (username.compareTo("null") == 0) username = null;
 		if (password.compareTo("null") == 0) password = null;
-/*
-		ConceptDetailsUtils cdu = new ConceptDetailsUtils(username, password);
-		String codingScheme = "NCI_Thesaurus";
-		Vector v = cdu.searchAvailableServiceUrl(codingScheme, version);
-		Utils.dumpVector("Service URLs supporting " + version, v);
-		cdu.getConceptDetails(codingScheme, version, concept_code);
-*/
-//      public void getConceptDetails(String serviceUrl, String named_graph, String username, String password, String concept_code) {
-
 		new ConceptDetailsUtils().getConceptDetails(serviceUrl, named_graph, username, password, concept_code);
 	}
 }

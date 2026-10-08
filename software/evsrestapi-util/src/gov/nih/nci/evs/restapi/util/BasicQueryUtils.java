@@ -73,6 +73,10 @@ public class BasicQueryUtils {
     String password = null;
     OWLSPARQLUtils owlSPARQLUtils = null;
 
+    public BasicQueryUtils() {
+
+	}
+
     public BasicQueryUtils(String serviceUrl, String named_graph, String username, String password) {
 		this.serviceUrl = serviceUrl;
     	this.named_graph = named_graph;

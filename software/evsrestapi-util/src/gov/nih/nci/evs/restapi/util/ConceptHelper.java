@@ -74,6 +74,10 @@ public class ConceptHelper {
 	String password = null;
 	OWLSPARQLUtils owlSPARQLUtils = null;
 
+	public ConceptHelper() {
+
+	}
+
     public ConceptHelper(String serviceUrl,
                           String namedGraph,
                           String username,

@@ -21,6 +21,10 @@ public class EmbeddedExcelPageGenerator {
 	String code = null;
 	boolean cdisc = false;
 
+	public EmbeddedExcelPageGenerator() {
+
+	}
+
 	public EmbeddedExcelPageGenerator(String valueSetName, String valueSetDescription) {
 		this.valueSetName = valueSetName;
 		this.valueSetDescription = valueSetDescription;

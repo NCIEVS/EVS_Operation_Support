@@ -20,10 +20,10 @@ public class EnumerationQA {
 
 	public void initialize() {
 		enumerationMap = path2SPARQL.getEnumerationMap(named_graph);
-		Utils.dumpHashMap("enumerationMap", enumerationMap);
+		//Utils.dumpHashMap("enumerationMap", enumerationMap);
 
 		propCode2EnumerationMap = path2SPARQL.creatPropCode2EnumerationMap();
-		Utils.dumpHashMap("propCode2EnumerationMap", propCode2EnumerationMap);
+		//Utils.dumpHashMap("propCode2EnumerationMap", propCode2EnumerationMap);
 	}
 
 	public Vector submitQuery(String query) {
@@ -89,14 +89,14 @@ public class EnumerationQA {
 		String enumeration = (String) propCode2EnumerationMap.get(propCode);
 		String propLabel = enumeration.replace("-enum", "");
 		Vector w1 = getEnumerationElements(named_graph, propCode);
-		Utils.dumpVector("(1) " + propLabel, w1);
+		//Utils.dumpVector("(1) " + propLabel, w1);
 
 		Vector w2 = submitQuery(construct_get_anno_prop_value_query(named_graph, propCode));
 		if (w2 == null) {
 			w2 = submitQuery(construct_get_anno_prop_qual_value_query(named_graph, propCode));
 		}
 
-		Utils.dumpVector("(2) " + propLabel, w2);
+		//Utils.dumpVector("(2) " + propLabel, w2);
 
 		if (w2 != null && w2.size() > 0) {
 			HashSet hset = Utils.vector2HashSet(w1);

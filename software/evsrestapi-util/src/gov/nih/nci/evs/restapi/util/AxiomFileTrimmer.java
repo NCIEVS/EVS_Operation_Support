@@ -55,8 +55,8 @@ public class AxiomFileTrimmer {
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, "|");
-			String code = (String) u.elementAt(1);
-			String prop_code = (String) u.elementAt(2);
+			String code = (String) u.elementAt(0);
+			String prop_code = (String) u.elementAt(1);
 			if (hset.contains(code) && prop_code.compareTo(propcode) == 0) {
 				w.add(line);
 			}

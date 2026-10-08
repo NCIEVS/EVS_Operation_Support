@@ -97,31 +97,22 @@ public class ExactMatchByTerm {
         SUBSET_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.subsetfile;
         PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
 
-		System.out.println(AXIOM_FILE);
-		File file = new File(AXIOM_FILE);
+    	File file = new File(AXIOM_FILE);
 		if (!file.exists()) {
-			System.out.println("WARNING: " + AXIOM_FILE + " does not exist.");
+			//System.out.println("WARNING: " + AXIOM_FILE + " does not exist.");
 			System.exit(0);
 		} else {
-			System.out.println("INFO: " + AXIOM_FILE + " exists.");
+			//System.out.println("INFO: " + AXIOM_FILE + " exists.");
 		}
-
 		sourceCode2LineMap = createSourceCode2LineMap();
 
 		retiredConcepts = createRetiredConceptSet();
-		System.out.println("retired concepts: " + retiredConcepts.size());
-
+		//System.out.println("retired concepts: " + retiredConcepts.size());
 		termfile = ConfigurationController.termfile;
-		file = new File(termfile);
-		if (!file.exists()) {
-			System.out.println("INFO: term file does not exists, use AXIOM_FILE as default");
+		if (termfile == null) {
 			termfile = AXIOM_FILE;
-		} else {
-			System.out.println("INFO: " + termfile + " exists.");
-			System.out.println(termfile);
 		}
 		term2CodesMap = createTerm2CodesMap(termfile);
-
 		SYNONYM_EXT = ConfigurationController.synonymExt;
 		if (SYNONYM_EXT != null && SYNONYM_EXT.length() > 0) {
 			file = new File(SYNONYM_EXT);
@@ -129,18 +120,18 @@ public class ExactMatchByTerm {
 				expandTerm2CodesMap(SYNONYM_EXT);
 			}
 		}
-
 		NCIPTMap = createNCIPTMap();
-		System.out.println("NCIPTMap: " + NCIPTMap.keySet().size());
-
+		//System.out.println("NCIPTMap: " + NCIPTMap.keySet().size());
 		NCISYMap = createNCISYMap();
-		System.out.println("NCISYMap: " + NCISYMap.keySet().size());
-
+		//System.out.println("NCISYMap: " + NCISYMap.keySet().size());
 		code2FULLSYNMap = createCode2FULLSYNMap();
-		System.out.println("code2FULLSYNMap: " + code2FULLSYNMap.keySet().size());
-
+		//System.out.println("code2FULLSYNMap: " + code2FULLSYNMap.keySet().size());
         branch = new HashSet();
         Vector codes = null;
+	}
+
+	public ExactMatchByTerm() {
+
 	}
 
 	public ExactMatchByTerm(String serviceUrl, String named_graph, String username, String password) {
@@ -156,13 +147,13 @@ public class ExactMatchByTerm {
 
 	public static Vector extractBranchCodes(String root) {
 		String HIER_FILE = ConfigurationController.reportGenerationDirectory + File.separator + HIER_FILE_NAME;
-		System.out.println(HIER_FILE);
+		//System.out.println(HIER_FILE);
 		File file = new File(HIER_FILE);
 		if (!file.exists()) {
-			System.out.println("WARNING: " + HIER_FILE + " does not exist.");
+			//System.out.println("WARNING: " + HIER_FILE + " does not exist.");
 			System.exit(0);
 		} else {
-			System.out.println("INFO: " + HIER_FILE + " exists.");
+			//System.out.println("INFO: " + HIER_FILE + " exists.");
 		}
 		Vector v = Utils.readFile(HIER_FILE);
 		HierarchyHelper hh = new HierarchyHelper(v);
@@ -172,13 +163,13 @@ public class ExactMatchByTerm {
 
 	public static HashMap createSourceCode2LineMap() {
 		String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + AXIOM_FILE_NAME;
-		System.out.println(AXIOM_FILE);
+		//System.out.println(AXIOM_FILE);
 		File file = new File(AXIOM_FILE);
 		if (!file.exists()) {
-			System.out.println("WARNING: " + AXIOM_FILE + " does not exist.");
+			//System.out.println("WARNING: " + AXIOM_FILE + " does not exist.");
 			System.exit(0);
 		} else {
-			System.out.println("INFO: " + AXIOM_FILE + " exists.");
+			//System.out.println("INFO: " + AXIOM_FILE + " exists.");
 		}
 		Vector v = Utils.readFile(AXIOM_FILE);
 		HashMap hmap = new HashMap();
@@ -214,13 +205,13 @@ public class ExactMatchByTerm {
 		long ms = System.currentTimeMillis();
 		String reportGenerationDirectory = ConfigurationController.reportGenerationDirectory;
 		String owlfile = reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
-		System.out.println(owlfile);
+		//System.out.println(owlfile);
 		OWLScanner scanner = new OWLScanner(owlfile);
 		Vector w = scanner.extractProperties(scanner.get_owl_vec(), prop_code);
 		String outputfile = prop_code + ".txt";
 		Utils.saveToFile(outputfile, w);
-		System.out.println(outputfile + " generated.");
-		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		//System.out.println(outputfile + " generated.");
+		//System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
     public static HashSet createRetiredConceptSet() {
@@ -252,6 +243,14 @@ public class ExactMatchByTerm {
 		return createSourcePTMap("HemOnc");
 	}
 
+/*
+			//C179412|P97|A worker who cannot feasibly work from home.|P378$NCI
+			if (u.contains("P383$PT") && u.contains("P384$" + source) ) {
+				lcv++;
+				hmap.put((String) u.elementAt(0), (String) u.elementAt(2));
+			}
+*/
+
     public static HashMap createSourcePTMap(String source) {
 		HashMap hmap = new HashMap();
 		Vector v = Utils.readFile(AXIOM_FILE);
@@ -260,7 +259,7 @@ public class ExactMatchByTerm {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			if (u.contains("P383$PT") && u.contains("P384$" + source) ) {
-				hmap.put((String) u.elementAt(1), (String) u.elementAt(3));
+				hmap.put((String) u.elementAt(0), (String) u.elementAt(2));
 			}
 		}
 		return hmap;
@@ -278,12 +277,12 @@ public class ExactMatchByTerm {
 			if (type.compareTo("P90") == 0) {
 				if (u.contains("P383$SY") && u.contains("P384$" + source) ) {
 					w = new Vector();
-					String key = (String) u.elementAt(1);
+					String key = (String) u.elementAt(0);
 
 					if (hmap.containsKey(key)) {
 						w = (Vector) hmap.get(key);
 					}
-					String sy = (String) u.elementAt(3);
+					String sy = (String) u.elementAt(2);
 					sy = HTMLDecoder.decode(sy);
 					if (!w.contains(sy)) {
 						w.add(sy);
@@ -312,7 +311,7 @@ public class ExactMatchByTerm {
 							String sourceCode = (String) u2.elementAt(1);
 							Vector w1 = new Vector();
 							if (sourceCode2NCItCodesMap.containsKey(sourceCode)) {
-								System.out.println("INFO: multiple sourceCode to NCItCode mapping encountered. " + sourceCode);
+								//System.out.println("INFO: multiple sourceCode to NCItCode mapping encountered. " + sourceCode);
 								w1 = (Vector) sourceCode2NCItCodesMap.get(sourceCode);
 							}
 							String ncitCode = (String) u.elementAt(1);
@@ -341,13 +340,16 @@ public class ExactMatchByTerm {
 		if (filename == null) {
 			filename = AXIOM_FILE;
 		}
+
+//C112109|P90|Prostaglandin E Synthase wt Allele|P383$SY|P384$NCI
+
 		Vector v = Utils.readFile(filename);
         for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String prop_code = (String) u.elementAt(2);
+			String prop_code = (String) u.elementAt(1);
 			if (prop_code.compareTo("P90") == 0) {
-				String term = (String) u.elementAt(3);
+				String term = (String) u.elementAt(2);
 				term = HTMLDecoder.decode(term);
 				String term_lc = term.toLowerCase();
 				if (!caseSensitive) {
@@ -358,7 +360,7 @@ public class ExactMatchByTerm {
 				if (hmap.containsKey(term)) {
 					w = (Vector) hmap.get(term);
 				}
-				String code = (String) u.elementAt(1);
+				String code = (String) u.elementAt(0);
 				if (!w.contains(code)) {
 					w.add(code);
 				}
@@ -375,14 +377,14 @@ public class ExactMatchByTerm {
         for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String code = (String) u.elementAt(1);
-			String prop_code = (String) u.elementAt(2);
+			String code = (String) u.elementAt(0);
+			String prop_code = (String) u.elementAt(1);
 			if (prop_code.compareTo("P90") == 0) {
 				Vector w = new Vector();
 				if (hmap.containsKey(code)) {
 					w = (Vector) hmap.get(code);
 				}
-				String term = (String) u.elementAt(3);
+				String term = (String) u.elementAt(2);
 				term = HTMLDecoder.decode(term);
 				if (!w.contains(term)) {
 					w.add(term);
@@ -586,7 +588,7 @@ public class ExactMatchByTerm {
 		Utils.saveToFile(outputfile, w);
 		Utils.saveToFile("no_matches_" + outputfile, no_matches);
 		Utils.saveToFile("matches_" + outputfile, matches);
-		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		//System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 		System.out.println(outputfile + " generated.");
 
         if (generateXLS) {
@@ -685,10 +687,10 @@ public class ExactMatchByTerm {
 		Utils.saveToFile(outputfile, w);
 		Utils.saveToFile("no_matches_" + outputfile, no_matches);
 		Utils.saveToFile("matches_" + outputfile, matches);
-		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		//System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 		System.out.println(outputfile + " generated.");
 
-		System.out.println("matched codes: " + knt);
+		//System.out.println("matched codes: " + knt);
 		return outputfile;
 	}
 
@@ -743,7 +745,7 @@ public class ExactMatchByTerm {
 		}
 		String outputfile = "results_" + datafile;
 		Utils.saveToFile(outputfile, w0);
-		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		//System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 		System.out.println(outputfile + " generated.");
 		System.out.println("matched property values: " + knt);
 		return outputfile;
@@ -911,7 +913,7 @@ public class ExactMatchByTerm {
 					}
 				}
 				Utils.saveToFile(propertyFile, w);
-				System.out.println("Updated property file " + propertyFile + ".");
+				//System.out.println("Updated property file " + propertyFile + ".");
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -966,7 +968,7 @@ public class ExactMatchByTerm {
 
 		String outputfile = "results_" + datafile;
 		ExactMatchByTerm.run(datafile, outputfile, 0, true);
-		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		//System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 
@@ -981,7 +983,7 @@ public class ExactMatchByTerm {
 	    String target = args[0];
 	    Vector v = test.getExactMatches(namedGraph, target);
 	    Utils.dumpVector(target, v);
-	    System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	    //System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 }

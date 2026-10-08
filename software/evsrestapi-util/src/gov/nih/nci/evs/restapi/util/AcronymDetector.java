@@ -84,19 +84,21 @@ public class AcronymDetector {
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String label = (String) u.elementAt(0);
-			String code = (String) u.elementAt(1);
-			String prop_code = (String) u.elementAt(2);
+			//String label = (String) u.elementAt(0);
+			String code = (String) u.elementAt(0);
+			String prop_code = (String) u.elementAt(1);
 			if (prop_code.compareTo("P90") == 0) {
 				Vector w = new Vector();
 				if (hmap.containsKey(code)) {
 					w = (Vector) hmap.get(code);
 				}
+				/*
 				if (!w.contains(label)) {
 					w.add(label);
 				}
+				*/
 				hmap.put(code, w);
-				String term = (String) u.elementAt(3);
+				String term = (String) u.elementAt(2);
 				if (!w.contains(term)) {
 					w.add(term);
 				}
@@ -214,10 +216,10 @@ public class AcronymDetector {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			String label = (String) u.elementAt(0);
-			String code = (String) u.elementAt(1);
-			String prop_code = (String) u.elementAt(2);
+			String code = (String) u.elementAt(0);
+			String prop_code = (String) u.elementAt(1);
 			if (prop_code.compareTo("P90") == 0) {
-				String term = (String) u.elementAt(3);
+				String term = (String) u.elementAt(2);
 				String term_uc = term.toUpperCase();
 				if (term.compareTo(term_uc) != 0) {
 					Vector u2 = StringUtils.parseData(term, ' ');

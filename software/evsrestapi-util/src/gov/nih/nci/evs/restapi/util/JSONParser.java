@@ -61,7 +61,7 @@ import org.json.JSONObject;
  */
 public class JSONParser {
 
-    private JSONParser() { }
+    public JSONParser() { }
 
 	public static Map<String, Object> parse(String json) {
 		Map<String, Object> map = new HashMap<String, Object>();

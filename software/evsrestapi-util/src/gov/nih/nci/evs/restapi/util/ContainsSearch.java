@@ -100,25 +100,23 @@ public class ContainsSearch {
 		File file = new File(AXIOM_FILE);
 		definitionMap = new HashMap();
 		if (!file.exists()) {
-			System.out.println("WARNING: " + AXIOM_FILE + " does not exist.");
+			//System.out.println("WARNING: " + AXIOM_FILE + " does not exist.");
 			System.exit(0);
 		} else {
-			System.out.println("INFO: " + AXIOM_FILE + " exists.");
+			//System.out.println("INFO: " + AXIOM_FILE + " exists.");
 			createDefinitionMap();
 		}
 	}
-
-
 
     public static void createDefinitionMap() {
 		Vector v = Utils.readFile(AXIOM_FILE);
 		for (int i=0; i<v.size(); i++) {
 			String t = (String) v.elementAt(i);
 			Vector u = parseData(t, '|');
-			String code = (String) u.elementAt(1);
-			String prop_code = (String) u.elementAt(2);
+			String code = (String) u.elementAt(0);
+			String prop_code = (String) u.elementAt(1);
 			if (prop_code.compareTo("P97") == 0) {
-				String def = (String) u.elementAt(3);
+				String def = (String) u.elementAt(2);
 				definitionMap.put(code, def);
 			}
 		}
@@ -172,7 +170,6 @@ public class ContainsSearch {
 		SYNONYMOUS_PHRASE_MAP = new HashMap();
 
 		if (SYNONYM_VEC.size() > 0) {
-
 			for (int i=0; i<SYNONYM_VEC.size(); i++) {
 				String wd_pair = (String) SYNONYM_VEC.elementAt(i);
 				wd_pair = wd_pair.toLowerCase();
@@ -247,7 +244,7 @@ public class ContainsSearch {
 				}
 			}
 		}
-		System.out.println("Initialization of ContainsSearch completed.");
+		//System.out.println("Initialization of ContainsSearch completed.");
 	}
 
     public static Vector removeFillers(Vector v) {
@@ -266,8 +263,9 @@ public class ContainsSearch {
 		if (!exists) {
 			System.out.println("WARNING: file " + SYNONYM_FILE + " does not exists.");
 			SYNONYM_VEC = new Vector();
+		} else {
+        	SYNONYM_VEC = Utils.readFile(SYNONYM_FILE);
 		}
-        SYNONYM_VEC = Utils.readFile(SYNONYM_FILE);
 	}
 
 	public static boolean isFiller(String wd) {
@@ -1325,7 +1323,7 @@ Row	NCIt code	NCIt DEFINITION	NCCN Regimen Name	NCCN Disease Name
 		def = addSynonymousPhrases(def0);
 		Vector def_vec = tokenize(def, false);
 		def_vec = addSynonyms(def_vec);
-		Utils.dumpVector(def, def_vec);
+		//Utils.dumpVector(def, def_vec);
 
 		for (int i3=0; i3<dis_vec.size(); i3++) {
 			String word = (String) dis_vec.elementAt(i3);
@@ -1421,7 +1419,7 @@ Row	NCIt code	NCIt DEFINITION	NCCN Regimen Name	NCCN Disease Name
 	    ContainsSearch cs = new ContainsSearch(serviceUrl, namedGraph, username, password);
 	    Vector v = cs.getContains(namedGraph, target);
 	    Utils.saveToFile(outputfile, v);
-	    System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+	    //System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 	public static void main1(String[] args) {

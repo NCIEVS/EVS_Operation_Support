@@ -75,27 +75,30 @@ public class AxiomRetrieval {
 		long ms = System.currentTimeMillis();
 		OWLScanner owlScanner = new OWLScanner(NCIT_OWL);
 		retiredConcepts = owlScanner.createRetiredConceptSet();
-		System.out.println("retiredConcepts: " + retiredConcepts.size());
 		propertyMap = owlScanner.getPropertyMap(owlScanner.get_owl_vec());
-		//A8Map = (HashMap) propertyMap.get("A8");
-		System.out.println("propertyMap: " + propertyMap.keySet().size());
-        File f = new File(REQUIRED_DATA_FILE);
-        if (f.exists()) {
-			req_data_vec = Utils.readFile(REQUIRED_DATA_FILE);
-			axiomMap = getAxiomMap(req_data_vec);
+        if (REQUIRED_DATA_FILE != null) {
+			File f = new File(REQUIRED_DATA_FILE);
+			if (f.exists()) {
+				req_data_vec = Utils.readFile(REQUIRED_DATA_FILE);
+				axiomMap = getAxiomMap(req_data_vec);
+			} else {
+				axiomMap = getAxiomMap();
+			}
 		} else {
-			System.out.println(REQUIRED_DATA_FILE + " does not exist.");
 			axiomMap = getAxiomMap();
 		}
-		System.out.println("axiomMap: " + axiomMap.keySet().size());
-		System.out.println("Total initialization time (ms): " + (System.currentTimeMillis() - ms));
+		//System.out.println("Total initialization time (ms): " + (System.currentTimeMillis() - ms));
+	}
+
+	public AxiomRetrieval() {
+
 	}
 
 	public static HashSet getRetiredConcepts() {
 		if (retiredConcepts != null) return retiredConcepts;
 		OWLScanner owlScanner = new OWLScanner(NCIT_OWL);
 		HashSet retiredConcepts = owlScanner.createRetiredConceptSet();
-		System.out.println("retiredConcepts: " + retiredConcepts.size());
+		//System.out.println("retiredConcepts: " + retiredConcepts.size());
 		return retiredConcepts;
 	}
 
@@ -103,7 +106,7 @@ public class AxiomRetrieval {
 		if (propertyMap != null) return propertyMap;
 		OWLScanner owlScanner = new OWLScanner(NCIT_OWL);
 		HashMap propertyMap = owlScanner.getPropertyMap(owlScanner.get_owl_vec());
-        System.out.println("propertyMap: " + propertyMap.keySet().size());
+        //System.out.println("propertyMap: " + propertyMap.keySet().size());
 		return propertyMap;
 	}
 
@@ -114,8 +117,8 @@ public class AxiomRetrieval {
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String code = (String) u.elementAt(1);
-			String propCode = (String) u.elementAt(2);
+			String code = (String) u.elementAt(0);
+			String propCode = (String) u.elementAt(1);
 
 			if (propCode.compareTo("P90") == 0) {
 				line = HTMLDecoder.decode(line);
@@ -203,8 +206,8 @@ public class AxiomRetrieval {
 			for (int i=0; i<v.size(); i++) {
 				String line = (String) v.elementAt(i);
 				Vector u = StringUtils.parseData(line, '|');
-				String code = (String) u.elementAt(1);
-				String prop_code = (String) u.elementAt(2);
+				String code = (String) u.elementAt(0);
+				String prop_code = (String) u.elementAt(1);
 				if (prop_code.compareTo(propCode) == 0) {
 					boolean matched = true;
 					if (u0.size() > 1) {

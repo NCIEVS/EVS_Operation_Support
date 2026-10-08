@@ -206,8 +206,8 @@ public class ContainsSearchByTerm {
 			}
 		}
 
-		Utils.dumpMultiValuedHashMap("SYNONYM_MAP", SYNONYM_MAP);
-		System.out.println("Initialization of ContainsSearch completed.");
+		//Utils.dumpMultiValuedHashMap("SYNONYM_MAP", SYNONYM_MAP);
+		//System.out.println("Initialization of ContainsSearch completed.");
 
 	}
 

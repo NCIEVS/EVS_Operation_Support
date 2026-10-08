@@ -71,6 +71,10 @@ public class ExactMatch {
     String termfile = null;
     HashSet retiredConcepts = new HashSet();
 
+    public ExactMatch() {
+
+	}
+
     public ExactMatch(String termfile) {
 		this.termfile = termfile;
 		initialize();
@@ -105,15 +109,16 @@ public class ExactMatch {
 		return (Vector) term2CodesMap.get(term);
 	}
 
+//C171435|P90|Specimen Anatomic Location|P383$SY|P384$NCI
     public HashMap createTerm2CodesMap() {
 		HashMap hmap = new HashMap();
 		Vector v = Utils.readFile(termfile);
         for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String prop_code = (String) u.elementAt(2);
+			String prop_code = (String) u.elementAt(1);
 			if (prop_code.compareTo("P90") == 0) {
-				String term = (String) u.elementAt(3);
+				String term = (String) u.elementAt(2);
 				term = HTMLDecoder.decode(term);
 				String term_lc = term.toLowerCase();
 				if (!caseSensitive) {
@@ -124,7 +129,7 @@ public class ExactMatch {
 				if (hmap.containsKey(term)) {
 					w = (Vector) hmap.get(term);
 				}
-				String code = (String) u.elementAt(1);
+				String code = (String) u.elementAt(0);
 				if (!w.contains(code)) {
 					w.add(code);
 				}

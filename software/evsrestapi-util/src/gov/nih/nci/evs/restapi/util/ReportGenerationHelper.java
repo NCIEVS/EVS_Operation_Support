@@ -82,7 +82,11 @@ public class ReportGenerationHelper {
     String username = null;
     String password = null;
     OWLSPARQLUtils owlSPARQLUtils = null;
-    AxiomUtils axiomUtils = null; //(String serviceUrl, String username, String password)
+    AxiomUtils axiomUtils = null;
+
+    public ReportGenerationHelper() {
+
+	}
 
     public ReportGenerationHelper(String serviceUrl, String named_graph, String username, String password) {
 		this.serviceUrl = serviceUrl;

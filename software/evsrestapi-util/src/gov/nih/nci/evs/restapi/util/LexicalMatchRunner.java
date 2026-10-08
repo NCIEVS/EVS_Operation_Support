@@ -76,12 +76,18 @@ public class LexicalMatchRunner {
     static String STOPWORD_FILE = "stop_words.txt";
     static boolean APPLY_STEMMING = true;
     static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
+    static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
+
+
     static HashSet retiredConcepts = new HashSet();
     static HashSet treedata = new HashSet();
+    static HierarchyHelper hh = null;
 
     //C100067|P310|Retired_Concept
     static HashSet createRetiredConceptHashSet() {
 		long ms = System.currentTimeMillis();
+		hh = new HierarchyHelper(Utils.readFile(PARENT_CHILD_FILE));
+
 		HashSet retiredConcepts = new HashSet();
 		String owlfile = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile;
 		OWLScanner scanner = new OWLScanner(owlfile);
@@ -135,8 +141,8 @@ public class LexicalMatchRunner {
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String label = (String) u.elementAt(0);
-			String code = (String) u.elementAt(1);
+			//String label = (String) u.elementAt(0);
+			String code = (String) u.elementAt(0);
 			String term = (String) u.elementAt(2);
 			Vector w = new Vector();
 			if (hmap.containsKey(code)) {
@@ -221,10 +227,11 @@ public class LexicalMatchRunner {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			//Recombinant Amphiregulin|C1000|P90|Recombinant Amphiregulin|P383$PT|P384$NCI
-            String label = (String) u.elementAt(0);
-			String code = (String) u.elementAt(1);
-			String prop_code = (String) u.elementAt(2);
-			String term = (String) u.elementAt(3);
+            //String label = (String) u.elementAt(0);
+			String code = (String) u.elementAt(0);
+			String label = hh.getLabel(code);
+			String prop_code = (String) u.elementAt(1);
+			String term = (String) u.elementAt(2);
 
 			if (prop_code.compareTo("P90") == 0) {
 				String term_lc = term.toLowerCase();
@@ -263,10 +270,10 @@ public class LexicalMatchRunner {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			String term = (String) u.elementAt(2);
-			String code = (String) u.elementAt(1);
+			String code = (String) u.elementAt(0);
 
 			if (!isRetired(code)) {
-				String label = (String) u.elementAt(0);
+				//String label = (String) u.elementAt(0);
 				String signature = getSignature(term);
 				Vector w = new Vector();
 				if (hmap.containsKey(signature)) {
@@ -277,6 +284,7 @@ public class LexicalMatchRunner {
 				}
 				hmap.put(signature, w);
 
+				String label = hh.getLabel(code);
 				w = new Vector();
 				signature = getSignature(label);
 				if (hmap.containsKey(signature)) {

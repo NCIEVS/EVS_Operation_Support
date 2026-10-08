@@ -72,6 +72,10 @@ public class JQueryHTMLTreeGenerator {
 	String fontColor = "red";
 	HashSet nodeSet = null;
 
+	public JQueryHTMLTreeGenerator() {
+
+	}
+
 	public JQueryHTMLTreeGenerator(Vector parent_child_vec) {
 		this.parent_child_vec = parent_child_vec;
 		hh = new HierarchyHelper(parent_child_vec);

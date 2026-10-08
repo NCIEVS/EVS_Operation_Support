@@ -63,6 +63,9 @@ public class IndexerClient {
     private IndexUtils indexUtils = null;
 	private int THRESHOLD = 100;
 
+	public IndexerClient() {
+	}
+
 	public IndexerClient(String serviceUrl, String namedGraph, String username, String password) {
 		this.serviceUrl = serviceUrl;
 		this.namedGraph = namedGraph;

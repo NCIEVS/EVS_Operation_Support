@@ -80,7 +80,7 @@ public class AcronymAnalyzer {
 				if (hmap.containsKey(label)) {
 					w = (Vector) hmap.get(label);
 				}
-				String code = (String) u.elementAt(1);
+				String code = (String) u.elementAt(0);
 				if (!w.contains(code)) {
 					w.add(code);
 				}
@@ -90,7 +90,7 @@ public class AcronymAnalyzer {
 				if (hmap.containsKey(term)) {
 					w = (Vector) hmap.get(term);
 				}
-				code = (String) u.elementAt(1);
+
 				if (!w.contains(code)) {
 					w.add(code);
 				}
@@ -107,11 +107,11 @@ public class AcronymAnalyzer {
         for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String label = (String) u.elementAt(0);
-			String code = (String) u.elementAt(1);
-			String prop_code = (String) u.elementAt(2);
+			//String label = (String) u.elementAt(0);
+			String code = (String) u.elementAt(0);
+			String prop_code = (String) u.elementAt(1);
 			if (prop_code.compareTo("P90") == 0) {
-				String term = (String) u.elementAt(3);
+				String term = (String) u.elementAt(2);
 				term = HTMLDecoder.decode(term);
 				Vector w = new Vector();
 				if (hmap.containsKey(code)) {
@@ -121,7 +121,7 @@ public class AcronymAnalyzer {
 					w.add(term);
 				}
 				hmap.put(code, w);
-
+/*
 				label = HTMLDecoder.decode(label);
 				w = new Vector();
 				if (hmap.containsKey(code)) {
@@ -130,6 +130,7 @@ public class AcronymAnalyzer {
 				if (!w.contains(label)) {
 					w.add(label);
 				}
+*/
 				hmap.put(code, w);
 			}
 		}
@@ -142,38 +143,40 @@ public class AcronymAnalyzer {
         for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String label = (String) u.elementAt(0);
-			label = removeSpecialCharacters(label);
-			label = HTMLDecoder.decode(label);
+			//String label = (String) u.elementAt(0);
+			//label = removeSpecialCharacters(label);
+			//label = HTMLDecoder.decode(label);
 
-			String prop_code = (String) u.elementAt(2);
+			String prop_code = (String) u.elementAt(1);
 
 			if (prop_code.compareTo("P90") == 0) {
-				String term = (String) u.elementAt(3);
+				String term = (String) u.elementAt(2);
 				term = removeSpecialCharacters(term);
 				term = HTMLDecoder.decode(term);
 
 				String term_uc = term.toUpperCase();
-
+/*
 				String label_uc = label.toUpperCase();
 				Vector w = new Vector();
 				if (hmap.containsKey(label_uc)) {
 					w = (Vector) hmap.get(label_uc);
 				}
-				String code = (String) u.elementAt(1);
+*/
+                Vector w = new Vector();
+				String code = (String) u.elementAt(0);
 				if (!w.contains(code)) {
 					w.add(code);
 				}
-
+/*
 				hmap.put(label_uc, w);
-
+*/
 				term = term_uc;
 
 				w = new Vector();
 				if (hmap.containsKey(term)) {
 					w = (Vector) hmap.get(term);
 				}
-				code = (String) u.elementAt(1);
+				//code = (String) u.elementAt(0);
 				if (!w.contains(code)) {
 					w.add(code);
 				}

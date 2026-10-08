@@ -18,7 +18,7 @@ public class OWLData {
     public static String CONTRIBUTING_SOURCE_CODE = "P322";
     public static String TERM_SOURCE_CODE = "P384";
 
-    private final Integer conceptCount;
+    private Integer conceptCount = Integer.valueOf(0);
     private HashMap<String, Integer> conceptCountsPerKind = new HashMap<String, Integer>();
     public HashMap<String, Vector<String>> conceptsPerKind = new HashMap<String, Vector<String>>();
     public HashMap<String, Vector<String>> parentCodeMap = new HashMap<String, Vector<String>>();
@@ -49,6 +49,10 @@ public class OWLData {
 	HashMap code2PropertyCountMap = null;
 	HashMap code2AxiomMap = null;
 	HashSet retired_concepts = null;
+
+	public OWLData() {
+	}
+
 
 	public OWLData(String owlfile) {
 		this.owlfile = owlfile;

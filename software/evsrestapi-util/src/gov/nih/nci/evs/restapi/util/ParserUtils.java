@@ -410,24 +410,6 @@ public class ParserUtils {
 		return w;
 	}
 
-/*
-	public List getAdditionalProperties(Vector v) {
-		List additionalProperties = new ArrayList();
-		List commonProperties = Arrays.asList(Constants.COMMON_PROPERTIES);
-		if (v == null) return null;
-		int n = v.size()/2;
-		for (int i=0; i<n; i++) {
-			String y_label = getValue((String) v.elementAt(i*2));
-			String z_label = getValue((String) v.elementAt(i*2+1));
-			String z = getValue(z_label);
-			if (!commonProperties.contains(y_label)) {
-				Property property = new Property(y_label, z);
-				additionalProperties.add(property);
-			}
-		}
-		return additionalProperties;
-	}
-*/
 	public List getAdditionalProperties(Vector v) {
 		if (v == null) return null;
 		List additionalProperties = new ArrayList();
@@ -446,16 +428,6 @@ public class ParserUtils {
 		}
 		return additionalProperties;
 	}
-
-	/*
-	public Path(
-		int direction,
-		List concepts) {
-		this.direction = direction;
-		this.concepts = concepts;
-	}
-	*/
-
 
 	public Paths trimPaths(Paths paths, String code) {
 		if (paths == null) return null;

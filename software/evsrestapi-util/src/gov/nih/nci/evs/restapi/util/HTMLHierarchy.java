@@ -61,6 +61,10 @@ public class HTMLHierarchy {
 
     String datafile = null;
 
+    public HTMLHierarchy() {
+
+	}
+
     public HTMLHierarchy(String datafile) {
         this.datafile = datafile;
         initialize();

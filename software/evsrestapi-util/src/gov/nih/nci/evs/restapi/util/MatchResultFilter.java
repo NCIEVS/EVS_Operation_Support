@@ -277,14 +277,14 @@ public class MatchResultFilter {
         for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String code = (String) u.elementAt(1);
-			String prop_code = (String) u.elementAt(2);
+			String code = (String) u.elementAt(0);
+			String prop_code = (String) u.elementAt(1);
 			if (prop_code.compareTo("P90") == 0) {
 				Vector w = new Vector();
 				if (hmap.containsKey(code)) {
 					w = (Vector) hmap.get(code);
 				}
-				String term = (String) u.elementAt(3);
+				String term = (String) u.elementAt(2);
 				term = HTMLDecoder.decode(term);
 				if (!w.contains(term)) {
 					w.add(term);

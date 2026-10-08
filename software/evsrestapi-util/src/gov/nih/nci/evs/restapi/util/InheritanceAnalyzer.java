@@ -47,6 +47,10 @@ public class InheritanceAnalyzer {
         MATCH_PATTERN.put("CECICI", Integer.valueOf(2));
 	}
 
+	public InheritanceAnalyzer() {
+
+	}
+
 	public InheritanceAnalyzer(String owlfile) {
 		this.owlfile = owlfile;
 		initialize();

@@ -3302,22 +3302,23 @@ C4910|<NHC0>C4910</NHC0>
 
 	public HashMap getPropertyMap(Vector owl_vec) {
 		Vector v = extractAllProperties(owl_vec);
-		System.out.println("v: " + v.size());
-		Utils.saveToFile("properties.txt", v);
+		//Utils.saveToFile("properties.txt", v);
 
         HashMap hmap = new HashMap();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
+
 			String code = (String) u.elementAt(0);
 			String prop_label = (String) u.elementAt(1);
 			String value = (String) u.elementAt(2);
+
 			value = HTMLDecoder.decode(value);
 			HashMap map = new HashMap();
 			if (hmap.containsKey(prop_label)) {
 				map = (HashMap) hmap.get(prop_label);
 			}
-			Vector w = new Vector();
+			/*
 			if (prop_label.startsWith("P")) {
 				if (map.containsKey(code)) {
 					w = (Vector) map.get(code);
@@ -3335,6 +3336,15 @@ C4910|<NHC0>C4910</NHC0>
 				}
 				map.put(value, w);
 			}
+			*/
+            Vector w = new Vector();
+			if (map.containsKey(code)) {
+				w = (Vector) map.get(code);
+			}
+			if (!w.contains(value)) {
+				w.add(value);
+			}
+			map.put(code, w);
 			hmap.put(prop_label, map);
 		}
 		return hmap;

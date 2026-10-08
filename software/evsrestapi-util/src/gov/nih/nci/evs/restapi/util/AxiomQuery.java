@@ -87,6 +87,10 @@ public class AxiomQuery {
     String password = null;
     OWLSPARQLUtils owlSPARQLUtils = null;
 
+    public AxiomQuery() {
+
+	}
+
     public AxiomQuery(String serviceUrl, String named_graph, String username, String password) {
 		this.serviceUrl = serviceUrl;
     	this.named_graph = named_graph;

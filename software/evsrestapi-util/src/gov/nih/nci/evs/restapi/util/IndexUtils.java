@@ -80,16 +80,18 @@ public class IndexUtils {
 
     static {
 		long ms = System.currentTimeMillis();
-		System.out.println("Initializing IndexUtils ...");
+		//System.out.println("Initializing IndexUtils ...");
 		stemmer = new PorterStemmer();
 		STOP_WORDS = LexicalMatching.STOP_WORDS;
 		KEYWORDS = LexicalMatching.KEYWORDS;
 		signatureMap = LexicalMatching.signatureMap;
 		id2LabelMap = LexicalMatching.id2LabelMap;
+		/*
 		System.out.println("KEYWORDS: " + KEYWORDS.size());
 		System.out.println("STOP_WORDS: " + STOP_WORDS.size());
 		System.out.println("Completed initializing IndexUtils.");
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		*/
 	}
 
     public IndexUtils() {

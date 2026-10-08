@@ -1,5 +1,5 @@
 package gov.nih.nci.evs.restapi.util;
-
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.text.*;
 import java.net.*;
@@ -62,10 +62,11 @@ import opennlp.tools.stemmer.PorterStemmer;
  */
 
 public class AxiomExtractor {
-	 static PorterStemmer stemmer = null;
-	 static String AXIOM_FILE = "axiom_ThesaurusInferred_forTS.owl";
-	 static String STOPWORD_FILE = "stop_words.txt";
-     static HashSet STOP_WORDS = null;
+	static PorterStemmer stemmer = null;
+	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
+
+	static String STOPWORD_FILE = "stop_words.txt";
+    static HashSet STOP_WORDS = null;
     static {
    	   stemmer = new PorterStemmer();
    	   STOP_WORDS = createStopWordSet(STOPWORD_FILE);
@@ -167,13 +168,13 @@ public class AxiomExtractor {
 		 for (int i=0; i<w.size(); i++) {
 			 String line = (String) w.elementAt(i);
 			 Vector u = StringUtils.parseData(line, '|');
-			 String code = (String) u.elementAt(1);
+			 String code = (String) u.elementAt(0);
 			 if (hset.contains(code)) {
 				 //System.out.println(line);
 				 //System.out.println(code);
-				 String prop_code = (String) u.elementAt(2);
+				 String prop_code = (String) u.elementAt(1);
 				 if (prop_code.compareTo("P90") == 0) {
-					 String term = (String) u.elementAt(3);
+					 String term = (String) u.elementAt(2);
 					 term = HTMLDecoder.decode(term);
 					 System.out.println(term);
 					 Vector w1 = tokenize(term);

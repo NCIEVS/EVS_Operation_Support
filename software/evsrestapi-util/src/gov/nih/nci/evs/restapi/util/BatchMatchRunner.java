@@ -17,6 +17,10 @@ public class BatchMatchRunner {
 		createTermFile();
 	}
 
+	public BatchMatchRunner() {
+
+	}
+
     public BatchMatchRunner(String inputDir, String outputDir) {
 		this.inputDir = inputDir;
 		this.outputDir = outputDir;

@@ -16,6 +16,10 @@ public class BranchTrimmer {
     public static int BY_CONCEPT_STATUS_PROPERY = 1;
     public static int BY_BRANCH = 2;
 
+    public BranchTrimmer() {
+
+	}
+
     public BranchTrimmer(String owlfile) {
 		this.owlfile = owlfile;
 	}

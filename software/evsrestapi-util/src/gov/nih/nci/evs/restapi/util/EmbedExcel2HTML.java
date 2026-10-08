@@ -72,6 +72,10 @@ public class EmbedExcel2HTML {
 	String code = null;
 	boolean cdisc = false;
 
+	public EmbedExcel2HTML() {
+
+	}
+
 	public EmbedExcel2HTML(String valueSetName, String valueSetDescription) {
 		this.valueSetName = valueSetName;
 		this.valueSetDescription = valueSetDescription;
