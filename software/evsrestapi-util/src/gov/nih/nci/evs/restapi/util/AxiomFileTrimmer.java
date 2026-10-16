@@ -48,16 +48,30 @@ public class AxiomFileTrimmer {
 		}
 	}
 
-	public static Vector retrieveAxioms(Vector codes, String propcode) {
+	public static Vector retrieveAxioms(Vector codes, String prop_code) {
+		Vector dataSpec = new Vector();
+		dataSpec.add(prop_code);
+		return retrieveAxioms(codes, dataSpec);
+	}
+
+
+	public static Vector retrieveAxioms(Vector codes, Vector dataSpec) {
 		HashSet hset = Utils.vector2HashSet(codes);
 		Vector w = new Vector();
 		Vector v = Utils.readFile(AXIOM_FILE);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, "|");
+			boolean include = true;
+			for (int j=0; j<u.size(); j++) {
+				String s = (String) dataSpec.elementAt(j);
+				if (!u.contains(s)) {
+					include = false;
+					break;
+				}
+			}
 			String code = (String) u.elementAt(0);
-			String prop_code = (String) u.elementAt(1);
-			if (hset.contains(code) && prop_code.compareTo(propcode) == 0) {
+			if (hset.contains(code) && include) {
 				w.add(line);
 			}
 		}
@@ -66,8 +80,27 @@ public class AxiomFileTrimmer {
 		return w;
     }
 
-	public static Vector retrieveAxioms(Vector codes) {
-		return retrieveAxioms(codes, "P90");
+	public static Vector retrieveAxioms(Vector dataSpec) {
+		Vector w = new Vector();
+		Vector v = Utils.readFile(AXIOM_FILE);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, "|");
+			boolean include = true;
+			for (int j=0; j<u.size(); j++) {
+				String s = (String) dataSpec.elementAt(j);
+				if (!u.contains(s)) {
+					include = false;
+					break;
+				}
+			}
+			if (include) {
+				w.add(line);
+			}
+		}
+		v.clear();
+		w = new SortUtils().quickSort(w);
+		return w;
     }
 
     public static Vector getCodes(int mode, Vector roots) {
@@ -97,17 +130,44 @@ public class AxiomFileTrimmer {
 
     public static void generateAxiomFile(int mode, Vector roots, String axiomfile) {
 		Vector codes = getCodes(mode, roots);
-        Vector w = retrieveAxioms(codes);
+		Vector dataSpec = new Vector();
+		dataSpec.add("P90");
+        Vector w = retrieveAxioms(codes, dataSpec);
+        Utils.saveToFile(axiomfile, w);
+	}
+
+    public static void generateAxiomFile(int mode, Vector roots, Vector dataSpec, String axiomfile) {
+		Vector codes = getCodes(mode, roots);
+        Vector w = retrieveAxioms(codes, dataSpec);
+        Utils.saveToFile(axiomfile, w);
+	}
+
+    public static void generateAxiomFile(Vector dataSpec, String axiomfile) {
+        Vector w = retrieveAxioms(dataSpec);
         Utils.saveToFile(axiomfile, w);
 	}
 
 	public static void main(String[] args) {
-		Vector roots = new Vector();
-		int mode = ExactMatch.BRANCH;
-		String root = "C2991";
-		roots.add("C2991");
-		String axiomfile = "axioms.txt";
-		generateAxiomFile(mode, roots, axiomfile);
+		String modeStr = args[0];
+        int mode = Integer.parseInt(modeStr);
+        if (mode == ExactMatch.DEFAULT) {
+			Vector dataSpec = StringUtils.parseData(args[1], '|');
+			String axiomfile = "axiom_"+ StringUtils.getToday() + ".txt";
+			if (args.length == 3) {
+				axiomfile = args[2];
+			}
+			generateAxiomFile(dataSpec, axiomfile);
+		} else {
+			String rootStr = args[1];
+			Vector roots = StringUtils.parseData(rootStr, '|');
+			String dataSpecStr = args[2];
+			Vector dataSpec = StringUtils.parseData(dataSpecStr, '|');
+			String axiomfile = "axiom_"+ StringUtils.getToday() + ".txt";
+			if (args.length == 4) {
+				axiomfile = args[3];
+			}
+			generateAxiomFile(mode, roots, dataSpec, axiomfile);
+		}
 	}
 }
 
