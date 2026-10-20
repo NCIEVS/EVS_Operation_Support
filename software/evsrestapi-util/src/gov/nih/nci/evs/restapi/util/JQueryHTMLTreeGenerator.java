@@ -67,7 +67,7 @@ public class JQueryHTMLTreeGenerator {
 	String TREE_VARIABLE_NAME = "demoList";
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
 
-	String HYPERLINK = "https://evsexplore-qa.semantics.cancer.gov/evsexplore/concept/ncit/";
+	String HYPERLINK = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
 
 	String fontColor = "red";
 	HashSet nodeSet = null;

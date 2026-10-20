@@ -2141,8 +2141,8 @@ public class ResolvedValueSetIteratorHolder {
 			code = "C178127";
 			htmlfile = "test7.html";
 
-            String DEFAULT_URL = "https://nciterms65.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&ns=ncit";
-
+            //String DEFAULT_URL = "https://nciterms65.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&ns=ncit";
+            String DEFAULT_URL = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
 			int startIndex = ExcelUtils.getExcelStartRow(excelfile, sheet, col, code);
             ResolvedValueSetIteratorHolder rvsi = new ResolvedValueSetIteratorHolder(excelfile, sheet, startIndex, col, code, DEFAULT_URL, cdisc);
 

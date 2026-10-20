@@ -68,10 +68,13 @@ import org.apache.commons.codec.binary.Base64;
  */
 public class MetadataExtractor {
 
-	public static String SOURCE_HELP_PAGE_URL = "https://nciterms65.nci.nih.gov/ncitbrowser/pages/source_help_info.jsf?dictionary=NCI_Thesaurus";
-	public static String TERM_TYPE_HELP_PAGE_URL = "https://nciterms65.nci.nih.gov/ncitbrowser/pages/term_type_help_info.jsf?dictionary=NCI_Thesaurus";
+	public static String SOURCE_HELP_PAGE_URL = "https://evsexplore.semantics.cancer.gov/evsexplore/pages/source_help_info.jsf?dictionary=NCI_Thesaurus";
 
-	public static String TERM_BROWSER_HOME_URL = "https://nciterms65.nci.nih.gov";
+	public static String TERM_TYPE_HELP_PAGE_URL = "https://evsexplore.semantics.cancer.gov/evsexplore/pages/term_type_help_info.jsf?dictionary=NCI_Thesaurus";
+
+	//public static String TERM_BROWSER_HOME_URL = "https://nciterms65.nci.nih.gov";
+	public static String TERM_BROWSER_HOME_URL = "https://evsexplore.semantics.cancer.gov/evsexplore";
+
 
 	public MetadataExtractor() {
 

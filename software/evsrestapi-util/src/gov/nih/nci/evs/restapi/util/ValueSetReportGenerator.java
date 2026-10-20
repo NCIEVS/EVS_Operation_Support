@@ -59,7 +59,8 @@ public class ValueSetReportGenerator {
 	String pageTitle = "Value Set QA Report";
 	String tableTitle = null;
 	Vector warnings = null;
-    static String HYPERLINK_URL ="https://nciterms65.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&ns=ncit&code=";
+    //static String HYPERLINK_URL ="https://nciterms65.nci.nih.gov/ncitbrowser/pages/concept_details.jsf?dictionary=NCI_Thesaurus&ns=ncit&code=";
+    static String HYPERLINK_URL = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
     String serviceUrl = null;
     String namedGraph = null;
     String username = null;
