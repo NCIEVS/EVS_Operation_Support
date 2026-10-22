@@ -5,7 +5,7 @@ import java.io.*;
 import java.util.*;
 import org.apache.commons.text.StringEscapeUtils;
 
-class LEQA {
+public class LEQA {
 
 	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
