@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
 import java.time.ZoneId;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -156,6 +157,14 @@ public class DateUtils {
 		String weekDay = "Monday";
 		return getNumberOfWeekDaysInAMonth(year, month, weekDay);
 	}
+
+    public static String getMonthName(int month) {
+        int year = DateUtils.getCurrentYear();
+        LocalDate date = LocalDate.of(year, month, 1);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM", Locale.US);
+        String monthName = date.format(formatter);
+        return monthName;
+    }
 
 	public static int getNumberOfWeekDaysInAMonth(int year, int month, String weekDay) {
 		int m = 0;
