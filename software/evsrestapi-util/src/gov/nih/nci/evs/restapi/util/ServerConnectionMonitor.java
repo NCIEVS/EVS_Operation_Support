@@ -36,9 +36,9 @@ public class ServerConnectionMonitor {
 		Vector weekday_vec = DateUtils.getWeekdayOfAMonth(year, month, weekDay);
 		for (int j=0; j<weekday_vec.size(); j++) {
 			Integer int_obj = (Integer) weekday_vec.elementAt(j);
-			String version = DateUtils.getNCItVersion(year, month, j);
-			String graphName = DateUtils.getNCIThesaurusGraphName(year, month, j);
-			w.add("" + year + "|" + DateUtils.getMonthString(month) + "|" + version + "|" + graphName + "|" + DateUtils.getNCItReleaseDate(year, month, j));
+			String version = NCItReleaseSchedule.getNCItVersion(year, month, j);
+			String graphName = NCItReleaseSchedule.getNCIThesaurusGraphName(year, month, j);
+			w.add("" + year + "|" + DateUtils.getMonthString(month) + "|" + version + "|" + graphName + "|" + NCItReleaseSchedule.getNCItReleaseDate(year, month, j));
 		}
         return w;
 	}

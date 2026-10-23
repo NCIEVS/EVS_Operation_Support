@@ -76,7 +76,7 @@ public class ServerMonitor {
 
 	public static void query(String codingScheme, String version) throws Exception {
 		if (version == null) {
-			version = DateUtils.getNCItMonthlyVersion();
+			version = NCItReleaseSchedule.getNCItMonthlyVersion();
 		}
 		Vector v = Utils.readFile(SERVER_STATUS);
 		Vector w = new Vector();

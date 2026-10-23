@@ -22,7 +22,7 @@ public class ReportDataGenerator {
 		date2NamedGraphMap = new HashMap();
 		int currentYear = DateUtils.getCurrentYear();
 		int currentMonth = DateUtils.getCurrentMonth();
-        Vector w = DateUtils.getNCItReleaseSchedule(currentYear, false);
+        Vector w = NCItReleaseSchedule.getNCItReleaseSchedule(currentYear, false);
         for (int i=0; i<w.size(); i++) {
 			String line = (String) w.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
