@@ -288,18 +288,6 @@ public class EVSStatisticsByOWL {
 			label = HTMLDecoder.decode(label);
 			code2LabelMap.put(code, label);
 		}
-		/*
-		w = scanner.extractPropertyData(prop_code);
-		for (int i=0; i<w.size(); i++) {
-			String line = (String) w.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
-			String code = (String) u.elementAt(0);
-			String label = (String) u.elementAt(1);
-			label = HTMLDecoder.decode(label);
-			code2LabelMap.put(code, label);
-		}
-		*/
-
 
 		prop_code = "P322"; //Contributing_Source
 		w = scanner.extractPropertyData(prop_code);
@@ -1106,6 +1094,8 @@ public class EVSStatisticsByOWL {
 	}
 
     public static Vector createValueSetTableData(HashMap valuesetCountHashMap, HashMap hmap) {
+		Vector debug_vec = new Vector();
+
         Vector w0 = new Vector();
         Vector w = new Vector();
         Vector keys = new Vector();
@@ -1117,11 +1107,18 @@ public class EVSStatisticsByOWL {
 		int total = 0;
 		int sub_total = 0;
 		keys = new SortUtils().quickSort(keys);
+		debug_vec.add("source2valueSetHashMap keys");
+		debug_vec.addAll(keys);
+
 		for (int i=0; i<keys.size(); i++) {
 			String key = (String) keys.elementAt(i);
 			w = new Vector();
 			Vector values = (Vector) hmap.get(key);
 			values = new SortUtils().quickSort(values);
+
+			debug_vec.add(key);
+			debug_vec.addAll(values);
+
 			sub_total = 0;
 			for (int k=0; k<values.size(); k++) {
 				String value = (String) values.elementAt(k);
@@ -1135,8 +1132,13 @@ public class EVSStatisticsByOWL {
 			w = new SortUtils().quickSort(w);
 			w.add("Subtotal (" + key + ")|" + "" + "|" + sub_total);
 			w0.addAll(w);
+
+			debug_vec.addAll(w);
 		}
 		w0.add("Total||" + total);
+
+		Utils.saveToFile("debug.txt",	debug_vec);
+
 		return w0;
     }
 
@@ -1227,8 +1229,16 @@ public class EVSStatisticsByOWL {
 	}
 
 	public void run_valuse_set() {
-		boolean publishedOnly = false;
+
+Vector debug_vs = new Vector();
+//KLO 10/27/2026
+		//boolean publishedOnly = false;
+		boolean publishedOnly = true;
 		Vector v = getValueSetData(publishedOnly);
+
+debug_vs.add("getValueSetData publishedOnly");
+debug_vs.addAll(v);
+
 		int number_of_valueses = 0;
 		int number_of_sources = 0;
 		HashSet sourceHashSet = new HashSet();
@@ -1239,13 +1249,23 @@ public class EVSStatisticsByOWL {
 		HashMap source2ValueSetCountHashMap = getSource2valueSetCountHashMap(v);
 		HashMap source2UniqueConceptCountHashMap = getSource2UniqueConceptCountHashMap(v);
 
+debug_vs.add("" + v.size());
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
+
+debug_vs.add(line);
+
+
 			Vector u = StringUtils.parseData(line, '|');
 			String source = (String) u.elementAt(6);
 
+debug_vs.add("source: " + source);
+
 			String valueset = (String) u.elementAt(3) + " (" +
 			                  (String) u.elementAt(4) + ")";
+
+debug_vs.add(valueset);
+
 
             String code = (String)u.elementAt(1);
             Integer int_obj = Integer.valueOf(0);
@@ -1282,6 +1302,18 @@ public class EVSStatisticsByOWL {
 			valuesetCountHashMap.put(valueset, int_obj);
 		}
 
+		Iterator it = source2valueSetHashMap.keySet().iterator();
+		while (it.hasNext()) {
+			String source = (String) it.next();
+			Vector w = (Vector) source2valueSetHashMap.get(source);
+			debug_vs.add("(*) " + source);
+			debug_vs.addAll(w);
+		}
+
+		Utils.saveToFile("debug_vs.txt", debug_vs);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
         Vector v1 = createValueSetTableData(valuesetCountHashMap, source2valueSetHashMap);
 	    String tableName = addTableNumber("Concepts In Value Set Grouped by Contributing Source");
 	    Vector th_vec = new Vector();
@@ -1291,6 +1323,8 @@ public class EVSStatisticsByOWL {
 	    th_vec.add("Count");
 
 	    addTable(tableName, th_vec, v1);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
         Vector v2 = createValueSetSourceTableData(
             source2ValueSetCountHashMap,
