@@ -1,4 +1,5 @@
 package gov.nih.nci.evs.restapi.util;
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -92,6 +93,7 @@ public class MetadataTableGenerator {
 			pw.println("<th>Code");
 			pw.println("<data>");
 			Vector v = owlSPARQLUtils.getSupportedProperties(named_graph);
+			Utils.saveToFile("supportedProperties.txt", v);
 			for (int i=0; i<v.size(); i++) {
 				String t = (String) v.elementAt(i);
 				pw.println(t);
@@ -104,6 +106,7 @@ public class MetadataTableGenerator {
 			pw.println("<th>Code");
 			pw.println("<data>");
 			v = owlSPARQLUtils.getSupportedRoles(named_graph);
+			Utils.saveToFile("supportedRoles.txt", v);
 			for (int i=0; i<v.size(); i++) {
 				String t = (String) v.elementAt(i);
 				pw.println(t);
@@ -116,6 +119,7 @@ public class MetadataTableGenerator {
 			pw.println("<th>Code");
 			pw.println("<data>");
 			v = owlSPARQLUtils.getSupportedAssociations(named_graph);
+			Utils.saveToFile("supportedAssociations.txt", v);
 			for (int i=0; i<v.size(); i++) {
 				String t = (String) v.elementAt(i);
 				pw.println(t);
@@ -130,6 +134,7 @@ public class MetadataTableGenerator {
 			pw.println("<th>QualifierCode");
 			pw.println("<data>");
 			v = owlSPARQLUtils.getSupportedPropertyQualifiers(named_graph);
+			Utils.saveToFile("supportedPopertyQualifiers.txt", v);
 			for (int i=0; i<v.size(); i++) {
 				String t = (String) v.elementAt(i);
 				pw.println(t);
@@ -150,10 +155,16 @@ public class MetadataTableGenerator {
 	}
 
 	public static void main(String[] args) {
+		/*
 		String serviceUrl = args[0];
 		String named_graph = args[1];
 		String username = args[2];
 		String password = args[3];
+		*/
+		String serviceUrl = ConfigurationController.serviceUrl;
+		String named_graph = ConfigurationController.namedGraph;
+		String username = ConfigurationController.username;
+		String password = ConfigurationController.password;
         MetadataTableGenerator MetadataTableGenerator = new MetadataTableGenerator(serviceUrl, named_graph, username, password);
         String filename = "metadata.txt";
         MetadataTableGenerator.generate(filename);
