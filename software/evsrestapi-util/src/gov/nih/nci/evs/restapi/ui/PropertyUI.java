@@ -204,6 +204,7 @@ C100002|A8|C61410
     public static void main(String[] args) {
         // Create the main frame
         JFrame frame = new JFrame("NCI Thesaurus Properties");
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(300, 200);
         frame.setLayout(new FlowLayout());
