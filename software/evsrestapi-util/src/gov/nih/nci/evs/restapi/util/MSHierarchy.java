@@ -5,15 +5,12 @@ import java.util.*;
 
 public class MSHierarchy {
 
-    public static void main(String [] args) {
-		String root = args[0];
-		boolean useNCIPT = false;
-		if (args.length > 1) {
-			String useNCIPTStr = args[1];
-			if (useNCIPTStr.compareTo("false") == 0) {
-				useNCIPT = true;
-			}
-	    }
+    public static String run(String root) {
+        boolean useNCIPT = false;
+        return run(root, useNCIPT);
+	}
+
+    public static String run(String root, boolean useNCIPT) {
 		Vector w = TreeDrawer.generateHierarchyData(root, useNCIPT);
 		Utils.saveToFile(root + ".txt", w);
 		try {
@@ -31,8 +28,22 @@ public class MSHierarchy {
         HTMLHierarchy.run(w, title, root);
         HierarchyHelper hh = new HierarchyHelper(w);
         hh.printTree(root);
+        String outputfile = root + "_tree.txt";
+        ASCIITree2Word.run(outputfile);
+        return outputfile;
+	}
 
-        ASCIITree2Word.run(root + "_tree.txt");
+    public static void main(String [] args) {
+		String root = args[0];
+		boolean useNCIPT = false;
+		if (args.length > 1) {
+			String useNCIPTStr = args[1];
+			if (useNCIPTStr.compareTo("false") == 0) {
+				useNCIPT = true;
+			}
+	    }
+	    String outputfile = run(root, useNCIPT);
+	    System.out.println(outputfile + " generated.");
 	}
 
 }

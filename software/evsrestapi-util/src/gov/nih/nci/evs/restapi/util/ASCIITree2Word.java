@@ -24,7 +24,7 @@ public class ASCIITree2Word {
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
 
 	public HashMap data_hmap = null;
-	public static String PROPERTY_FILE = "config.properties";
+	//public static String PROPERTY_FILE = "config.properties";
 	String asciitreefile = null;
 	String docxfile = null;
 	String root = null;
@@ -93,24 +93,10 @@ public class ASCIITree2Word {
 
         n = asciitreefile.lastIndexOf("_");
         this.root = asciitreefile.substring(0, n);
-        initialize();
 	}
 
 	public String getRoot() {
 		return this.root;
-	}
-
-    public void initialize() {
-		data_hmap = new HashMap();
-		Vector v = Utils.readFile(PROPERTY_FILE);
-        for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			Vector u = gov.nih.nci.evs.restapi.util.StringUtils.parseData(line, '=');
-			String key = (String) u.elementAt(0);
-			String value = (String) u.elementAt(1);
-			Vector values = gov.nih.nci.evs.restapi.util.StringUtils.parseData(value, '|');
-			data_hmap.put(key, values);
-		}
 	}
 
 	public void writeParagraph(XWPFHeader header,
@@ -158,7 +144,6 @@ public class ASCIITree2Word {
 
     public void writeParagraph(XWPFDocument document, Vector content) {
 		XWPFParagraph para = document.createParagraph();
-		//para.setAlignment(ParagraphAlignment.LEFT);
 		for (int i=0; i<content.size(); i++) {
 			String line = (String) content.elementAt(i);
 			XWPFRun paraRun = para.createRun();
