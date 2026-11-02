@@ -31,10 +31,21 @@ public class HTMLDecoder {
 		SpecialCharReadWrite.saveToFile(filename, w);
 	}
 
+/*
+symbols:
+        (1) &amp;|&amp;
+        (2) &apos;|'
+        (3) &gt;|>
+        (4) &lt;|<
+        (5) &quot;|&quot;
+*/
+
 	public static String replace(String input) {
 		input = input.replace("&apos;", "'");
 		input = input.replace("&lt;", "<");
 		input = input.replace("&gt;", ">");
+		input = input.replace("&amp;", "&");
+		input = input.replace("&quot;", "\"");
         return input;
 	}
 
