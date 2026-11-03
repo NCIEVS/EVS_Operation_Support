@@ -46,7 +46,7 @@ public class HierarchyUI {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-        JLabel label1 = new JLabel("NCIt Hierarchy Data File:");
+        JLabel label1 = new JLabel("Hierarchy Data File:");
 		JTextField hierDataFileTF = new JTextField();
 		hierDataFileTF.setPreferredSize(new Dimension(600, 30));
 		hierDataFileTF.setText(PARENT_CHILD_FILE);
@@ -212,13 +212,34 @@ public class HierarchyUI {
 					} else if (format.compareTo("ASCII") == 0) {
 						Vector w = Utils.readFile(hierdatafile);
 						HierarchyHelper hh = new HierarchyHelper(w);
-						hh.printTree(root);
-						status.setText(root + "_tree.txt generated.");
+						try {
+							PrintWriter pw = null;
+							n = hierdatafile.lastIndexOf(".");
+							String asciitreefile = hierdatafile.substring(0, n) + "_tree.txt";
+							try {
+								pw = new PrintWriter(asciitreefile, "UTF-8");
+								hh.printTree(pw);
+							} catch (Exception ex) {
+
+							} finally {
+								try {
+									pw.close();
+									System.out.println("Output file " + asciitreefile + " generated.");
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+							}
+							System.out.println(asciitreefile + " generated.");
+							status.setText(asciitreefile + " generated.");
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
 					} else if (format.compareTo("HTML") == 0) {
 						int maxLevel = 35;
                         DynamicTreePlus.generateDynamicHTMLTree(root, maxLevel);
                         status.setText(root + "_htmltree.html generated.");
 					}
+
 				}
 			}
         });
@@ -306,7 +327,54 @@ public class HierarchyUI {
         gbc.gridy = 3;
         panel.add(status, gbc);
 
+/*
+        /////////////////////////////////////////////////////////////////////
+        JPanel btnPanel = new JPanel();
+        FlowLayout layout2 = new FlowLayout();
+        btnPanel.setLayout(layout2);
 
+        btnPanel.add(encodeBtn);
+        btnPanel.add(decodeBtn);
+        btnPanel.add(saveBtn);
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        panel.add(btnPanel, gbc);
+
+        /////////////////////////////////////////////////////////////////////
+
+        JLabel label4 = new JLabel("Results:");
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        panel.add(label4, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(3, 3, 3, 3);
+
+		// Wrap it in a scroll pane
+		//JPanel noWrapPanel = new JPanel( new BorderLayout() );
+		//noWrapPanel.add( jt );
+
+        JScrollPane scrollPane = new JScrollPane(jt);
+
+        //JScrollPane scrollPane = new JScrollPane(noWrapPanel);
+
+        // Set scroll policies
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        //scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+        panel.add(scrollPane, gbc);
+
+        /////////////////////////////////////////////////////////////////////
+
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        panel.add(statusLabel, gbc);
+*/
         /////////////////////////////////////////////////////////////////////
         frame.add(panel);
         // Make the frame visible
