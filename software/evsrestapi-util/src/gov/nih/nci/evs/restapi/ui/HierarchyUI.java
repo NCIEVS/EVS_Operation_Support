@@ -41,9 +41,7 @@ public class HierarchyUI {
         frame.setSize(1000, 200);
         frame.setLayout(new FlowLayout());
 		JLabel statusLabel = new JLabel("Status:");
-
 		JLabel status = new JLabel("");
-
 
 ///////////////////////////////////////////////////////////////////////////////
         JLabel label1 = new JLabel("Hierarchy Data File:");
@@ -62,9 +60,6 @@ public class HierarchyUI {
 		StyleConstants.setSpaceBelow(attrs, 0);
 		// Apply to the whole document
 		doc.setParagraphAttributes(0, doc.getLength(), attrs, false);
-
-        //SimpleAttributeSet boldAttr = createSimpleAttributeSet(true, 12, Color.BLUE);
-        //jt.setCharacterAttributes(boldAttr, true);
 
         JButton browseBtn1 = new JButton("Browse");
         browseBtn1.addActionListener(new ActionListener() {
@@ -90,30 +85,9 @@ public class HierarchyUI {
 				String s = e.getActionCommand();
 				if (s.equals("View")) {
 					String hierdatafile = hierDataFileTF.getText();
-					/*
-					JFileChooser fileChooser = new JFileChooser();
-					fileChooser.setDialogTitle("Select Hierarchy Output File");
-					int userSelection = fileChooser.showSaveDialog(null);
-					if (userSelection == JFileChooser.APPROVE_OPTION) {
-						File fileToSave = fileChooser.getSelectedFile();
-						System.out.println("Selected hierarchy output file: " + fileToSave.getAbsolutePath());
-						hierFileTF1.setText(fileToSave.getAbsolutePath());
-						statusLabel.setText("");
-					}
-					*/
-					//HierarchyViewer.run(hierdatafile);
-
 					JDialog treedialog = new TreeDialog(hierdatafile);
-					//treedialog.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 					treedialog.setSize(400, 300);
 					treedialog.setVisible(true);
-/*
-				    JDialog dialog = new JDialog(treedialog, "Hierarchy", false);
-					//dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-					// Add the JFrame to the dialog's content pane
-					dialog.getContentPane().add(treedialog, BorderLayout.CENTER);
-					dialog.setVisible(true);
-*/
 				}
 			}
         });
@@ -167,25 +141,6 @@ public class HierarchyUI {
         JComboBox<String> formatCombo = new JComboBox<>(formats);
 
         formatCombo.setSelectedIndex(0);
-/*
-        JButton hierBrowseBtn2 = new JButton("Browse");
-        hierBrowseBtn1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String s = e.getActionCommand();
-				if (s.equals("Browse")) {
-					JFileChooser fileChooser = new JFileChooser();
-					fileChooser.setDialogTitle("Select Word Hierarchy File");
-					int userSelection = fileChooser.showSaveDialog(null);
-					if (userSelection == JFileChooser.APPROVE_OPTION) {
-						File fileToSave = fileChooser.getSelectedFile();
-						System.out.println("Selected Word hierarchy file: " + fileToSave.getAbsolutePath());
-						hierFileTF1.setText(fileToSave.getAbsolutePath());
-						statusLabel.setText("");
-					}
-				}
-			}
-        });
-*/
 
         JButton hierGeneBtn2 = new JButton("Generate");
         hierGeneBtn2.addActionListener(new ActionListener() {
@@ -238,6 +193,7 @@ public class HierarchyUI {
 						int maxLevel = 35;
                         DynamicTreePlus.generateDynamicHTMLTree(root, maxLevel);
                         status.setText(root + "_htmltree.html generated.");
+                        String outputfile = HTMLHierarchy.run(hierdatafile, root, root);
 					}
 
 				}
@@ -327,54 +283,6 @@ public class HierarchyUI {
         gbc.gridy = 3;
         panel.add(status, gbc);
 
-/*
-        /////////////////////////////////////////////////////////////////////
-        JPanel btnPanel = new JPanel();
-        FlowLayout layout2 = new FlowLayout();
-        btnPanel.setLayout(layout2);
-
-        btnPanel.add(encodeBtn);
-        btnPanel.add(decodeBtn);
-        btnPanel.add(saveBtn);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        panel.add(btnPanel, gbc);
-
-        /////////////////////////////////////////////////////////////////////
-
-        JLabel label4 = new JLabel("Results:");
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.insets = new Insets(3, 3, 3, 3);
-        panel.add(label4, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.insets = new Insets(3, 3, 3, 3);
-
-		// Wrap it in a scroll pane
-		//JPanel noWrapPanel = new JPanel( new BorderLayout() );
-		//noWrapPanel.add( jt );
-
-        JScrollPane scrollPane = new JScrollPane(jt);
-
-        //JScrollPane scrollPane = new JScrollPane(noWrapPanel);
-
-        // Set scroll policies
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        //scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-        panel.add(scrollPane, gbc);
-
-        /////////////////////////////////////////////////////////////////////
-
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        gbc.insets = new Insets(3, 3, 3, 3);
-        panel.add(statusLabel, gbc);
-*/
         /////////////////////////////////////////////////////////////////////
         frame.add(panel);
         // Make the frame visible
