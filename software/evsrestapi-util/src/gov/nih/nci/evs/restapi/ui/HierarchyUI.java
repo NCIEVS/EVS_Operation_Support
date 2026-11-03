@@ -219,108 +219,10 @@ public class HierarchyUI {
                         DynamicTreePlus.generateDynamicHTMLTree(root, maxLevel);
                         status.setText(root + "_htmltree.html generated.");
 					}
-					/*
-					try {
-						Vector w0 = new Vector();
-						Vector w = Utils.readFile(hierdatafile);
-						w0.add("Parent Label|Parent Code|Child Label|Child Code");
-						w0.addAll(w);
-						n = hierdatafile.lastIndexOf(".");
-						//String filename = hierdatafile.substring(0, n) + "_mod.txt";
-						//Utils.saveToFile(filename, w0);
-						//MSTable.run(filename);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-					*/
-
-					/*
-                    n = hierdatafile.lastIndexOf(".");
-                    String root = hierdatafile.substring(0, n);
-					String title = root + " Hierarchy";
-					Vector w = Utils.readFile(hierdatafile);
-					HTMLHierarchy.run(w, title, root);
-					HierarchyHelper hh = new HierarchyHelper(w);
-					hh.printTree(root);
-					ASCIITree2Word.run(root + "_tree.txt");
-					statusLabel.setText("Word hierarchy generated.");
-					*/
 				}
 			}
         });
 
-/*
-        JButton encodeBtn = new JButton("Encode");
-        encodeBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String s = e.getActionCommand();
-				if (s.equals("Encode")) {
-					statusLabel.setText("");
-					String inputfile = hierDataFileTF.getText();
-					String outputfile = hierFileTF1.getText();
-					System.out.println("inputfile: " + inputfile);
-					System.out.println("outputfile: " + outputfile);
-					if (outputfile.compareTo("") == 0) {
-						statusLabel.setText("Please specify an output file.");
-					} else {
-					    File f = new File(inputfile);
-					    if (!f.exists()) {
-							statusLabel.setText(f.getName() + " does not exist");
-						} else {
-							//SimpleAttributeSet boldAttr = createSimpleAttributeSet(true, 12, Color.BLUE);
-							//jt.setCharacterAttributes(boldAttr, true);
-							jt.setText("");
-							statusLabel.setText("");
-							Vector v = Utils.readFile(inputfile);
-							for (int i=0; i<v.size(); i++) {
-								String line = (String) v.elementAt(i);
-								appendToPane(jt, HTMLDecoder.encode(line) + newline);
-							}
-							//statusLabel.setText(outputfile + " generated.");
-							saveBtn.setEnabled(true);
-				    	}
-
-					}
-				}
-			}
-        });
-
-        JButton decodeBtn = new JButton("Decode");
-        decodeBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String s = e.getActionCommand();
-				if (s.equals("Decode")) {
-					String inputfile = hierDataFileTF.getText();
-					String outputfile = hierFileTF1.getText();
-					System.out.println("inputfile: " + inputfile);
-					System.out.println("outputfile: " + outputfile);
-					if (outputfile.compareTo("") == 0) {
-						statusLabel.setText("Please specify an output file.");
-					} else {
-					    File f = new File(inputfile);
-					    if (!f.exists()) {
-							statusLabel.setText(f.getName() + " does not exist");
-						} else {
-							//SimpleAttributeSet boldAttr = createSimpleAttributeSet(true, 12, Color.BLUE);
-							//jt.setCharacterAttributes(boldAttr, true);
-							jt.setText("");
-							statusLabel.setText("");
-							Vector v = Utils.readFile(inputfile);
-							for (int i=0; i<v.size(); i++) {
-								String line = (String) v.elementAt(i);
-								appendToPane(jt, HTMLDecoder.decode(line) + newline);
-							}
-							//statusLabel.setText(outputfile + " generated.");
-							saveBtn.setEnabled(true);
-				    	}
-
-					}
-				}
-
-			}
-        });
-
-*/
 
         JPanel panel = new JPanel();
 
@@ -404,54 +306,7 @@ public class HierarchyUI {
         gbc.gridy = 3;
         panel.add(status, gbc);
 
-/*
-        /////////////////////////////////////////////////////////////////////
-        JPanel btnPanel = new JPanel();
-        FlowLayout layout2 = new FlowLayout();
-        btnPanel.setLayout(layout2);
 
-        btnPanel.add(encodeBtn);
-        btnPanel.add(decodeBtn);
-        btnPanel.add(saveBtn);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        panel.add(btnPanel, gbc);
-
-        /////////////////////////////////////////////////////////////////////
-
-        JLabel label4 = new JLabel("Results:");
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.insets = new Insets(3, 3, 3, 3);
-        panel.add(label4, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.insets = new Insets(3, 3, 3, 3);
-
-		// Wrap it in a scroll pane
-		//JPanel noWrapPanel = new JPanel( new BorderLayout() );
-		//noWrapPanel.add( jt );
-
-        JScrollPane scrollPane = new JScrollPane(jt);
-
-        //JScrollPane scrollPane = new JScrollPane(noWrapPanel);
-
-        // Set scroll policies
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        //scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-        panel.add(scrollPane, gbc);
-
-        /////////////////////////////////////////////////////////////////////
-
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        gbc.insets = new Insets(3, 3, 3, 3);
-        panel.add(statusLabel, gbc);
-*/
         /////////////////////////////////////////////////////////////////////
         frame.add(panel);
         // Make the frame visible

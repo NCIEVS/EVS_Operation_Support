@@ -119,16 +119,6 @@ public class HTMLEncoderUI {
 		inputFileTF.setPreferredSize(new Dimension(600, 30));
 		inputFileTF.setText("termfile_C3367.txt");
 
-/*
-JPanel noWrapPanel = new JPanel( new BorderLayout() );
-noWrapPanel.add( textPane );
-*/
-
-/*
-        JTextArea jt = new JTextArea();
-        jt.setPreferredSize(new Dimension(25, 500));
-*/
-
         JTextPane jt = new JTextPane();
         jt.setPreferredSize(new Dimension(25, 500));
 
@@ -140,9 +130,6 @@ noWrapPanel.add( textPane );
 		StyleConstants.setSpaceBelow(attrs, 0);
 		// Apply to the whole document
 		doc.setParagraphAttributes(0, doc.getLength(), attrs, false);
-
-        //SimpleAttributeSet boldAttr = createSimpleAttributeSet(true, 12, Color.BLUE);
-        //jt.setCharacterAttributes(boldAttr, true);
 
         JButton browseBtn1 = new JButton("Browse");
         browseBtn1.addActionListener(new ActionListener() {
