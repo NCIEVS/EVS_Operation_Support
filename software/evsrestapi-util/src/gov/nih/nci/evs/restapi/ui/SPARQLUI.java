@@ -111,7 +111,7 @@ public class SPARQLUI {
 
     public static void main(String[] args) {
         // Create the main frame
-        JFrame frame = new JFrame("SPARQL QUery UI");
+        JFrame frame = new JFrame("SPARQL Query UI");
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 200);
