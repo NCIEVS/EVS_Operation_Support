@@ -194,6 +194,9 @@ public class HierarchyUI {
                         DynamicTreePlus.generateDynamicHTMLTree(root, maxLevel);
                         status.setText(root + "_htmltree.html generated.");
                         String outputfile = HTMLHierarchy.run(hierdatafile, root, root);
+                        Vector w = Utils.readFile(hierdatafile);
+                        outputfile = JQueryHTMLTreeGenerator.run(w, root);
+                        status.setText(outputfile + " generated.");
 					}
 
 				}

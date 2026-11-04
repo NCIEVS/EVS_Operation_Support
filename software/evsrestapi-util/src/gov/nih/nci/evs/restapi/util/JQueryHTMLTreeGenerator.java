@@ -337,7 +337,7 @@ public class JQueryHTMLTreeGenerator {
 		return v;
 	}
 
-	public static void run(String root) {
+	public static String run(String root) {
         long ms = System.currentTimeMillis();
         Vector parent_child_vec = Utils.readFile(PARENT_CHILD_FILE);
         Vector codes = new Vector();
@@ -347,7 +347,7 @@ public class JQueryHTMLTreeGenerator {
         String outputfile = "parent_child_" + root + ".txt";
         Utils.saveToFile(outputfile, v);
 		JQueryHTMLTreeGenerator generator = new JQueryHTMLTreeGenerator(parent_child_vec);
-	    outputfile = root + "_tree.html";
+	    outputfile = root + "_jquerytree.html";
 	    String label = runner.getHierarchyHelper().getLabel(root);
 	    String title = label + " (" + root + ")" + " Hierarchy";
 	    Vector mth_nodes = getNodes(v);
@@ -355,6 +355,27 @@ public class JQueryHTMLTreeGenerator {
 	    generator.setNodeSet(nodeSet);
 		generator.generate(outputfile, title);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		return outputfile;
+	}
+
+	public static String run(Vector parent_child_vec, String root) {
+        long ms = System.currentTimeMillis();
+        Vector codes = new Vector();
+        codes.add(root);
+        TransitiveClosureRunner runner = new TransitiveClosureRunner(parent_child_vec);
+        Vector v = runner.run(codes);
+        String outputfile = "parent_child_" + root + ".txt";
+        Utils.saveToFile(outputfile, v);
+		JQueryHTMLTreeGenerator generator = new JQueryHTMLTreeGenerator(parent_child_vec);
+	    outputfile = root + "_jquerytree.html";
+	    String label = runner.getHierarchyHelper().getLabel(root);
+	    String title = label + " (" + root + ")" + " Hierarchy";
+	    Vector mth_nodes = getNodes(v);
+	    HashSet nodeSet = Utils.vector2HashSet(mth_nodes);
+	    generator.setNodeSet(nodeSet);
+		generator.generate(outputfile, title);
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		return outputfile;
 	}
 
 	public static void main(String[] args) {
