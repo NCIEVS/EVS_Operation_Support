@@ -281,10 +281,7 @@ public class HTMLTable {
 
 		for (int i=0; i<data_vec.size(); i++) {
 			String data = (String) data_vec.elementAt(i);
-			//System.out.println(data);
-
 			out.println("<tr>");
-			//Vector u = StringUtils.parseData(data, '\t');
 			Vector u = StringUtils.parseData(data, delim);
 
 			for (int j=0; j<u.size(); j++) {
@@ -319,7 +316,6 @@ public class HTMLTable {
 		}
 		return true;
 	}
-
 
     public static void printFooter(PrintWriter out, String footer) {
 		out.println("</div>");

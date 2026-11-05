@@ -125,9 +125,6 @@ public class SPARQLUI {
 		Vector serviceUrl_vec = ConfigurationController.serviceUrl_vec;
 		Utils.dumpVector("serviceUrl_vec", serviceUrl_vec);
 
-//serviceUrls=http://ncias-d2175-c.nci.nih.gov:3030/NCIT2/query|http://ncidb-q294-c.nci.nih.gov:3030/NCIT2/query|http://ncidb-s308-c.nci.nih.gov:3030/NCIT2/query|http://ncidb-p335-c.nci.nih.gov:3030/NCIT2/query|http://ncias-d2175-c.nci.nih.gov:3030/CTRP/query|http://ncidb-q294-c.nci.nih.gov:3030/CTRP/query|http://ncias-q1761-v.nci.nih.gov:3030/NCIEVS/query|http://ncidb-s308-c.nci.nih.gov:3030/CTRP/query|http://ncidb-p335-c.nci.nih.gov:3030/CTRP/query
-
-
 		String[] serviceUrls = new String[serviceUrl_vec.size()];
         for (int i=0; i<serviceUrl_vec.size(); i++) {
 			String url = (String) serviceUrl_vec.elementAt(i);
