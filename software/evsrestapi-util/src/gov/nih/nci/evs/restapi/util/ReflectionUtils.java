@@ -103,9 +103,6 @@ public class ReflectionUtils {
 				String methodName = m.getName();
 				String parameterTypes = getParameterTypes(m);
 				v.add(methodName);
-				System.out.println("methodName: " + methodName);
-				System.out.println("parameterTypes: " + parameterTypes);
-
             } catch (Exception e) {
                 System.err.printf("Error accessing field %s: %s%n", m.getName(), e.getMessage());
             }

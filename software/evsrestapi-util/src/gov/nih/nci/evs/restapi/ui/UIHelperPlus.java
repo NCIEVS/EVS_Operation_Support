@@ -101,11 +101,12 @@ public class UIHelperPlus {
 					for (int j=0; j<values.size(); j++) {
 						options[j] = (String) values.elementAt(j);
 					}
-
-					String t2 = (String) u.elementAt(2);
-					Vector u2 = StringUtils.parseData(t2, '$');
-					btn1 = (String) (String) u2.elementAt(1);
-					btn1_label = (String) (String) u2.elementAt(1);
+                    if (u.size() > 2) {
+						String t2 = (String) u.elementAt(2);
+						Vector u2 = StringUtils.parseData(t2, '$');
+						btn1 = (String) (String) u2.elementAt(1);
+						btn1_label = (String) (String) u2.elementAt(1);
+					}
                     printUIComponent(pw, label1, label2, combo_i, options, btn1_label, btn2_label);
 				} else if (component.compareTo("JLabel") == 0) {
 					label2 = (String) (String) u1.elementAt(1);
@@ -312,7 +313,9 @@ public class UIHelperPlus {
 		out.println("			public void actionPerformed(ActionEvent e) {");
 		out.println("				String s = e.getActionCommand();");
 		out.println("				if (s.equals(\"Browse\")) {");
-		out.println("					" + tf + ".setText(\"\");");
+		//if (tf != null && tf.length() > 0) {
+		//	out.println("					//" + tf + ".setText(\"\");");
+		//}
 		out.println("					JFileChooser fileChooser = new JFileChooser();");
 		out.println("					fileChooser.setDialogTitle(\"Select File\");");
 		out.println("					int userSelection = fileChooser.showOpenDialog(null);");
