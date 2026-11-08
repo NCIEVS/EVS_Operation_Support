@@ -15,8 +15,28 @@ public class ReflectionUtils {
     private final Constructor<?>[] constructors;
     private final Object object;
 
+    public static Object instantiateClassByName(String className) {
+		Object instance = null;
+		try {
+			Class<?> clazz = Class.forName(className);
+			instance = clazz.getDeclaredConstructor().newInstance();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return instance;
+	}
+
     public ReflectionUtils(final Object object) {
         this.object = object;
+        final var objectClass = object.getClass();
+        this.fields = objectClass.getDeclaredFields();
+        this.methods = objectClass.getDeclaredMethods();
+        this.constructors = objectClass.getConstructors();
+        Arrays.stream(fields).forEach(f -> f.setAccessible(true));
+    }
+
+    public ReflectionUtils(final String className) {
+        this.object = instantiateClassByName(className);
         final var objectClass = object.getClass();
         this.fields = objectClass.getDeclaredFields();
         this.methods = objectClass.getDeclaredMethods();
