@@ -63,7 +63,7 @@ public class AxiomTable {
 			line = (String) w.elementAt(i);
 			obj = AxiomReader.line2Object(line);
 			ReflectionUtils ru = new ReflectionUtils(obj);
-			HashMap hmap = ru.getFieldValues();
+			HashMap hmap = ru.getFieldName2ValueMap();
 			StringBuffer buf = new StringBuffer();
 			buf.append((String) hmap.get((String) fieldNames.elementAt(1)) + "\t" +
 							(String)hmap.get((String) fieldNames.elementAt(0)));

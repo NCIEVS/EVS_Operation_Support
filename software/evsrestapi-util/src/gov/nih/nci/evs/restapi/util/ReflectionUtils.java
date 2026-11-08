@@ -8,19 +8,6 @@ import java.lang.reflect.Method;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
-/*
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.*;
-
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.commons.text.*;
-import org.apache.poi.ss.usermodel.IndexedColors;
-*/
 
 public class ReflectionUtils {
     private final Field[] fields;
@@ -43,15 +30,15 @@ public class ReflectionUtils {
         return array[array.length - 1];
     }
 
-    private static String getParameterTypes(final Method m) {
+    public static String getParameterTypes(final Method m) {
         return Arrays.stream(m.getParameterTypes()).map(Class::getSimpleName).collect(Collectors.joining(", "));
     }
 
-    private static String getReturnType(final Method m) {
+    public static String getReturnType(final Method m) {
         return m.getReturnType().getSimpleName();
     }
 
-    private static String getConstructorParamTypes(final Constructor<?> c) {
+    public static String getConstructorParamTypes(final Constructor<?> c) {
         return Arrays.stream(c.getParameterTypes()).map(Class::getSimpleName).collect(Collectors.joining(", "));
     }
 
@@ -72,7 +59,7 @@ public class ReflectionUtils {
         return v;
     }
 
-    public HashMap getFieldValues() {
+    public HashMap getFieldName2ValueMap() {
 		HashMap hmap = new HashMap();
         for (final var f : fields) {
             try {
@@ -88,6 +75,47 @@ public class ReflectionUtils {
         }
         return hmap;
     }
+
+    public Vector getMethodNames() {
+		Vector v = new Vector();
+        for (final var m : methods) {
+            try {
+				String methodName = m.getName();
+				String parameterTypes = getParameterTypes(m);
+				v.add(methodName);
+				System.out.println("methodName: " + methodName);
+				System.out.println("parameterTypes: " + parameterTypes);
+
+            } catch (Exception e) {
+                System.err.printf("Error accessing field %s: %s%n", m.getName(), e.getMessage());
+            }
+        }
+        return v;
+	}
+
+    public HashMap getMethodName2ParameterTypeMap() {
+		HashMap hmap = new HashMap();
+		Vector v = new Vector();
+        for (final var m : methods) {
+            try {
+				String methodName = m.getName();
+				String parameterTypes = getParameterTypes(m);
+				v.add(methodName);
+				Vector w = new Vector();
+				if (hmap.containsKey(methodName)) {
+					w = (Vector) hmap.get(methodName);
+				}
+				if (!w.contains(parameterTypes)) {
+					w.add(parameterTypes);
+				}
+				hmap.put(methodName, w);
+
+            } catch (Exception e) {
+                System.err.printf("Error accessing field %s: %s%n", m.getName(), e.getMessage());
+            }
+        }
+        return hmap;
+	}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
     public static void generateReflectionRunner(String parentClassName, String methodSignature) {
