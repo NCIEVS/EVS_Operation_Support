@@ -123,7 +123,7 @@ public class HierarchyUI {
 				String s = e.getActionCommand();
 				if (s.equals("View")) {
 					String hierdatafile = hierFileTF1.getText();
-					JDialog treedialog = new TreeDialog(hierdatafile);
+					JDialog treedialog = new TreeDialog(hierdatafile, "Hierarchy");
 					treedialog.setSize(400, 300);
 					treedialog.setVisible(true);
 				}
