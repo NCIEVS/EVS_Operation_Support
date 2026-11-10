@@ -1,11 +1,14 @@
 package gov.nih.nci.evs.restapi.ui;
 import gov.nih.nci.evs.restapi.util.*;
 import javax.swing.JFrame;
+import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import java.io.*;
 import java.util.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class JTableMaker {
 	static String ALPHABET = null;
@@ -166,6 +169,20 @@ JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
 		JTable table = new JTable(data, columnNames);
 		JScrollPane scrollPane = new JScrollPane(table);
 		return scrollPane;
+	}
+
+
+    public static JTable createJTableWithListener(String filename, boolean heading, JTextField tf) {
+        JTable table = createJTable(filename, heading);
+		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent event) {
+				if (!event.getValueIsAdjusting()) {
+					int selectedRow = table.getSelectedRow();
+					tf.setText("selectedRow=" + selectedRow);
+				}
+			}
+		});
+		return table;
 	}
 
 	public static void main(String[] args) {
