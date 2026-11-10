@@ -1,4 +1,5 @@
 package gov.nih.nci.evs.restapi.util;
+import gov.nih.nci.evs.restapi.config.*;
 import gov.nih.nci.evs.restapi.bean.*;
 import gov.nih.nci.evs.restapi.common.*;
 import java.io.*;
@@ -353,9 +354,9 @@ public class VIHUtils {
 
 	public static void main(String[] args) {
 		long ms = System.currentTimeMillis();
-		Vector parent_child_vec = Utils.readFile("parent_child.txt");
+		Vector parent_child_vec = Utils.readFile(ConfigurationController.hierfile);
 		VIHUtils vihUtils = new VIHUtils(parent_child_vec);
-        String code = "C12365";
+        String code = args[0];//"C12365";
         TreeItem ti = vihUtils.buildViewInHierarchyTree(code);
         TreeItem.printTree(ti, 0, false);
         System.out.println("\n");

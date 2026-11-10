@@ -1,4 +1,5 @@
 package gov.nih.nci.evs.restapi.util;
+import gov.nih.nci.evs.restapi.config.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -73,17 +74,10 @@ public class ValueSetHierarchyReport {
 	}
 
     public void initialize() {
-		OWLScanner owlscanner = new OWLScanner(owlfile);
-		parent_child_vec = owlscanner.extractHierarchicalRelationships();
-		gov.nih.nci.evs.restapi.util.Utils.saveToFile("parent_child.txt", parent_child_vec);
+		parent_child_vec = Utils.readFile(ConfigurationController.hierfile);
 		String associationCode = "A8";
-		a8_vec = owlscanner.extractAssociations(owlscanner.get_owl_vec(), associationCode);
+		a8_vec = Utils.readFile(ConfigurationController.subsetfile);
 		gov.nih.nci.evs.restapi.util.Utils.saveToFile(a8File, a8_vec);
-
-		Vector parent_child_vec = Utils.readFile(parent_child_file);
-		a8_vec = Utils.readFile(a8File);
-		System.out.println("parent_child_vec: " + parent_child_vec.size());
-
 		hh = new HierarchyHelper(parent_child_vec);
 		subset_hmap = create_subset_hmap();
 	}
@@ -114,8 +108,6 @@ public class ValueSetHierarchyReport {
     public void writeData(PrintWriter out) {
 		out.println("	<h1>" + title + "</h1>");
 		out.println("	<div id=\"html\" class=\"demo\">");
-
-
 		out.println("		<ul>");
 		out.println("			<li data-jstree='{ \"opened\" : true }'>NCI Thesaurus");
 		out.println("				<ul>");
@@ -124,12 +116,8 @@ public class ValueSetHierarchyReport {
 		out.println("				</ul>");
 		out.println("			</li>");
 		out.println("		</ul>");
-
-
 		out.println("	</div>");
 	}
-
-
 
     public static Vector parseData(String line, char delimiter) {
 		if(line == null) return null;
@@ -329,13 +317,12 @@ public class ValueSetHierarchyReport {
 		StringBuffer buf = new StringBuffer();
 		for (int i=0; i<maxLevel-1; i++) {
 			int j = i+1;
-			buf.append("Level " + j + " Subset Label").append("\t");
-			buf.append("Level " + j + " Subset Code").append("\t");
+			buf.append("Level " + j + " Subset Label").append("|");
+			buf.append("Level " + j + " Subset Code").append("|");
 		}
-		buf.append("Member Concept Label").append("\t");
+		buf.append("Member Concept Label").append("|");
 		buf.append("Member Concept Code");
 		out.println(buf.toString());
-
 		Stack stack = new Stack();
 		stack.push(root);
 		while (!stack.isEmpty()) {
@@ -362,10 +349,11 @@ public class ValueSetHierarchyReport {
 		}
 	}
 
-    public void run(String root) {
+    public String run(String root) {
         long ms = System.currentTimeMillis();
 		PrintWriter pw = null;
 		String textfile = this.root + "_" + StringUtils.getToday() + ".txt";
+
 		try {
 			pw = new PrintWriter(textfile, "UTF-8");
             //run(pw);
@@ -382,6 +370,7 @@ public class ValueSetHierarchyReport {
 			}
 		}
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
+		return textfile;
 	}
 
 
@@ -420,15 +409,15 @@ public class ValueSetHierarchyReport {
 
 
     public static void main(String[] args) {
-		String owlfile = args[0];
-		String root = args[1];
+
+		String owlfile = ConfigurationController.owlfile;
+		String root = args[0];
 		System.out.println(owlfile);
 		System.out.println(root);
 
 		ValueSetHierarchyReport valueSetHierarchyReport = new ValueSetHierarchyReport(owlfile, root);
-		int maxLevel = valueSetHierarchyReport.getMaxLevel(root);
-		System.out.println("maxLevel: " + maxLevel);
-
-		//valueSetHierarchyReport.run(root);
+		String outputfile = valueSetHierarchyReport.run(root);
+		System.out.println(outputfile + " generated.");
 	}
 }
+//Subset C173382 - COVID-19 Terminology
