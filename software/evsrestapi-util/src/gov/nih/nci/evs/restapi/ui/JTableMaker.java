@@ -148,6 +148,26 @@ JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
 		run(tableName, columnNames, data);
 	}
 
+    public static JTable createJTable(String filename, boolean heading) {
+		String[] columnNames = getColumnNames(filename, heading);
+		String[][] data = loadTableData(filename, heading);
+		JTable table = new JTable(data, columnNames);
+		return table;
+	}
+
+    public static JScrollPane createJScrollPane(JTable table) {
+		JScrollPane scrollPane = new JScrollPane(table);
+		return scrollPane;
+	}
+
+    public static JScrollPane createJScrollPane(String filename, boolean heading) {
+		String[] columnNames = getColumnNames(filename, heading);
+		String[][] data = loadTableData(filename, heading);
+		JTable table = new JTable(data, columnNames);
+		JScrollPane scrollPane = new JScrollPane(table);
+		return scrollPane;
+	}
+
 	public static void main(String[] args) {
 		String filename = args[0];
 		String tableName = "Test JTableMaker";
