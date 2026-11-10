@@ -231,7 +231,10 @@ C100002|A8|C61410
 					String title = (String) comboBox1.getSelectedItem();
 					String selectedItem = (String) comboBox1.getSelectedItem();
 					String datafile = extractProperties(PROPERTY_FILE, selectedItem);
-					TableDialog d = new TableDialog(frame, title, datafile);
+					//TableDialog d = new TableDialog(frame, title, datafile);
+					TableDialog tableDialog = new TableDialog(datafile, title, true);
+					tableDialog.setSize(400, 300);
+					tableDialog.setVisible(true);
 				}
 			}
         });
@@ -258,7 +261,11 @@ C100002|A8|C61410
 					String selectedItem = (String) comboBox2.getSelectedItem();
 					System.out.println(selectedItem);
 					String datafile = extractRestrictions(RESTRICTION_FILE, selectedItem);
-					TableDialog d = new TableDialog(frame, title, datafile);
+
+					//TableDialog d = new TableDialog(frame, title, datafile);
+					TableDialog tableDialog = new TableDialog(datafile, title, true);
+					tableDialog.setSize(400, 300);
+					tableDialog.setVisible(true);
 				}
 			}
         });
@@ -284,7 +291,10 @@ C100002|A8|C61410
 					String title = (String) comboBox3.getSelectedItem();
 					String selectedItem = (String) comboBox3.getSelectedItem();
 					String datafile = extractAssociations(ASSOCIATION_FILE, selectedItem);
-					TableDialog d = new TableDialog(frame, title, datafile);
+					//TableDialog d = new TableDialog(frame, title, datafile);
+					TableDialog tableDialog = new TableDialog(datafile, title, true);
+					tableDialog.setSize(400, 300);
+					tableDialog.setVisible(true);
 				}
 			}
         });

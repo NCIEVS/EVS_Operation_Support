@@ -35,7 +35,7 @@ public class HierarchyDataUI {
         w0.add("Parent Label|Parent Code|Child Label|Child Code");
         w0.addAll(v);
         Utils.saveToFile("hier.txt", w0);
-        JTable tbl = TableDialog.createJTable("hier.txt");
+        JTable tbl = JTableMaker.createJTable("hier.txt");
 
 		// Disable auto-resize to allow horizontal scroll
 		tbl.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);

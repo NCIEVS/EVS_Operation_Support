@@ -16,7 +16,6 @@ public class JTableMaker {
 			buf.append(c);
 		}
 		ALPHABET = buf.toString();
-		System.out.println(ALPHABET);
 	}
 
 
@@ -102,9 +101,20 @@ JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
 		return data;
 	}
 
-	public static JScrollPane createJTableScrollPane(String tableName, String[] columnNames, String[][] data) {
-        //DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
-        //tableModel.removeRow(0);
+	public static JTable createJTable(String datafile) {
+		boolean heading = true;
+		String[] columnNames = getColumnNames(datafile, heading);
+		String[][] data = loadTableData(datafile, heading);
+		JTable table = new JTable(data, columnNames);
+		return table;
+	}
+
+	public static JTable createJTable(String[] columnNames, String[][] data) {
+		JTable table = new JTable(data, columnNames);
+		return table;
+	}
+
+	public static JScrollPane createJTableScrollPane(String[] columnNames, String[][] data) {
 		JTable table = new JTable(data, columnNames);
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
