@@ -63,6 +63,50 @@ import java.util.*;
  */
 public class DelimitedDataExtractor {
 
+    public static Vector getHashMapValues(HashMap hmap) {
+		Vector w = new Vector();
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			Object value = hmap.get(key);
+			if (value instanceof String) {
+				w.add(key + "|" + value);
+			} else if (value instanceof Vector) {
+				Vector v = (Vector) value;
+				for (int j=0; j<v.size(); j++) {
+					String t = (String) v.elementAt(j);
+					w.add(key + "|" + t);
+				}
+			}
+		}
+		return w;
+	}
+
+
+	public static Vector extractByMatchingFieldValue(Vector w, int key, String value, String delim_columns, char delim) {
+		Vector<Integer> columns = delimitedInt2integers(delim_columns, '|');
+		Vector v = new Vector();
+		for (int i=0; i<w.size(); i++) {
+			String line = (String) w.elementAt(i);
+			Vector u = StringUtils.parseData(line, delim);
+			String t = (String) u.elementAt(key);
+            if (t.compareTo(value) == 0) {
+				StringBuffer buf = new StringBuffer();
+				for (int k=0; k<u.size(); k++) {
+					Integer column_obj = Integer.valueOf(k);
+					if (columns.contains(column_obj)) {
+						String t2 = (String) u.elementAt(k);
+					    buf.append(t2).append(delim);
+					}
+				}
+				String s = buf.toString();
+				s = s.substring(0, s.length()-1);
+				v.add(s);
+			}
+		}
+		return v;
+	}
+
 	public static Vector<Integer> delimitedInt2integers(String delim_columns, char delim) {
 		Vector w = StringUtils.parseData(delim_columns, delim);
 		Vector columns = new Vector();

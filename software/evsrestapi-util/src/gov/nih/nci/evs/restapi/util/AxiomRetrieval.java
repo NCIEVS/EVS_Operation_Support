@@ -94,6 +94,20 @@ public class AxiomRetrieval {
 
 	}
 
+    public static Vector getPropertyValues(String propCode) {
+		String axiomFile = AXIOM_FILE;
+		System.out.println(axiomFile);
+		Vector data_vec = Utils.readFile(axiomFile);
+		System.out.println("data_vec: " + data_vec.size());
+		String delim_column_key = "1";
+		String delim_column_value = "0|2";
+		char delim = '|';
+        HashMap hmap = DelimitedDataExtractor.createHashMap(data_vec, delim_column_key, delim_column_value, delim);
+        Vector w = DelimitedDataExtractor.getHashMapValues(hmap);
+        w = DelimitedDataExtractor.extractByMatchingFieldValue(w, 0, propCode, "1|2", '|');
+        return w;
+	}
+
 	public static HashSet getRetiredConcepts() {
 		if (retiredConcepts != null) return retiredConcepts;
 		OWLScanner owlScanner = new OWLScanner(NCIT_OWL);
