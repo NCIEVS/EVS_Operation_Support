@@ -418,18 +418,13 @@ public class UIHelper {
 		}
 	}
 
-	public static void main(String[] args) {
-		if (args.length == 0) {
-			new UIHelper(DESIGN_FILE).run();
-		} else if (args.length == 1) {
-			String designFile = args[0];
-			new UIHelper(designFile).run();
-	    } else {
-			String designFile = args[0];
-			String altDesignFile = args[1];
-			UIHelper.convert(designFile, altDesignFile);
-			new UIHelperPlus(altDesignFile).generate();
-		}
+    public static void main(String[] args) {
+		String designFile = args[0];
+		Vector w = Utils.readFile(designFile);
+		Utils.dumpVector(designFile, w);
+		String altDesignFile = "alt_" + designFile;
+		UIHelper.convert(designFile, altDesignFile);
+		new UIHelperPlus(altDesignFile).generate();
 	}
 }
 

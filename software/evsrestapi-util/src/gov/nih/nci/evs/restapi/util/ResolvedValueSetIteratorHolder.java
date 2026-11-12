@@ -104,6 +104,7 @@ import org.apache.poi.openxml4j.util.ZipSecureFile;
  */
 public class ResolvedValueSetIteratorHolder {
     public static final String[] FILE_TYPES = new String[] { "xls", "xlsx" };
+    public static String DEFAULT_URL = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
 
     private StringBuffer out = new StringBuffer();
     private SimpleDateFormat sdf;
@@ -2101,8 +2102,32 @@ public class ResolvedValueSetIteratorHolder {
         }
     }
 
-	public static void main(String [ ] args)
-	{
+    public static String run(String excelfile, int sheet, int col, String code, boolean cdisc, String url, String htmlfile) {
+        int startIndex = ExcelUtils.getExcelStartRow(excelfile, sheet, col, code);
+        try {
+            ResolvedValueSetIteratorHolder rvsi = new ResolvedValueSetIteratorHolder(excelfile, sheet, startIndex, col, code, url, cdisc);
+			Vector w = new Vector();
+			w.add("<html><head></head><body><table>");
+			ListIterator iterator = rvsi.getResolvedValueSetIterator();
+			int lcv = 0;
+			while (iterator.hasNext()) {
+				String t = (String) iterator.next();
+				w.add(t);
+				lcv++;
+			}
+			w.add("</table></body></html>");
+			saveToFile(htmlfile, w);
+			Vector content = rvsi.getTableContent();
+			saveToFile("content.txt", content);
+			String content_str = rvsi.getResolvedValueSetContent();
+			return content_str;
+    	} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+
+	public static void main(String [ ] args) {
 		String excelfile = null;
 		try {
 			excelfile = "FDA-CDRH_NCIt_Subsets.xls";
@@ -2132,6 +2157,8 @@ public class ResolvedValueSetIteratorHolder {
 			col = 0;
 			code = "C81223";
 			htmlfile = "test4.html";
+
+			/*
 			//5:1:C178127
             cdisc = false;
 			excelfile = "PCDC_Terminology.xls";
@@ -2140,32 +2167,12 @@ public class ResolvedValueSetIteratorHolder {
 			col = 0;
 			code = "C178127";
 			htmlfile = "test7.html";
+			*/
 
-            //String DEFAULT_URL = "https://nciterms65.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&ns=ncit";
-            String DEFAULT_URL = "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/";
-			int startIndex = ExcelUtils.getExcelStartRow(excelfile, sheet, col, code);
-            ResolvedValueSetIteratorHolder rvsi = new ResolvedValueSetIteratorHolder(excelfile, sheet, startIndex, col, code, DEFAULT_URL, cdisc);
-
+			String content_str = run(excelfile, sheet, col, code, cdisc, DEFAULT_URL, htmlfile);
 			Vector w = new Vector();
-
-			w.add("<html><head></head><body><table>");
-			ListIterator iterator = rvsi.getResolvedValueSetIterator();
-			int lcv = 0;
-			while (iterator.hasNext()) {
-				String t = (String) iterator.next();
-				w.add(t);
-				lcv++;
-			}
-			w.add("</table></body></html>");
-			saveToFile(htmlfile, w);
-
-			Vector content = rvsi.getTableContent();
-			saveToFile("content.txt", content);
-
-			String content_str = rvsi.getResolvedValueSetContent();
-			w = new Vector();
 			w.add(content_str);
-			saveToFile("content_str.txt", content);
+			Utils.saveToFile("content_str.txt", w);
     	} catch (Exception ex) {
 			ex.printStackTrace();
 		}
