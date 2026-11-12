@@ -1,5 +1,4 @@
 package gov.nih.nci.evs.restapi.util;
-
 import java.io.*;
 import java.util.*;
 import org.apache.poi.hssf.usermodel.*;
@@ -42,6 +41,17 @@ import org.apache.poi.xssf.usermodel.XSSFHyperlink;
 public class XLS2XLSX {
 
 	private static String getCellData(Cell cell) {
+		try {
+			return cell.getStringCellValue();
+		} catch (Exception ex) {
+			HSSFDataFormatter dataFormatter = new HSSFDataFormatter();
+			String value = dataFormatter.formatCellValue(cell);
+			return value;
+		}
+	}
+
+/*
+	private static String getCellData(Cell cell) {
 		String value = null;
 		if (cell == null) {
 			return null;
@@ -66,6 +76,7 @@ public class XLS2XLSX {
 		}
 		return value;
 	}
+*/
 
 
     public static void run(String inpFn, String outFn) {
@@ -85,7 +96,11 @@ public class XLS2XLSX {
             Workbook wbOut = new XSSFWorkbook();
             int sheetCnt = wbIn.getNumberOfSheets();
             for (int i = 0; i < sheetCnt; i++) {
-                Sheet sIn = wbIn.getSheetAt(0);
+
+                Sheet sIn = wbIn.getSheetAt(i);
+
+                System.out.println("Converting sheet " + sIn.getSheetName() + " ...");
+
                 Sheet sOut = wbOut.createSheet(sIn.getSheetName());
                 Iterator<Row> rowIt = sIn.rowIterator();
                 while (rowIt.hasNext()) {
@@ -95,9 +110,8 @@ public class XLS2XLSX {
                     Iterator<Cell> cellIt = rowIn.cellIterator();
                     while (cellIt.hasNext()) {
                         Cell cellIn = cellIt.next();
-                        Cell cellOut = rowOut.createCell(
-                                cellIn.getColumnIndex(), cellIn.getCellType());
-
+                        //Cell cellOut = rowOut.createCell(cellIn.getColumnIndex(), cellIn.getCellType());
+                        Cell cellOut = rowOut.createCell(cellIn.getColumnIndex(), CellType.STRING);
                         String data = getCellData(cellIn);
                         cellOut.setCellValue(data);
 						CellStyle styleIn = cellIn.getCellStyle();
@@ -110,6 +124,7 @@ public class XLS2XLSX {
             OutputStream out = new BufferedOutputStream(new FileOutputStream(outF));
             try {
                 wbOut.write(out);
+                System.out.println(outFn + " generated.");
             } finally {
                 out.close();
             }

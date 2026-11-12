@@ -334,12 +334,13 @@ public class UIHelper {
 		out.println("				if (s.equals(\"Browse\")) {");
 		out.println("					" + tf + ".setText(\"\");");
 		out.println("					JFileChooser fileChooser = new JFileChooser();");
-		out.println("					fileChooser.setDialogTitle(\"Select Query File\");");
+		out.println("					fileChooser.setDialogTitle(\"Select File\");");
+        out.println("					File defaultDirectory = new File(System.getProperty(\"user.dir\"));");
+        out.println("					fileChooser.setCurrentDirectory(defaultDirectory);");
 		out.println("					int userSelection = fileChooser.showOpenDialog(null);");
 		out.println("					if (userSelection == JFileChooser.APPROVE_OPTION) {");
 		out.println("						File fileToOpen = fileChooser.getSelectedFile();");
 		out.println("						String inputfile = fileToOpen.getAbsolutePath();");
-
 		out.println("					}");
 		out.println("				} else if (s.equals(\"" + btnLabel + "\")) {");
 		out.println("				     // <Add action statements here.>");
