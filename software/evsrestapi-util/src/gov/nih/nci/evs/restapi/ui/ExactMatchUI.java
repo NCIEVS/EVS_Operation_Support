@@ -181,6 +181,9 @@ public class ExactMatchUI {
 				if (s.equals("Browse")) {
 					JFileChooser fileChooser = new JFileChooser();
 					fileChooser.setDialogTitle("Select Axiom File");
+					File defaultDirectory = new File(System.getProperty("user.dir"));
+					fileChooser.setCurrentDirectory(defaultDirectory);
+
 					int userSelection = fileChooser.showOpenDialog(null);
 					if (userSelection == JFileChooser.APPROVE_OPTION) {
 						File fileToOpen = fileChooser.getSelectedFile();
@@ -206,6 +209,9 @@ public class ExactMatchUI {
 				if (s.equals("Browse")) {
 					JFileChooser fileChooser = new JFileChooser();
 					fileChooser.setDialogTitle("Select Data File");
+					File defaultDirectory = new File(System.getProperty("user.dir"));
+					fileChooser.setCurrentDirectory(defaultDirectory);
+
 					int userSelection = fileChooser.showOpenDialog(null);
 					if (userSelection == JFileChooser.APPROVE_OPTION) {
 						File fileToOpen = fileChooser.getSelectedFile();

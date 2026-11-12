@@ -197,6 +197,9 @@ public class CSV2HTMLTableUI {
 					jt.setText("");
 					JFileChooser fileChooser = new JFileChooser();
 					fileChooser.setDialogTitle("Select Query File");
+					File defaultDirectory = new File(System.getProperty("user.dir"));
+					fileChooser.setCurrentDirectory(defaultDirectory);
+
 					int userSelection = fileChooser.showOpenDialog(null);
 					if (userSelection == JFileChooser.APPROVE_OPTION) {
 						File fileToOpen = fileChooser.getSelectedFile();

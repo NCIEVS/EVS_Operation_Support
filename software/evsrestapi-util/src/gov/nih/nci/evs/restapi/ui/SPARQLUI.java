@@ -188,6 +188,9 @@ public class SPARQLUI {
 				if (s.equals("Browse")) {
 					jt.setText("");
 					JFileChooser fileChooser = new JFileChooser();
+					File defaultDirectory = new File(System.getProperty("user.dir"));
+					fileChooser.setCurrentDirectory(defaultDirectory);
+
 					fileChooser.setDialogTitle("Select Query File");
 					int userSelection = fileChooser.showOpenDialog(null);
 					if (userSelection == JFileChooser.APPROVE_OPTION) {

@@ -68,6 +68,9 @@ public class HierarchyUI {
 				if (s.equals("Browse")) {
 					JFileChooser fileChooser = new JFileChooser();
 					fileChooser.setDialogTitle("Select Hierarchy Data File");
+					File defaultDirectory = new File(System.getProperty("user.dir"));
+					fileChooser.setCurrentDirectory(defaultDirectory);
+
 					int userSelection = fileChooser.showOpenDialog(null);
 					if (userSelection == JFileChooser.APPROVE_OPTION) {
 						File fileToOpen = fileChooser.getSelectedFile();
@@ -107,6 +110,9 @@ public class HierarchyUI {
 				if (s.equals("Browse")) {
 					JFileChooser fileChooser = new JFileChooser();
 					fileChooser.setDialogTitle("Select Hierarchy Data File");
+					File defaultDirectory = new File(System.getProperty("user.dir"));
+					fileChooser.setCurrentDirectory(defaultDirectory);
+
 					int userSelection = fileChooser.showSaveDialog(null);
 					if (userSelection == JFileChooser.APPROVE_OPTION) {
 						File fileToSave = fileChooser.getSelectedFile();

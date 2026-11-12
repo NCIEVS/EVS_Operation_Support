@@ -142,6 +142,9 @@ public class ClipBoardUI {
 					try {
 						String content = textArea.getText();
 						JFileChooser fc = new JFileChooser();//FileSystemView.getFileSystemView());
+						File defaultDirectory = new File(System.getProperty("user.dir"));
+						fc.setCurrentDirectory(defaultDirectory);
+
 						fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 						fc.setApproveButtonText("Save");
 						//fc.setCurrentDirectory(new File (System.getProperty("user.home") + System.getProperty("file.separator")+ OUTPUT_DIR));

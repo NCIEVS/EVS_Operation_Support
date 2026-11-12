@@ -36,6 +36,9 @@ public class ExcelFormatterUI {
 				if (s.equals("Browse")) {
 					tf1.setText("");
 					JFileChooser fileChooser = new JFileChooser();
+					File defaultDirectory = new File(System.getProperty("user.dir"));
+					fileChooser.setCurrentDirectory(defaultDirectory);
+
 					fileChooser.setDialogTitle("Select File");
 					int userSelection = fileChooser.showOpenDialog(null);
 					if (userSelection == JFileChooser.APPROVE_OPTION) {

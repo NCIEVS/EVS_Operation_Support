@@ -38,6 +38,9 @@ public class Text2ExcelUI {
 				String s = e.getActionCommand();
 				if (s.equals("Browse")) {
 					JFileChooser chooser = new JFileChooser();
+					File defaultDirectory = new File(System.getProperty("user.dir"));
+					chooser.setCurrentDirectory(defaultDirectory);
+
 					chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); // Show only directories
 					int option = chooser.showOpenDialog(frame);
 					if (option == JFileChooser.APPROVE_OPTION) {

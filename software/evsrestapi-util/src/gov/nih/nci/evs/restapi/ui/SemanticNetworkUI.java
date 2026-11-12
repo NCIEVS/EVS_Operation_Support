@@ -57,6 +57,9 @@ public class SemanticNetworkUI {
 				if (s.equals("Browse")) {
 					JFileChooser fileChooser = new JFileChooser();
 					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); // Allow directories only
+					File defaultDirectory = new File(System.getProperty("user.dir"));
+					fileChooser.setCurrentDirectory(defaultDirectory);
+
 					fileChooser.setDialogTitle("Select Target Directory");
 					int userSelection = fileChooser.showOpenDialog(null);
 					if (userSelection == JFileChooser.APPROVE_OPTION) {

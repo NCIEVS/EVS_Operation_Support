@@ -123,6 +123,9 @@ public class ValueSetHierarchyUI {
 				if (s.equals("Browse")) {
 					JFileChooser fileChooser = new JFileChooser();
 					fileChooser.setDialogTitle("Select Hierarchy Data File");
+					File defaultDirectory = new File(System.getProperty("user.dir"));
+					fileChooser.setCurrentDirectory(defaultDirectory);
+
 					int userSelection = fileChooser.showOpenDialog(null);
 					if (userSelection == JFileChooser.APPROVE_OPTION) {
 						File fileToOpen = fileChooser.getSelectedFile();
@@ -140,7 +143,7 @@ public class ValueSetHierarchyUI {
 				String s = e.getActionCommand();
 				if (s.equals("View")) {
 					String hierdatafile = hierDataFileTF.getText();
-					System.out.println("********************* hierdatafile: " + hierdatafile);
+					System.out.println("hierdatafile: " + hierdatafile);
 					String root = rootTF1.getText();
 					JDialog treedialog = new TreeDialog(hierdatafile, root);
 					treedialog.setSize(400, 300);
