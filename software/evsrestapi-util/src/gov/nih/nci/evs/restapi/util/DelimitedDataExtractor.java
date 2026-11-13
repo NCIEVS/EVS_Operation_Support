@@ -63,28 +63,67 @@ import java.util.*;
  */
 public class DelimitedDataExtractor {
 
-    public static Vector getHashMapValues(HashMap hmap) {
-		Vector w = new Vector();
+	public static int findCodeColumnNumberInFile(String filename, char delim) {
+		Vector v = Utils.readFile(filename);
+		String firstLn = (String) v.elementAt(0);
+		return findCodeColumnNumber(firstLn, delim);
+	}
+
+	public static int findCodeColumnNumber(String line, char delim) {
+		Vector u = StringUtils.parseData(line, delim);
+		for (int i=0; i<u.size(); i++) {
+			String t = (String) u.elementAt(i);
+			if (t.compareToIgnoreCase("Code") == 0 || t.compareToIgnoreCase("NCIt Code") == 0) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	public static char findDelimiterInFile(String filename) {
+		Vector v = Utils.readFile(filename);
+		String firstLn = (String) v.elementAt(0);
+		return findDelimiter(firstLn);
+	}
+
+	public static char findDelimiter(String line) {
+		if (line.indexOf("|") != -1) return '\t';
+		return '|';
+	}
+
+	public static String vector2DelimitedString(Vector v, char delim) {
+		StringBuffer buf = new StringBuffer();
+        for (int i=0; i<v.size(); i++) {
+			String t = (String) v.elementAt(i);
+			buf.append(t + delim);
+		}
+		String t = buf.toString();
+		t = t.substring(0, t.length()-1);
+		return t;
+	}
+
+	public static String toTabDelimited(String line) {
+		line = line.replace("|", "\t");
+		return line;
+	}
+
+	public static Vector getHashMapValues(HashMap hmap) {
+		Vector v = new Vector();
 		Iterator it = hmap.keySet().iterator();
 		while (it.hasNext()) {
 			String key = (String) it.next();
-			Object value = hmap.get(key);
-			if (value instanceof String) {
-				w.add(key + "|" + value);
-			} else if (value instanceof Vector) {
-				Vector v = (Vector) value;
-				for (int j=0; j<v.size(); j++) {
-					String t = (String) v.elementAt(j);
-					w.add(key + "|" + t);
-				}
+			Vector values = (Vector) hmap.get(key);
+			for (int i=0; i<values.size(); i++) {
+				String value = (String) values.elementAt(i);
+				v.add(key + "|" + value);
 			}
 		}
-		return w;
+		return v;
 	}
 
 
 	public static Vector extractByMatchingFieldValue(Vector w, int key, String value, String delim_columns, char delim) {
-		Vector<Integer> columns = delimitedInt2integers(delim_columns, '|');
+		Vector<Integer> columns = DelimitedDataExtractor.delimitedInt2integers(delim_columns, '|');
 		Vector v = new Vector();
 		for (int i=0; i<w.size(); i++) {
 			String line = (String) w.elementAt(i);
@@ -106,6 +145,7 @@ public class DelimitedDataExtractor {
 		}
 		return v;
 	}
+
 
 	public static Vector<Integer> delimitedInt2integers(String delim_columns, char delim) {
 		Vector w = StringUtils.parseData(delim_columns, delim);

@@ -185,6 +185,50 @@ public class DataAppender {
         return hmap;
 	}
 
+    public static void run(String datafile, String propertyCodeStr, String outputfile) {
+		Vector propCodes = StringUtils.parseData(propertyCodeStr, '|');
+		Vector properties = propCodes;
+		PropertyRetrieval propertyRetrieval = new PropertyRetrieval(NCIT_OWL, properties);
+		HashMap map = propertyRetrieval.getPropertyMap();
+		char delim = DelimitedDataExtractor.findDelimiter(datafile);
+		int codeCol = DelimitedDataExtractor.findCodeColumnNumberInFile(datafile, delim);
+		if (codeCol == -1) {
+			System.out.println("WARNING: Code column not found in " + datafile + ".");
+			return;
+		} else {
+			Vector v = Utils.readFile(datafile);
+			Vector w = new Vector();
+			propertyCodeStr.replace("|", "" + delim);
+			propertyCodeStr = delim + propertyCodeStr;
+			String firstLn = (String) v.elementAt(0) + propertyCodeStr;
+			w.add(DelimitedDataExtractor.toTabDelimited(firstLn));
+			Vector w1 = new Vector();
+			for (int j=1; j<v.size(); j++) {
+				String line = (String) v.elementAt(j);
+				Vector u2 = StringUtils.parseData(line, delim);
+				String key = (String) u2.elementAt(codeCol);
+				StringBuffer buf = new StringBuffer();
+				for (int k=0; k<propCodes.size(); k++) {
+					String propCode = (String) propCodes.elementAt(k);
+					HashMap hmap = (HashMap) map.get(propCode);
+					Vector values = (Vector) hmap.get(key);
+					if (values != null) {
+						String t = DelimitedDataExtractor.vector2DelimitedString(values, '$');
+						buf.append(delim + t);
+					} else {
+						buf.append(delim);
+					}
+				}
+				String s2 = buf.toString();
+				line = line + s2;
+				w1.add(DelimitedDataExtractor.toTabDelimited(line));
+			}
+			w.addAll(w1);
+			Utils.saveToFile(outputfile, w);
+			System.out.println(outputfile + " generated.");
+		}
+	}
+
 
 	public static void main(String[] args) {
 		String datafile = args[0];
