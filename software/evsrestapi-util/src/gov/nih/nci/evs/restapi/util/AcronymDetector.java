@@ -62,13 +62,14 @@ import java.util.*;
  *
  */
 public class AcronymDetector {
-
 	static String NCIT_OWL = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.owlfile; //"ThesaurusInferred_forTS.owl";
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
 	static String RESTRICTION_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.rolefile; //"roles.txt";
 	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
 	static String A8_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.subsetfile;
     static HashMap code2TermsHashMap = null;
+    static HashMap term2CodesHashMap = null;
+    static HashMap lcterm2CodesHashMap = null;
     static String ACRONYM_DATA = "acronyms.txt";
     static int MAX_ACRONYM_LENGTH = 5;
     static int DEFAULT_MAX_ACRONYM_LENGTH = 5;
@@ -76,6 +77,8 @@ public class AcronymDetector {
 
     static {
 		code2TermsHashMap = createCode2TermsHashMap();
+		term2CodesHashMap = createTerm2CodesHashMap();
+		lcterm2CodesHashMap = new HashMap();//createLcTerm2CodesHashMap();
 	}
 
     public static HashMap createCode2TermsHashMap() {
@@ -84,7 +87,7 @@ public class AcronymDetector {
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			//String label = (String) u.elementAt(0);
+			String label = (String) u.elementAt(0);
 			String code = (String) u.elementAt(0);
 			String prop_code = (String) u.elementAt(1);
 			if (prop_code.compareTo("P90") == 0) {
@@ -92,11 +95,9 @@ public class AcronymDetector {
 				if (hmap.containsKey(code)) {
 					w = (Vector) hmap.get(code);
 				}
-				/*
 				if (!w.contains(label)) {
 					w.add(label);
 				}
-				*/
 				hmap.put(code, w);
 				String term = (String) u.elementAt(2);
 				if (!w.contains(term)) {
@@ -108,7 +109,82 @@ public class AcronymDetector {
 		return hmap;
 	}
 
+    public static HashMap createTerm2CodesHashMap() {
+		HashMap hmap = new HashMap();
+		Vector v = Utils.readFile(AXIOM_FILE);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String label = (String) u.elementAt(0);
+			String code = (String) u.elementAt(0);
+			String prop_code = (String) u.elementAt(1);
+			if (prop_code.compareTo("P90") == 0) {
+				Vector w = new Vector();
+				//////////////////////////////////////////////////
+				if (hmap.containsKey(label)) {
+					w = (Vector) hmap.get(label);
+				}
+				if (!w.contains(code)) {
+					w.add(code);
+				}
+				hmap.put(label, w);
+				String term = (String) u.elementAt(2);
 
+				//////////////////////////////////////////////////
+				w = new Vector();
+				if (hmap.containsKey(term)) {
+					w = (Vector) hmap.get(term);
+				}
+				if (!w.contains(code)) {
+					w.add(code);
+				}
+				hmap.put(term, w);
+			}
+		}
+		return hmap;
+	}
+
+    public static HashMap createLcTerm2CodesHashMap() {
+		HashMap hmap = new HashMap();
+		Vector v = Utils.readFile(AXIOM_FILE);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String label = (String) u.elementAt(0);
+			String code = (String) u.elementAt(0);
+			String prop_code = (String) u.elementAt(1);
+			if (prop_code.compareTo("P90") == 0) {
+				Vector w = new Vector();
+				//////////////////////////////////////////////////
+				label = label.toLowerCase();
+                label = removeSpecialCharacters(label);
+
+				if (hmap.containsKey(label)) {
+					w = (Vector) hmap.get(label);
+				}
+				if (!w.contains(code)) {
+					w.add(code);
+				}
+				hmap.put(label, w);
+
+				String term = (String) u.elementAt(2);
+
+				//////////////////////////////////////////////////
+				term = label.toLowerCase();
+                term = removeSpecialCharacters(term);
+
+				w = new Vector();
+				if (hmap.containsKey(term)) {
+					w = (Vector) hmap.get(term);
+				}
+				if (!w.contains(code)) {
+					w.add(code);
+				}
+				hmap.put(term, w);
+			}
+		}
+		return hmap;
+	}
 
     public static String removeSpecialCharacters(String term) {
 		term = term.replace("(", "");
@@ -171,6 +247,16 @@ public class AcronymDetector {
 									}
 									if (token.length() > 1) {
 										hmap.put(token, w3);
+
+										//lcterm2CodesHashMap
+										Vector values = new Vector();
+										if (lcterm2CodesHashMap.containsKey(token)) {
+											values = (Vector) lcterm2CodesHashMap.get(token);
+										}
+										if (!values.contains(code)) {
+											values.add(code);
+										}
+										lcterm2CodesHashMap.put(token, values);
 									}
 								}
 							}
@@ -179,7 +265,10 @@ public class AcronymDetector {
 				}
 			}
 		}
-        return hmap;
+		if (hmap.keySet().size() > 0) {
+			return hmap;
+		}
+        return null;
 	}
 
     public static boolean isAlphanumeric(String str) {
@@ -209,13 +298,16 @@ public class AcronymDetector {
 		return true;
 	}
 
+//C123808|P90|BPG-Dependent PGAM|P383$SY|P384$NCI
 	public static void generateAcronymData() {
+		System.out.println("AXIOM_FILE: " + AXIOM_FILE);
 		Vector v = Utils.readFile(AXIOM_FILE);
+		System.out.println("AXIOM_FILE length: " + v.size());
 		HashSet acronyms = new HashSet();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
-			String label = (String) u.elementAt(0);
+			String label = (String) u.elementAt(2);
 			String code = (String) u.elementAt(0);
 			String prop_code = (String) u.elementAt(1);
 			if (prop_code.compareTo("P90") == 0) {
@@ -267,33 +359,85 @@ public class AcronymDetector {
 	}
 
     public static HashMap findAcronyms(Vector v) {
-		HashMap hmap = new HashMap();
-		HashSet hset = new HashSet();
+		HashMap map = new HashMap();
 		int lcv = 0;
 		int total = v.size();
 		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
+			String term = (String) v.elementAt(i);
 			lcv++;
 			if (lcv == 100) {
 				System.out.println("" + i + " out of " + total + " completed.");
 				lcv = 0;
 			}
-			if (line.indexOf("No match") == -1) {
-				Vector u = StringUtils.parseData(line, '\t');
-				String s = (String) u.elementAt(1);
-				Vector u2 = StringUtils.parseData(s, '|');
-				String code = (String) u2.elementAt(1);
-				if (!hset.contains(code)) {
-					hset.add(code);
-					HashMap map = findAcronyms(code);
-					if (map.keySet().size() > 0) {
-						hmap.put(code, map);
+			Vector codes = (Vector) term2CodesHashMap.get(term);
+			if (codes != null) {
+				for (int j=0; j<codes.size(); j++) {
+					String code = (String) codes.elementAt(j);
+					HashMap hmap = findAcronyms(code);
+					if (hmap != null) {
+						Iterator it = hmap.keySet().iterator();
+						while (it.hasNext()) {
+							String key = (String) it.next();
+							Vector w = new Vector();
+							if (map.containsKey(key)) {
+								w = (Vector) map.get(key);
+							}
+							Vector w1 = (Vector) hmap.get(key);
+							for (int k=0; k<w1.size(); k++) {
+								String t = (String) w1.elementAt(k);
+								if (!w.contains(t)) {
+									w.add(t);
+								}
+							}
+							map.put(key, w);
+						}
 					}
 				}
 			}
 		}
-		return hmap;
+		return map;
 	}
+
+    public static HashMap findAcronym2CodesHashMap(Vector v) {
+		HashMap map = new HashMap();
+		int lcv = 0;
+		int total = v.size();
+		for (int i=0; i<v.size(); i++) {
+			String term = (String) v.elementAt(i);
+			lcv++;
+			if (lcv == 100) {
+				System.out.println("" + i + " out of " + total + " completed.");
+				lcv = 0;
+			}
+			Vector codes = (Vector) term2CodesHashMap.get(term);
+			if (codes != null) {
+				for (int j=0; j<codes.size(); j++) {
+					String code = (String) codes.elementAt(j);
+					HashMap hmap = findAcronyms(code);
+					if (hmap != null) {
+						Iterator it = hmap.keySet().iterator();
+						while (it.hasNext()) {
+							String key = (String) it.next();
+							Vector w = new Vector();
+							if (map.containsKey(key)) {
+								w = (Vector) map.get(key);
+							}
+							Vector w1 = (Vector) hmap.get(key);
+							for (int k=0; k<w1.size(); k++) {
+								String t = (String) w1.elementAt(k);
+								if (!w.contains(code)) {
+									w.add(code);
+								}
+							}
+							map.put(key, w);
+						}
+					}
+				}
+			}
+		}
+		return map;
+	}
+
 
 	public static boolean isInteger(String t) {
 		try {
@@ -303,7 +447,6 @@ public class AcronymDetector {
 			return false;
 		}
 	}
-
 
 	public static Vector sortAcronyms(HashMap hmap) {
 		Vector w = new Vector();
@@ -345,10 +488,19 @@ public class AcronymDetector {
 		return w1;
 	}
 
-	public static String dumpAcronyms(HashMap hmap) {
-		Vector w = sortAcronyms(hmap);
-		Utils.saveToFile("NCIt_acronyms.txt", w);
-		return "NCIt_acronyms.txt";
+	public static Vector dumpAcronyms(HashMap hmap) {
+		Vector w = new Vector();
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			Vector values = (Vector) hmap.get(key);
+			for (int i=0; i<values.size(); i++) {
+				String value = (String) values.elementAt(i);
+				w.add(key + "|" + value);
+			}
+		}
+		w = new SortUtils().quickSort(w);
+		return w;
 	}
 
 	public static String run() {
@@ -363,26 +515,38 @@ public class AcronymDetector {
 
 		set_MAX_ACRONYM_LENGTH(max_acronym_length);
 		long ms = System.currentTimeMillis();
-		String serviceUrl = ConfigurationController.serviceUrl;
-		String named_graph = ConfigurationController.namedGraph;
-		String username = ConfigurationController.username;
-		String password = ConfigurationController.password;
-		System.out.println("serviceUrl: " + serviceUrl);
-		System.out.println("named_graph: " + named_graph);
 		String datafile = ACRONYM_DATA;
-		File f = new File(datafile);
-		if (!f.exists()) {
-			System.out.println(datafile + " does not exist.");
-			generateAcronymData();
-			System.out.println(datafile + " generated.");
-		}
-
+		generateAcronymData();
 		int colNum = 0;
 		char delim = '\t';
-		SPARQLSearchUtils.run(serviceUrl, named_graph, username, password, datafile, colNum, delim);
-		HashMap hmap = findAcronyms(Utils.readFile("results_" + ACRONYM_DATA));
-		String outputfile = dumpAcronyms(hmap);
+		HashMap hmap = findAcronyms(Utils.readFile(ACRONYM_DATA));
+		Vector w = dumpAcronyms(hmap);
+
+		w = appendCodes(w);
+
+		String outputfile = "NCIt_acronyms.txt";
+		Utils.saveToFile(outputfile, w);
+		System.out.println("Outputfile " + outputfile + " generated.");
 		return outputfile;
+	}
+
+	public static Vector appendCodes(Vector v) {
+		//HashMap codeMap = findAcronym2CodesHashMap(v);
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String token = (String) u.elementAt(0);
+			Vector codes = (Vector) lcterm2CodesHashMap.get(token);
+			if (codes != null) {
+				codes = new SortUtils().quickSort(codes);
+				String codeStr = DelimitedDataExtractor.vector2DelimitedString(codes, '$');
+				w.add(line + "|" + codeStr);
+			}else {
+				w.add(line + "|");
+			}
+		}
+		return w;
 	}
 
 	public static void main(String[] args) {
