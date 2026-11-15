@@ -764,6 +764,22 @@ public class Utils {
 		return insert(file1, file2, INSERT_CONTENT_HERE);
 	}
 
+    public static String vector2DelimitedString(Vector v, char delim) {
+		if (v == null) return "";
+		v = new SortUtils().quickSort(v);
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<v.size(); i++) {
+			String value = (String) v.elementAt(i);
+			buf.append(value).append("" + delim);
+		}
+		String t = buf.toString();
+		if (t.endsWith("" + delim)) {
+			t = t.substring(0, t.length()-1);
+		}
+		String decoded = HTMLDecoder.decode(t);
+		return decoded.trim();
+	}
+
     public static String vector2DelimitedString(Vector v) {
 		if (v == null) return "";
 		v = new SortUtils().quickSort(v);
