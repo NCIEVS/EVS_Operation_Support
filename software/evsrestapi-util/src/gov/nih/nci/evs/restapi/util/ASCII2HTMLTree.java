@@ -85,12 +85,13 @@ public class ASCII2HTMLTree {
 			root = "<root>";
 		}
 		w.addAll(parent_child_vec);
-		Utils.saveToFile("mod_" + asciitreedatafile, w);
-
 		int n = asciitreedatafile.lastIndexOf(".");
+		String newFile = asciitreedatafile.substring(0, n) + "_mod.txt";
+		Utils.saveToFile(newFile, w);
+
 		String htmlfile = asciitreedatafile.substring(0, n) + "_tree.html";
 
-		ASCII2HTMLTreeConverter.generateDynamicHTMLTree("mod_" + asciitreedatafile, htmlfile);
+		ASCII2HTMLTreeConverter.generateDynamicHTMLTree(newFile, htmlfile);
 		Vector v = Utils.readFile(htmlfile);
 		w = new Vector();
 		for (int i=0; i<v.size(); i++) {
@@ -101,7 +102,7 @@ public class ASCII2HTMLTree {
 		Utils.saveToFile(htmlfile, w);
 		System.out.println(htmlfile + " generated.");
 
-		String htmlfile2 = HTMLHierarchy.run("mod_" + asciitreedatafile, title, root);
+		String htmlfile2 = HTMLHierarchy.run(newFile, title, root);
 		System.out.println(htmlfile2 + " generated.");
 	}
 
