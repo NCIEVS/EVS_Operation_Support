@@ -61,6 +61,9 @@ public class FTPSiteInventory {
     static {
 		currentWorkingDirectory = System.getProperty("user.dir");
 	}
+	public static String RAW_FTP_DATA = "FTP_TABLE_DATA.txt";
+	public static String FTP_TABLE_DATA = "ftp.txt";
+	public static String FTP_HIER_DATA = "ftp_hier_data.txt";
 
 	public static void download(String url, String outputfile) {
 		try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
@@ -78,15 +81,22 @@ public class FTPSiteInventory {
 	public static Vector getURLPageContent(String url) {
 		String htmlfile = "root.html";
 		String url0 = url;
+
+		System.out.println(url);
+		System.out.println(EVS_FTP_URL);
+
 		if (url.compareTo(EVS_FTP_URL) != 0) {
-			String line = url;
+     		String line = url;
 			url = url.replace(EVS_FTP_URL, "");
 			url = url.replace("/", "");
 			String href = url.trim();
 			htmlfile = href + ".html";
 		}
-		System.out.println("Downloading from " + url0);
+		System.out.println("****************** Downloading from " + url0);
+		System.out.println("download url0: " + url0);
 		download(url0, htmlfile);
+		System.out.println("download url0: " + url0 + " done.");
+		System.out.println("parseHTML: " + htmlfile);
         Vector w = parseHTML(htmlfile);
         FileUtils.deleteFile(htmlfile);
         return w;
@@ -130,23 +140,19 @@ public class FTPSiteInventory {
 		return w;
 	}
 
+/*
     public static Vector run() {
 		String url = EVS_FTP_URL;
 		Vector w0 = getURLPageContent(url);
-		Utils.dumpVector(url, w0);
-
 		Vector w = new Vector();
 		w.add("URL|File Name|Last Modified Date|Size");
-
 		Stack stack = new Stack();
-
 		for (int i=0; i<w0.size(); i++) {
 			String line = (String) w0.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
 			String href = (String) u.elementAt(0);
 			System.out.println(href);
 			if (href.endsWith("/")) {
-				System.out.println("Stack push " + href);
 				stack.push(EVS_FTP_URL + href);
 			} else {
 				String href2 = href.replace(" ", "%20");
@@ -173,7 +179,12 @@ public class FTPSiteInventory {
 		}
         return w;
 	}
-
+*/
+/*
+    public static Vector run() {
+		return null;
+	}
+*/
 	public static void generate(String filename) {
         generate(filename, false);
 	}
@@ -260,12 +271,13 @@ public class FTPSiteInventory {
 		Vector v = Utils.readFile(filename);
 		for (int i=1; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
-			Vector u = StringUtils.parseData(line, '|');
+			Vector u = StringUtils.parseData(line, '\t');
 			String t0 = (String) u.elementAt(0);
 			String t1 = (String) u.elementAt(1);
 			String t2 = (String) u.elementAt(2);
 			String t3 = (String) u.elementAt(3);
-			String s1 = toHyperLink(t0, t1);
+
+			String s1 = toHyperLink(t0 + File.separator + t1, t1);
 			out.println("<tr>");
 
 			if (showURL) {
@@ -280,6 +292,7 @@ public class FTPSiteInventory {
 				out.println("<td width=\"15%\">");
 				out.println(t2);
 				out.println("</td>");
+
 			} else {
 
 				out.println("<td width=\"60%\">");
@@ -312,23 +325,142 @@ public class FTPSiteInventory {
 	}
 
     public static void run(String outputfile) {
-		run(outputfile, false);
+		//run(outputfile, false);
+		run(outputfile, true);
 	}
 
     public static void run(String outputfile, boolean showURL) {
 		long ms = System.currentTimeMillis();
+		/*
         File f = new File(outputfile);
-        if (!f.exists()) {
-			Vector w = run();
-			//Utils.dumpVector(EVS_FTP_URL, w);
-			Utils.saveToFile(outputfile, w);
-		}
+		Vector w = run();
+		Utils.dumpVector(EVS_FTP_URL, w);
+		Utils.saveToFile(outputfile, w);
+        generate(outputfile, showURL);
+        */
         generate(outputfile, showURL);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
+	public static Vector findFTPSubs(HashMap hmap, String url) {
+		Vector w = new Vector();
+	    Set set = hmap.keySet();
+	    Iterator it = set.iterator();
+	    while (it.hasNext()) {
+			String t = (String) it.next();
+			if (t.compareTo(url) != 0 && t.startsWith(url)) {
+				int n = t.lastIndexOf("/");
+				String s = t.substring(n+1, t.length());
+				Vector u1 = StringUtils.parseData(s, "/");
+				if (u1.size() == 1) {
+					w.add(t);
+				}
+			}
+		}
+	    return w;
+	}
+
+
+	public static Vector generateFTPHierData(HashMap hmap) {
+		String EVS_FTP = "https://evs.nci.nih.gov/ftp1";
+		Vector w = new Vector();
+		Stack stack = new Stack();
+		stack.push(EVS_FTP);
+		HashMap label2CodeMap = new HashMap();
+		int count = 0;
+		while (!stack.isEmpty()) {
+			String url = (String) stack.pop();
+			if (!label2CodeMap.containsKey(url)) {
+				count++;
+				String code = "URL_" + count;
+				label2CodeMap.put(url, code);
+			}
+            String parentCode = (String) label2CodeMap.get(url);
+			Vector subs = findFTPSubs(hmap, url);
+			if (subs.size() > 0) {
+				for (int i=0; i<subs.size(); i++) {
+					String sub = (String) subs.elementAt(i);
+
+					if (!label2CodeMap.containsKey(sub)) {
+						count++;
+						String code = "URL_" + count;
+						label2CodeMap.put(sub, code);
+					}
+					String childCode = (String) label2CodeMap.get(sub);
+					w.add(url + "|" + parentCode + "|" + sub + "|" + childCode);
+					stack.push(sub);
+				}
+			}
+		}
+        return new SortUtils().quickSort(w);
+	}
+
+	public static Vector formatFPTData(HashMap hmap) {
+		Vector w = new Vector();
+		w.add("URL/tName/tLast modified/tSize/tDescription");
+		Iterator it = hmap.keySet().iterator();
+		while (it.hasNext()) {
+			String url = (String) it.next();
+			Vector v = (Vector) hmap.get(url);
+			for (int i=0; i<v.size(); i++) {
+				String line = (String) v.elementAt(i);
+				w.add(url + "\t" + line);
+			}
+		}
+		return w;
+	}
+
+
+	public static HashMap loadFTPSiteData(String filename) {
+		HashMap hmap = new HashMap();
+		String url = null;
+		Vector data_vec = null;
+		Vector v = Utils.readFile(filename);
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (line.startsWith("http")) {
+				if (data_vec != null) {
+					hmap.put(url, data_vec);
+				}
+				url = line;
+				data_vec = new Vector();
+			} else {
+				Vector u = StringUtils.parseData(line, '\t');
+				if (u.size() == 4) {
+					data_vec.add(line);
+				}
+			}
+		}
+		if (data_vec != null) {
+			hmap.put(url, data_vec);
+		}
+		return hmap;
+	}
+
+	public static String generateFTPHierData() {
+		String filename = RAW_FTP_DATA;
+		File f = new File(filename);
+		if (!f.exists()) {
+			System.out.println(filename + " does not exist.");
+			return null;
+		}
+		HashMap hmap = loadFTPSiteData(filename);
+		Vector v = formatFPTData(hmap);
+		Utils.saveToFile(FTP_TABLE_DATA, v);
+		Vector w = generateFTPHierData(hmap);
+		Utils.saveToFile(FTP_HIER_DATA, w);
+		return FTP_HIER_DATA;
+	}
+
+    public static void main0(String[] args) {
+    	String hier_data = generateFTPHierData();
+    	if (hier_data != null) {
+			System.out.println(hier_data + " generated.");
+		}
+	}
+
     public static void main(String[] args) {
-		String outputfile = "ftp.txt";
+		String outputfile = FTP_TABLE_DATA;
 		run(outputfile);
 	}
 }
