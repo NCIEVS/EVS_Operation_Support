@@ -465,7 +465,7 @@ public class PolyHierarchy {
 	public static void substitute(String filename, Vector replace_vec, Vector by_vec) {
 		Vector v = Utils.readFile(filename);
 		int n = filename.lastIndexOf(".");
-		String backupfile = filename.substring(0, n) + "_bak.txt";//"bak_" + filename;
+		String backupfile = filename.substring(0, n) + "_bak.txt";
 		Utils.saveToFile(backupfile, v);
 		Vector w = new Vector();
 		for (int i=0; i<v.size(); i++) {

@@ -184,7 +184,8 @@ public class TableDataLoader {
 	 }
 
 	 public static void qa(String filename) {
-		 String outputfile = "bak_" + filename;
+		 int n = filename.lastIndexOf(".");
+		 String outputfile = filename.substring(0, n) + "_mod.txt";;
 		 Vector v0 = Utils.readFile(filename);
 		 Vector v1 = Utils.readFile(outputfile);
 
@@ -194,7 +195,7 @@ public class TableDataLoader {
 		 System.out.println("v0: " + n0);
 		 System.out.println("v1: " + n1);
 
-		 int n = n0;
+		 n = n0;
 		 if (n1 < n0) {
 			 n = n1;
 		 }

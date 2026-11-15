@@ -450,7 +450,9 @@ public class ExcelFormatter {
 	}
 
 	public static void reformat(String xlsfile, short firstRowColor) {
-		FileUtils.copyfile(xlsfile, "bak_" + xlsfile);
+		int n = xlsfile.lastIndexOf(".");
+		String newFile = xlsfile.substring(0, n) + "_bak.txt";
+		FileUtils.copyfile(xlsfile, newFile);
 		reformat(xlsfile, xlsfile, firstRowColor);
 	}
 

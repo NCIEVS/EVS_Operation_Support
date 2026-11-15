@@ -782,7 +782,9 @@ public class ContainsSearch {
 				knt2++;
 			}
 		}
-		Utils.saveToFile("mod_" + targetfile, w);
+		int n = targetfile.lastIndexOf(".");
+		String newFile = targetfile.substring(0, n) + "_mod.txt";
+		Utils.saveToFile(newFile, w);
 		System.out.println("No match: " + knt2);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}

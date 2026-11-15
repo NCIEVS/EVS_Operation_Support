@@ -165,8 +165,11 @@ public class ExactMatchPlus {
 				}
 			}
 		}
-		Utils.saveToFile("mod_" + filename, w);
-		Utils.saveToFile("change_" + filename, w2);
+		int n = filename.lastIndexOf(".");
+		String newFile = filename.substring(0, n) + "_mod.txt";
+		Utils.saveToFile(newFile, w);
+		newFile = filename.substring(0, n) + "_change.txt";
+		Utils.saveToFile(newFile, w2);
 	}
 
     public static void main(String[] args) {
