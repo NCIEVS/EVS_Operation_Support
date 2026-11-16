@@ -1,10 +1,12 @@
-package gov.nih.nci.evs.restapi.io;
+package gov.nih.nci.evs.restapi.ui;
 import gov.nih.nci.evs.restapi.util.*;
 import gov.nih.nci.evs.restapi.config.*;
 import java.io.File;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 
 public class SwingComponents {
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
@@ -70,7 +72,29 @@ public class SwingComponents {
 		return dmtn;
 	}
 
-    public static JTree ceateHierarchyTree(String rootCode) {
+    public static JTree createHierarchyTree() {
+		DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode();
+		String label = "NCI Thesaurus";
+		dmtn.setUserObject(label);
+		Vector roots = hh.getRoots();
+		Vector v = new Vector();
+		for (int i=0; i<roots.size(); i++) {
+			String root = (String) roots.elementAt(i);
+			v.add(hh.getLabel(root) + "|" + root);
+		}
+		v = new SortUtils().quickSort(v);
+
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			DefaultMutableTreeNode childNode = createTreeNode((String) u.elementAt(1));
+			dmtn.add(childNode);
+		}
+        JTree tree = new JTree(dmtn);
+		return tree;
+	}
+
+    public static JTree createHierarchyTree(String rootCode) {
 		DefaultMutableTreeNode root = createTreeNode(rootCode);
         JTree tree = new JTree(root);
 		return tree;
@@ -83,16 +107,24 @@ public class SwingComponents {
 		return scrollPane;
 	}
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Directory Tree");
-        JScrollPane scrollPane = createFileScrollPane();
-        frame.add(scrollPane);
-        frame.setSize(400, 400);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-    }
+    public static void addTreeSelectionListener(JTree tree, Object component) {
+		tree.addTreeSelectionListener(new TreeSelectionListener() {
+			public void valueChanged(TreeSelectionEvent e) {
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
+				if (node != null) {
+					if (component instanceof JTextField) {
+						JTextField tf = (JTextField) component;
+						tf.setText((String) node.getUserObject());
+					} else if (component instanceof JLabel) {
+						JLabel label = (JLabel) component;
+						label.setText((String) node.getUserObject());
+					}
+					System.out.println("Node selected: " + node.getUserObject());
+				}
+			}
+		});
+	}
 
-/*
     public static void main(String[] args) {
         JFrame frame = new JFrame("Tree");
         String root = args[0];
@@ -102,5 +134,16 @@ public class SwingComponents {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
+
+/*
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Directory Tree");
+        JScrollPane scrollPane = createFileScrollPane();
+        frame.add(scrollPane);
+        frame.setSize(400, 400);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
 */
+
 }
