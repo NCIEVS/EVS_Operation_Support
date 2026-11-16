@@ -3,6 +3,7 @@ import gov.nih.nci.evs.restapi.util.*;
 import gov.nih.nci.evs.restapi.config.*;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -103,8 +104,31 @@ public class ZipUtilityUI {
 						String destDir = tf2.getText();
 						ZipUtils.unzip(zipfile, destDir);
 						int n = zipfile.lastIndexOf(File.separator);
-						String foldername = zipfile.substring(n, zipfile.length());
+						String foldername = zipfile.substring(n+1, zipfile.length());
 						label4.setText(foldername + " unzipped to folder " + tf2.getText());
+
+						JFileChooser fileChooser = new JFileChooser();
+						fileChooser.setDialogTitle("Select File");
+						File defaultDirectory = new File(destDir);
+						fileChooser.setCurrentDirectory(defaultDirectory);
+
+						fileChooser.setAcceptAllFileFilterUsed(false); // Disables Open button for all files [^2^]
+
+						// Optional: hide buttons entirely
+						fileChooser.setControlButtonsAreShown(false);
+
+						// Custom FileView to disable file selection
+						fileChooser.setFileView(new javax.swing.filechooser.FileView() {
+							@Override
+							public Boolean isTraversable(File f) {
+								// Allow traversing into directories
+								return f.isDirectory();
+							}
+						});
+
+						fileChooser.setAcceptAllFileFilterUsed(false);
+                        int userSelection = fileChooser.showOpenDialog(null);
+
 					} catch (Exception ex) {
 						label4.setText("Something goes wrong - unzip unsuccessful.");
 					}
