@@ -70,6 +70,20 @@ public class TreeDrawer {
         return w;
 	}
 
+    public static void generateHTMLTrees(String root) {
+		String hierdatafile = root + "_treedata.txt";
+		HierarchyHelper hh = new HierarchyHelper(Utils.readFile(PARENT_CHILD_FILE));
+		Vector v = hh.get_transitive_closure_v4(root);
+		Utils.saveToFile(hierdatafile, v);
+		int maxLevel = 35;
+		DynamicTreePlus.generateDynamicHTMLTree(root, maxLevel);
+		System.out.println(root + "_htmltree.html generated.");
+		String title = root + " Hierarchy";
+		String outputfile = HTMLHierarchy.run(hierdatafile, title, root);
+		outputfile = JQueryHTMLTreeGenerator.run(v, root);
+		System.out.println(outputfile + " generated.");
+	}
+
 	public static void run(String root, boolean useNCIPT) {
 		Vector w = generateHierarchyData(root, useNCIPT);
         String title = root + " Hierarchy";
