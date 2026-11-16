@@ -44,7 +44,7 @@ public class HTMLAppender {
 		Vector w = new Vector();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
-			if (line.indexOf("data-jstree") != -1) {
+			if (line.indexOf("data-jstree") != -1 || line.indexOf("show_hide") != -1) {
                  int n1 = line.lastIndexOf(">C");
                  int n2 = line.lastIndexOf("<");
                  String code = line.substring(n1+1, n2);
