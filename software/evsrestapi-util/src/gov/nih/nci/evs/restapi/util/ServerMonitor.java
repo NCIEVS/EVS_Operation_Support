@@ -17,6 +17,9 @@ import java.util.*;
 import java.util.regex.*;
 import org.json.*;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * <!-- LICENSE_TEXT_START -->
  * Copyright 2022 Guidehouse. This software was developed in conjunction
@@ -69,6 +72,7 @@ import org.json.*;
  */
 public class ServerMonitor {
     public static String SERVER_STATUS = "server_status.txt";
+    public static String newLine = "\n";
 
 	public static void query(String version) throws Exception {
 		query("NCI_Thesaurus", version);
@@ -105,9 +109,15 @@ public class ServerMonitor {
 	}
 
 	public static void run() {
+		JTextArea ta = null;
+		run(ta);
+	}
+
+	public static void run(JTextArea ta) {
         long ms = System.currentTimeMillis();
         String outputfile = SERVER_STATUS;
 		PrintWriter pw = null;
+		ta.setText("");
 
 		HashMap hmap = new HashMap();
 		Vector w = new Vector();
@@ -121,15 +131,26 @@ public class ServerMonitor {
 			Vector serviceUrl_vec = StringUtils.parseData(serviceUrls, '|');
 			String codingScheme = "NCI_Thesaurus";
 			pw.println("Default namedGraph: " + namedGraph);
+			if (ta != null) {
+				ta.append("Default namedGraph: " + namedGraph + newLine);
+			}
 			for (int i=0; i<serviceUrl_vec.size(); i++) {
 				String serviceUrl = (String) serviceUrl_vec.elementAt(i);
 				int j = i+1;
 				pw.println("(" + j + ") " + serviceUrl);
+				if (ta != null) {
+					ta.append("(" + j + ") " + serviceUrl + newLine);
+				}
 				try {
 					MetadataUtils test = new MetadataUtils(serviceUrl, namedGraph, username, password);
 					String version = test.getLatestVersion(codingScheme);
 					pw.println(codingScheme);
 					pw.println("latest version: " + version);
+                    if (ta != null) {
+						ta.append(codingScheme + newLine);
+						ta.append("latest version: " + version + newLine);
+					}
+
 					test.dumpNameVersion2NamedGraphMap(pw);
 					HashMap nameVersion2NamedGraphMap = test.getNameVersion2NamedGraphMap();
 					if (nameVersion2NamedGraphMap != null) {
@@ -137,7 +158,10 @@ public class ServerMonitor {
 					}
 
 				} catch (Exception ex) {
-					pw.println("Instantiation of MetadataUtils failed.");
+					pw.println("WARNING: Instantiation of MetadataUtils failed at " + serviceUrl);
+					if (ta != null) {
+						ta.append("WARNING: Instantiation of MetadataUtils failed at " + serviceUrl);
+					}
 				}
 			}
 
