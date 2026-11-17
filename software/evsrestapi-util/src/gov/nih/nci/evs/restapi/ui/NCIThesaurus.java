@@ -8,6 +8,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.text.*;
+import javax.swing.tree.*;
 
 public class NCIThesaurus {
 
@@ -20,6 +21,19 @@ public class NCIThesaurus {
 		String json = (String) w.elementAt(0);
 		JSONViewerTableGenerator.run(htmlfile, json);
 	}
+
+    private static DefaultMutableTreeNode searchNode(DefaultMutableTreeNode root, String nodeName) {
+        @SuppressWarnings("unchecked")
+        //Enumeration<DefaultMutableTreeNode> e = root.depthFirstEnumeration();
+        Enumeration<?> e = root.depthFirstEnumeration();
+        while (e.hasMoreElements()) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
+            if (nodeName.equalsIgnoreCase(node.toString())) {
+                return node;
+            }
+        }
+        return null; // Not found
+    }
 
     public static void main(String[] args) {
         // Create the main frame
@@ -40,6 +54,11 @@ public class NCIThesaurus {
 
         JLabel label1 = new JLabel("NCI Thesaurus");
         JTree tree = SwingComponents.createHierarchyTree();
+
+        // Get the root node from the JTree
+        TreeModel model = tree.getModel();
+        Object rootNode = model.getRoot();
+        final DefaultMutableTreeNode dmtnRoot = (DefaultMutableTreeNode) rootNode;
 
         JLabel label2 = new JLabel("Selected Concept");
         JTextField tf1 = new JTextField();
@@ -71,6 +90,31 @@ public class NCIThesaurus {
 			}
         });
 
+        JLabel label3 = new JLabel("Target");
+        JTextField tf2 = new JTextField();
+        tf2.setPreferredSize(new Dimension(600, 30));
+        JButton Btn2 = new JButton("Search");
+        Btn2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String s = e.getActionCommand();
+				label5.setText("");
+				if (s.equals("Search")) {
+					DefaultMutableTreeNode root = dmtnRoot;
+					String nodeName = tf2.getText();
+					DefaultMutableTreeNode foundNode = searchNode(root, nodeName);
+					if (foundNode != null) {
+						// Get path and expand
+						TreePath path = new TreePath(foundNode.getPath());
+						tree.expandPath(path);
+						tree.setSelectionPath(path);
+						tree.scrollPathToVisible(path);
+						System.out.println("Found and expanded: " + nodeName);
+					} else {
+						System.out.println("Node not found: " + nodeName);
+					}
+				}
+			}
+        });
 
         SwingComponents.addTreeSelectionListener(tree, tf1);
         JScrollPane scrollPane = new JScrollPane(tree);
@@ -82,6 +126,7 @@ public class NCIThesaurus {
         gbc.gridy = 0;
         gbc.insets = new Insets(3, 3, 3, 3);
         panel.add(scrollPane, gbc);
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.insets = new Insets(3, 3, 3, 3);
@@ -90,7 +135,6 @@ public class NCIThesaurus {
         gbc.gridy = 1;
         gbc.insets = new Insets(3, 3, 3, 3);
         panel.add(tf1, gbc);
-
         gbc.gridx = 2;
         gbc.gridy = 1;
         gbc.insets = new Insets(3, 3, 3, 3);
@@ -99,9 +143,22 @@ public class NCIThesaurus {
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.insets = new Insets(3, 3, 3, 3);
-        panel.add(label4, gbc);
+        panel.add(label3, gbc);
         gbc.gridx = 1;
         gbc.gridy = 2;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        panel.add(tf2, gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        panel.add(Btn2, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        panel.add(label4, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 3;
         gbc.insets = new Insets(3, 3, 3, 3);
         panel.add(label5, gbc);
         frame.add(panel);
