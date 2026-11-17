@@ -17,10 +17,25 @@ public class BrowserLauncher {
 
     public static void launch(String filepath) {
         try {
-			filepath = filepath.replace("\\", "//");
-			String url = "file:///" + filepath;
-            Desktop desktop = Desktop.getDesktop();
-            desktop.browse(new URI(url));
+			Desktop desktop = Desktop.getDesktop();
+			if (filepath.endsWith("html")) {
+				File f = new File(filepath);
+				if (f.exists()) {
+					String cwd = System.getProperty("user.dir");
+					String url = "file:///" + cwd + File.separator + filepath;
+					url = url.replace("\\", "//");
+					desktop.browse(new URI(url));
+				} else {
+					System.out.println("File not found.");
+				}
+			} else if (filepath.endsWith("xlsx") || filepath.endsWith("xls")) {
+				File excelFile = new File(filepath);
+				if (excelFile.exists()) {
+					desktop.open(excelFile); // Opens with default Excel app
+				} else {
+					System.out.println("File not found.");
+				}
+			}
         } catch (Exception e) {
             e.printStackTrace();
         }
