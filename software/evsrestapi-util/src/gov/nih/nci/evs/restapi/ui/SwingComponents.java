@@ -8,6 +8,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.text.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 public class SwingComponents {
 	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
     public static HierarchyHelper hh = null;
@@ -123,6 +128,83 @@ public class SwingComponents {
 				}
 			}
 		});
+	}
+
+	public static JTextPane createJTextPane(int x_dim, int y_dim, int fontSize, Color color) {
+		JTextPane textPane = new JTextPane();
+        textPane.setPreferredSize(new Dimension(x_dim, y_dim));
+        SimpleAttributeSet boldAttr = new SimpleAttributeSet();
+        StyleConstants.setBold(boldAttr, true);
+        StyleConstants.setFontSize(boldAttr, fontSize);
+        StyleConstants.setForeground(boldAttr, color);
+        textPane.setCharacterAttributes(boldAttr, false);
+        textPane.setText("");
+
+        SimpleAttributeSet normalAttr = new SimpleAttributeSet();
+        StyleConstants.setBold(normalAttr, false);
+        textPane.setCharacterAttributes(normalAttr, false);
+        return textPane;
+	}
+
+    public static JScrollPane createJScrollPane4JTextPane(JTextPane textPane) {
+		JScrollPane scrollPane = new JScrollPane(textPane,
+				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		return scrollPane;
+	}
+
+	public static JButton createFileChooserButton(String title, Vector extensionFilters, JTextField tf1) {
+        JButton btn1 = new JButton("Browse");
+        btn1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String s = e.getActionCommand();
+				if (s.equals("Browse")) {
+					JFileChooser fileChooser = new JFileChooser();
+					fileChooser.setDialogTitle(title);
+					File defaultDirectory = new File(System.getProperty("user.dir"));
+					fileChooser.setCurrentDirectory(defaultDirectory);
+
+                    if (extensionFilters != null) {
+						for (int i=0; i<extensionFilters.size(); i++) {
+							String t = (String) extensionFilters.elementAt(i);
+							Vector u = StringUtils.parseData(t, '|');
+							fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(
+								(String) u.elementAt(0),
+								(String) u.elementAt(1)
+								));
+						}
+					}
+
+					int userSelection = fileChooser.showOpenDialog(null);
+					if (userSelection == JFileChooser.APPROVE_OPTION) {
+						File fileToOpen = fileChooser.getSelectedFile();
+						String inputfile = fileToOpen.getAbsolutePath();
+						tf1.setText(inputfile);
+					}
+				}
+			}
+        });
+        return btn1;
+	}
+
+	public static void gridBagConstraintsLayout(GridBagConstraints gbc, int row,
+	    int numCols, Vector<JComponent> components, JPanel panel) {
+		for (int i=0; i<numCols; i++) {
+	        gbc.gridx = i;
+	        gbc.gridy = row;
+	        gbc.insets = new Insets(3, 3, 3, 3);
+	        panel.add(components.elementAt(i), gbc);
+		}
+	}
+
+	public static void gridBagConstraintsLayout(GridBagConstraints gbc, int row,
+	    int[] cols, Vector<JComponent> components, JPanel panel) {
+		for (int i=0; i<cols.length; i++) {
+	        gbc.gridx = cols[i];
+	        gbc.gridy = row;
+	        gbc.insets = new Insets(3, 3, 3, 3);
+	        panel.add(components.elementAt(i), gbc);
+		}
 	}
 
     public static void main(String[] args) {
