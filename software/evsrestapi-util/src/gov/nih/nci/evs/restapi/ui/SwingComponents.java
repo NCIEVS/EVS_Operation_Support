@@ -207,6 +207,42 @@ public class SwingComponents {
 		}
 	}
 
+	public static JPanel gridBagConstraintsLayout(GridBagConstraints gbc, int[] rows, int[] cols,
+	    Vector<JComponent> components) {
+		JPanel panel = new JPanel();
+		for (int i=0; i<components.size(); i++) {
+	        gbc.gridx = cols[i];
+	        gbc.gridy = rows[i];
+	        gbc.insets = new Insets(3, 3, 3, 3);
+	        panel.add(components.elementAt(i), gbc);
+		}
+		return panel;
+	}
+
+	public static JPanel boxHorizontalLayout(Vector<JComponent> components) {
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		//verticalPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		for (int i=0; i<components.size(); i++) {
+			Component c = (Component) components.elementAt(i);
+			panel.add(c);
+			panel.add(Box.createRigidArea(new Dimension(0, 5)));
+		}
+        return panel;
+	}
+
+	public static JPanel boxVerticalLayout(Vector<JComponent> components) {
+		JPanel verticalPanel = new JPanel();
+		verticalPanel.setLayout(new BoxLayout(verticalPanel, BoxLayout.Y_AXIS));
+		//verticalPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		for (int i=0; i<components.size(); i++) {
+			Component c = (Component) components.elementAt(i);
+			verticalPanel.add(c);
+			verticalPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+		}
+        return verticalPanel;
+	}
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("Tree");
         String root = args[0];
@@ -216,16 +252,5 @@ public class SwingComponents {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
-
-/*
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Directory Tree");
-        JScrollPane scrollPane = createFileScrollPane();
-        frame.add(scrollPane);
-        frame.setSize(400, 400);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-    }
-*/
 
 }
