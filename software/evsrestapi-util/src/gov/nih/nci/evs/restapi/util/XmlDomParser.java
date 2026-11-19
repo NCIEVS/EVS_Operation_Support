@@ -1,14 +1,18 @@
 package gov.nih.nci.evs.restapi.util;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.IOException;
+
+import java.util.*;
+import java.io.*;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.XMLConstants;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 
 /**
  * <!-- LICENSE_TEXT_START -->
@@ -62,23 +66,51 @@ import org.xml.sax.SAXException;
  */
 public class XmlDomParser {
 
-	public static Node searchNode(NodeList nodeList, String nodeName) {
+	public static Vector<Node> searchNode(NodeList nodeList, String nodeName) {
 		if (nodeList.getLength() == 0) return null;
+        Vector<Node> nodes = new Vector();
 		for (int count = 0; count < nodeList.getLength(); count++) {
 			Node tempNode = nodeList.item(count);
 			if (tempNode.getNodeName().compareTo(nodeName) == 0) {
-				return tempNode;
+				nodes.add(tempNode);
 			} else {
-				Node node = searchNode(tempNode.getChildNodes(), nodeName);
-				if (node != null && node.getNodeName().compareTo(nodeName) == 0) {
-					return node;
+				Vector<Node> node_vec = searchNode(tempNode.getChildNodes(), nodeName);
+				if (node_vec != null) {
+					nodes.addAll(node_vec);
 				}
 			}
 		}
-		return null;
+		return nodes;
 	}
 
-	private static void printNote(NodeList nodeList) {
+	public static void printNode(PrintWriter pw, NodeList nodeList) {
+		for (int count = 0; count < nodeList.getLength(); count++) {
+			Node tempNode = nodeList.item(count);
+			if (tempNode.getNodeType() == Node.ELEMENT_NODE) {
+				String line = tempNode.getNodeName() + "|" + tempNode.getTextContent();
+				if (line.length() > 0) {
+					pw.println(tempNode.getNodeName() + "|" + tempNode.getTextContent());
+				}
+				if (tempNode.hasAttributes()) {
+					// get attributes names and values
+					NamedNodeMap nodeMap = tempNode.getAttributes();
+					for (int i = 0; i < nodeMap.getLength(); i++) {
+						Node node = nodeMap.item(i);
+						line = node.getNodeName() + "|" + node.getNodeValue();
+						if (line.length() > 0) {
+							pw.println(line);
+						}
+					}
+				}
+				if (tempNode.hasChildNodes()) {
+					// loop again if has child nodes
+					printNode(pw, tempNode.getChildNodes());
+				}
+			}
+		}
+	}
+
+	public static void printNode(NodeList nodeList) {
 		for (int count = 0; count < nodeList.getLength(); count++) {
 			Node tempNode = nodeList.item(count);
 			// make sure it's element node.
@@ -86,6 +118,7 @@ public class XmlDomParser {
 				// get node name and value
 				System.out.println("\nNode Name=" + tempNode.getNodeName() + " [OPEN]");
 				System.out.println("Node Value=" + tempNode.getTextContent());
+
 				if (tempNode.hasAttributes()) {
 					// get attributes names and values
 					NamedNodeMap nodeMap = tempNode.getAttributes();
@@ -97,13 +130,12 @@ public class XmlDomParser {
 				}
 				if (tempNode.hasChildNodes()) {
 					// loop again if has child nodes
-					printNote(tempNode.getChildNodes());
+					printNode(tempNode.getChildNodes());
 				}
-				System.out.println("Node Name=" + tempNode.getNodeName() + " [CLOSE]");
+				//System.out.println("Node Name=" + tempNode.getNodeName() + " [CLOSE]");
 			}
 		}
 	}
-
 
 	public static InputStream readXmlFileIntoInputStream(String fileName) {
 		String currentDir = System.getProperty("user.dir");
@@ -119,52 +151,29 @@ public class XmlDomParser {
 	}
 
 
-	public static void main(String[] args) {
-		String xmlfile = args[0];
-		// Instantiate the Factory
+    public static void searchNodes(String xmlfile, Vector nodeNames) {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		try (InputStream is = readXmlFileIntoInputStream(xmlfile)) {
+		try (
+			InputStream is = readXmlFileIntoInputStream(xmlfile)) {
 			// parse XML file
 			DocumentBuilder db = dbf.newDocumentBuilder();
-
 			// read from a project's resources folder
 			Document doc = db.parse(is);
-
-			System.out.println("Root Element :" + doc.getDocumentElement().getNodeName());
-
-            String nodeName = "met:concise_name";
-            Node node = searchNode(doc.getChildNodes(), nodeName);
-            if (node != null) {
-				System.out.println(nodeName + ": " + node.getTextContent());
-			} else {
-				System.out.println(nodeName + ": NOT FOUND");
+			for (int i=0; i<nodeNames.size(); i++) {
+				String nodeName = (String) nodeNames.elementAt(i);
+				Vector<Node> node_vec = searchNode(doc.getChildNodes(), nodeName);
+				if (node_vec != null) {
+					for (int j=0; j<node_vec.size(); j++) {
+						Node node = (Node) node_vec.elementAt(j);
+					    System.out.println(nodeName + ": " + node.getTextContent());
+					}
+				} else {
+					System.out.println(nodeName + ": NOT FOUND");
+				}
 			}
-
-            nodeName = "met:description";
-            node = searchNode(doc.getChildNodes(), nodeName);
-            if (node != null) {
-				System.out.println(nodeName + ": " + node.getTextContent());
-			} else {
-				System.out.println(nodeName + ": NOT FOUND");
-			}
-
-            nodeName = "met:version_releaseDate";
-            node = searchNode(doc.getChildNodes(), nodeName);
-            if (node != null) {
-				System.out.println(nodeName + ": " + node.getTextContent());
-			} else {
-				System.out.println(nodeName + ": NOT FOUND");
-			}
-            nodeName = "met:map_rank_applicable";
-            node = searchNode(doc.getChildNodes(), nodeName);
-            if (node != null) {
-				System.out.println(nodeName + ": " + node.getTextContent());
-			} else {
-				System.out.println(nodeName + ": NOT FOUND");
-			}
-
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			e.printStackTrace();
 		}
 	}
+
 }
