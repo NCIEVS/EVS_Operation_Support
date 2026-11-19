@@ -13,6 +13,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  * <!-- LICENSE_TEXT_START -->
@@ -66,6 +67,109 @@ import org.w3c.dom.Node;
  */
 public class XmlDomParser {
 
+    public static Document createDocument(String filename) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            File file = new File(filename);
+            Document document = builder.parse(file);
+            return document;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+
+	public static Element getRootElement(Document document) {
+		try {
+            document.getDocumentElement().normalize();
+            // Step 3: Get the root element
+            Element root = document.getDocumentElement();
+            return root;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+
+ 	public static NodeList getElementsByTagName(Element root, String tagName) {
+		try {
+            NodeList nodeList = root.getElementsByTagName(tagName);//"owl:Axiom");
+            return nodeList;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+    }
+
+  	public static NodeList getNodeListByTagName(String filename, String tagName) {
+		try {
+			Document document = createDocument(filename);
+			return getNodeListByTagName(document, tagName);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+
+ 	public static NodeList getNodeListByTagName(Document document, String tagName) {
+		Element root = getRootElement(document);
+		NodeList nodeList = getElementsByTagName(root, tagName);
+		return nodeList;
+	}
+
+	public static void printNode(PrintWriter pw, NodeList nodeList) {
+		for (int count = 0; count < nodeList.getLength(); count++) {
+			Node tempNode = nodeList.item(count);
+			if (tempNode.getNodeType() == Node.ELEMENT_NODE) {
+				String line = tempNode.getNodeName() + "|" + tempNode.getTextContent();
+				if (line.length() > 0) {
+					if (pw != null) {
+						pw.println(tempNode.getNodeName() + "|" + tempNode.getTextContent());
+					} else {
+						System.out.println(tempNode.getNodeName() + "|" + tempNode.getTextContent());
+					}
+				}
+				if (tempNode.hasAttributes()) {
+					// get attributes names and values
+					NamedNodeMap nodeMap = tempNode.getAttributes();
+					for (int i = 0; i < nodeMap.getLength(); i++) {
+						Node node = nodeMap.item(i);
+						line = node.getNodeName() + "|" + node.getNodeValue();
+						if (line.length() > 0) {
+							if (pw != null) {
+								pw.println(line);
+							} else {
+								System.out.println(line);
+							}
+						}
+					}
+				}
+				if (tempNode.hasChildNodes()) {
+					// loop again if has child nodes
+					printNode(pw, tempNode.getChildNodes());
+				}
+			}
+		}
+	}
+
+	public static void printNode(NodeList nodeList) {
+		printNode(null, nodeList);
+	}
+
+	public static InputStream readXmlFileIntoInputStream(String fileName) {
+		String currentDir = System.getProperty("user.dir");
+		fileName = currentDir + File.separator + fileName;
+		System.out.println(fileName);
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream(new File(fileName));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return fis;
+	}
+
 	public static Vector<Node> searchNode(NodeList nodeList, String nodeName) {
 		if (nodeList.getLength() == 0) return null;
         Vector<Node> nodes = new Vector();
@@ -82,74 +186,6 @@ public class XmlDomParser {
 		}
 		return nodes;
 	}
-
-	public static void printNode(PrintWriter pw, NodeList nodeList) {
-		for (int count = 0; count < nodeList.getLength(); count++) {
-			Node tempNode = nodeList.item(count);
-			if (tempNode.getNodeType() == Node.ELEMENT_NODE) {
-				String line = tempNode.getNodeName() + "|" + tempNode.getTextContent();
-				if (line.length() > 0) {
-					pw.println(tempNode.getNodeName() + "|" + tempNode.getTextContent());
-				}
-				if (tempNode.hasAttributes()) {
-					// get attributes names and values
-					NamedNodeMap nodeMap = tempNode.getAttributes();
-					for (int i = 0; i < nodeMap.getLength(); i++) {
-						Node node = nodeMap.item(i);
-						line = node.getNodeName() + "|" + node.getNodeValue();
-						if (line.length() > 0) {
-							pw.println(line);
-						}
-					}
-				}
-				if (tempNode.hasChildNodes()) {
-					// loop again if has child nodes
-					printNode(pw, tempNode.getChildNodes());
-				}
-			}
-		}
-	}
-
-	public static void printNode(NodeList nodeList) {
-		for (int count = 0; count < nodeList.getLength(); count++) {
-			Node tempNode = nodeList.item(count);
-			// make sure it's element node.
-			if (tempNode.getNodeType() == Node.ELEMENT_NODE) {
-				// get node name and value
-				System.out.println("\nNode Name=" + tempNode.getNodeName() + " [OPEN]");
-				System.out.println("Node Value=" + tempNode.getTextContent());
-
-				if (tempNode.hasAttributes()) {
-					// get attributes names and values
-					NamedNodeMap nodeMap = tempNode.getAttributes();
-					for (int i = 0; i < nodeMap.getLength(); i++) {
-						Node node = nodeMap.item(i);
-						System.out.println("attr name: " + node.getNodeName());
-						System.out.println("attr value: " + node.getNodeValue());
-					}
-				}
-				if (tempNode.hasChildNodes()) {
-					// loop again if has child nodes
-					printNode(tempNode.getChildNodes());
-				}
-				//System.out.println("Node Name=" + tempNode.getNodeName() + " [CLOSE]");
-			}
-		}
-	}
-
-	public static InputStream readXmlFileIntoInputStream(String fileName) {
-		String currentDir = System.getProperty("user.dir");
-		fileName = currentDir + File.separator + fileName;
-		System.out.println(fileName);
-		FileInputStream fis = null;
-		try {
-			fis = new FileInputStream(new File(fileName));
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return fis;
-	}
-
 
     public static void searchNodes(String xmlfile, Vector nodeNames) {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
