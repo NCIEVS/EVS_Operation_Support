@@ -100,4 +100,32 @@ public class SerializationUtils {
 		}
 		return null;
 	}
+
+	public static void serializeVector(Vector v, String filename) {
+		try {
+			FileOutputStream file = new FileOutputStream(filename);
+			ObjectOutputStream out = new ObjectOutputStream(file);
+			out.writeObject(v);
+			out.close();
+			file.close();
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public static Vector deserializeVector(String filename) {
+		try {
+			FileInputStream file = new FileInputStream(filename);
+			ObjectInputStream in = new ObjectInputStream(file);
+			Vector v = (Vector) in.readObject();
+			in.close();
+			file.close();
+			return v;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
 }

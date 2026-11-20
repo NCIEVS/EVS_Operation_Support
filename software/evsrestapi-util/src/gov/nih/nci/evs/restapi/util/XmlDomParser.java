@@ -66,12 +66,13 @@ import org.xml.sax.SAXException;
  *
  */
 public class XmlDomParser {
+	public static String NCIT_NS = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
 
-    public static Document createDocument(String filename) {
+    public static Document createDocument(String xmlfile) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            File file = new File(filename);
+            File file = new File(xmlfile);
             Document document = builder.parse(file);
             return document;
 		} catch (Exception ex) {
@@ -102,9 +103,9 @@ public class XmlDomParser {
 		return null;
     }
 
-  	public static NodeList getNodeListByTagName(String filename, String tagName) {
+  	public static NodeList getNodeListByTagName(String xmlfile, String tagName) {
 		try {
-			Document document = createDocument(filename);
+			Document document = createDocument(xmlfile);
 			return getNodeListByTagName(document, tagName);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -119,34 +120,39 @@ public class XmlDomParser {
 	}
 
 	public static void printNode(PrintWriter pw, NodeList nodeList) {
+		String line = null;
 		for (int count = 0; count < nodeList.getLength(); count++) {
 			Node tempNode = nodeList.item(count);
 			if (tempNode.getNodeType() == Node.ELEMENT_NODE) {
-				String line = tempNode.getNodeName() + "|" + tempNode.getTextContent();
-				if (line.length() > 0) {
+				try {
+					line = tempNode.getNodeName() + "|" + tempNode.getTextContent();
 					if (pw != null) {
 						pw.println(tempNode.getNodeName() + "|" + tempNode.getTextContent());
 					} else {
 						System.out.println(tempNode.getNodeName() + "|" + tempNode.getTextContent());
 					}
+			    } catch (Exception ex) {
+					ex.printStackTrace();
 				}
+
 				if (tempNode.hasAttributes()) {
 					// get attributes names and values
 					NamedNodeMap nodeMap = tempNode.getAttributes();
 					for (int i = 0; i < nodeMap.getLength(); i++) {
 						Node node = nodeMap.item(i);
-						line = node.getNodeName() + "|" + node.getNodeValue();
-						if (line.length() > 0) {
+						try {
+							line = node.getNodeName() + "|" + node.getNodeValue();
 							if (pw != null) {
 								pw.println(line);
 							} else {
 								System.out.println(line);
 							}
+						} catch (Exception ex) {
+							ex.printStackTrace();
 						}
 					}
 				}
 				if (tempNode.hasChildNodes()) {
-					// loop again if has child nodes
 					printNode(pw, tempNode.getChildNodes());
 				}
 			}
@@ -157,59 +163,79 @@ public class XmlDomParser {
 		printNode(null, nodeList);
 	}
 
-	public static InputStream readXmlFileIntoInputStream(String fileName) {
+	public static InputStream readXmlFileIntoInputStream(String xmlfile) {
 		String currentDir = System.getProperty("user.dir");
-		fileName = currentDir + File.separator + fileName;
-		System.out.println(fileName);
+		xmlfile = currentDir + File.separator + xmlfile;
+		System.out.println(xmlfile);
 		FileInputStream fis = null;
 		try {
-			fis = new FileInputStream(new File(fileName));
+			fis = new FileInputStream(new File(xmlfile));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		return fis;
 	}
 
-	public static Vector<Node> searchNode(NodeList nodeList, String nodeName) {
-		if (nodeList.getLength() == 0) return null;
-        Vector<Node> nodes = new Vector();
-		for (int count = 0; count < nodeList.getLength(); count++) {
-			Node tempNode = nodeList.item(count);
-			if (tempNode.getNodeName().compareTo(nodeName) == 0) {
-				nodes.add(tempNode);
-			} else {
-				Vector<Node> node_vec = searchNode(tempNode.getChildNodes(), nodeName);
-				if (node_vec != null) {
-					nodes.addAll(node_vec);
-				}
-			}
-		}
-		return nodes;
+	public static void dumpElement(Element element) {
+		//printNode(PrintWriter pw, NodeList nodeList) {
+		 NodeList nodeList = element.getElementsByTagName("owl:Class");
+		 XmlDomParser.printNode(null, nodeList);
+		 /*
+         System.out.println(element.getTagName());
+         String attrValue = element.getElementsByTagName("P108").item(0).getTextContent();
+         System.out.println(attrValue);
+         //attrValue = element.getElementsByTagName("rdfs:lable").item(0).getTextContent();
+         //System.out.println(attrValue);
+         attrValue = element.getElementsByTagName("P106").item(0).getTextContent();
+         System.out.println(attrValue);
+         */
 	}
 
-    public static void searchNodes(String xmlfile, Vector nodeNames) {
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		try (
-			InputStream is = readXmlFileIntoInputStream(xmlfile)) {
-			// parse XML file
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			// read from a project's resources folder
-			Document doc = db.parse(is);
-			for (int i=0; i<nodeNames.size(); i++) {
-				String nodeName = (String) nodeNames.elementAt(i);
-				Vector<Node> node_vec = searchNode(doc.getChildNodes(), nodeName);
-				if (node_vec != null) {
-					for (int j=0; j<node_vec.size(); j++) {
-						Node node = (Node) node_vec.elementAt(j);
-					    System.out.println(nodeName + ": " + node.getTextContent());
-					}
-				} else {
-					System.out.println(nodeName + ": NOT FOUND");
-				}
-			}
-		} catch (ParserConfigurationException | SAXException | IOException e) {
-			e.printStackTrace();
-		}
+
+
+    public static String code2Id(String code) {
+		return NCIT_NS + code;
 	}
 
+    public static Vector<Element> searchElements(String xmlfile, String tagName, String attrName, String attrValue) throws Exception {
+        // Parse the document
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.parse(xmlfile);
+        doc.getDocumentElement().normalize();
+
+        NodeList inputList = doc.getElementsByTagName(tagName);
+        Vector<Element> elements = new Vector();
+        for (int i = 0; i < inputList.getLength(); i++) {
+            Element element = (Element) inputList.item(i);
+            String value = element.getAttribute(attrName);
+            if (attrValue.equals(value)) {
+                elements.add(element);
+                dumpElement(element);
+            }
+        }
+        return elements;
+	}
+
+    public static void main(String[] args) {
+		String xmlfile = args[0];
+		String id = args[1];
+		System.out.println("xmlfile: " + xmlfile);
+		System.out.println("id: " + id);
+		String tagName = "owl:Class";
+		String attrName = "rdf:about";
+		String code = "C10000";
+		String attrValue = code2Id(code);
+		System.out.println(attrValue);
+		try {
+        	Vector<Element> elements = searchElements(xmlfile, tagName, attrName, attrValue);
+        	for (int i=0; i<elements.size(); i++) {
+				Element element = (Element) elements.elementAt(i);
+				NodeList nodeList = element.getElementsByTagName(tagName);
+				printNode(null, nodeList);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 }
