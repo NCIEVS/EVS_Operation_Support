@@ -205,6 +205,7 @@ public class NCItDomParser {
 	}
 
 	public static HashMap loadClasses(String filename) { //"dom_class.txt"
+	    //return NCItDomParser.loadClasses(filename);
 		long ms = System.currentTimeMillis();
 		Vector v = Utils.readFile(filename);
 		String classId = null;
@@ -225,10 +226,17 @@ public class NCItDomParser {
 
 			String line = (String) v.elementAt(i);
 			if (line.compareTo("owl:Class|") == 0) {
-				i++;
-				line = (String) v.elementAt(i);
-				int n = line.lastIndexOf("#");
-				classId = line.substring(n+1, line.length());
+				String tmp = (String) v.elementAt(i+1);
+				Vector u = StringUtils.parseData(tmp, '|');
+				String s = (String) u.elementAt(0);
+				if (s.compareTo("rdf:about") != 0) {
+					i++;
+				} else {
+					i++;
+					line = (String) v.elementAt(i);
+					int n = line.lastIndexOf("#");
+					classId = line.substring(n+1, line.length());
+				}
 
 			} else if (line.compareTo("owl:Restriction|") == 0) {
 				String key = "owl:Restriction";
@@ -252,13 +260,9 @@ public class NCItDomParser {
 				if (hmap.containsKey(key)) {
 					w = (Vector) hmap.get(key);
 				}
-				w.add(value);
-				//System.out.println(key + " --> " + value);
-
-				if (key.compareTo("owl:onProperty") == 0) {
-					System.out.println("(1) ?????????????owl:onProperty???????????????????");
+				if (!w.contains(value)) {
+					w.add(value);
 				}
-
 				hmap.put(key, w);
 				map.put(classId, hmap);
 
@@ -268,6 +272,7 @@ public class NCItDomParser {
 				if (key.compareTo("rdfs:subClassOf") == 0) {
 					String nextLine = (String) v.elementAt(i+1);
 					if (nextLine.compareTo("owl:Restriction|") == 0) {
+						//load superclasses & restrictions
 
 					} else {
 						i++;
@@ -285,12 +290,9 @@ public class NCItDomParser {
 						if (hmap.containsKey(key)) {
 							w = (Vector) hmap.get(key);
 						}
-						w.add(value);
-
-						if (key.compareTo("owl:onProperty") == 0) {
-							System.out.println("(2) ?????????????owl:onProperty???????????????????");
+						if (!w.contains(value)) {
+							w.add(value);
 						}
-
 						hmap.put(key, w);
 						map.put(classId, hmap);
 					}
@@ -312,10 +314,8 @@ public class NCItDomParser {
 					if (hmap.containsKey(key)) {
 						w = (Vector) hmap.get(key);
 					}
-					w.add(value);
-
-					if (key.compareTo("owl:onProperty") == 0) {
-						System.out.println("(2) ?????????????owl:onProperty???????????????????");
+					if (!w.contains(value)) {
+						w.add(value);
 					}
 					hmap.put(key, w);
 					map.put(classId, hmap);
@@ -325,20 +325,8 @@ public class NCItDomParser {
 		System.out.println("" + v.size() + " out of " + v.size() + " completed.");
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
         return map;
-		//HashMap hmap = (HashMap) map.get("C99999");
-		//Utils.dumpMultiValuedHashMap("C99999", hmap);
 	}
 
-/*
-rdf:about|http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#Concept_Status-enum
-owl:equivalentClass|
-rdfs:Datatype|
-owl:oneOf|
-rdf:Description|
-rdf:type|
-rdf:resource|http://www.w3.org/1999/02/22-rdf-syntax-ns#List
-rdf:first|Concept_Pending_Approval
-*/
 	public static Vector compileDataTypes(String filename) { //"dom_datatype.txt"
 		long ms = System.currentTimeMillis();
 		Vector v = Utils.readFile(filename);
