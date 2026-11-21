@@ -120,7 +120,7 @@ public class NCItDomParser {
 		Vector v = Utils.readFile(filename);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
-			if (line.indexOf("|") != -1) {
+			if (line.indexOf("|") != -1 && !line.startsWith(" ")) {
 				w.add(line);
 			}
 		}
@@ -205,13 +205,12 @@ public class NCItDomParser {
 	}
 
 	public static HashMap loadClasses(String filename) { //"dom_class.txt"
-	    //return NCItDomParser.loadClasses(filename);
 		long ms = System.currentTimeMillis();
 		Vector v = Utils.readFile(filename);
 		String classId = null;
 
 		int lcv = 1;
-		int increment = 10000;
+		int increment = 50000;
 		int k = -1;
 
 		HashMap map = new HashMap();
@@ -235,7 +234,12 @@ public class NCItDomParser {
 					i++;
 					line = (String) v.elementAt(i);
 					int n = line.lastIndexOf("#");
-					classId = line.substring(n+1, line.length());
+					if (n != -1) {
+						classId = line.substring(n+1, line.length());
+						if (StringUtils.isNCItCode(classId)) {
+							classId = line.substring(n+1, line.length());
+						}
+					}
 				}
 
 			} else if (line.compareTo("owl:Restriction|") == 0) {
@@ -297,7 +301,7 @@ public class NCItDomParser {
 						map.put(classId, hmap);
 					}
 				} else {
-					String value = (String) u.elementAt(1);
+					String value = line.replace((String) u.elementAt(0)+"|", "");
 					if (value.length() == 0) {
 						i++;
 						line = (String) v.elementAt(i);
@@ -326,6 +330,7 @@ public class NCItDomParser {
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
         return map;
 	}
+
 
 	public static Vector compileDataTypes(String filename) { //"dom_datatype.txt"
 		long ms = System.currentTimeMillis();
@@ -523,14 +528,6 @@ public class NCItDomParser {
 							ex.printStackTrace();
 						}
 					}
-/*
-					if (pageNumber == 0) {
-						btn3a.setEnabled(false);
-					}
-
-					pageNumber++;
-					pageNumberLabel.setText("" + pageNumber);
-*/
                     btn3a.setEnabled(false);
                     btn3b.setEnabled(false);
 				}
