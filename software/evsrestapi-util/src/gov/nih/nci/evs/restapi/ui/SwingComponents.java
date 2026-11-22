@@ -243,6 +243,33 @@ public class SwingComponents {
         return verticalPanel;
 	}
 
+	public static JTextPane createJTextPane(int dim_x, int dim_y) {
+        JTextPane jt = new JTextPane();
+        jt.setPreferredSize(new Dimension(dim_y, dim_x));
+        return jt;
+	}
+
+    public static SimpleAttributeSet createSimpleAttributeSet(boolean bold, int size, Color color) {
+        SimpleAttributeSet attr = new SimpleAttributeSet();
+        StyleConstants.setBold(attr, bold);
+        StyleConstants.setFontSize(attr, size);
+        StyleConstants.setForeground(attr, color);
+        return attr;
+	}
+
+	public static JScrollPane createJScrollPane(JTextPane jt, int fontSize, Color color) {
+        StyledDocument doc = jt.getStyledDocument();
+		SimpleAttributeSet attrs = createSimpleAttributeSet(false, fontSize, color);
+		StyleConstants.setLineSpacing(attrs, 0);
+		StyleConstants.setSpaceAbove(attrs, 0);
+		StyleConstants.setSpaceBelow(attrs, 0);
+		doc.setParagraphAttributes(0, doc.getLength(), attrs, false);
+        JScrollPane scrollPane = new JScrollPane(jt);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        return scrollPane;
+	}
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("Tree");
         String root = args[0];
