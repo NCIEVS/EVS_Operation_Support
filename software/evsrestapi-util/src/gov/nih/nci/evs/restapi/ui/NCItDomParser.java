@@ -204,7 +204,7 @@ public class NCItDomParser {
 		return w;
 	}
 
-	public static HashMap loadClasses(String filename) { //"dom_class.txt"
+	public static HashMap loadDomOutput(String filename, String tagName) { //"dom_class.txt"
 		long ms = System.currentTimeMillis();
 		Vector v = Utils.readFile(filename);
 		String classId = null;
@@ -224,7 +224,7 @@ public class NCItDomParser {
 			lcv++;
 
 			String line = (String) v.elementAt(i);
-			if (line.compareTo("owl:Class|") == 0) {
+			if (line.compareTo(tagName + "|") == 0) {
 				String tmp = (String) v.elementAt(i+1);
 				Vector u = StringUtils.parseData(tmp, '|');
 				String s = (String) u.elementAt(0);
@@ -331,8 +331,20 @@ public class NCItDomParser {
         return map;
 	}
 
+	public static HashMap loadClasses(String filename) {
+	    return loadDomOutput(filename, "owl:Class");
+	}
 
-	public static Vector compileDataTypes(String filename) { //"dom_datatype.txt"
+	public static HashMap loadObjectProperties(String filename) {
+	    return loadDomOutput(filename, "owl:ObjectProperty");
+	}
+
+	public static HashMap loadAnnotatinProperties(String filename) {
+	    return loadDomOutput(filename, "owl:AnnotationProperty");
+	}
+
+
+	public static Vector compileDataTypes(String filename) {
 		long ms = System.currentTimeMillis();
 		Vector v = Utils.readFile(filename);
 
