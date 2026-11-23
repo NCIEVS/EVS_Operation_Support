@@ -82,7 +82,7 @@ public class NCItDomParser {
         Vector u = StringUtils.parseData(rootElementTagName, ':');
         String name = (String) u.elementAt(1);
         name = name.toLowerCase();
-        return name;//.substring(0, 5);
+        return name;
 	}
 
     public static String getDOMOutputName(String rootElementTagName) {
@@ -97,7 +97,7 @@ public class NCItDomParser {
 		    pw = new PrintWriter(outputfile, "UTF-8");
 		    Document document = XmlDomParser.createDocument(filename);
             NodeList nodeList = XmlDomParser.getNodeListByTagName(document, rootElementTagName);
-            System.out.println("Processsing " + rootElementTagName + " ... - Please wait.");
+            System.out.println("Processsing " + rootElementTagName + " - Please wait.");
             XmlDomParser.printNode(pw, nodeList);
             System.out.println("Done.");
         } catch (Exception ex) {
@@ -158,8 +158,10 @@ public class NCItDomParser {
 					if (quals.length() > 1) {
 						quals = quals.substring(0, quals.length()-1);
 					}
-					String t = annotatedSource + "|" + annotatedProperty + "|" + annotatedTarget + "|" + quals;
-					w.add(t);
+					//if (StringUtils.isNCItCode(annotatedSource)) {
+						String t = annotatedSource + "|" + annotatedProperty + "|" + annotatedTarget + "|" + quals;
+						w.add(t);
+					//}
 				}
 				qual_buf = new StringBuffer();
 				annotatedSource = null;
@@ -175,7 +177,7 @@ public class NCItDomParser {
 					annotatedSource = (String) u.elementAt(1);
 					int n = annotatedSource.lastIndexOf("#");
 					annotatedSource = annotatedSource.substring(n+1, annotatedSource.length());
-				} else if (s.compareTo("owl:annotatedProperty") == 0) {
+    			} else if (s.compareTo("owl:annotatedProperty") == 0) {
 					i++;
 					line = (String) v.elementAt(i);
 					u = StringUtils.parseData(line, '|');
@@ -184,8 +186,6 @@ public class NCItDomParser {
 					annotatedProperty = annotatedProperty.substring(n+1, annotatedProperty.length());
 				} else if (s.compareTo("owl:annotatedTarget") == 0) {
 					annotatedTarget = (String) u.elementAt(1);
-					int n = annotatedTarget.lastIndexOf("#");
-					annotatedTarget = annotatedTarget.substring(n+1, annotatedTarget.length());
 				} else { // qualifiers
 					line = line.replace("|", "$");
 					qual_buf.append(line).append("|");
@@ -197,8 +197,10 @@ public class NCItDomParser {
 			if (quals.length() > 1) {
 				quals = quals.substring(0, quals.length()-1);
 			}
-			String t = annotatedSource + "|" + annotatedProperty + "|" + annotatedTarget + "|" + quals;
-			w.add(t);
+			//if (StringUtils.isNCItCode(annotatedSource)) {
+				String t = annotatedSource + "|" + annotatedProperty + "|" + annotatedTarget + "|" + quals;
+				w.add(t);
+			//}
 		}
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 		return w;
