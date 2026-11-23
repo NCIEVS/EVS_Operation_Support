@@ -264,11 +264,16 @@ public class NCItDomParser {
 				if (hmap.containsKey(key)) {
 					w = (Vector) hmap.get(key);
 				}
-				if (!w.contains(value)) {
-					w.add(value);
-				}
+				w.add(value);
+				/*
 				hmap.put(key, w);
 				map.put(classId, hmap);
+				*/
+				if (classId != null) {
+					hmap.put(key, w);
+					map.put(classId, hmap);
+					if (key.compareTo("rdfs:label") == 0) classId = null;
+				}
 
 			} else {
 				Vector u = StringUtils.parseData(line, '|');
@@ -276,6 +281,8 @@ public class NCItDomParser {
 				if (key.compareTo("rdfs:subClassOf") == 0) {
 					String nextLine = (String) v.elementAt(i+1);
 					if (nextLine.compareTo("owl:Restriction|") == 0) {
+
+					} else if (nextLine.compareTo("owl:Class|") == 0) {
 						//load superclasses & restrictions
 
 					} else {
@@ -297,8 +304,12 @@ public class NCItDomParser {
 						if (!w.contains(value)) {
 							w.add(value);
 						}
-						hmap.put(key, w);
-						map.put(classId, hmap);
+						//KLO
+						if (classId != null) {
+							hmap.put(key, w);
+							map.put(classId, hmap);
+							if (key.compareTo("rdfs:label") == 0) classId = null;
+						}
 					}
 				} else {
 					String value = line.replace((String) u.elementAt(0)+"|", "");
@@ -321,14 +332,41 @@ public class NCItDomParser {
 					if (!w.contains(value)) {
 						w.add(value);
 					}
+					if (classId != null) {
+						hmap.put(key, w);
+						map.put(classId, hmap);
+						if (key.compareTo("rdfs:label") == 0) classId = null;
+					}
+					/*
 					hmap.put(key, w);
 					map.put(classId, hmap);
+					*/
 				}
 			}
 		}
 		System.out.println("" + v.size() + " out of " + v.size() + " completed.");
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
         return map;
+	}
+
+	public static void dumpDomHashMap() {
+		HashMap map = loadDomOutput("dom_class.txt", "owl:Class");
+		Iterator it = map.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			HashMap hmap = (HashMap) map.get(key);
+			Utils.dumpMultiValuedHashMap(key, hmap);
+		}
+	}
+
+	public static void dumpDomOutputHashMap(String filename, String tagName) {
+		HashMap map = loadDomOutput(filename, tagName);
+		Iterator it = map.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			HashMap hmap = (HashMap) map.get(key);
+			Utils.dumpMultiValuedHashMap(key, hmap);
+		}
 	}
 
 	public static HashMap loadClasses(String filename) {
@@ -396,8 +434,6 @@ public class NCItDomParser {
         return w;
     }
 
-
-
     public static void run(String[] args) {
         // Create the main frame
         JFrame frame = new JFrame("NCItDomParser UI");
@@ -419,10 +455,12 @@ public class NCItDomParser {
         JLabel label_0 = new JLabel("");
 
         JLabel label_a = new JLabel("Root Element Tag Name");
-		String[] tagnames = new String[3];
+		String[] tagnames = new String[5];
 		tagnames[0] = "owl:Class";
         tagnames[1] = "owl:Axiom";
         tagnames[2] = "rdfs:Datatype";
+        tagnames[3] = "owl:ObjectProperty";
+        tagnames[4] = "owl:AnnotationProperty";
 
 		JComboBox tagNameList = new JComboBox(tagnames);
 		tagNameList.setSelectedIndex(0);
@@ -715,6 +753,7 @@ public class NCItDomParser {
 
     public static void main(String[] args) {
 		run(args);
+		//dumpDomHashMap();
 	}
 
 }
