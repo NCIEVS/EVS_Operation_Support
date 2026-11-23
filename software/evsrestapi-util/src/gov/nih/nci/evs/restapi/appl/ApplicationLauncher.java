@@ -186,8 +186,8 @@ public class ApplicationLauncher {
 	public static void launch(String filepath) {
 		if (filepath.endsWith(".html")) {
 			openHTML(filepath);
-		} else if (filepath.endsWith(".txt")) {
-			launchTextPad(TEXTPAD_exe);
+		} else if (filepath.endsWith(".txt") || filepath.endsWith(".json")) {
+			launchTextPad(filepath);
 		} else if (filepath.endsWith(".xls") || filepath.endsWith(".xlsx")) {
 			OpenExcel(filepath);
 		} else {

@@ -234,7 +234,6 @@ public class SwingComponents {
 	public static JPanel boxVerticalLayout(Vector<JComponent> components) {
 		JPanel verticalPanel = new JPanel();
 		verticalPanel.setLayout(new BoxLayout(verticalPanel, BoxLayout.Y_AXIS));
-		//verticalPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		for (int i=0; i<components.size(); i++) {
 			Component c = (Component) components.elementAt(i);
 			verticalPanel.add(c);

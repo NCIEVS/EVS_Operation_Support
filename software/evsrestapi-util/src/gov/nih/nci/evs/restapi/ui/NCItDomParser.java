@@ -97,7 +97,7 @@ public class NCItDomParser {
 		    pw = new PrintWriter(outputfile, "UTF-8");
 		    Document document = XmlDomParser.createDocument(filename);
             NodeList nodeList = XmlDomParser.getNodeListByTagName(document, rootElementTagName);
-            System.out.println("Processsing ... - Please wait.");
+            System.out.println("Processsing " + rootElementTagName + " ... - Please wait.");
             XmlDomParser.printNode(pw, nodeList);
             System.out.println("Done.");
         } catch (Exception ex) {

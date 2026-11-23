@@ -25,7 +25,11 @@ import java.io.*;
 import java.util.*;
 
 public class DomPostProcessor {
-
+    static String DOM_CLASS_FILE = "dom_class.txt";
+    static String DOM_AXIOM_FILE = "dom_axiom.txt";
+    static String DOM_DATATYPE_FILE = "dom_datatype.txt";
+    static String DOM_OBJECTPROPERTY_FILE = "dom_objectproperty.txt";
+    static String DOM_ANNOTATIONPROPERTY_FILE = "dom_annotationproperty.txt";
 	public static String NCIT_NS = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#";
 
 	public static HashMap loadClasses(String filename) { //"dom_class.txt"
@@ -68,6 +72,10 @@ public class DomPostProcessor {
 
 	public static Vector generateA8File(HashMap map) {
         HashMap code2LabelMap = generateCode2LabelMap(map);
+        return generateA8File(map, code2LabelMap);
+    }
+
+	public static Vector generateA8File(HashMap map, HashMap code2LabelMap) {
 		Vector w = new Vector();
 		Vector error_vec = new Vector();
 		Iterator it = map.keySet().iterator();
@@ -139,6 +147,10 @@ public class DomPostProcessor {
 
 	public static Vector generateAssociationFile(HashMap map) {
         HashMap code2LabelMap = generateCode2LabelMap(map);
+        return generateAssociationFile(map, code2LabelMap);
+	}
+
+	public static Vector generateAssociationFile(HashMap map, HashMap code2LabelMap) {
 		Vector w = new Vector();
 		Vector error_vec = new Vector();
 		Iterator it = map.keySet().iterator();
@@ -171,6 +183,11 @@ public class DomPostProcessor {
 
 	public static Vector generateRestrictionFile(HashMap map) {
         HashMap code2LabelMap = generateCode2LabelMap(map);
+        return generateRestrictionFile(map, code2LabelMap);
+	}
+
+
+	public static Vector generateRestrictionFile(HashMap map, HashMap code2LabelMap) {
         HashMap objectPropMap = NCItDomParser.loadObjectProperties("dom_objectproperty.txt");
         HashMap propCode2LabeMap = new HashMap();
         Iterator it = objectPropMap.keySet().iterator();
@@ -260,9 +277,12 @@ public class DomPostProcessor {
 		return new SortUtils().quickSort(w);
 	}
 
-
 	public static Vector generateHierarchyDataFile(HashMap map) {
         HashMap code2LabelMap = generateCode2LabelMap(map);
+        return generateHierarchyDataFile(map, code2LabelMap);
+    }
+
+	public static Vector generateHierarchyDataFile(HashMap map, HashMap code2LabelMap) {
 		Vector w = new Vector();
 		Vector error_vec = new Vector();
 		Iterator it = map.keySet().iterator();
