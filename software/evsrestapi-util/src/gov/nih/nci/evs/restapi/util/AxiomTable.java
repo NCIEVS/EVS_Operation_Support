@@ -24,6 +24,11 @@ import org.json.*;
 
 public class AxiomTable {
 
+	static String AXIOM_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.axiomfile;
+	static String PARENT_CHILD_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.hierfile; // "parent_child.txt";
+	static String A8_FILE = ConfigurationController.reportGenerationDirectory + File.separator + ConfigurationController.subsetfile;
+
+
     public static String run(int mode, String root, String prop_code) {
 		boolean flatFormat = false;
 		return run(mode, root, prop_code, flatFormat);
@@ -38,7 +43,10 @@ public class AxiomTable {
     public static String run(int mode, String root, String prop_code, boolean flatFormat) {
 		Vector roots = new Vector();
 		roots.add(root);
-        Vector w = AxiomFileTrimmer.retrieveAxioms(AxiomFileTrimmer.getCodes(mode, roots), prop_code);
+
+		AxiomFileTrimmer axiomFileTrimmer = new AxiomFileTrimmer(AXIOM_FILE, PARENT_CHILD_FILE, A8_FILE);
+
+        Vector w = axiomFileTrimmer.retrieveAxioms(axiomFileTrimmer.getCodes(mode, roots), prop_code);
         Utils.saveToFile("axiomfile_" + root + ".txt", w);
         Vector v0 = new Vector();
 

@@ -210,8 +210,9 @@ public class ExactMatch {
 		}
 		System.out.println("w: " + w.size());
 		Utils.saveToFile(outputfile, w);
-		Utils.saveToFile("no_matches_" + outputfile, no_matches);
-		Utils.saveToFile("matches_" + outputfile, matches);
+		int n = outputfile.lastIndexOf(".");
+		Utils.saveToFile(outputfile.substring(0, n) + "_nomatches.txt", no_matches);
+		Utils.saveToFile(outputfile.substring(0, n) + "_matches.txt", matches);
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 		System.out.println(outputfile + " generated.");
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));

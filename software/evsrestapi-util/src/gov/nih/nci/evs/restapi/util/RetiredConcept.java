@@ -46,9 +46,9 @@ public class RetiredConcept {
 		System.out.println("retired_concept_set (owlscanner): " + retired_concept_set.size());
 
 		w = extractPropertyValues(CONCEPT_STATUS_CODE);
-		Utils.dumpVector(CONCEPT_STATUS_CODE, w);
+		Utils.saveToFile(CONCEPT_STATUS_CODE, w);
 
-		System.out.println("Total initializaion run time (ms): " + (System.currentTimeMillis() - ms));
+		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
 
 	public void checkRetiredCoceptStatus() {
@@ -145,87 +145,3 @@ public class RetiredConcept {
 	}
 }
 
-/*
-
-P310
-
-    <!-- http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C28428 -->
-
-
-    <owl:Class rdf:about="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C28428">
-        <owl:disjointWith rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C3910"/>
-        <owl:disjointWith rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C43431"/>
-        <owl:disjointWith rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C7057"/>
-        <owl:disjointWith rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C97325"/>
-        <NHC0>C28428</NHC0>
-        <P106>Conceptual Entity</P106>
-        <P108>Retired Concept</P108>
-        <P366>Retired_Concepts</P366>
-        <P90>All Retired Concepts</P90>
-        <P90>Retired Concept</P90>
-        <P90>Retired Concepts</P90>
-        <P90>isRetired</P90>
-        <P95>Do Not move anything here - strictly for the TDE Manager</P95>
-        <P97>Concept has been retired, and should not be used except to deal with old data.</P97>
-        <rdfs:label>Retired Concept</rdfs:label>
-    </owl:Class>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C28428"/>
-        <owl:annotatedProperty rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P90"/>
-        <owl:annotatedTarget>All Retired Concepts</owl:annotatedTarget>
-        <P383>SY</P383>
-        <P384>NCI</P384>
-    </owl:Axiom>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C28428"/>
-        <owl:annotatedProperty rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P90"/>
-        <owl:annotatedTarget>Retired Concept</owl:annotatedTarget>
-        <P383>PT</P383>
-        <P384>NCI</P384>
-    </owl:Axiom>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C28428"/>
-        <owl:annotatedProperty rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P90"/>
-        <owl:annotatedTarget>Retired Concepts</owl:annotatedTarget>
-        <P383>SY</P383>
-        <P384>NCI</P384>
-    </owl:Axiom>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C28428"/>
-        <owl:annotatedProperty rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P90"/>
-        <owl:annotatedTarget>isRetired</owl:annotatedTarget>
-        <P383>SY</P383>
-        <P384>NCI</P384>
-    </owl:Axiom>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C28428"/>
-        <owl:annotatedProperty rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P97"/>
-        <owl:annotatedTarget>Concept has been retired, and should not be used except to deal with old data.</owl:annotatedTarget>
-        <P378>NCI</P378>
-        <P379>DEFAULT_Review</P379>
-        <P380>060127</P380>
-    </owl:Axiom>
-
-
-    <!-- http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C113462 -->
-
-
-    <owl:Class rdf:about="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C113462">
-        <rdfs:subClassOf rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C28428"/>
-        <NHC0>C113462</NHC0>
-        <P106>Conceptual Entity</P106>
-        <P108>Retired Concept 2013</P108>
-        <P90>Retired Concept 2013</P90>
-        <P95>Bin for concepts retired in 2013.</P95>
-        <P98>Bin for concepts retired in 2013.</P98>
-        <rdfs:label>Retired Concept 2013</rdfs:label>
-        <owl:deprecated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</owl:deprecated>
-    </owl:Class>
-    <owl:Axiom>
-        <owl:annotatedSource rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C113462"/>
-        <owl:annotatedProperty rdf:resource="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P90"/>
-        <owl:annotatedTarget>Retired Concept 2013</owl:annotatedTarget>
-        <P383>PT</P383>
-        <P384>NCI</P384>
-    </owl:Axiom>
-*/
