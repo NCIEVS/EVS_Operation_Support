@@ -8,13 +8,13 @@ import java.util.*;
 
 public class RetiredConcept {
 	String owlfile = null;
-    static String RETIRED_CONCEPT_ROOT = "C28428";
+    public static String RETIRED_CONCEPT_ROOT = "C28428";
     OWLScanner owlscanner = null;
     HierarchyHelper hh = null;
     Vector retired_concept_codes = null;
     HashSet retired_concepts = null;
     HashSet retired_concept_set = null;
-    static String CONCEPT_STATUS_CODE = "P310";
+    public static String CONCEPT_STATUS_CODE = "P310";
 
     public RetiredConcept(String owlfile) {
 		this.owlfile = owlfile;
@@ -46,7 +46,7 @@ public class RetiredConcept {
 		System.out.println("retired_concept_set (owlscanner): " + retired_concept_set.size());
 
 		w = extractPropertyValues(CONCEPT_STATUS_CODE);
-		Utils.saveToFile(CONCEPT_STATUS_CODE, w);
+		Utils.saveToFile(CONCEPT_STATUS_CODE + ".txt", w);
 
 		System.out.println("Total run time (ms): " + (System.currentTimeMillis() - ms));
 	}
