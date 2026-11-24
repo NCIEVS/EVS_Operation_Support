@@ -41,9 +41,6 @@ public class UIHelperPlus {
 		try {
 			pw = new PrintWriter(outputfile, "UTF-8");
 			printClassStmts(pw, className);
-
-			pw.println("///////////////////////////////////////////////////////////////////////////");
-
 			String tf_i = null;
 			String btn_1 = null;
 			String btn_2 = null;
@@ -51,6 +48,7 @@ public class UIHelperPlus {
 			int btn_count = 0;
 			int combo_count = 0;
 			int label_count = 0;
+
 			for (int i=1; i<design_vec.size(); i++) {
 				String label1 = null;
 				String label2 = null;
@@ -399,22 +397,29 @@ public class UIHelperPlus {
 		}
 	}
 
-/*
-Test
-0|0|JLabel$Hierarchy Data File
-1|0|JTextField
-2|0|JButton$Browse
-3|0|JButton$View
-0|1|JLabel$Branch Data File
-1|1|JTextField
-2|1|JButton$Browse
-3|1|JButton$View
-0|2|JLabel$Report Format
-1|2|JComboBox$ASCII;Default Mutable Tree Node;MS Word;HTML
-2|2|JButton$Generate
-0|3|JButton$Browse
-1|3|JButton$View
-*/
+    public static void printRadioButtonGroup(PrintWriter pw, int btngroup_count, String[] options) {
+		try {
+			String panelLabel = "btnGroupPanel" + btngroup_count;
+			//System.out.println("JPanel " + panelLabel + " = new JPanel();");
+			pw.println("JPanel " + panelLabel + " = new JPanel();");
+			String btnGroupLabel = "btnGroup" + btngroup_count;
+			pw.println("ButtonGroup " + btnGroupLabel + " = new ButtonGroup();");
+			for (int i=0; i<options.length; i++) {
+				String btngroupId = "" + btngroup_count + "_" + i;
+				pw.println("JRadioButton btn_" + btngroupId + " = new JRadioButton(" + "\"" + options[i] + "\"" + ");");
+				pw.println("btn_" + btngroupId + " .addActionListener(new ActionListener() {");
+				pw.println("\tpublic void actionPerformed(ActionEvent e) {");
+				pw.println("\tSystem.out.println(\"Clicked!\");");
+				pw.println("}");
+				pw.println("});");
+				pw.println(btnGroupLabel + ".add(btn_" + btngroupId + ");");
+				pw.println(panelLabel + ".add(btn_" + btngroupId + ");");
+			}
+	    } catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
     public void printUIComponents(PrintWriter out) {
 		int labelCount = 0;
 		int btnCount = 0;
@@ -427,6 +432,8 @@ Test
 		String btnLabel = null;
 		String label = null;
 		String[] options = null;
+		int btngroup_count = 0;
+		String btngroup_i = null;
 
 		Vector v = Utils.readFile(DESIGN_FILE);
 		for (int i=1; i<v.size(); i++) {
@@ -473,6 +480,16 @@ Test
 				out.println("\t\t\t\"" + t + "\"};");
 				out.println("        JComboBox<String> combobox" + comboboxCount + " = new JComboBox<>(" + "options" + comboboxCount + ");");
 				out.println("        " + "combobox" + comboboxCount + ".setSelectedIndex(0);");
+			} else if (component.compareTo("ButtonGroup") == 0) {
+				btngroup_count++;
+				btngroup_i = "btngroup" + btngroup_count;
+				String valueStr = (String) u2.elementAt(1);
+				Vector u3 = StringUtils.parseData(valueStr, ';');
+				options = new String[u3.size()];
+				for (int j=0; j<u3.size(); j++) {
+					options[j] = (String) u3.elementAt(j);
+				}
+				printRadioButtonGroup(out, btngroup_count, options);
 			}
 		}
 
@@ -480,6 +497,7 @@ Test
 		btnCount = 0;
 		jtCount = 0;
 		comboboxCount = 0;
+		btngroup_count = 0;
 
 		for (int i=1; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
@@ -508,6 +526,10 @@ Test
 			} else if (component.compareTo("JComboBox") == 0) {
 				comboboxCount++;
 				out.println("        panel.add(combobox" + comboboxCount + ", gbc);");
+			} else if (component.compareTo("ButtonGroup") == 0) {
+				btngroup_count++;
+				String panelLabel = "btnGroupPanel" + btngroup_count;
+				out.println("        panel.add(" + panelLabel + ", gbc);");
 			}
 		}
 	}

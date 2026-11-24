@@ -192,6 +192,29 @@ public class UIHelper {
 		out.println("");
 	}
 
+    public static void printRadioButtonGroup(PrintWriter pw, int btngroup_count, String[] options) {
+		try {
+			String panelLabel = "btnGroupPanel" + btngroup_count;
+			//System.out.println("JPanel " + panelLabel + " = new JPanel();");
+			pw.println("JPanel " + panelLabel + " = new JPanel();");
+			String btnGroupLabel = "btnGroup" + btngroup_count;
+			pw.println("ButtonGroup " + btnGroupLabel + " = new ButtonGroup();");
+			for (int i=0; i<options.length; i++) {
+				String btngroupId = "" + btngroup_count + "_" + i;
+				pw.println("JRadioButton btn_" + btngroupId + " = new JRadioButton(" + "\"" + options[i] + "\"" + ");");
+				pw.println("btn_" + btngroupId + " .addActionListener(new ActionListener() {");
+				pw.println("\tpublic void actionPerformed(ActionEvent e) {");
+				pw.println("\tSystem.out.println(\"Clicked!\");");
+				pw.println("}");
+				pw.println("});");
+				pw.println(btnGroupLabel + ".add(btn_" + btngroupId + ");");
+				pw.println(panelLabel + ".add(btn_" + btngroupId + ");");
+			}
+	    } catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	public void printLayOutStmts(PrintWriter out) {
 		int row = 0;
 		int col = 0;
@@ -201,18 +224,23 @@ public class UIHelper {
 		int btn_count = 0;
 		int label_count = 0;
 		int combo_count = 0;
+		int btngroup_count = 0;
 		String combo_i = null;
 		String label_i = null;
 		String label_j = null;
+		String btngroup_i = null;
 
 		for (int i=1; i<design_vec.size(); i++) {
 			String btn1 = null;
 			String btn2 = null;
 			tf_i = null;
 			combo_i = null;
+			btngroup_i = null;
 
 			String line = (String) design_vec.elementAt(i);
 			System.out.println("\n" + line);
+
+			//JLabel$Mode|ButtonGroup$Default;Banch;Subset|JButton$Run
 			Vector u = StringUtils.parseData(line, '|');
 
 			String t0 = (String) u.elementAt(0);
@@ -225,8 +253,7 @@ public class UIHelper {
 			Vector u1 = StringUtils.parseData(t1, '$');
 
 			String component = (String) (String) u1.elementAt(0);
-
-			System.out.println("component: " + component);
+			System.out.println("***************************** component: " + component);
 
 			if (component.compareTo("JLabel") == 0) {
 				label = (String) (String) u1.elementAt(1);
@@ -268,14 +295,19 @@ public class UIHelper {
 					btn_count++;
 					btn_2 = "btn" + btn_count;
 				}
-			}
+			} else if (component.compareTo("ButtonGroup") == 0) {
+				btngroup_count++;
+				btngroup_i = "btngroup" + btngroup_count;
+				String values = (String) u1.elementAt(1);
+				Vector u2 = StringUtils.parseData(values, ';');
+				String[] options = new String[u2.size()];
+				for (int j=0; j<u2.size(); j++) {
+					options[i] = (String) u2.elementAt(j);
+				}
 
-			System.out.println("label_i: " + label_i);
-			System.out.println("label_j: " + label_j);
-			System.out.println("tf_i: " + tf_i);
-			System.out.println("combo_i: " + combo_i);
-			System.out.println("btn_1: " + btn_1);
-			System.out.println("btn_2: " + btn_2);
+				System.out.println("***************************** printRadioButtonGroup *****************************");
+				printRadioButtonGroup(out, btngroup_count, options);
+			}
 
 			out.println("        gbc.gridx = " + col + ";");
 			out.println("        gbc.gridy = " + row + ";");
@@ -290,6 +322,8 @@ public class UIHelper {
 				out.println("        panel.add(" + tf_i + ", gbc);");
 			} else if (component.compareTo("JComboBox") == 0) {
 				out.println("        panel.add(" + combo_i + ", gbc);");
+			} else if (component.compareTo("ButtonGroup") == 0) {
+				out.println("        panel.add(" + btngroup_i + ", gbc);");
 			} else if (component.compareTo("JLabel") == 0) {
 				out.println("        panel.add(" + label_j + ", gbc);");
 			}
@@ -429,10 +463,12 @@ public class UIHelper {
 }
 
 /* Sample ui_design.txt:
-Test
-JLabel$Hierarchy Data File|JTextField|JButton$Browse|JButton$View
-JLabel$Branch Hierarchy Data File|JTextField|JButton$Browse|JButton$View
-JLabel$Report Format|JComboBox$ASCII;Default Mutable Tree Node;MS Word;HTML|JButton$Generate
+AxiomFileUI
+JLabel$Axiom File|JTextField|JButton$Browse
+JLabel$Hierarchy File|JTextField|JButton$Browse
+JLabel$Subset (A8) File|JTextField|JButton$Browse
+JLabel$Qualifiers|JTextField
+JLabel$Mode|ButtonGroup$Default;Banch;Subset|JButton$Run
 JLabel$Status|JLabel$
 */
 
