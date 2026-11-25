@@ -11,16 +11,27 @@ import java.util.*;
 import javax.swing.text.*;
 
 public class NCItBasicStatBatchSubmitter {
+	/*
     static HashMap filenameMap = null;
     static {
 		filenameMap = new HashMap();
-		filenameMap.put("Concept", "labels.txt");
-		filenameMap.put("Axiom", "axiom_ThesaurusInferred_forTS.txt");
-		filenameMap.put("Hierarchy", "parent_child.txt");
-		filenameMap.put("Restriction", "roles.txt");
+		filenameMap.put("Concept", "Concept File");
+		filenameMap.put("Axiom", "Axiom File");
+		filenameMap.put("Hierarchy", "Hierarchy File");
+		filenameMap.put("Restriction", "Restriction File");
 		filenameMap.put("Association", "associations.txt");
 		filenameMap.put("Property", "properties.txt");
 	}
+
+
+		filenameMap = new HashMap();
+		filenameMap.put("Concept File", "labels.txt");
+		filenameMap.put("Axiom File", "axiom_ThesaurusInferred_forTS.txt");
+		filenameMap.put("Hierarchy File", "parent_child.txt");
+		filenameMap.put("Restriction File", "roles.txt");
+		filenameMap.put("Association File", "associations.txt");
+		filenameMap.put("Property File", "properties.txt");
+	*/
 
 	public NCItBasicStatBatchSubmitter() {
 		initialize();
@@ -54,11 +65,14 @@ public class NCItBasicStatBatchSubmitter {
 			if (excludeStr.compareTo("true") != 0) {
 				excludeRetired = false;
 			}
+			/*
 			String filename = (String) filenameMap.get(type);
 			Vector data_vec = Utils.readFile((String) filenameMap.get(type));
+			*/
 			String countStr = "";
 			try {
-				Vector w1 = NCItBasicStatUI.match(data_vec, pattern, excludeRetired);
+				Vector w1 = NCItBasicStatUI.match(type + " File", pattern, excludeRetired);
+				Utils.saveToFile("match_" + type.toLowerCase() + i + ".txt", w1);
 				countStr = "" + w1.size();
 		    } catch (Exception ex) {
 				ex.printStackTrace();

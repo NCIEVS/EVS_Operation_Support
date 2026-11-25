@@ -85,7 +85,6 @@ public class NCItBasicStatUI {
 		if (pattern.isEmpty()) {
 			Vector v = Utils.readFile(filename);
 			if (!excludeRetired) {
-				//return v.size();
 				return v;
 			} else {
 				int count = 0;
@@ -137,7 +136,7 @@ public class NCItBasicStatUI {
 		int count = 0;
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
-			if (excludeRetired && NCItBasicStatUI.containsRetiredCode(line)) {
+			if (excludeRetired && containsRetiredCode(line)) {
 				//System.out.println("SKIP");
 			} else {
 				Vector u2 = StringUtils.parseData(line, '|');
@@ -208,6 +207,18 @@ public class NCItBasicStatUI {
 			}
         });
 
+        JButton btn_a = new JButton("View");
+        btn_a.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String s = e.getActionCommand();
+				if (s.equals("View")) {
+					//String selected = (String) combobox1.getSelectedItem();
+					//String filename = (String) filenameMap.get(selected);
+					ApplicationLauncher.launch("match_results.txt");
+				}
+			}
+        });
+
         JButton btn3 = new JButton("Clear");
         btn3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -254,6 +265,11 @@ public class NCItBasicStatUI {
 					 System.out.println(pattern);
 					 boolean excludeRetired = btn_1_1.isSelected();
 					 System.out.println("excludeRetired? " + excludeRetired);
+					 /*
+					 String filename = (String) filenameMap.get(selected);
+					 Vector data_vec = Utils.readFile(filename);
+					 */
+
 					 Vector w = match(selected, pattern, excludeRetired);
 					 int count = w.size();
 					 tf2.setText("" + count);
@@ -305,6 +321,10 @@ public class NCItBasicStatUI {
         gbc.insets = new Insets(3, 3, 3, 3);
         panel.add(tf2, gbc);
         gbc.gridx = 2;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        panel.add(btn_a, gbc);
+        gbc.gridx = 3;
         gbc.gridy = 3;
         gbc.insets = new Insets(3, 3, 3, 3);
         panel.add(btn3, gbc);
