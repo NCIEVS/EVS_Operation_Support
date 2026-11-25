@@ -30,7 +30,7 @@ public class ZipUtilityUI {
         JLabel label3 = new JLabel("Status");
         JLabel label4 = new JLabel("");
 
-        JLabel label1 = new JLabel("Zip File");
+        JLabel label1 = new JLabel("Zip File Name (.zip)");
         JTextField tf1 = new JTextField();
         tf1.setPreferredSize(new Dimension(600, 30));
         JButton btn1 = new JButton("Browse");
@@ -136,6 +136,53 @@ public class ZipUtilityUI {
 			}
         });
 
+        JLabel label3b = new JLabel("Root Directory");
+        JTextField tf3 = new JTextField();
+        tf3.setPreferredSize(new Dimension(600, 30));
+        JButton btn4 = new JButton("Browse");
+        btn4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String s = e.getActionCommand();
+				if (s.equals("Browse")) {
+					JFileChooser fileChooser = new JFileChooser();
+					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+					fileChooser.setDialogTitle("Select File");
+					File defaultDirectory = new File(System.getProperty("user.dir"));
+					fileChooser.setCurrentDirectory(defaultDirectory);
+					int userSelection = fileChooser.showOpenDialog(null);
+					if (userSelection == JFileChooser.APPROVE_OPTION) {
+						File fileToOpen = fileChooser.getSelectedFile();
+						String inputfile = fileToOpen.getAbsolutePath();
+						tf2.setText(inputfile);
+					}
+				} else {
+				     // <Add action statements here.>
+				}
+			}
+        });
+
+        JLabel label3c = new JLabel("Name a Zip File (.zip)");
+        JTextField tf3b = new JTextField();
+        tf3b.setPreferredSize(new Dimension(600, 30));
+
+        JButton btn5 = new JButton("Zip");
+        btn5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String s = e.getActionCommand();
+				if (s.equals("Zip")) {
+					label4.setText("");
+					try {
+						String zipfile = tf3b.getText();
+						String rootDir = tf3.getText();
+						ZipUtils.zipFile(rootDir, zipfile);
+						label4.setText("Files in the " + rootDir + " zipped to " + zipfile);
+					} catch (Exception ex) {
+						label4.setText("Something goes wrong - unzip unsuccessful.");
+					}
+				}
+			}
+        });
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(3, 3, 3, 3);
@@ -169,11 +216,39 @@ public class ZipUtilityUI {
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.insets = new Insets(3, 3, 3, 3);
-        panel.add(label3, gbc);
+        panel.add(label3c, gbc);
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbc.insets = new Insets(3, 3, 3, 3);
+        panel.add(tf3b, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        panel.add(label3b, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        panel.add(tf3, gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        panel.add(btn4, gbc);
+        gbc.gridx = 3;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        panel.add(btn5, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        panel.add(label3, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        gbc.insets = new Insets(3, 3, 3, 3);
         panel.add(label4, gbc);
+
         frame.add(panel);
         // Make the frame visible
         frame.setVisible(true);

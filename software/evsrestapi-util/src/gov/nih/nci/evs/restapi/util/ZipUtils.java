@@ -116,10 +116,10 @@ public class ZipUtils {
         return v;
 	}
 
-	public static void zipFile(String rooDir, String zipfle) throws IOException {
+	public static void zipFile(String rootDir, String zipfle) throws IOException {
 		FileOutputStream fos = new FileOutputStream(zipfle);
 		ZipOutputStream zipOut = new ZipOutputStream(fos);
-		Vector v = listFilesInDirectory(rooDir);
+		Vector v = listFilesInDirectory(rootDir);
 		for (int i=0 ;i<v.size(); i++) {
 			String subfoldername = (String) v.elementAt(i);
 			File fileToZip = new File(subfoldername);
