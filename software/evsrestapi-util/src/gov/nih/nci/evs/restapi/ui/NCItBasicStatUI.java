@@ -1,7 +1,6 @@
 package gov.nih.nci.evs.restapi.ui;
 import gov.nih.nci.evs.restapi.appl.*;
 import gov.nih.nci.evs.restapi.util.*;
-//import gov.nih.nci.evs.restapi.config.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -120,14 +119,16 @@ public class NCItBasicStatUI {
 	}
 
 	public static Vector match(Vector v, String pattern, boolean excludeRetired) {
-		System.out.println("v: " + v.size());
+		if (pattern.compareTo("") == 0) return v;
 		Vector w = new Vector();
 		Vector u0 = StringUtils.parseData(pattern, '|');
 		Vector u1 = new Vector();
-		for (int i=0; i<u0.size(); i++) {
-			String t = (String) u0.elementAt(i);
-			if (t.compareTo("*") != 0) {
-				u1.add(t);
+		if (u0.size() > 0) {
+			for (int i=0; i<u0.size(); i++) {
+				String t = (String) u0.elementAt(i);
+				if (t.compareTo("*") != 0) {
+					u1.add(t);
+				}
 			}
 		}
 		if (u1.size() == 0) {
@@ -136,7 +137,7 @@ public class NCItBasicStatUI {
 		int count = 0;
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
-			if (excludeRetired && containsRetiredCode(line)) {
+			if (excludeRetired && NCItBasicStatUI.containsRetiredCode(line)) {
 				//System.out.println("SKIP");
 			} else {
 				Vector u2 = StringUtils.parseData(line, '|');
@@ -161,7 +162,6 @@ public class NCItBasicStatUI {
 		}
 		return w;
 	}
-
 
     public static void main(String[] args) {
         // Create the main frame
@@ -322,3 +322,5 @@ public class NCItBasicStatUI {
         frame.setVisible(true);
     }
 }
+
+
