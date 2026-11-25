@@ -24,18 +24,10 @@ public class NCItBasicStatUI {
 		filenameMap.put("Association File", "associations.txt");
 		filenameMap.put("Property File", "properties.txt");
 
-		Vector v = Utils.readFile("properties.txt");
-		Vector w = new Vector();
-		for (int i=0; i<v.size(); i++) {
-			String line = (String) v.elementAt(i);
-			if (line.indexOf("|P310|") != -1) {
-				w.add(line);
-			}
-		}
-		Utils.saveToFile(RETIRED_FILE, w);
+        createConceptStatusFile();
 
 		RETIRED_CONCEPTS = new HashSet();
-		v = Utils.readFile(RETIRED_FILE);
+		Vector v = Utils.readFile(RETIRED_FILE);
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
@@ -46,9 +38,25 @@ public class NCItBasicStatUI {
 		}
 		System.out.println("Number of retired concepts: " + RETIRED_CONCEPTS.size());
 
-		v = Utils.readFile("parent_child.txt");
+		createLabelFile();
+	}
+
+    public static void createConceptStatusFile() {
+		Vector v = Utils.readFile("properties.txt");
+		Vector w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (line.indexOf("|P310|") != -1) {
+				w.add(line);
+			}
+		}
+		Utils.saveToFile(RETIRED_FILE, w);
+	}
+
+    public static void createLabelFile() {
+		Vector v = Utils.readFile("parent_child.txt");
 		HashSet hset = new HashSet();
-		w = new Vector();
+		Vector w = new Vector();
 		for (int i=0; i<v.size(); i++) {
 			String line = (String) v.elementAt(i);
 			Vector u = StringUtils.parseData(line, '|');
@@ -69,7 +77,7 @@ public class NCItBasicStatUI {
 		}
 		w = new SortUtils().quickSort(w);
 		Utils.saveToFile(LABEL_FILE, w);
-		System.out.println("Number of retired concepts: " + RETIRED_CONCEPTS.size());
+		System.out.println("Number of concepts: " + w.size());
 	}
 
 	public static Vector match(String selected, String pattern, boolean excludeRetired) {
