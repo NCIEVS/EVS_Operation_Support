@@ -1,7 +1,7 @@
-package gov.nih.nci.evs.restapi.appl;
-import gov.nih.nci.evs.restapi.ui.*;
+package gov.nih.nci.evs.restapi.ui;
+import gov.nih.nci.evs.restapi.appl.*;
 import gov.nih.nci.evs.restapi.util.*;
-import gov.nih.nci.evs.restapi.config.*;
+//import gov.nih.nci.evs.restapi.config.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,8 +14,10 @@ public class NCItBasicStatUI {
     static HashMap filenameMap = null;
     static String RETIRED_FILE = "P310.txt";
     static HashSet RETIRED_CONCEPTS = null;
+    static String LABEL_FILE = "labels.txt";
     static {
 		filenameMap = new HashMap();
+		filenameMap.put("Concept File", "labels.txt");
 		filenameMap.put("Axiom File", "axiom_ThesaurusInferred_forTS.txt");
 		filenameMap.put("Hierarchy File", "parent_child.txt");
 		filenameMap.put("Restriction File", "roles.txt");
@@ -42,6 +44,31 @@ public class NCItBasicStatUI {
 				RETIRED_CONCEPTS.add((String) u.elementAt(0));
 			}
 		}
+		System.out.println("Number of retired concepts: " + RETIRED_CONCEPTS.size());
+
+		v = Utils.readFile("parent_child.txt");
+		HashSet hset = new HashSet();
+		w = new Vector();
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			Vector u = StringUtils.parseData(line, '|');
+			String parentLabel = (String) u.elementAt(0);
+			String parentCode = (String) u.elementAt(1);
+			String childLabel = (String) u.elementAt(2);
+			String childCode = (String) u.elementAt(3);
+			String t = parentLabel + "|" + parentCode;
+			if (!hset.contains(t)) {
+				hset.add(t);
+				w.add(t);
+			}
+			t = childLabel + "|" + childCode;
+			if (!hset.contains(t)) {
+				hset.add(t);
+				w.add(t);
+			}
+		}
+		w = new SortUtils().quickSort(w);
+		Utils.saveToFile(LABEL_FILE, w);
 		System.out.println("Number of retired concepts: " + RETIRED_CONCEPTS.size());
 	}
 
@@ -152,9 +179,10 @@ public class NCItBasicStatUI {
         tf1.setPreferredSize(new Dimension(600, 30));
 
         JLabel label1 = new JLabel("NCIt File");
-		String[] options1 = new String[]{
-			"Axiom File",
+		String[] options1 = new String[] {
+			"Concept File",
 			"Hierarchy File",
+			"Axiom File",
 			"Restriction File",
 			"Association File",
 			"Property File"};
@@ -171,8 +199,6 @@ public class NCItBasicStatUI {
 				}
 			}
         });
-
-
 
         JButton btn3 = new JButton("Clear");
         btn3.addActionListener(new ActionListener() {
