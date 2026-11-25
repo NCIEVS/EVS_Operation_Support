@@ -45,6 +45,89 @@ public class NCItBasicStatUI {
 		System.out.println("Number of retired concepts: " + RETIRED_CONCEPTS.size());
 	}
 
+	public static Vector match(String selected, String pattern, boolean excludeRetired) {
+		String filename = (String) filenameMap.get(selected);
+		Vector w = new Vector();
+		if (pattern.isEmpty()) {
+			Vector v = Utils.readFile(filename);
+			if (!excludeRetired) {
+				//return v.size();
+				return v;
+			} else {
+				int count = 0;
+				for (int i=0; i<v.size(); i++) {
+					String line = (String) v.elementAt(i);
+					if (!containsRetiredCode(line)) {
+						w.add(line);
+						count++;
+					}
+				}
+				return w;//count;
+			}
+		} else {
+			System.out.println("Reading " + filename);
+			Vector v = Utils.readFile(filename);
+			System.out.println("v " + v.size());
+			return match(v, pattern, excludeRetired);
+		}
+	}
+
+	public static boolean containsRetiredCode(String line) {
+		Vector u = StringUtils.parseData(line, '|');
+		for (int i=0; i<u.size(); i++) {
+			String t = (String) u.elementAt(i);
+			boolean bool = StringUtils.isNCItCode(t);
+			if (bool && RETIRED_CONCEPTS.contains(t)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static Vector match(Vector v, String pattern, boolean excludeRetired) {
+		System.out.println("v: " + v.size());
+		Vector w = new Vector();
+		Vector u0 = StringUtils.parseData(pattern, '|');
+		Vector u1 = new Vector();
+		for (int i=0; i<u0.size(); i++) {
+			String t = (String) u0.elementAt(i);
+			if (t.compareTo("*") != 0) {
+				u1.add(t);
+			}
+		}
+		if (u1.size() == 0) {
+			return v;//.size();
+		}
+		int count = 0;
+		for (int i=0; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			if (excludeRetired && containsRetiredCode(line)) {
+				//System.out.println("SKIP");
+			} else {
+				Vector u2 = StringUtils.parseData(line, '|');
+				boolean bool = true;
+				for (int j=0; j<u1.size(); j++) {
+					String t = (String) u1.elementAt(j);
+					if (!u2.contains(t)) {
+						bool = false;
+						break;
+					}
+				}
+				if (bool) {
+					// rare exception C171325|P90|P97
+					if (line.contains("|P90|P97") && pattern.compareTo("P97") == 0) {
+						//skip
+					} else {
+						count++;
+						w.add(line);
+					}
+				}
+			}
+		}
+		return w;
+	}
+
+
     public static void main(String[] args) {
         // Create the main frame
         JFrame frame = new JFrame("NCItBasicStat UI");
@@ -143,90 +226,7 @@ public class NCItBasicStatUI {
 					 Utils.saveToFile("match_results.txt", w);
 				}
 			}
-
-			public Vector match(String selected, String pattern, boolean excludeRetired) {
-				String filename = (String) filenameMap.get(selected);
-				Vector w = new Vector();
-				if (pattern.isEmpty()) {
-					Vector v = Utils.readFile(filename);
-					if (!excludeRetired) {
-						//return v.size();
-						return v;
-					} else {
-						int count = 0;
-						for (int i=0; i<v.size(); i++) {
-							String line = (String) v.elementAt(i);
-							if (!containsRetiredCode(line)) {
-								w.add(line);
-								count++;
-							}
-						}
-						return w;//count;
-					}
-				} else {
-					System.out.println("Reading " + filename);
-					Vector v = Utils.readFile(filename);
-					System.out.println("v " + v.size());
-					return match(v, pattern, excludeRetired);
-				}
-			}
-
-			public boolean containsRetiredCode(String line) {
-				Vector u = StringUtils.parseData(line, '|');
-				for (int i=0; i<u.size(); i++) {
-					String t = (String) u.elementAt(i);
-					boolean bool = StringUtils.isNCItCode(t);
-					if (bool && RETIRED_CONCEPTS.contains(t)) {
-						return true;
-					}
-				}
-				return false;
-			}
-
-			public Vector match(Vector v, String pattern, boolean excludeRetired) {
-				System.out.println("v: " + v.size());
-				Vector w = new Vector();
-				Vector u0 = StringUtils.parseData(pattern, '|');
-				Vector u1 = new Vector();
-				for (int i=0; i<u0.size(); i++) {
-					String t = (String) u0.elementAt(i);
-					if (t.compareTo("*") != 0) {
-						u1.add(t);
-					}
-				}
-				if (u1.size() == 0) {
-					return v;//.size();
-				}
-				int count = 0;
-				for (int i=0; i<v.size(); i++) {
-					String line = (String) v.elementAt(i);
-					if (excludeRetired && containsRetiredCode(line)) {
-						//System.out.println("SKIP");
-					} else {
-						Vector u2 = StringUtils.parseData(line, '|');
-						boolean bool = true;
-						for (int j=0; j<u1.size(); j++) {
-							String t = (String) u1.elementAt(j);
-							if (!u2.contains(t)) {
-								bool = false;
-								break;
-							}
-						}
-						if (bool) {
-							// rare exception C171325|P90|P97
-							if (line.contains("|P90|P97") && pattern.compareTo("P97") == 0) {
-								//skip
-							} else {
-								count++;
-								w.add(line);
-							}
-						}
-					}
-				}
-				return w;
-			}
-        });
-
+		});
 
         gbc.gridx = 0;
         gbc.gridy = 0;
