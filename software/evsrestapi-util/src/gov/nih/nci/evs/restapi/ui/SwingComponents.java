@@ -269,6 +269,114 @@ public class SwingComponents {
         return scrollPane;
 	}
 
+    public static JPanel createButtonGroupPanel(String delimitedLabels) {
+		char delim = ';';
+		return createButtonGroupPanel(delimitedLabels, delim);
+	}
+
+    public static JPanel createButtonGroupPanel(String delimitedLabels, char delim) {
+		JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+		ButtonGroup btnGroup = new ButtonGroup();
+		Vector labels = StringUtils.parseData(delimitedLabels, delim);
+		for (int i=0; i<labels.size(); i++) {
+			String label = (String) labels.elementAt(i);
+			JRadioButton btn = new JRadioButton(label);
+			if (i == 0) {
+				btn.setSelected(true);
+			}
+			btnGroup.add(btn);
+			panel.add(btn);
+		}
+		return panel;
+	}
+
+    public static java.util.List<JRadioButton> findRadioButtonByLabel(Container container, String labelText) {
+        java.util.List<JRadioButton> matches = new java.util.ArrayList<>();
+        for (Component comp : container.getComponents()) {
+            if (comp instanceof JRadioButton) {
+                JRadioButton cb = (JRadioButton) comp;
+                if (labelText.equals(cb.getText())) {
+                    matches.add(cb);
+                }
+            } else if (comp instanceof Container) {
+                // Recursively search nested containers
+                matches.addAll(findRadioButtonByLabel((Container) comp, labelText));
+            }
+        }
+        return matches;
+    }
+
+    public static void addRadioButtonActionListener(JFrame f, String delimitedLabels, char delim) {
+		Vector labels = StringUtils.parseData(delimitedLabels, delim);
+		for (int i=0; i<labels.size(); i++) {
+			String label = (String) labels.elementAt(i);
+			java.util.List<JRadioButton> btns = findRadioButtonByLabel(f.getContentPane(), label);
+			for (int j=0; j<btns.size(); j++) {
+				JRadioButton btn = (JRadioButton) btns.get(j);
+				btn.addActionListener(e -> {
+					if (e.getID() == ActionEvent.ACTION_PERFORMED) {
+						System.out.println("User clicked button " + label);//e.getID());
+					}
+				});
+			}
+		}
+	}
+
+    public static JPanel createCheckBoxPanel(String delimitedLabels) {
+		char delim = ';';
+		return createCheckBoxPanel(delimitedLabels, delim);
+	}
+
+    public static JPanel createCheckBoxPanel(String delimitedLabels, char delim) {
+		JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+		Vector labels = StringUtils.parseData(delimitedLabels, delim);
+		for (int i=0; i<labels.size(); i++) {
+			String label = (String) labels.elementAt(i);
+			JCheckBox checkBox = new JCheckBox(label);
+			checkBox.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					String s = e.getActionCommand();
+				}
+			});
+			p.add(checkBox);
+		}
+		return p;
+	}
+
+    // Method to find all JCheckBoxes with a given label text
+    public static java.util.List<JCheckBox> findCheckBoxesByLabel(Container container, String labelText) {
+        java.util.List<JCheckBox> matches = new java.util.ArrayList<>();
+        for (Component comp : container.getComponents()) {
+            if (comp instanceof JCheckBox) {
+                JCheckBox cb = (JCheckBox) comp;
+                if (labelText.equals(cb.getText())) {
+                    matches.add(cb);
+                }
+            } else if (comp instanceof Container) {
+                // Recursively search nested containers
+                matches.addAll(findCheckBoxesByLabel((Container) comp, labelText));
+            }
+        }
+        return matches;
+    }
+
+    public static void addCheckBoxActionListener(JFrame f, String delimitedLabels, char delim) {
+		Vector labels = StringUtils.parseData(delimitedLabels, delim);
+		for (int i=0; i<labels.size(); i++) {
+			String label = (String) labels.elementAt(i);
+			java.util.List<JCheckBox> checkBoxes = findCheckBoxesByLabel(f.getContentPane(), label);
+			for (int j=0; j<checkBoxes.size(); j++) {
+				JCheckBox checkbox = (JCheckBox) checkBoxes.get(j);
+				checkbox.addActionListener(e -> {
+					if (e.getID() == ActionEvent.ACTION_PERFORMED) {
+						System.out.println("User clicked checkbox " + label);//e.getID());
+					}
+				});
+			}
+		}
+	}
+
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("Tree");
         String root = args[0];
