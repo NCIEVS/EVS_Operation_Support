@@ -322,6 +322,14 @@ public class SwingComponents {
 		}
 	}
 
+	public static JRadioButton findRadioButtonByLabel(JFrame f, String label) {
+		java.util.List<JRadioButton> btns = findRadioButtonByLabel(f.getContentPane(), label);
+		if (btns.size() > 0) {
+			return (JRadioButton) btns.get(0);
+		}
+		return null;
+	}
+
     public static JPanel createCheckBoxPanel(String delimitedLabels) {
 		char delim = ';';
 		return createCheckBoxPanel(delimitedLabels, delim);
@@ -376,6 +384,13 @@ public class SwingComponents {
 		}
 	}
 
+	public static JCheckBox findCheckBoxByLabel(JFrame f, String label) {
+		java.util.List<JCheckBox> checkBoxes = findCheckBoxesByLabel(f.getContentPane(), label);
+		if (checkBoxes.size() > 0) {
+			return (JCheckBox) checkBoxes.get(0);
+		}
+		return null;
+	}
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Tree");
