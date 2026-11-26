@@ -392,6 +392,15 @@ public class SwingComponents {
 		return null;
 	}
 
+    public static JPanel createButtonPanel(Vector<Component> components) {
+		JPanel btnPanel = new JPanel();
+		btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.PAGE_AXIS));
+		for (int i=0; i<components.size(); i++) {
+			btnPanel.add((Component) components.elementAt(i));
+		}
+		return btnPanel;
+	}
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("Tree");
         String root = args[0];
