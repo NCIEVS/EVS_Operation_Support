@@ -401,6 +401,25 @@ public class SwingComponents {
 		return btnPanel;
 	}
 
+    public static JButton createFileChooserButton(String title, String filterStr, JTextField tf) {
+		char delim = ';';
+		return createFileChooserButton(title, filterStr, delim, tf);
+	}
+
+    public static JButton createFileChooserButton(String title, String filterStr, char delim, JTextField tf) {
+        Vector filters = StringUtils.parseData(filterStr, delim);
+	    JButton btn = SwingComponents.createFileChooserButton(title, filters, tf);
+	    return btn;
+	}
+
+    public static JScrollPane createScrollPane(int dim_x, int dim_y) {
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setPreferredSize(new Dimension(dim_x, dim_y));
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	    return scrollPane;
+	}
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("Tree");
         String root = args[0];

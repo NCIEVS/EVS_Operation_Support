@@ -1,7 +1,7 @@
 package gov.nih.nci.evs.restapi.ui;
 import gov.nih.nci.evs.restapi.appl.*;
 import gov.nih.nci.evs.restapi.util.*;
-import gov.nih.nci.evs.restapi.config.*;
+//import gov.nih.nci.evs.restapi.config.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -82,7 +82,7 @@ public class FileFinder {
      * Appends a line of text to the JTextPane.
      * Handles newline insertion and scrolls to the bottom.
      */
-    private static void appendLine(JTextPane textPane, String line) {
+    public static void appendLine(JTextPane textPane, String line) {
         StyledDocument doc = textPane.getStyledDocument();
         try {
             // Ensure newline if there is already content
@@ -125,8 +125,12 @@ public class FileFinder {
 					JFileChooser fileChooser = new JFileChooser();
 					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					fileChooser.setDialogTitle("Select File");
-					File defaultDirectory = new File(System.getProperty("user.dir"));
-					fileChooser.setCurrentDirectory(defaultDirectory);
+					try {
+						File defaultDirectory = new File(System.getProperty("user.dir"));
+						fileChooser.setCurrentDirectory(defaultDirectory);
+					} catch (Exception ex) {
+
+					}
 					int userSelection = fileChooser.showOpenDialog(null);
 					if (userSelection == JFileChooser.APPROVE_OPTION) {
 						File fileToOpen = fileChooser.getSelectedFile();
@@ -164,16 +168,19 @@ public class FileFinder {
 				     String target = (String) u.elementAt(0);
 				     Vector file_found = find(new File(rootDir), target);
 				     if (file_found.size() == 0) {
-						JOptionPane.showMessageDialog(frame,
+						 JOptionPane.showMessageDialog(frame,
 							"No file found.",
 							"No file found",
 							JOptionPane.INFORMATION_MESSAGE);
-						label5.setText("No file found.");
-						jt.setText("");
-						return;
+						 label5.setText("No file found.");
+						 return;
+					 } else {
+						 label5.setText("" + file_found.size() + " files found.");
+						 jt.setText("");
 					 }
 
 				     Utils.dumpVector(rootDir, file_found);
+				     appendLine(jt, target);
 				     for (int i=0; i<file_found.size(); i++) {
 						 String filepath = (String) file_found.elementAt(i);
 						 appendLine(jt, filepath);
