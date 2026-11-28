@@ -35,6 +35,26 @@ public class UIHelperPlus {
 		className = (String) design_vec.elementAt(0);
 	}
 
+    public static void convert(String inputfile, String outputfile) {
+		String ui_design = inputfile;
+		Vector v = Utils.readFile(ui_design);
+		Vector w = new Vector();
+		w.add((String) v.elementAt(0));
+		for (int i=1; i<v.size(); i++) {
+			String line = (String) v.elementAt(i);
+			//JLabel$Hierarchy Data File|JTextField|JButton$Browse|JButton$View
+			Vector u = StringUtils.parseData(line, '|');
+			int row = i-1;
+			int col = 0;
+			for (int j=0; j<u.size(); j++) {
+				String t = "" + row + "|" + col + "|" + (String) u.elementAt(j);
+				col++;
+				w.add(t);
+			}
+		}
+		Utils.saveToFile(outputfile, w);
+    }
+
     public void run() {
 		PrintWriter pw = null;
 		String outputfile = className + ".java";
@@ -554,6 +574,7 @@ public class UIHelperPlus {
 		}
 	}
 
+/*
 	public static void main(String[] args) {
 		String designFile = DESIGN_FILE;
 		if (args.length == 1) {
@@ -561,7 +582,13 @@ public class UIHelperPlus {
 		}
 		new UIHelperPlus(designFile).generate();
 	}
-
+*/
+    public static void main(String[] args) {
+		String designFile = args[0];
+		String altDesignFile = "alt_" + designFile;
+		convert(designFile, altDesignFile);
+		new UIHelperPlus(altDesignFile).generate();
+	}
 }
 
 /* Sample ui_design.txt:
